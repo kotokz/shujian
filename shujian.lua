@@ -3794,7 +3794,7 @@ function shujian_set()
     l_result = utils.msgbox("是否自动学习及领悟", "XuexiLingwu",
                             "yesno", "?", 1)
     if l_result and l_result == "yes" then
-        flag.autoxuexi = 1
+      flag.autoxuexi = 1
     else
         flag.autoxuexi = 0
     end

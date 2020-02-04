@@ -2103,12 +2103,12 @@ end
 
 function wait_busy()
     while true do
-        wait.time(0.4)
         exe('bei bei bei')
         local l, w = wait.regexp(
                          '^(> )*(你现在已经组合|你已准备有一种技能了|你至少不会这两种拳脚技能的其中之一)',
                          1)
         if l ~= nil then break end
+        wait.time(0.4)
     end
 end
 

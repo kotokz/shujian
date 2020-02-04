@@ -90,44 +90,22 @@ end
 function xuncheng_go()
     DeleteTemporaryTriggers()
     if hp.neili_lim <= hp.neili_max then Execute('yun jingli') end
-    if hp.jingxue >= hp.jingxue_max * 0.5 then
-        -- Execute('#8(du book)')
-    end
+    -- if hp.jingxue >= hp.jingxue_max * 0.5 then
+    --     -- Execute('#8(du book)')
+    -- end
     Execute('hp')
     wait.make(function()
-        wait.time(2)
-        exe('yun jing;du book')
-        if hp.jingli > 100 then
-            i = i + 1
-            xuncheng_step()
-        else
-            xuncheng_wait()
-        end
-    end)
-end
-function xuncheng_step()
-    Execute(xuncheng[i])
-    if i < 13 then
-        -- Execute('dazuo 30')
-        wait.make(function()
+        for key, step in ipairs(xuncheng) do
+            wait.time(2)
+            Execute(step)
             wait.time(1)
             exe('yun jing;du book')
             wait_busy()
-            xuncheng_go()
-        end)
-    else
+        end
         xuncheng_task()
-    end
-end
-function xuncheng_wait()
-    wait.make(function()
-        wait.time(1)
-        exe('yun jing;du book')
-        -- Execute('dazuo '..hp.dazuo)
-        wait_busy()
-        xuncheng_go()
     end)
 end
+
 function xuncheng_task()
     DeleteTemporaryTriggers()
     create_triggerex_f('xuncheng_task1',
@@ -211,7 +189,6 @@ function xuncheng_task_wait()
     wait.make(function()
         wait_busy()
         DeleteTemporaryTriggers()
-        wait.time(1)
         Execute('hp;w')
         wait_busy()
         xuncheng_task()
@@ -220,8 +197,11 @@ end
 
 function xuncheng_check()
     DeleteTemporaryTriggers()
-    Execute('cha;score;yun jingli;hp')
-    check_bei(xuncheng_checkpot)
+    wait.make(function()
+        Execute('cha;score;yun jingli;hp')
+        wait_busy()
+        xuncheng_checkpot()
+    end)
 end
 function xuncheng_checkpot()
     if hp.pot >= hp.pot_max * 6 / 7 then
@@ -233,7 +213,9 @@ function xuncheng_checkpot()
             return go(check_xuexi, "大理城", "茶馆")
             -- return go(xuexi,"大理城","茶馆")
         else
-            return checkWait(xuncheng_check, 5)
+            wait.time(5)
+            return xuncheng_check()
+            -- return checkWait(xuncheng_check, 5)
         end
     else
         return xuncheng_start()

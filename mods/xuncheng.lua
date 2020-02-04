@@ -200,18 +200,15 @@ function xuncheng_task_wait()
     if hp.exp and hp.exp > 300000 then
         if xctuna == 1 then
             Execute('e;yun jing;tuna ' .. hp.jingxue / 2)
-            return check_busy(xuncheng_task_goon)
         else
             Execute('e;yun qi;dazuo ' .. hp.dazuo)
-            return check_busy(xuncheng_task_goon)
         end
     elseif hp.exp > 100000 and hp.qixue < hp.dazuo then
         Execute('e;yun qi;dazuo ' .. hp.dazuo)
-        return check_busy(xuncheng_task_goon)
     else
         Execute('e;dazuo ' .. hp.dazuo)
-        return check_busy(xuncheng_task_goon)
     end
+    return check_busy(xuncheng_task_goon)
 end
 function xuncheng_task_goon()
     DeleteTemporaryTriggers()

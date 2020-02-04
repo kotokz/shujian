@@ -205,13 +205,11 @@ function xuncheng_task_wait()
             Execute('e;yun qi;dazuo ' .. hp.dazuo)
             return check_busy(xuncheng_task_goon)
         end
+    elseif hp.exp > 100000 and hp.qixue < hp.dazuo then
+        Execute('e;yun qi;dazuo ' .. hp.dazuo)
+        return check_busy(xuncheng_task_goon)
     else
-        if hp.qixue > hp.dazuo and hp.exp > 100000 then
-            Execute('e;dazuo ' .. hp.dazuo)
-        else
-            Execute('e;yun qi;dazuo ' .. hp.dazuo)
-        end
-
+        Execute('e;dazuo ' .. hp.dazuo)
         return check_busy(xuncheng_task_goon)
     end
 end

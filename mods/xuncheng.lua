@@ -77,7 +77,8 @@ function xuncheng_join()
         Execute('e;#4s;#4e;#3n;e')
         Execute('s;ask fu sigui about join')
         wait.time(2)
-        check_busy(xuncheng_join_back)
+        wait_busy()
+        xuncheng_join_back()
     end)
 end
 function xuncheng_join_back()
@@ -111,7 +112,8 @@ function xuncheng_step()
         wait.make(function()
             wait.time(1)
             exe('yun jing;du book')
-            check_busy(xuncheng_go)
+            wait_busy()
+            xuncheng_go()
         end)
     else
         xuncheng_task()
@@ -122,7 +124,8 @@ function xuncheng_wait()
         wait.time(1)
         exe('yun jing;du book')
         -- Execute('dazuo '..hp.dazuo)
-        check_busy(xuncheng_go)
+        wait_busy()
+        xuncheng_go()
     end)
 end
 function xuncheng_task()
@@ -204,17 +207,17 @@ function xuncheng_task_wait()
     else
         Execute('e;dazuo ' .. hp.dazuo)
     end
-    return check_busy(xuncheng_task_goon)
-end
-function xuncheng_task_goon()
-    DeleteTemporaryTriggers()
+
     wait.make(function()
+        wait_busy()
+        DeleteTemporaryTriggers()
         wait.time(1)
         Execute('hp;w')
-        check_busy(xuncheng_task)
+        wait_busy()
+        xuncheng_task()
     end)
-
 end
+
 function xuncheng_check()
     DeleteTemporaryTriggers()
     Execute('cha;score;yun jingli;hp')

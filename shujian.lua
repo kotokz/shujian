@@ -331,7 +331,8 @@ function main()
     -- ain
     Openfpk()
     map.rooms["sld/lgxroom"].ways["#outSld"] = "huanghe/huanghe8"
-    exe('down;alias askk ask $*;stand;halt;uweapon;score;cha;hp;jifa all;jiali max;unset no_kill_ap;cond;pfmset')
+    exe(
+        'down;alias askk ask $*;stand;halt;uweapon;score;cha;hp;jifa all;jiali max;unset no_kill_ap;cond;pfmset')
     if not perform.skill or not perform.pre or not job.zuhe or
         countTab(job.zuhe) < 2 then
         return shujian_set()
@@ -2100,6 +2101,17 @@ function beiUnarmedSkill()
     return l_skill
 end
 
+function wait_busy()
+    while true do
+        wait.time(0.4)
+        exe('bei bei bei')
+        local l, w = wait.regexp(
+                         '^(> )*(你现在已经组合|你已准备有一种技能了|你至少不会这两种拳脚技能的其中之一)',
+                         1)
+        if l ~= nil then break end
+    end
+end
+
 function check_busy(func, p_cmd)
     disWait()
     DeleteTriggerGroup("check_bei")
@@ -3794,7 +3806,7 @@ function shujian_set()
     l_result = utils.msgbox("是否自动学习及领悟", "XuexiLingwu",
                             "yesno", "?", 1)
     if l_result and l_result == "yes" then
-      flag.autoxuexi = 1
+        flag.autoxuexi = 1
     else
         flag.autoxuexi = 0
     end

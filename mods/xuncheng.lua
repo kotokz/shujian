@@ -14,7 +14,6 @@ xuncheng = {
     [13] = 's;n;w;s;n;w;e;n;w;e;n;w;e;n;w;e;n;w;yun jingli'
 }
 
-local i = 0
 local xctuna = 0
 
 function xunCheng()
@@ -36,13 +35,12 @@ function xuncheng_start()
     if hp.exp and hp.exp > 2000000 then
         return fullNeili()
     else
-        i = 0
         create_trigger_f('xuncheng_start1',
                          "^>*\\s*你向朱丹臣打听有关『巡城』的消息。",
                          '', 'xuncheng_accept')
         create_trigger_f('xuncheng_start2', "^>*\\s*这里没有这个人。",
                          '', 'xuncheng_nobody')
-        Execute('unset 积蓄;nick 巡城中;ask zhu danchen about 巡城')
+        Execute('unset 积蓄;ask zhu danchen about 巡城')
         create_timer_s('walkWait4', 1.0, 'xuncheng_askagain')
     end
 end

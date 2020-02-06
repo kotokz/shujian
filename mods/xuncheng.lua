@@ -176,15 +176,16 @@ function xunchengxi()
     end)
 end
 function xuncheng_task_wait()
-    if hp.exp and hp.exp > 300000 and xctuna == 1 then
-        Execute('e;yun jing;tuna ' .. hp.jingxue / 2)
-    elseif hp.exp > 100000 and hp.qixue < hp.dazuo then
-        Execute('e;yun qi;dazuo ' .. hp.dazuo)
-    else
-        Execute('e;dazuo ' .. hp.dazuo)
-    end
-
     wait.make(function()
+        if hp.exp and hp.exp > 300000 and xctuna == 1 then
+            Execute('e;yun jing;tuna ' .. hp.jingxue / 2)
+        elseif hp.exp > 100000 and hp.qixue < hp.dazuo then
+            Execute('e;yun qi;dazuo ' .. hp.dazuo)
+        elseif hp.qixue < hp.dazuo and score.party == "Ø¤°ï" then
+            Execute('e;sleep')
+        else
+            Execute('e;dazuo ' .. hp.dazuo)
+        end
         wait_busy()
         DeleteTemporaryTriggers()
         Execute('hp;w')

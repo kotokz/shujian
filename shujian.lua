@@ -985,7 +985,11 @@ function xuexiSleep()
     if score.party and score.party == "Ã˙’∆∞Ô" and score.gender == '≈Æ' then
         return go(xuexiSleepOver, "Ã˙’∆…Ω", "≈Æ–›œ¢ “")
     end
-    return xuexiFinish()
+    if score.party and score.party == "ÿ§∞Ô" then
+        return go(xuexiSleepOver, "chengdu/houyuan", "")
+    else
+        return xuexiFinish()
+    end
 end
 function xxSleepcheck()
     exe('give caihua 1 coin')

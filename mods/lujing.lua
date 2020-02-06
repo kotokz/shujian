@@ -823,7 +823,9 @@ function go_confirm()
           chats_locate('定位系统：从【'.. sour.area .. sour.room ..'】出发，未达目的地【'..dest.area .. dest.room ..'】，终点为【'.. locl.area .. locl.room ..'】！','cyan')
        end
        flag.go=0
-       return road.act()
+       if road.act ~= nil then          
+          return road.act()
+       end
     else
        return go(road.act)
     end

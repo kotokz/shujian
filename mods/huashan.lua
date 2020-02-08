@@ -112,9 +112,13 @@ function hsaskjob()
 end
 function job_huashan()
     EnableTriggerGroup("huashan_ask", true)
-    exe('ask yue buqun about job')
-    DeleteTimer("walkWait4")
-    create_timer_s('walkWait4', 1.0, 'huashan_ask_test')
+
+    wait.make(function()
+        wait_busy()
+        exe('ask yue buqun about job')
+        DeleteTimer("walkWait4")
+        create_timer_s('walkWait4', 1.0, 'huashan_ask_test')
+    end)
 end
 huashan_ask_test = function() exe('ask yue buqun about job') end
 function huashan_trigger()

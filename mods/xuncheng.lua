@@ -97,7 +97,7 @@ function xuncheng_go()
             wait.time(2)
             Execute(step)
             wait.time(1)
-            exe('yun jing;du book')
+            exe('yun jing')
             wait_busy()
         end
         xuncheng_task()

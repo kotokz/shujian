@@ -496,7 +496,7 @@ function hqgzcFinishT()
     EnableTimer('walkWait4', false)
     DeleteTimer("walkWait4")
     EnableTriggerGroup("hqgzcFinish", true)
-    if hqgzcjl and hqgzcjl * 1 == 0 then
+    if hqgzcjl and hqgzcjl ~= 1 then
         wait.make(function()
             wait.time(3)
             exe('ask hong qigong about »Æ½ð½±Àø')

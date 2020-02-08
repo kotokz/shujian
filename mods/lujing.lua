@@ -75,44 +75,106 @@ local ItemGet = {
 }
 
 
+-- function exe(cmd)
+-- 	cmdck=0
+-- 	cmd_check()
+--     if GetConnectDuration() == 0 then
+--        return Connect()
+--     end
+--     if cmd==nil then
+--         if locl.room=='明霞门' or locl.room=='猛虎营' or locl.room=='佛照门' or locl.room_relation=='街道｜猛虎营-----街道-----招财大车店｜明霞门街道' then
+-- 			return walk_wait()
+--         end 
+--         cmd='look' 
+--     end
+-- --	   if locl.area and locl.area~="峨嵋山" then
+-- --       Execute('halt')
+-- --   end
+--         Execute(cmd)
+-- 		--print(cmd..' '..check_step_num..' '..check_steptest)
+--         check_steptest=1
+-- 	    if string.find(cmd,';') then
+-- 	        _check_step_num=utils.split(cmd,';')
+-- 			check_steptest=table.getn(_check_step_num)
+-- 	    end
+-- 		check_step_num=check_step_num+check_steptest
+-- 		if check_step_num>71 then
+-- 			need_waittime=1
+--            	    step_docheck()
+-- 	            wait.make(function() 
+--                     wait.time(road.wait)
+--                     --Execute(cmd) 
+-- 				    step_docheckdo()
+--                 end)
+--         else
+-- 			need_waittime=0
+-- 			road.wait=0.2
+-- 			--Execute(cmd)
+-- 		end
+		
+-- end
+l_CmdCnt=0
+lstCmdSend={}
+lstCmdSendTime={}
+max_cmd = 100
+
 function exe(cmd)
-	cmdck=0
-	cmd_check()
     if GetConnectDuration() == 0 then
        return Connect()
     end
-    if cmd==nil then
-        if locl.room=='明霞门' or locl.room=='猛虎营' or locl.room=='佛照门' or locl.room_relation=='街道｜猛虎营-----街道-----招财大车店｜明霞门街道' then
-			return walk_wait()
-        end 
-        cmd='look' 
+
+    if job.name and job.name=="huashan" and job.id and string.find(cmd,job.id) then return Execute(cmd) end
+
+    if cmd==nil then cmd='look' end
+        local l_strCmd=cmd..';'
+        local l_thisCmdCnt=0
+        for v in string.gmatch(l_strCmd,"[^;];") do
+            --print(v)
+                l_thisCmdCnt=l_thisCmdCnt+1
     end
---	   if locl.area and locl.area~="峨嵋山" then
---       Execute('halt')
---   end
-        Execute(cmd)
-		--print(cmd..' '..check_step_num..' '..check_steptest)
-        check_steptest=1
-	    if string.find(cmd,';') then
-	        _check_step_num=utils.split(cmd,';')
-			check_steptest=table.getn(_check_step_num)
-	    end
-		check_step_num=check_step_num+check_steptest
-		if check_step_num>71 then
-			need_waittime=1
-           	    step_docheck()
-	            wait.make(function() 
-                    wait.time(road.wait)
-                    --Execute(cmd) 
-				    step_docheckdo()
-                end)
+        local l_waitTime=0.0001
+    -- print(l_thisCmdCnt)
+        local l_curTime=socket.gettime()
+        local l_lenTable=table.getn(lstCmdSend)
+        for i=1,l_lenTable -1 do
+            local l_tmp1=lstCmdSend[l_lenTable]-lstCmdSend[i]+l_thisCmdCnt
+                local l_tmp2=l_curTime-lstCmdSendTime[i]
+            if  l_tmp1>max_cmd and l_tmp2 < (l_tmp1/75.0)*3 then
+                if  (l_tmp1/100.0)*3-l_tmp2 > l_waitTime then
+                    l_waitTime=(l_tmp1/100.0)*3-l_tmp2
+                end
+            end
+        end
+        -- print('l_waitTime='..l_waitTime)
+        if (l_waitTime>0.01) then
+            print('trigged flood detect,l_waitTime='..l_waitTime)
+            EnableTimer('walkwait',false)
+            wait.make(function()
+                wait.time(l_waitTime)
+                Execute(cmd)
+                if road.i<=table.getn(road.detail) and flag.walkwait then 
+                    EnableTimer('walkwait',true) 
+                end
+            end)
         else
-			need_waittime=0
-			road.wait=0.2
-			--Execute(cmd)
-		end
-		
+             Execute(cmd)
+        end
+        if l_thisCmdCnt<5 then
+            l_CmdCnt=l_CmdCnt+l_thisCmdCnt
+            lstCmdSend[l_lenTable]=l_CmdCnt
+            lstCmdSendTime[l_lenTable]=l_curTime
+        else
+            if  table.getn(lstCmdSend)>=10 then
+                table.remove(lstCmdSend,1)
+                table.remove(lstCmdSendTime,1)
+            end
+            l_CmdCnt=l_CmdCnt+l_thisCmdCnt
+            table.insert(lstCmdSend,l_CmdCnt)
+            table.insert(lstCmdSendTime,l_curTime)
+        end
+        -- print("curTime="..l_curTime.."    cmd="..cmd.."    l_CmdCnt="..l_CmdCnt)
 end
+
 function cmd_check()
     cmdck=1
 	create_timer_s('cmdckk',90,'cmd_ckset')
@@ -370,8 +432,9 @@ function walk_trigger()
     EnableTriggerGroup("walk",false)
 end
 function walk_wait()
-       EnableTriggerGroup("walk",true)
-	   EnableTrigger("hp12",true)
+    flag.walkwait=true
+    EnableTriggerGroup("walk",true)
+    EnableTrigger("hp12",true)
 	   if tmp.find then
 	         create_timer_s('walkWait',0.4,'walkTimer')
 		  if cntr1() > 0 then
@@ -384,9 +447,12 @@ function walk_wait()
 	   end
 end
 function walkTimer()
-    exe('alias action 正在赶路中')
+    if flag.walkwait then
+        exe('alias action 正在赶路中')
+    end
 end
 function walk_goon()
+    flag.walkwait=false
     EnableTriggerGroup("walk",false)
     EnableTimer('walkwait',false)
 	EnableTrigger("hp12",false)

@@ -6,6 +6,7 @@ loadmod = function(str) include("mods\\" .. str .. ".lua") end
 require "wait"
 require "tprint"
 require "addxml"
+require "socket"
 
 loadmod "status"
 loadmod "lujing"
@@ -309,6 +310,9 @@ beihook = test
 halthook = test
 
 function main()
+    l_CmdCnt = 0
+    lstCmdSend[1] = 0
+    lstCmdSendTime[1] = socket.gettime()
     needdolost = 0
     autopk = 0
     setAlias()
@@ -986,7 +990,13 @@ function xuexiSleep()
         return go(xuexiSleepOver, "铁掌山", "女休息室")
     end
     if score.party and score.party == "丐帮" then
-        return go(xuexiSleepOver, "chengdu/houyuan", "")
+        -- return go(xuexiSleepOver, "chengdu/houyuan", "")
+        wait.make(function()
+            wait_busy()
+            exe('sleep')
+            wait_busy()
+            return xuexiStart()
+        end)
     else
         return xuexiFinish()
     end
@@ -1561,7 +1571,7 @@ function goMark(n, l, w)
 end
 function Markletter()
     l_result = utils.inputbox(
-                   "输入信件人物ID，放弃请输入discard。",
+                   "输入信件人物ID，放弃请输入discard， 需要手动查找请输入help。",
                    "lostname", GetVariable("lostname"), "宋体", "12")
     if not isNil(l_result) then SetVariable("lostname", l_result) end
     return MarkName()
@@ -1570,9 +1580,11 @@ function MarkName()
     local lost_cmd = GetVariable("lostname")
     if lost_cmd == 'discard' then
         return exe('discard letter')
-    else
-        return exe('mark ' .. lost_cmd)
+    elseif lost_cmd == 'help' then
+        print('Use mark xxx')
+        return exe('who;a;a;')
     end
+    return exe('mark ' .. lost_cmd)
 end
 function lookXin()
     lookxin = 1
@@ -3186,6 +3198,7 @@ function refineOK()
         wait.time(3)
         dis_all()
         fqyyArmorMessage('熔炼矿石完毕！')
+        job.name = nil
         return checkWait(checkPrepare)
     end)
 end
@@ -3233,13 +3246,16 @@ function check_food()
     -- if job.zuhe["wudang"] then wait_kill='yes' end
     exe('nick 去武当吃喝;remove all;wear all')
     exe('hp;unset no_kill_ap;yield no')
-    if (hp.food < 60 or hp.water < 60) and hp.exp < 500000 then
-        return go(dali_eat, '大理城', '茶馆')
-    elseif hp.food < 60 or hp.water < 60 then
-        return go(wudang_eat, '武当山', '茶亭')
-    else
-        check_bei(check_food_over)
-    end
+    wait.make(function()
+        wait_busy()
+        if (hp.food < 60 or hp.water < 60) and hp.exp < 500000 then
+            return go(dali_eat, '大理城', '茶馆')
+        elseif hp.food < 60 or hp.water < 60 then
+            return go(wudang_eat, '武当山', '茶亭')
+        else
+            check_bei(check_food_over)
+        end
+    end)
 end
 function wudang_eat()
     if locl.room == "茶亭" then
@@ -4249,7 +4265,7 @@ function jobSet()
                                   "宋体", "12")
         if not isNil(l_result) then
             SetVariable("hqgzcjiangli", l_result)
-            hqgzcjl = l_result
+            hqgzcjl = 0
         else
             hqgzcjl = 1
         end

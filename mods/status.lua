@@ -305,6 +305,7 @@ hp_dazuo_act=function()
     return create_timer_s('dazuo_count',1.5,'hp_dazuo_timer')
 end
 hp_dazuo_timer=function()
+    if tmp.i == nil then tmp.i = 0 end
     tmp.i = tmp.i + 1
     if tmp.i > 30 then
        return main()

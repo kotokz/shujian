@@ -113,66 +113,50 @@ local ItemGet = {
 -- 		end
 		
 -- end
-l_CmdCnt=0
-lstCmdSend={}
-lstCmdSendTime={}
-max_cmd = 100
-
 function exe(cmd)
+	cmdck=0
+	cmd_check()
     if GetConnectDuration() == 0 then
        return Connect()
     end
-
-    if job.name and job.name=="huashan" and job.id and string.find(cmd,job.id) then return Execute(cmd) end
-
-    if cmd==nil then cmd='look' end
-        local l_strCmd=cmd..';'
-        local l_thisCmdCnt=0
-        for v in string.gmatch(l_strCmd,"[^;];") do
-            --print(v)
-                l_thisCmdCnt=l_thisCmdCnt+1
+    if cmd==nil then
+        if locl.room=='明霞门' or locl.room=='猛虎营' or locl.room=='佛照门' or locl.room_relation=='街道｜猛虎营-----街道-----招财大车店｜明霞门街道' then
+			return walk_wait()
+        end 
+        cmd='look' 
     end
-        local l_waitTime=0.0001
-    -- print(l_thisCmdCnt)
-        local l_curTime=socket.gettime()
-        local l_lenTable=table.getn(lstCmdSend)
-        for i=1,l_lenTable -1 do
-            local l_tmp1=lstCmdSend[l_lenTable]-lstCmdSend[i]+l_thisCmdCnt
-                local l_tmp2=l_curTime-lstCmdSendTime[i]
-            if  l_tmp1>max_cmd and l_tmp2 < (l_tmp1/75.0)*3 then
-                if  (l_tmp1/100.0)*3-l_tmp2 > l_waitTime then
-                    l_waitTime=(l_tmp1/100.0)*3-l_tmp2
-                end
-            end
+--	   if locl.area and locl.area~="峨嵋山" then
+--       Execute('halt')
+--   end
+    run(cmd)		
+end
+
+cmd_limit=30
+walkecho=true
+
+function run(str)
+	if ((str=="")or(str==nil)) then return end
+	SetSpeedWalkDelay(math.floor(1000/cmd_limit))
+	_cmds={}
+    if string.find(str,';') then
+        _cmds=utils.split(str,';')
+        for i, cmd in pairs(_cmds) do
+            add_cmd_to_queue(cmd)
+            if walkecho==true then Note(cmd) end
         end
-        -- print('l_waitTime='..l_waitTime)
-        if (l_waitTime>0.01) then
-            print('trigged flood detect,l_waitTime='..l_waitTime)
-            EnableTimer('walkwait',false)
-            wait.make(function()
-                wait.time(l_waitTime)
-                Execute(cmd)
-                if road.i<=table.getn(road.detail) and flag.walkwait then 
-                    EnableTimer('walkwait',true) 
-                end
-            end)
-        else
-             Execute(cmd)
-        end
-        if l_thisCmdCnt<5 then
-            l_CmdCnt=l_CmdCnt+l_thisCmdCnt
-            lstCmdSend[l_lenTable]=l_CmdCnt
-            lstCmdSendTime[l_lenTable]=l_curTime
-        else
-            if  table.getn(lstCmdSend)>=10 then
-                table.remove(lstCmdSend,1)
-                table.remove(lstCmdSendTime,1)
-            end
-            l_CmdCnt=l_CmdCnt+l_thisCmdCnt
-            table.insert(lstCmdSend,l_CmdCnt)
-            table.insert(lstCmdSendTime,l_curTime)
-        end
-        -- print("curTime="..l_curTime.."    cmd="..cmd.."    l_CmdCnt="..l_CmdCnt)
+    else
+        add_cmd_to_queue(str)
+        if walkecho==true then Note(str) end
+    end
+end
+
+function add_cmd_to_queue(cmd) 
+    if cmd ~=nil and cmd:sub(1, 1)=='#' then
+        cmd = cmd:sub(2)
+        Queue(EvaluateSpeedwalk(cmd),false)
+    else
+        Queue(cmd,false)
+    end
 end
 
 function cmd_check()

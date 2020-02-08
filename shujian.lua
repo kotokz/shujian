@@ -310,9 +310,6 @@ beihook = test
 halthook = test
 
 function main()
-    l_CmdCnt = 0
-    lstCmdSend[1] = 0
-    lstCmdSendTime[1] = socket.gettime()
     needdolost = 0
     autopk = 0
     setAlias()
@@ -456,7 +453,7 @@ function checkDebug()
     vippoison = 1
     exe('look bei nang;hp')
     if job.name == 'songmoya' then
-        exe('set wimpycmd halt\\down\\hp')
+        Execute('set wimpycmd halt\\down\\hp')
         job.name = 'poison'
         return check_halt(fangqiypt)
     end
@@ -587,7 +584,11 @@ function lingwu_unwield()
     exe('hp')
     local leweapon = GetVariable("learnweapon")
     exe('wield ' .. leweapon)
-    return check_busy(lingwuzbok) -- 不准备内力，直接领悟。
+    wait.make(function()
+        wait_busy()
+        lingwuzbok()
+    end)
+    -- return check_busy(lingwuzb) -- 不准备内力，直接领悟。
 end
 function lingwuzb() zhunbeineili(lingwuzbok) end
 function lingwuzbok() go(lingwu_goon, '嵩山少林', '达摩院后殿') end
@@ -602,10 +603,7 @@ function lingwuSleepOver()
     exe('sleep')
     checkWait(lingwu_eat, 3)
 end
---[[function lingwu_goonpre()
-    EnableTimer('walkWait4',false)
-	lingwu_goon()
-end]]
+
 function lingwu_goon()
     if locl.room ~= "达摩院后殿" then return lingwu_finish() end
     EnableTriggerGroup("lingwu", true)
@@ -621,11 +619,15 @@ function lingwu_goon()
             return lingwuSleep()
         end
     end
-    -- yunAddInt()
     flag.idle = nil
-    exe('yun jing;#10(lingwu ' .. skill .. ')')
+    wait.make(function()
+        exe('#10(lingwu ' .. skill .. ')')
+        wait_busy()
+        exe('yun jing')
+    end)
+
     -- exe('alias action 少林领悟就是好啊，就是好！')
-    create_timer_s('walkWait4', 0.4, 'lingwu_alias')
+    -- create_timer_s('walkWait4', 0.4, 'lingwu_alias')
     -- return check_bei(lingwu_alias,1.8)原来的程序。
 end
 function lingwu_eat()
@@ -638,12 +640,13 @@ function lingwu_eat()
         return go(lingwu_eat, '武当山', '茶亭')
     end
 end
-function lingwu_alias()
-    exe('yun jing')
-    -- exe('alias action 少林领悟就是好啊，就是好！')
-end
+-- function lingwu_alias()
+--     exe('yun jing')
+--     -- exe('alias action 少林领悟就是好啊，就是好！')
+-- end
 function lingwu_next()
     EnableTriggerGroup("lingwu", false)
+    if tmp.lingwu == nil then tmp.lingwu = 1 end
     tmp.lingwu = tmp.lingwu + 1
     local length = table.getn(skillsLingwu)
     if tmp.lingwu > length then

@@ -89,7 +89,7 @@ end
 local armor_list={}
 function cun_armor_list()
 	 wait.make(function()
-	 Execute('i;say 装备检查完毕')
+	exe('i;say 装备检查完毕')
 	 repeat 
 	 local l,w=wait.regexp('^[> ]*[□]\\S+\\((.+)\\)$|^[> ]*你说道：「装备检查完毕」$')
 	 table.insert(armor_list,string.lower(Trim(w[1])))
@@ -102,7 +102,7 @@ function cun_armor()
 	i = cun_i
 	wait.make(function()
 	if i < #armor_list and armor_list[i]~= '' and #armor_list>1 and not string.find(armor_list[i],'nang') and not string.find(armor_list[i],'card') and not string.find(armor_list[i],'sword') and not string.find(armor_list[i],'axe') then 
-	 Execute('cun '..armor_list[i])
+	exe('cun '..armor_list[i])
 	   local l,w = wait.regexp('^[> ]*你从身上拿出.+，放入自己的个人储物箱。$|^[> ]*你正忙着！$|^[> ]*你身上没有这样东西。$|^[> ]*.+不可以被保存。$')  
 		if string.find(l,'放入自己的个人储物箱') or string.find(l,'你身上没有这样东西') or string.find(l,'可以被保存') then 
 		i = i + 1 
@@ -121,7 +121,7 @@ end
 function cun_cmd()
     armor_list={}
 	cun_armor_list()
-	Execute('remove all')
+	exe('remove all')
 	cun_i = 1
 	DoAfterSpecial(0.5,'cun_armor()',12)
 end
@@ -133,7 +133,7 @@ function qu_cmd()
 end
 function qu_armor_list()
 	 wait.make(function()
-	 Execute('dlist')
+	exe('dlist')
 	 repeat 
 	 local l,w=wait.regexp('^[> ]*┃\\s+(.+)\\s+\\S+\\s+\.+天\\s+┃$|^[> ]*┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛$')
 	 table.insert(armor_list,string.lower(Trim(w[1])))

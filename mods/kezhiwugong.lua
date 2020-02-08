@@ -970,10 +970,10 @@ function kezhiwugongStart()
         job.name == 'hubiao' then
         create_alias('mypfm_buff', 'mypfm_buff',
                      'alias mybuff ' .. GetVariable("mybuff"))
-        exe('mypfm_buff')
+        Execute('mypfm_buff')
         create_alias('mypfm_debuff', 'mypfm_debuff',
                      'alias mydebuff ' .. GetVariable("mydebuff"))
-        exe('mypfm_debuff')
+        Execute('mypfm_debuff')
     end
     -- print("开启检测")
     npc_num = 0
@@ -1039,14 +1039,14 @@ function kezhiwugongkill(p_num)
                 print('合气憋足了！老子要放大招刷死你！')
                 print(
                     '天！地！玄！黄！唯！我！独！尊！杀。。。。。。')
-                exe('set wimpy 100;set wimpycmd mybuff\\mydebuff\\mypfm\\hp')
-                exe('pppp' .. p_num)
+                Execute('set wimpy 100;set wimpycmd mybuff\\mydebuff\\mypfm\\hp')
+                Execute('pppp' .. p_num)
                 haichaoID = npc_id[p_num]
                 kflag[p_num] = 1
                 return
             else
-                exe('set wimpy 100;set wimpycmd mybuff\\mydebuff\\hp')
-                exe('pppp' .. p_num)
+                Execute('set wimpy 100;set wimpycmd mybuff\\mydebuff\\hp')
+                Execute('pppp' .. p_num)
                 haichaoID = npc_id[p_num]
                 kflag[p_num] = 1
                 print('积攒合气！')
@@ -1054,21 +1054,21 @@ function kezhiwugongkill(p_num)
             end
         else
             if job.name == 'guanfu' or job.name == 'hubiao' then
-                exe('set wimpycmd mybuff\\mydebuff\\mypfm\\hp;set wimpy 100')
-                exe('pppp' .. p_num)
+                Execute('set wimpycmd mybuff\\mydebuff\\mypfm\\hp;set wimpy 100')
+                Execute('pppp' .. p_num)
                 haichaoID = npc_id[p_num]
                 kflag[p_num] = 1
             elseif job.name == 'diemenglou' or job.name == 'pk' then
-                exe('set wimpycmd hp;set wimpy 100')
+                Execute('set wimpycmd hp;set wimpy 100')
                 if heqi and heqi > 40 then
-                    exe('pppp' .. p_num)
+                    Execute('pppp' .. p_num)
                 else
                     flag.busy = true
                 end
                 haichaoID = npc_id[p_num]
                 kflag[p_num] = 1
             else
-                exe('set wimpy 100;set wimpycmd pppp' .. p_num .. '\\hp')
+                Execute('set wimpy 100;set wimpycmd pppp' .. p_num .. '\\hp')
                 haichaoID = npc_id[p_num]
                 kflag[p_num] = 1
             end
@@ -1078,25 +1078,25 @@ function kezhiwugongkill(p_num)
             (job.name == 'diemenglou' or job.name == 'pk' or job.name ==
                 'guanfu' or job.name == 'hubiao') then
             if heqi and heqi > tonumber(GetVariable("heqi_number")) then
-                exe('set wimpy 100;set wimpycmd mybuff\\mydebuff\\mypfm\\hp')
-                exe('pkpfm')
+                Execute('set wimpy 100;set wimpycmd mybuff\\mydebuff\\mypfm\\hp')
+                Execute('pkpfm')
                 return
             else
-                exe('set wimpy 100;set wimpycmd mybuff\\mydebuff\\hp')
-                exe('pkpfm')
+                Execute('set wimpy 100;set wimpycmd mybuff\\mydebuff\\hp')
+                Execute('pkpfm')
                 print('积攒合气！')
                 return
             end
         else
             if job.name == 'diemenglou' or job.name == 'pk' or job.name ==
                 'guanfu' then
-                exe('set wimpycmd mybuff\\mydebuff\\mypfm\\hp;set wimpy 100')
-                exe('pkpfm')
+                Execute('set wimpycmd mybuff\\mydebuff\\mypfm\\hp;set wimpy 100')
+                Execute('pkpfm')
             elseif job.name == 'songmoya' then
-                exe(
+                Execute(
                     'set wimpycmd smybuff\\mydebuff\\pkpfm\\mypfm\\hp;set wimpy 100')
             else
-                exe('set wimpycmd pfmpfm\\hp;set wimpy 100')
+                Execute('set wimpycmd pfmpfm\\hp;set wimpy 100')
             end
         end
     end
@@ -1333,10 +1333,10 @@ function kezhiwugongSetPerform(tempatt, i, targetid)
         job.name == 'hubiao' then
         create_alias('kezhiwugongpfm', 'kezhiwugongpfm', 'alias pppp' .. i ..
                          ' ' .. GetVariable(pk_valuecmd[tempatt]))
-        exe('kezhiwugongpfm')
+        Execute('kezhiwugongpfm')
         create_alias('mypfm_kezhi', 'mypfm_kezhi',
                      'alias mypfm ' .. GetVariable("mypfm") .. ' ' .. targetid)
-        exe('mypfm_kezhi')
+        Execute('mypfm_kezhi')
     elseif job.name == 'songmoya' then
         if score.party == '桃花岛' then
             exe('set szj 1')
@@ -1345,7 +1345,7 @@ function kezhiwugongSetPerform(tempatt, i, targetid)
                              'alias pppp' .. i .. ' ' ..
                                  GetVariable(kezhi_valuecmd[tempatt]) .. ' ' ..
                                  targetid)
-                exe('kezhiwugongpfm')
+                Execute('kezhiwugongpfm')
                 exe('set 兰花手 蝶舞式;jiali max')
             end
             if yptteam > 6 and yptteam < 19 then
@@ -1354,7 +1354,7 @@ function kezhiwugongSetPerform(tempatt, i, targetid)
                                  GetVariable(pk_valuecmd[tempatt]) .. ';' ..
                                  GetVariable("smybuff") .. ';' ..
                                  GetVariable("smy_pfm1") .. ' ' .. targetid)
-                exe('kezhiwugongpfm')
+                Execute('kezhiwugongpfm')
                 exe('set 兰花手 蝶舞式;jiali max')
             end
             if yptteam > 18 and yptteam < 23 then
@@ -1364,7 +1364,7 @@ function kezhiwugongSetPerform(tempatt, i, targetid)
                                  GetVariable(pk_valuecmd[tempatt]) .. ';' ..
                                  GetVariable("smybuff") .. ';' ..
                                  GetVariable("smy_pfm3") .. ' ' .. targetid)
-                exe('kezhiwugongpfm')
+                Execute('kezhiwugongpfm')
                 exe('unset debuff_boost')
             end
             if yptteam > 22 and yptteam < 26 then
@@ -1376,7 +1376,7 @@ function kezhiwugongSetPerform(tempatt, i, targetid)
                                  GetVariable("smy_pfm2") .. ' ' .. targetid ..
                                  ';' .. GetVariable("smy_pfm3") .. ' ' ..
                                  targetid .. ';jiali 1')
-                exe('kezhiwugongpfm')
+                Execute('kezhiwugongpfm')
                 exe('unset debuff_boost')
             end
         end
@@ -1384,7 +1384,7 @@ function kezhiwugongSetPerform(tempatt, i, targetid)
         create_alias('kezhiwugongpfm', 'kezhiwugongpfm',
                      'alias pppp' .. i .. ' ' ..
                          GetVariable(kezhi_valuecmd[tempatt]) .. ' ' .. targetid)
-        exe('kezhiwugongpfm')
+        Execute('kezhiwugongpfm')
     end
 end
 function kezhiwugongsuccess(kezhi_cmd, k_order, npci)
@@ -1479,12 +1479,12 @@ function pk_heqi_control()
         if GetVariable("pk_buff_heqi") then
             if heqi and heqi > tonumber(GetVariable("pk_buff_heqi")) then
                 flag.buff = false
-                exe('mybuff')
+                Execute('mybuff')
             end
         else
             if heqi and heqi > 200 then
                 flag.buff = false
-                exe('mybuff')
+                Execute('mybuff')
             end
         end
         wait.make(function()
@@ -1496,12 +1496,12 @@ function pk_heqi_control()
         if GetVariable("pk_debuff_heqi") then
             if heqi and heqi > tonumber(GetVariable("pk_debuff_heqi")) then
                 flag.debuff = false
-                exe('mydebuff')
+                Execute('mydebuff')
             end
         else
             if heqi and heqi > 400 then
                 flag.debuff = false
-                exe('mydebuff')
+                Execute('mydebuff')
             end
         end
         wait.make(function()
@@ -1513,12 +1513,12 @@ function pk_heqi_control()
         if GetVariable("pk_pfm_heqi") then
             if heqi and heqi > tonumber(GetVariable("pk_pfm_heqi")) then
                 flag.pfm = false
-                exe('mypfm')
+                Execute('mypfm')
             end
         else
             if heqi and heqi > 720 then
                 flag.pfm = false
-                exe('mypfm')
+                Execute('mypfm')
             end
         end
         wait.make(function()

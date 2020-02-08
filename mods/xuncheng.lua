@@ -40,7 +40,7 @@ function xuncheng_start()
                          '', 'xuncheng_accept')
         create_trigger_f('xuncheng_start2', "^>*\\s*这里没有这个人。",
                          '', 'xuncheng_nobody')
-        Execute('unset 积蓄;ask zhu danchen about 巡城')
+        exe('unset 积蓄;ask zhu danchen about 巡城')
         create_timer_s('walkWait4', 1.0, 'xuncheng_askagain')
     end
 end
@@ -71,34 +71,32 @@ end
 function xuncheng_join()
     DeleteTemporaryTriggers()
     wait.make(function()
-        wait.time(3)
-        Execute('e;#4s;#4e;#3n;e')
-        Execute('s;ask fu sigui about join')
-        wait.time(2)
+        wait.time(1)
+        exe('e;#4s;#4e;#3n;e')
+        exe('s;ask fu sigui about join')
         wait_busy()
         xuncheng_join_back()
     end)
 end
 function xuncheng_join_back()
-    Execute('n')
-    Execute('w;#3s;#4w;#4n;w')
+    exe('n')
+    exe('w;#3s;#4w;#4n;w')
     xuncheng_start()
 end
 
 function xuncheng_go()
     DeleteTemporaryTriggers()
-    if hp.neili_lim <= hp.neili_max then Execute('yun jingli') end
+    if hp.neili_lim <= hp.neili_max then exe('yun jingli') end
     -- if hp.jingxue >= hp.jingxue_max * 0.5 then
     --     -- Execute('#8(du book)')
     -- end
-    Execute('hp')
+    exe('hp')
     wait.make(function()
         for key, step in ipairs(xuncheng) do
-            wait.time(2)
-            Execute(step)
+            wait_busy()
+            exe(step)
             wait.time(1)
             exe('yun jing')
-            wait_busy()
         end
         xuncheng_task()
     end)
@@ -131,7 +129,7 @@ function xuncheng_task()
                        'xuncheng_dazuo()', '')
     wait.make(function()
         wait.time(1)
-        Execute('task ok')
+        exe('task ok')
     end)
 end
 function xuncheng_tuna()
@@ -178,17 +176,17 @@ end
 function xuncheng_task_wait()
     wait.make(function()
         if hp.exp and hp.exp > 300000 and xctuna == 1 then
-            Execute('e;yun jing;tuna ' .. hp.jingxue / 2)
+            exe('e;yun jing;tuna ' .. hp.jingxue / 2)
         elseif hp.exp > 100000 and hp.qixue < hp.dazuo then
-            Execute('e;yun qi;dazuo ' .. hp.dazuo)
+            exe('e;yun qi;dazuo ' .. hp.dazuo)
         elseif hp.qixue < hp.dazuo and score.party == "丐帮" then
-            Execute('e;sleep')
+            exe('e;sleep')
         else
-            Execute('e;dazuo ' .. hp.dazuo)
+            exe('e;dazuo ' .. hp.dazuo)
         end
         wait_busy()
         DeleteTemporaryTriggers()
-        Execute('hp;w')
+        exe('hp;w')
         wait_busy()
         xuncheng_task()
     end)
@@ -197,7 +195,7 @@ end
 function xuncheng_check()
     DeleteTemporaryTriggers()
     wait.make(function()
-        Execute('cha;score;yun jingli;hp')
+        exe('cha;score;yun jingli;hp')
         wait_busy()
         xuncheng_checkpot()
     end)

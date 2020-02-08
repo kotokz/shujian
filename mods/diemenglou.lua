@@ -1082,12 +1082,12 @@ function dmlFight(n, l, w)
     npc_id = string.lower(w[4])
     create_alias('pkpfm_kezhi', 'pkpfm_kezhi',
                  'alias pkpfm ' .. GetVariable("pkpfm"))
-    exe('pkpfm_kezhi')
+    ExecuteExecute('pkpfm_kezhi')
     create_alias('mypfm_kezhi', 'mypfm_kezhi',
                  'alias mypfm ' .. GetVariable("mypfm") .. ' ' .. npc_id)
-    exe('mypfm_kezhi')
-    exe('set wimpycmd pkpfm\\hp')
-    exe('pkpfm')
+    Execute('mypfm_kezhi')
+    Execute('set wimpycmd pkpfm\\hp')
+    Execute('pkpfm')
     exe('set wimpy 100;yield no')
     exe('look ' .. npc_id)
     exe('nick µûÃÎÂ¥Õ½¶·ÖÐ')
@@ -1293,15 +1293,15 @@ function hpHeqiCheck(n, l, w)
     if heqi >= 840 then
         create_alias('l_pkPfm', 'l_pkPfm',
                      'alias pfmpfm ' .. GetVariable('pfmsanqing'))
-        exe('l_pkPfm')
-        exe('set wimpycmd pfmpfm\\hp')
+        Execute('l_pkPfm')
+        Execute('set wimpycmd pfmpfm\\hp')
     end
 end
 function pkPfmSet(n, l, w)
     local subPfm = string.lower(w[2])
     create_alias('pkPfm', 'pkPfm',
                  'alias pfmpfm perform ' .. subPfm .. ';perform ' .. subPfm)
-    exe('pkPfm')
+    Execute('pkPfm')
 end
 function dmlInPk()
     DeleteTimer('dmlPkCheck')

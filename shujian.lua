@@ -569,6 +569,7 @@ function lingwu()
     skillsLingwu = utils.split(GetVariable("lingwuskills"), '|')
     road.temp = 0
     tmp.lingwu = 1
+    tmp.stop = false
     lingwudie = 0
     return check_busy(lingwu_go)
 end
@@ -623,7 +624,11 @@ function lingwu_goon()
     wait.make(function()
         exe('#10(lingwu ' .. skill .. ')')
         wait_busy()
-        exe('yun jing')
+        if tmp.stop then
+            lingwu_finish()
+        else
+            exe('yun jing')
+        end
     end)
 
     -- exe('alias action 少林领悟就是好啊，就是好！')
@@ -667,10 +672,12 @@ function lingwu_next()
     end
 end
 function lingwu_finish1()
-    EnableTimer('walkWait4', false)
-    checkWait(lingwu_finish, 1)
+    -- EnableTimer('walkWait4', false)
+    tmp.stop = true
+    -- checkWait(lingwu_finish, 1)
 end
 function lingwu_finish()
+    tmp.stop = true
     messageShow('少林领悟完成')
     local skill = skillsLingwu[tmp.lingwu]
     EnableTriggerGroup("lingwu", false)

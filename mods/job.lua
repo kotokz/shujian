@@ -1365,7 +1365,7 @@ prepare_neili_idle=function()
    end
    exe('cond')
 end
-prepare_neili_stop=function()
+function prepare_neili_stop()
    DeleteTimer('neili')
    DeleteTimer('bei')
    EnableTriggerGroup("prepare_neili",false)

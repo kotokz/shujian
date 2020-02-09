@@ -451,6 +451,86 @@ function hp_trigger()
     SetTriggerOption("score12","group","score")
 end
 
+
+function check_pot(p_cmd)
+    if hp.exp < 5000000 then
+        l_pot = hp.pot_max - 100
+    else
+        l_pot = hp.pot_max - 200
+    end
+    flag.lingwu = 0
+
+    job_exp_tongji()
+
+    if flag.autoxuexi == nil then flag.autoxuexi = 0 end
+
+    if hp.pot < l_pot or flag.autoxuexi == 0 then
+        return check_job()
+    end
+
+    local max_skill = hp.pot_max - 100
+    if score.party == "普通百姓" then
+        if score.gold and skills["literate"] and score.gold > 3000 and skills["literate"].lvl < max_skill then
+            return literate()
+        end
+        if skills["parry"].lvl < max_skill and skills["parry"].lvl >= 101 then 
+            return checklingwu()
+        end
+        if skills["force"].lvl > 50 and skills["force"].lvl < 101 then
+            if skills["force"].lvl == 101 then
+                exe('fangqi force 1;y;y;y')
+            end
+            return huxi()
+        end
+        if skills["shenzhao-jing"] and skills["shenzhao-jing"].lvl < 200 then 
+            return learnSzj() 
+        end
+    else
+        if score.gold and skills["literate"] and score.gold > 3000 and
+                skills["literate"].lvl < max_skill then
+                return literate()
+            end
+        
+        if flag.type and flag.type ~= 'lingwu' and flag.xuexi == 1 then
+            return checkxue() 
+        end
+        
+        for p in pairs(skills) do
+            local q = qrySkillEnable(p)
+            if q and q['force'] and perform.force and p == perform.force and
+                skills[p].lvl < 100  then
+                if skills[p].mstlvl and skills[p].mstlvl > skills[p].lvl then
+                    return checkxue()
+                end
+            end
+            if flagFull[p] and not skillEnable[p] and skills[p].lvl < 450 and
+            skills[p].lvl <= skills["dodge"].lvl  then
+                if not skills[p].mstlvl or skills[p].mstlvl > skills[p].lvl then
+                    return checkxue()
+                end
+            end
+        end
+
+        if perform.skill and skills[perform.skill] and skills[perform.skill].lvl < 450 then 
+            return checkxue() 
+        end
+
+        if skills["parry"] and skills["parry"].lvl < max_skill and skills["parry"].lvl >= 450 then
+            flag.lingwu = 1
+        end
+
+        if flag.lingwu == 1 then return checklingwu() end
+        
+        if not flag.wxjz then flag.wxjz = 0 end
+        if skills["wuxiang-zhi"] and flag.wxjz == 0 then
+            if skills["finger"].lvl > skills["wuxiang-zhi"].lvl and skills["wuxiang-zhi"].lvl < max_skill then
+                return wxjzFofa()
+            end
+        end
+    end
+    return check_job()
+end
+
 function lingwu_trigger()
     DeleteTriggerGroup("lingwu")
     create_trigger_t('lingwu1',"^.*(你只能从特殊技能中领悟。|你不会这种技能。|你要领悟什么？)",'','lingwu_next')
@@ -468,4 +548,140 @@ function lingwu_trigger()
     SetTriggerOption("lingwu6","group","lingwu")
     SetTriggerOption("lingwu7","group","lingwu")
     EnableTriggerGroup("lingwu",false)
+end
+
+
+function checklingwu()
+    if lingwudie == 0 then return lingwu() end
+    if xxpot < hp.pot_max then return lingwu() end
+    messageShow('不需要领悟')
+    return check_job()
+end
+function lingwu()
+    DeleteTemporaryTriggers()
+    skillsLingwu = {}
+    skillsLingwu = utils.split(GetVariable("lingwuskills"), '|')
+    road.temp = 0
+    tmp.lingwu = 1
+    tmp.stop = false
+    lingwudie = 0
+    return check_busy(lingwu_go)
+end
+function lingwu_go()
+    exe('nick 少林领悟达摩院后殿')
+    messageShow('去少林领悟')
+    jifaAll()
+    go(lingwu_unwield, '嵩山少林', '达摩院')
+end
+function lingwu_unwield()
+    weapon_unwield()
+    exe('hp')
+    local leweapon = GetVariable("learnweapon")
+    exe('wield ' .. leweapon)
+    wait.make(function()
+        wait_busy()
+        if newbie == 1 then
+            return lingwuzb()
+        else
+            return lingwuzbok()
+        end
+    end)
+    -- return check_busy(lingwuzb) -- 不准备内力，直接领悟。
+end
+function lingwuzb() zhunbeineili(lingwuzbok) end
+function lingwuzbok() 
+    lingwu_trigger()
+    go(lingwu_goon, '嵩山少林', '达摩院后殿') 
+end
+function lingwuSleep()
+    if score.gender == '男' then
+        return go(lingwuSleepOver, "songshan/nan-room", "")
+    else
+        return go(lingwuSleepOver, "songshan/nv-room", "")
+    end
+end
+function lingwuSleepOver()
+    exe('sleep')
+    checkWait(lingwu_eat, 3)
+end
+
+function lingwu_goon()
+    if locl.room ~= "达摩院后殿" then return lingwu_finish() end
+    EnableTriggerGroup("lingwu", true)
+    local skill = skillsLingwu[tmp.lingwu]
+
+    if not skills[skill] or skills[skill].lvl == 0 or skills[skill].lvl >=
+        hp.pot_max - 100 then return lingwu_next() end
+
+    if hp.neili < 1000 then
+        if hp.exp > 20000000 or score.gender == '无' then
+            return go(lingwu_eat, '武当山', '茶亭')
+        else
+            return lingwuSleep()
+        end
+    end
+    flag.idle = nil
+    wait.make(function()
+        exe('#10(lingwu ' .. skill .. ')')
+        if tmp.stop then
+           return lingwu_finish()
+        else
+           exe('yun jing')
+        end
+    end)
+end
+function lingwu_eat()
+    if locl.room == "茶亭" then
+        flag.food = 0
+        exe(
+            'sit chair;knock table;get tao;#3(eat tao);get cha;#4(drink cha);drop cha;drop tao;fill jiudai')
+        check_bei(lingwu_go)
+    else
+        return go(lingwu_eat, '武当山', '茶亭')
+    end
+end
+function lingwu_next()
+    EnableTriggerGroup("lingwu", false)
+    if tmp.lingwu == nil then tmp.lingwu = 1 end
+    tmp.lingwu = tmp.lingwu + 1
+    local length = table.getn(skillsLingwu)
+    if tmp.lingwu > length then
+        flag.lingwu = 0
+        lingwudie = 1
+        xxpot = hp.pot_max
+        -- return check_bei(lingwu_finish)
+        return lingwu_finish()
+    else
+        local skill = skillsLingwu[tmp.lingwu]
+        -- print(skillsLingwu[tmp.lingwu])
+        if skills[skill] and skills[skill].lvl > 0 and skills[skill].lvl <
+            hp.pot_max - 100 then
+            return check_bei(lingwu_goon, 1)
+        else
+            return lingwu_next()
+        end
+    end
+end
+function lingwu_finish1()
+    -- EnableTimer('walkWait4', false)
+    tmp.stop = true
+    -- checkWait(lingwu_finish, 1)
+end
+function lingwu_finish()
+    tmp.stop = true
+    messageShow('少林领悟完成')
+    local skill = skillsLingwu[tmp.lingwu]
+    EnableTriggerGroup("lingwu", false)
+    DeleteTriggerGroup("lingwu")
+    exe('cha')
+    flag.lingwu = 0
+    if tmp.lingwu > 1 and tmp.lingwu <= table.getn(skillsLingwu) then
+        table.remove(skillsLingwu, tmp.lingwu)
+        table.insert(skillsLingwu, 1, skill)
+    end
+    -- weapon_unwield()
+    -- local leweapon=GetVariable("learnweapon")
+    -- exe('cha;unwield '..leweapon)
+    return check_jobx()
+    -- return check_busy(check_food)
 end

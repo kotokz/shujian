@@ -6,8 +6,8 @@ xuncheng = {
     [5] = 's;s;e;e;w;w;n;n;s;e;n;s;e;w;s;e;w;s;e;w;n;w;s;buy ban doufu;buy doufu gan;#2(eat doufu ganyun);#2(eat doufu gan);yun jingli',
     [6] = 'n;e;e;w;s;e;w;s;e;w;s;e;e;se;n;s;s;e;w;s;e;w;su;enter;yun jingli',
     [7] = 'd;d;d;e;e;up;e;w;d;w;w;up;up;up;out;nd;n;n;nw;yun jingli',
-    [8] = 'ne;#6(eu);se;se;enter;n;n;n;yun jingli',
-    [9] = 's;s;s;out;#4(nw);wd;wd;sw;w;w;yun jingli',
+    [8] = 'ne;#2(eu);se;se;enter;n;n;n;yun jingli',
+    [9] = 's;s;s;out;#2(nw);wd;wd;sw;w;w;yun jingli',
     [10] = 's;e;w;s;e;w;s;e;w;s;e;w;s;n;w;s;n;w;n;e;w;w;yun jingli',
     [11] = 'e;n;s;s;s;s;su;e;w;se;w;w;e;e;s;su;yun jingli',
     [12] = 'sw;ne;nd;n;su;n;s;s;n;nd;nw;nd;n;n;w;yun jingli',
@@ -95,7 +95,7 @@ function xuncheng_go()
         for key, step in ipairs(xuncheng) do
             wait_busy()
             exe(step)
-            wait.time(1)
+            wait.time(2)
             exe('yun jing')
         end
         xuncheng_task()

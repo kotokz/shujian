@@ -114,8 +114,8 @@ local ItemGet = {
 		
 -- end
 function exe(cmd)
-	cmdck=0
-	cmd_check()
+	-- cmdck=0
+	-- cmd_check()
     if GetConnectDuration() == 0 then
        return Connect()
     end
@@ -159,33 +159,33 @@ function add_cmd_to_queue(cmd)
     end
 end
 
-function cmd_check()
-    cmdck=1
-	create_timer_s('cmdckk',90,'cmd_ckset')
-end
-function cmd_ckset()
-    if cmdck==1 then
-		return walk_wait()
-	end
-end
-function step_docheck()
-	if need_waittime==1 then
-		    if os.clock()-check_step_time<3 then
-		        road.wait=3.01-os.clock()+check_step_time
-				--common_walk=string.format("%0.2f",common_walk)
-			    --print(common_walk..' '..check_step_num)
-		    else
-			    road.wait=0.2
-		        --print(common_walk..' '..check_step_num)
-		    end
-	end
-end
-function step_docheckdo()
-	    check_step_time=os.clock()
-		check_step_num=0
-		need_waittime=0
-		road.wait=0.2
-end
+-- function cmd_check()
+--     cmdck=1
+-- 	create_timer_s('cmdckk',90,'cmd_ckset')
+-- end
+-- function cmd_ckset()
+--     if cmdck==1 then
+-- 		return walk_wait()
+-- 	end
+-- end
+-- function step_docheck()
+-- 	if need_waittime==1 then
+-- 		    if os.clock()-check_step_time<3 then
+-- 		        road.wait=3.01-os.clock()+check_step_time
+-- 				--common_walk=string.format("%0.2f",common_walk)
+-- 			    --print(common_walk..' '..check_step_num)
+-- 		    else
+-- 			    road.wait=0.2
+-- 		        --print(common_walk..' '..check_step_num)
+-- 		    end
+-- 	end
+-- end
+-- function step_docheckdo()
+-- 	    check_step_time=os.clock()
+-- 		check_step_num=0
+-- 		need_waittime=0
+-- 		road.wait=0.2
+-- end
 function exe_road(cmd)
     if GetConnectDuration() == 0 then
        return Connect()
@@ -383,7 +383,7 @@ exit_set=function(exit)
 end
 locate=function()
         locatee()
-        create_timer_s('loclWait',1,'locatecheck')
+        create_timer_s('loclWait',2,'locatecheck')
 end
 locatecheck=function()
     locatee()
@@ -398,7 +398,7 @@ locatee=function()
 end
 fastLocate=function()
 	fastLocatee()
-	create_timer_s('loclWait',0.3,'fastlocatecheck')
+	create_timer_s('loclWait',1,'fastlocatecheck')
 end
 fastlocatecheck=function()
     fastLocatee()
@@ -1442,7 +1442,7 @@ duHhe=function()
     locate()
     return check_bei(duHhe_start)
 end
-duHhe_start=function()
+function duHhe_start()
     if string.find(locl.room,'渡') then
 	if ll_place and ll_place=='兰州大渡口' then return end
        EnableTriggerGroup("duhe",true)
@@ -1479,7 +1479,7 @@ duhe_go_enter=function()
     if flag.duhe==1 then
     prepare_neili_stop()
     --exe('set 积蓄')
-    exe('yun qi;dazuo '..hp.dazuo)
+    exe('yun jing;yun qi;dazuo '..hp.dazuo)
 	create_timer_st('walkWait4',2,'dazuo_check')
     end
 end
@@ -1500,7 +1500,7 @@ duhe_enter_check=function()
        prepare_neili_stop()
     else
        exe('sxlian')
-       return exe('yun qi;dazuo '..hp.dazuo)
+       return exe('yun jing;yun qi;dazuo '..hp.dazuo)
     end
 	create_timer_st('walkWait4',2,'dazuo_check')
 end
@@ -1652,7 +1652,7 @@ dujiang_go_enter=function()
 	DeleteTimer('walkwait4')
     if flag.dujiang==1 then
     --exe('set 积蓄')
-    exe('yun qi;dazuo '..hp.dazuo)
+    exe('yun jing;yun qi;dazuo '..hp.dazuo)
     end
 	create_timer_st('walkWait4',2,'dazuo_check')
 end
@@ -1673,7 +1673,7 @@ dujiang_enter_check=function()
        return prepare_neili_stop()
     else
        exe('sxlian')
-       return exe('yun qi;dazuo '..hp.dazuo)
+       return exe('yun jing;yun qi;dazuo '..hp.dazuo)
     end
 	create_timer_st('walkWait4',2,'dazuo_check')
 end

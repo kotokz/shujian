@@ -1573,7 +1573,7 @@ dujiang_trigger=function()
     create_trigger_t('dujiang5','^(> )*你的\\D*修为不够','','dujiang_cannt')
     create_trigger_t('dujiang6','^(> )*你的真气不够了！','','dujiang_go_enter')
     create_trigger_t('dujiang7','^(> )*这里的水太深太急，你渡不过去。','','dujiang_move')
-    create_trigger_t('dujiang8','^(> )*你一提内息，看准了(河|江)中渡船位置，使出','','dujiang_fly')
+    create_trigger_t('dujiang8','^(> )*你一提内息，看准了(河|江)中渡船位置，使出','','dujiang_fly_start')
     create_trigger_t('dujiang9','^(> )*艄公(们|)把踏脚板收','','dujiang_dujiang')
     create_trigger_t('dujiang10','^(> )*一艘渡船缓缓地驶了过来，艄公将一块踏脚板搭上堤岸，以便乘客上下','','dujiang_enter')
     create_trigger_t('dujiang11','^(> )*有船不坐，你想扮Cool啊？','','dujiang_waitb')
@@ -1619,14 +1619,15 @@ duCjiang_check=function()
 end
 duCjiang_start=function()
     if string.find(locl.room,'江') then
-	if ll_place and ll_place == '扬州城长江北岸' then return end
-       EnableTriggerGroup("dujiang",true)
-       if flag.dujiang==1 then
-		create_timer_st('walkWait4',2,'dujiang_wait2')
-          return exe('yell boat;dujiang')
-       else
-          return dujiang_enter()
-       end
+        if ll_place and ll_place == '扬州城长江北岸' then return end
+        EnableTriggerGroup("dujiang",true)
+        if flag.dujiang==1 then
+            tmp.dujiang_start_point = locl.room
+            create_timer_st('walkWait4',2,'dujiang_wait2')
+            return exe('yell boat;dujiang')
+        else
+            return dujiang_enter()
+        end
     else
        if math.random(1,10)>1 then
           return go(road.act)
@@ -1684,10 +1685,18 @@ function dazuo_wait()
 	DeleteTimer('walkWait4')
 end
 dujiang_out=function()
-    exe('out')
-    return dujiang_over()
+    wait.make(function()
+        wait_busy()
+        exe('out')
+        if flag.dujiang == 1 and tmp.dujiang_start_point == locl.room then
+            dujiang_wait()
+        else
+            dujiang_over()
+        end
+    end)
 end
 dujiang_over=function()
+    tmp.dujiang_start_point = nil
     EnableTriggerGroup("dujiang",false)
     DeleteTriggerGroup("dujiang")
 	weapon_unwield()
@@ -1714,13 +1723,18 @@ dujiang_cannt=function()
 	jifaDodge()
     return checkWait(duCjiang_start,0.5)
 end
+
+function dujiang_fly_start()
+    print("起飞第一步")
+    -- possible failure here:  你还想提气，却发现力不从心了。
+end
 dujiang_fly=function()
    -- ain
    EnableTriggerGroup("dujiang",false)
    DeleteTriggerGroup("dujiang")
    DeleteTimer('walkwait4')
         wait.make(function() 
-            wait.time(5) 
+            wait.time(2) 
         exe('jifa all')  
         return check_busy(dujiang_over)
         end)

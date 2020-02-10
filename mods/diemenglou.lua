@@ -1082,7 +1082,7 @@ function dmlFight(n, l, w)
     npc_id = string.lower(w[4])
     create_alias('pkpfm_kezhi', 'pkpfm_kezhi',
                  'alias pkpfm ' .. GetVariable("pkpfm"))
-    ExecuteExecute('pkpfm_kezhi')
+    Execute('pkpfm_kezhi')
     create_alias('mypfm_kezhi', 'mypfm_kezhi',
                  'alias mypfm ' .. GetVariable("mypfm") .. ' ' .. npc_id)
     Execute('mypfm_kezhi')

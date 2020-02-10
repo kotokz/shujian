@@ -1691,8 +1691,10 @@ dujiang_out=function()
             exe('out')
             fastLocate()
             wait_busy()
-            print("previous localtion: " .. tmp.dujiang_start_point.. " current localtion: ".. locl.room)
-            if tmp.dujiang_start_point == locl.room then
+            if tmp.dujiang_start_point then
+                print("previous localtion: " .. tmp.dujiang_start_point.. " current localtion: ".. locl.room)
+            end
+            if tmp.dujiang_start_point and tmp.dujiang_start_point == locl.room then
                 return dujiang_wait()
             else
                 return dujiang_over()

@@ -335,12 +335,8 @@ function main()
     map.rooms["sld/lgxroom"].ways["#outSld"] = "huanghe/huanghe8"
     exe(
         'down;alias askk ask $*;stand;halt;uweapon;score;cha;hp;jifa all;jiali max;unset no_kill_ap;cond;pfmset')
-    if not perform.skill or not perform.pre or not job.zuhe or
-        countTab(job.zuhe) < 2 then
-        return shujian_set()
-    else
-        return check_bei(hp_dazuo_count)
-    end
+    return check_bei(hp_dazuo_count)
+
 end
 
 function login_choose() Send('n') end
@@ -1222,6 +1218,9 @@ function check_job()
         kdummy = 0
         return xunCheng()
     end
+    if not perform.skill or not perform.pre or not job.zuhe or
+        countTab(job.zuhe) < 2 then return shujian_set() end
+
     create_triggerex_lvl('dmlflag1',
                          '^(> )*【江湖传闻】玩家竞技活动开始了！',
                          '', 'dml_on', 95)
@@ -2779,7 +2778,7 @@ function check_food()
     if mydummy == true then return dummyfind() end
     -- if job.zuhe["wudang"] then wait_kill='yes' end
 
-    if flag.xuncheng_start then return xuncheng() end
+    if flag.xuncheng_start then return xunCheng() end
     exe('nick 去武当吃喝;remove all;wear all')
     exe('hp;unset no_kill_ap;yield no')
     wait.make(function()

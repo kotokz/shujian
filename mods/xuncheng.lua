@@ -96,7 +96,7 @@ function xuncheng_go()
         for key, step in ipairs(xuncheng) do
             wait_busy()
             exe(step)
-            wait.time(2)
+            wait.time(1.5)
             exe('yun jing')
         end
         xuncheng_task()

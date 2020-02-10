@@ -2778,6 +2778,8 @@ function check_food()
     hpheqi()
     if mydummy == true then return dummyfind() end
     -- if job.zuhe["wudang"] then wait_kill='yes' end
+
+    if flag.xuncheng_start then return xuncheng() end
     exe('nick 去武当吃喝;remove all;wear all')
     exe('hp;unset no_kill_ap;yield no')
     wait.make(function()
@@ -3856,6 +3858,7 @@ function setAlias()
     create_alias_s('qu_dl', 'qu_dl', 'goto_set.dl')
     create_alias_s('tj', 'tj', 'jobExpTongji')
     create_alias_s('setlian', 'setlian', 'setLian')
+    create_alias_s('setautoxue', 'setautoxue', 'set_autoxue')
     create_alias_s('setlearn', 'setlearn', 'setLearn')
     create_alias_s('setlingwu', 'setlingwu', 'setLingwu')
     create_alias_s('setdzxy', 'setdzxy', 'setdzxy')
@@ -3938,6 +3941,16 @@ function setLian()
         SetVariable("mycishu", l_result)
         lianxi_times = l_result
     end
+end
+function set_autoxue()
+    l_result = utils.msgbox("是否自动学习及领悟", "XuexiLingwu",
+                            "yesno", "?", 1)
+    if l_result and l_result == "yes" then
+        flag.autoxuexi = 1
+    else
+        flag.autoxuexi = 0
+    end
+    SetVariable("flagautoxuexi", flag.autoxuexi)
 end
 function pk_start()
     l_result = utils.inputbox("你要PK的目标是（英文ID）？",

@@ -466,7 +466,11 @@ function check_pot(p_cmd)
 
     if flag.autoxuexi == nil then flag.autoxuexi = 0 end
 
-    if hp.pot < l_pot or flag.autoxuexi == 0 then
+    if hp.pot < l_pot  then
+        print("潜能不够，继续工作")
+        return check_job()
+    elseif flag.autoxuexi == 0 then
+        print("flag.autoxuexi 为0，继续工作")
         return check_job()
     end
 
@@ -485,7 +489,7 @@ function check_pot(p_cmd)
             return huxi()
         end
         if skills["shenzhao-jing"] and skills["shenzhao-jing"].lvl < 200 then 
-            return learnSzj() 
+            return learnSzj()
         end
     else
         if score.gold and skills["literate"] and score.gold > 3000 and
@@ -494,7 +498,7 @@ function check_pot(p_cmd)
             end
         
         if flag.type and flag.type ~= 'lingwu' and flag.xuexi == 1 then
-            return checkxue() 
+            return checkxue()
         end
         
         for p in pairs(skills) do
@@ -514,7 +518,7 @@ function check_pot(p_cmd)
         end
 
         if perform.skill and skills[perform.skill] and skills[perform.skill].lvl < 450 then 
-            return checkxue() 
+            return checkxue()
         end
 
         if skills["parry"] and skills["parry"].lvl < max_skill and skills["parry"].lvl >= 450 then
@@ -541,7 +545,7 @@ function lingwu_trigger()
     create_trigger_t('lingwu9',"^.*以你现在的基本内功修为，尚无法领悟基本内功。",'','lingwu_next')
     create_trigger_t('lingwu5',"^.*由于实战经验不足，阻碍了你的「\\D*」进步",'','lingwu_next')
     create_trigger_t('lingwu6','^.*(你深深吸了几口气，精神看起来好多了。|你现在精神饱满。)','','lingwu_goon')
-    create_trigger_t('lingwu7',"^.*你的内力不够。",'','lingwu_finish1') 
+    create_trigger_t('lingwu7',"^.*你的内力不够。",'','lingwu_finish') 
     SetTriggerOption("lingwu1","group","lingwu")
     SetTriggerOption("lingwu2","group","lingwu")
     SetTriggerOption("lingwu3","group","lingwu")

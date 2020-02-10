@@ -1679,18 +1679,26 @@ dujiang_enter_check=function()
 	create_timer_st('walkWait4',2,'dazuo_check')
 end
 function dazuo_check()
-	exe('dazuo '..hp.dazuo)
+	exe('hp;dazuo '..hp.dazuo)
 end
 function dazuo_wait()
 	DeleteTimer('walkWait4')
 end
 dujiang_out=function()
     wait.make(function()
-        wait_busy()
-        exe('out')
-        if flag.dujiang == 1 and tmp.dujiang_start_point == locl.room then
-            dujiang_wait()
+        if flag.dujiang == 1 then
+            wait_busy()
+            exe('out')
+            fastLocate()
+            wait_busy()
+            print("previous localtion: " .. tmp.dujiang_start_point.. " current localtion: ".. locl.room)
+            if tmp.dujiang_start_point == locl.room then
+                return dujiang_wait()
+            else
+                return dujiang_over()
+            end
         else
+            exe('out')
             dujiang_over()
         end
     end)
@@ -1706,7 +1714,12 @@ dujiang_over=function()
 end
 dujiang_wait=function()
    DeleteTimer('walkwait4') 
-    exe('yun jing;yun qi;yun jingli;sxlian;dazuo '..hp.dazuo)
+   exe('yun jing;yun qi;yun jingli')
+   if hp.neili > 4000 then
+        exe('sxlian;dazuo '..hp.dazuo)
+   else
+        exe('dazuo '..hp.dazuo)
+   end
    create_timer_s('walkWait4',1,'dazuo_check')
 end
 dujiang_waitb=function()
@@ -1735,8 +1748,8 @@ dujiang_fly=function()
    DeleteTimer('walkwait4')
         wait.make(function() 
             wait.time(2) 
-        exe('jifa all')  
-        return check_busy(dujiang_over)
+            exe('jifa all')  
+            return check_busy(dujiang_over)
         end)
    --return check_bei(dujiang_over)
 end

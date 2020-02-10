@@ -22,7 +22,7 @@
    output_font_name="ĞÂËÎÌå"
    script_editor="notepad"
    script_editor_argument="%file"
-   script_filename="C:\MUSHS\shujian.lua"
+   script_filename="C:\MUSHS\worlds\shujian\shujian.lua"
    script_language="Lua"
    script_prefix="/"
    site="tj.sjever.net"

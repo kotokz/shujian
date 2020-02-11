@@ -3330,7 +3330,7 @@ function pfmSet()
         l_pfm = perform.pre
         create_alias('pfmset', 'pfmset', 'alias pfmpfm ' .. l_pfm)
         Note("默认PFM")
-        exe('pfmset')
+        Execute('pfmset')
     end
     l_result = utils.inputbox("你的空手PFM(不使用武器的PFM)是?",
                               "pfmks", GetVariable("pfmks"), "宋体", "12")
@@ -3339,7 +3339,7 @@ function pfmSet()
         l_pfm = l_result
         create_alias('pfmks', 'pfmks', 'alias pfmpfm ' .. l_pfm)
         Note("空手PFM")
-        exe('pfmks')
+        Execute('pfmks')
     end
     l_result = utils.inputbox(
                    "遇到慕容剑法用的PFM(使用不拿剑可以克制慕容的skills,慕容剑法的属性为：险)是?",
@@ -3349,7 +3349,7 @@ function pfmSet()
         l_pfm = l_result
         create_alias('pfmmrjf', 'pfmmrjf', 'alias pfmpfm ' .. l_pfm)
         Note("不用剑的PFM")
-        exe('pfmmrjf')
+        Execute('pfmmrjf')
     end
     l_result = utils.inputbox(
                    "遇到明教圣火令法PFM(使用拿武器克制明教的skills，圣火令法的属性为：奇)是?",
@@ -3359,7 +3359,7 @@ function pfmSet()
         l_pfm = l_result
         create_alias('pfmshlf', 'pfmshlf', 'alias pfmpfm ' .. l_pfm)
         Note("带兵器PFM")
-        exe('pfmshlf')
+        Execute('pfmshlf')
     end
     l_result = utils.inputbox(
                    "填写你的无属性PFM(使用无属性的skills，玄铁剑法改归属为空)是?",
@@ -3369,7 +3369,7 @@ function pfmSet()
         l_pfm = l_result
         create_alias('pfmwu', 'pfmwu', 'alias pfmpfm ' .. l_pfm)
         Note("无属性PFM")
-        exe('pfmwu')
+        Execute('pfmwu')
     end
     l_result = utils.inputbox("填写你的克制无属性PFM是?", "pwu",
                               GetVariable("pwu"), "宋体", "12")
@@ -3378,7 +3378,7 @@ function pfmSet()
         l_pfm = l_result
         create_alias('pwu', 'pwu', 'alias pfmpfm ' .. l_pfm)
         Note("克制无属性PFM")
-        exe('pwu')
+        Execute('pwu')
     end
     l_result = utils.inputbox(
                    "填写你的空属性PFM(使用空属性的skills)是?",
@@ -3388,7 +3388,7 @@ function pfmSet()
         l_pfm = l_result
         create_alias('pkong', 'pkong', 'alias pfmpfm ' .. l_pfm)
         Note("空属性PFM")
-        exe('pkong')
+        Execute('pkong')
     end
     l_result = utils.inputbox(
                    "填写你的最大合气PFM(不管武功属性)是?",
@@ -3398,7 +3398,7 @@ function pfmSet()
         l_pfm = l_result
         create_alias('pfmsanqing', 'pfmsanqing', 'alias pfmpfm ' .. l_pfm)
         Note("最大合气PFM")
-        exe('pfmsanqing')
+        Execute('pfmsanqing')
     end
     l_result = utils.inputbox(
                    "填写你的正属性PFM(用verify 来查看你的pfm的属性再填写。格式：verify yunu-jianfa)是?         【被克制属性为：险。属性克制数值为：正130 刚空120 快110 妙险无100】无正属性可按后面的数值高低来填入对你有对应属性的FPM！",
@@ -3409,7 +3409,7 @@ function pfmSet()
         l_pfm = perform.zhen
         create_alias('pfmzhen', 'pfmzhen', 'alias pfmpfm ' .. l_pfm)
         Note("正属性PFM")
-        exe('pfmzhen')
+        Execute('pfmzhen')
     end
     l_result = utils.inputbox(
                    "填写你的奇属性PFM(用verify 来查看你的pfm的属性再填写。格式：verify yunu-jianfa)是?         【被克制属性为：妙。属性克制数值为：奇130 柔空120 慢110 无妙险100】无奇属性可按后面的数值高低来填入对你有对应属性的FPM！",
@@ -3420,7 +3420,7 @@ function pfmSet()
         l_pfm = perform.qi
         create_alias('pfmqi', 'pfmqi', 'alias pfmpfm ' .. l_pfm)
         Note("奇属性PFM")
-        exe('pfmqi')
+        Execute('pfmqi')
     end
     l_result = utils.inputbox(
                    "填写你的刚属性PFM(用verify 来查看你的pfm的属性再填写。格式：verify yunu-jianfa)是?         【被克制属性为：慢。属性克制数值为：刚130 正空120 险110 慢快无100】无刚属性可按后面的数值高低来填入对你有对应属性的FPM！",
@@ -3431,7 +3431,7 @@ function pfmSet()
         l_pfm = perform.gang
         create_alias('pfmgang', 'pfmgang', 'alias pfmpfm ' .. l_pfm)
         Note("刚属性PFM")
-        exe('pfmgang')
+        Execute('pfmgang')
     end
     l_result = utils.inputbox(
                    "填写你的柔属性PFM(用verify 来查看你的pfm的属性再填写。格式：verify yunu-jianfa)是?         【被克制属性为：快。属性克制数值为：柔130 奇空120 妙110 快慢无100】无柔属性可按后面的数值高低来填入对你有对应属性的FPM！",
@@ -3442,7 +3442,7 @@ function pfmSet()
         l_pfm = perform.rou
         create_alias('pfmrou', 'pfmrou', 'alias pfmpfm ' .. l_pfm)
         Note("柔属性PFM")
-        exe('pfmrou')
+        Execute('pfmrou')
     end
     l_result = utils.inputbox(
                    "填写你的快属性PFM(用verify 来查看你的pfm的属性再填写。格式：verify yunu-jianfa)是?         【被克制属性为：刚。属性克制数值为：快130 妙空120 奇110 无刚柔100】无快属性可按后面的数值高低来填入对你有对应属性的FPM！",
@@ -3453,7 +3453,7 @@ function pfmSet()
         l_pfm = perform.kuai
         create_alias('pfmkuai', 'pfmkuai', 'alias pfmpfm ' .. l_pfm)
         Note("快属性PFM")
-        exe('pfmkuai')
+        Execute('pfmkuai')
     end
     l_result = utils.inputbox(
                    "填写你的慢属性PFM(用verify 来查看你的pfm的属性再填写。格式：verify yunu-jianfa)是?         【被克制属性为：柔。属性克制数值为：慢130 险空120 正110 无刚柔100】无慢属性可按后面的数值高低来填入对你有对应属性的FPM！",
@@ -3464,7 +3464,7 @@ function pfmSet()
         l_pfm = perform.man
         create_alias('pfmman', 'pfmman', 'alias pfmpfm ' .. l_pfm)
         Note("慢属性PFM")
-        exe('pfmman')
+        Execute('pfmman')
     end
     l_result = utils.inputbox(
                    "填写你的秒属性PFM(用verify 来查看你的pfm的属性再填写。格式：verify yunu-jianfa)是?         【被克制属性为：正。属性克制数值为：妙130 快空120 刚110 无正奇100】无妙属性可按后面的数值高低来填入对你有对应属性的FPM！",
@@ -3475,7 +3475,7 @@ function pfmSet()
         l_pfm = perform.miao
         create_alias('pfmmiao', 'pfmmiao', 'alias pfmpfm ' .. l_pfm)
         Note("妙属性PFM")
-        exe('pfmmiao')
+        Execute('pfmmiao')
     end
     l_result = utils.inputbox(
                    "填写你的险属性PFM(用verify 来查看你的pfm的属性再填写。格式：verify yunu-jianfa)是?         【被克制属性为：奇。属性克制数值为：险130 慢空120 柔110 无正奇100】无险属性可按后面的数值高低来填入对你有对应属性的FPM！",
@@ -3486,7 +3486,7 @@ function pfmSet()
         l_pfm = perform.xian
         create_alias('pfmxian', 'pfmxian', 'alias pfmpfm ' .. l_pfm)
         Note("险属性PFM")
-        exe('pfmxian')
+        Execute('pfmxian')
     end
     l_result = utils.inputbox(
                    "你FPK的PFM(用verify 来查看你的pfm的属性再填写格式：verify yunu-jianfa)是?",
@@ -3499,7 +3499,7 @@ function pfmSet()
         lianxi_times = l_result
     end
     Note("使用默认PFM")
-    exe('pfmset')
+    Execute('pfmset')
 end
 
 function myUweapon()

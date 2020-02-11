@@ -380,6 +380,8 @@ weaponRepairDo = function()
                      '', 'weaponRepairGold')
     create_trigger_t('repair6', '^(> )*你的精神状态不佳$', '',
                      'weaponRepairCannt')
+    create_trigger_t('repair7', '^(> )*你的铁锤坏掉了！$', '',
+                     'weaponRepairBuy')
     SetTriggerOption("repair1", "group", "repair")
     SetTriggerOption("repair2", "group", "repair")
     SetTriggerOption("repair3", "group", "repair")

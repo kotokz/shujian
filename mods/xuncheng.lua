@@ -176,7 +176,13 @@ function xunchengxi()
 end
 function xuncheng_task_wait()
     wait.make(function()
-        if hp.exp and hp.exp > 300000 and xctuna == 1 and hp.neili >
+        if hp.jingli_max >= hp.jingli_lim and hp.neili_max >= hp.neili_lim then
+            if hp.neili > hp.neili_max * 0.8 then
+                exe('e;yun jing;yun qi;yun jingli;sxlian;dazuo ' .. hp.dazuo)
+            else
+                exe('e;yun qi;dazuo ' .. hp.dazuo)
+            end
+        elseif hp.exp and hp.exp > 300000 and xctuna == 1 and hp.neili >
             hp.neili_max * 0.4 then
             exe('e;yun jing;yun qi;tuna ' .. hp.jingxue / 2)
         elseif hp.exp > 100000 and hp.qixue < hp.dazuo then

@@ -497,10 +497,12 @@ function check_pot(p_cmd)
                 return literate()
             end
         
+        -- flag.xuexi = 1 when parry < 450
         if flag.type and flag.type ~= 'lingwu' and flag.xuexi == 1 then
             return checkxue()
         end
-        
+
+        -- find special force, if level < 100 then xuexi.
         for p in pairs(skills) do
             local q = qrySkillEnable(p)
             if q and q['force'] and perform.force and p == perform.force and
@@ -509,22 +511,29 @@ function check_pot(p_cmd)
                     return checkxue()
                 end
             end
-            if flagFull[p] and not skillEnable[p] and skills[p].lvl < 450 and
-            skills[p].lvl <= skills["dodge"].lvl  then
-                if not skills[p].mstlvl or skills[p].mstlvl > skills[p].lvl then
-                    return checkxue()
-                end
-            end
         end
 
+        -- check perform skill, if less than 450 go xuexi.  This clause might need to remove.
         if perform.skill and skills[perform.skill] and skills[perform.skill].lvl < 450 then 
             return checkxue()
         end
 
-        if skills["parry"] and skills["parry"].lvl < max_skill and skills["parry"].lvl >= 450 then
-            flag.lingwu = 1
+        -- if parry > 450, always lingwu.
+        if skills["parry"] and skills["parry"].lvl >= 450 then
+            if skills["parry"].lvl < max_skill then
+                flag.lingwu = 1
+            else
+                local skillsLingwu = {}
+                skillsLingwu = utils.split(GetVariable("lingwuskills"), '|')
+                for p in pairs(skillsLingwu) do 
+                    if skillEnable[p] == nil and skills[p] < max_skill then
+                        flag.lingwu = 1
+                        break
+                    end 
+                end
+            end
         end
-
+        
         if flag.lingwu == 1 then return checklingwu() end
         
         if not flag.wxjz then flag.wxjz = 0 end
@@ -792,6 +801,7 @@ function xuexiCheck()
 end
 function xuexiStart()
     EnableTriggerGroup("xuexi", true)
+   
     tmp.xuexi = 1
 
     if master.id and locl.item and locl.item[score.master] and

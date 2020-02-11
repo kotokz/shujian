@@ -205,7 +205,7 @@ function locate_trigger()
     create_trigger_t('locate2','^(> )*【你现在正处于(\\D*)】\\n(\\D*)\\s*\\-\\s*','','local_area')
     create_trigger_t('locate3',"^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$",'','local_exit')
     create_trigger_t('locate4',"^(\\D*) = (\\D*)$",'','local_id')
-    create_trigger_t('locate5','^(> )*你把 "action" 设定为 "正在定位" 成功完成。$','','local_start')
+    -- create_trigger_t('locate5','^(> )*你把 "action" 设定为 "正在定位" 成功完成。$','','local_start')
     create_trigger_t('locate6',"^(> )*现在是\\D*年\\D*月\\D*日(\\D*)时",'','local_time')
     create_trigger_t('server_time','^您参与游戏的主机北京时间是\\s*星期(\\D*)\\s*\\d*-\\D*-\\s*\\d*\\s*(\\d*):(\\d*):','','local_time_cal')
     create_trigger_t('locate7',"^\\D*这里没有任何明显的出路",'','local_exitt')
@@ -382,33 +382,56 @@ exit_set=function(exit)
     return l_set    
 end
 locate=function()
-        locatee()
-        create_timer_s('loclWait',2,'locatecheck')
+        -- create_timer_s('loclWait',2,'locatecheck')
+    wait.make(function()
+        locate_trigger()
+        EnableTrigger("locate5",true)
+        localget=0
+        while true do
+            exe('alias action 正在定位')
+            exe('id here')
+            exe('set look;l;time')
+            local l, w = wait.regexp('^(> )*你把 "action" 设定为 "正在定位" 成功完成。$',1)
+            if l ~= nil then break end
+        end
+        local_start()
+    end)
 end
-locatecheck=function()
-    locatee()
-end
-locatee=function()
-    locate_trigger()
-    EnableTrigger("locate5",true)
-	localget=0
-    exe('alias action 正在定位')
-    exe('id here')
-    exe('set look;l;time')
-end
+-- locatecheck=function()
+--     locatee()
+-- end
+-- locatee=function()
+--     locate_trigger()
+--     EnableTrigger("locate5",true)
+-- 	localget=0
+--     exe('alias action 正在定位')
+--     exe('id here')
+--     exe('set look;l;time')
+-- end
 fastLocate=function()
-	fastLocatee()
-	create_timer_s('loclWait',1,'fastlocatecheck')
+	-- fastLocatee()
+    -- create_timer_s('loclWait',1,'fastlocatecheck')
+    wait.make(function()
+        locate_trigger()
+        EnableTrigger("locate5",true)
+        while true do
+            exe('alias action 正在定位')
+            exe('set look;l')
+            local l, w = wait.regexp('^(> )*你把 "action" 设定为 "正在定位" 成功完成。$',1)
+            if l ~= nil then break end
+        end
+        local_start()
+    end)
 end
-fastlocatecheck=function()
-    fastLocatee()
-end
-function fastLocatee()
-	locate_trigger()
-    EnableTrigger("locate5",true)
-    exe('alias action 正在定位')
-    exe('set look;l')
-end
+-- fastlocatecheck=function()
+--     fastLocatee()
+-- end
+-- function fastLocatee()
+-- 	locate_trigger()
+--     EnableTrigger("locate5",true)
+--     exe('alias action 正在定位')
+--     exe('set look;l')
+-- end
 function walk_trigger()
     DeleteTriggerGroup("walk")
     create_trigger_t('walk1','^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$','','walk_goon')

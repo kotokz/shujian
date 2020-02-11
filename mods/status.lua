@@ -525,11 +525,11 @@ function check_pot(p_cmd)
             else
                 local skillsLingwu = {}
                 skillsLingwu = utils.split(GetVariable("lingwuskills"), '|')
-                for p in pairs(skillsLingwu) do 
-                    if skillEnable[p] == nil and skills[p] < max_skill then
+                for i,p in pairs(skillsLingwu) do 
+                    if skillEnable[p] == nil and skills[p] and skills[p].lvl < max_skill then
                         flag.lingwu = 1
                         break
-                    end 
+                    end
                 end
             end
         end
@@ -546,7 +546,7 @@ function check_pot(p_cmd)
     return check_job()
 end
 
-function lingwu_trigger()
+function lingwu_trigger()impro
     DeleteTriggerGroup("lingwu")
     create_trigger_t('lingwu1',"^.*(你只能从特殊技能中领悟。|你不会这种技能。|你要领悟什么？)",'','lingwu_next')
     create_trigger_t('lingwu2',"^.*你从实战中得到的潜能已经用完了。",'','lingwu_finish1')

@@ -444,7 +444,8 @@ function walk_goon()
 	   return searchFunc()
 	end
 	EnableTrigger("hp12",true)
-    create_timer_s('roadWait',road.wait,'path_start')
+    -- create_timer_s('roadWait',road.wait,'path_start')
+    return path_start()
 end
 function goto(where)
    dis_all()
@@ -1121,10 +1122,11 @@ function searchStart()
 		if tmpsearch>20 then
 			tmpsearch=3
 			--print("apath:"..path)
-			wait.make(function()
-				wait.time(road.wait)
-				searchStart()
-			end)
+			-- wait.make(function()
+			-- 	wait.time(road.wait)
+			-- 	searchStart()
+            -- end)
+            searchStart()
 			--return walk_wait()
 		else
 			tmpsearch=tmpsearch+1
@@ -1647,7 +1649,7 @@ dujiang_dujiang=function()
     end
 end
 dujiang_jump=function()
-    exe('yun qi;yell boat;dujiang')
+    exe('hp;yun qi;yell boat;dujiang')
 end
 dujiang_go_enter=function()
 	DeleteTimer('walkwait4')
@@ -1725,8 +1727,13 @@ dujiang_wait=function()
    create_timer_s('walkWait4',1,'dazuo_check')
 end
 dujiang_waitb=function()
-   DeleteTimer('walkwait4') 
-    exe('yun jing;yun qi;yun jingli;sxlian;dazuo '..hp.dazuo)        
+    DeleteTimer('walkwait4') 
+    exe('yun jing;yun qi;yun jingli')  
+    if hp.neili > 4000 then
+        exe('sxlian;dazuo '..hp.dazuo)
+    else
+        exe('dazuo '..hp.dazuo)
+    end      
     create_timer_s('walkWait4',1,'dazuo_check')
 end
 dujiang_jingli=function()

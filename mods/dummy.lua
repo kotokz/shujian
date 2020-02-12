@@ -190,86 +190,86 @@ function dummy_judge(n, l, w)
         messageShow(
             '杀大米：遇到姑苏慕容，装备武器：长剑。使用慕容剑法专用PFM！',
             'greenyellow')
-        exe('pfmmrjf')
+        Execute('pfmmrjf')
     end
     if job.party2 and job.party2 == '姑苏慕' and job.weapon == 'blade' then
         messageShow(
             '杀大米：遇到姑苏慕容，装备武器：钢刀。使用妙属性PFM！',
             'greenyellow')
-        exe('pfmmiao')
+        Execute('pfmmiao')
     end
     if job.party2 and job.party2 == '明' and job.weapon == 'dagger' then
         messageShow(
             '杀大米：遇到明教，装备武器：一块铁令。使用圣火令法专用武器PFM！',
             'greenyellow')
-        exe('pfmshlf')
+        Execute('pfmshlf')
     end
     if job.party2 and job.party2 == '少林' and job.weapon == 'whip' then
         messageShow(
             '杀大米：遇到少林，装备武器：长鞭。使用险属性PFM！',
             'greenyellow')
-        exe('pfmxian')
+        Execute('pfmxian')
     end
     if job.party2 and job.party2 == '古墓' and job.weapon == 'unarmed' then
         messageShow(
             '杀大米：遇到古墓派，装备武器：空手。使用奇属性PFM！',
             'greenyellow')
-        exe('pfmqi')
+        Execute('pfmqi')
     elseif job.party2 and job.party2 == '古墓' and job.weapon == 'sword' then
         messageShow('杀大米：遇到古墓派。使用快属性PFM！',
                     'greenyellow')
-        exe('pfmkuai')
+        Execute('pfmkuai')
     elseif job.party2 and job.party2 == '古墓' then
         messageShow('杀大米：遇到古墓派，使用刚属性PFM！',
                     'greenyellow')
-        exe('pfmgang')
+        Execute('pfmgang')
     end
     if job.party2 and job.party2 == '峨嵋' then
         messageShow('杀大米：遇到峨嵋。使用正属性PFM！',
                     'greenyellow')
-        exe('pfmzhen')
+        Execute('pfmzhen')
     end
     if job.party2 and job.party2 == '丐' and job.weapon == 'stick' then
         messageShow(
             '杀大米：遇到丐帮，装备武器：竹棒。使用奇属性PFM！',
             'greenyellow')
-        exe('pfmqi')
+        Execute('pfmqi')
     elseif job.party2 and job.party2 == '丐' then
         messageShow('杀大米：遇到丐帮。使用正属性PFM！',
                     'greenyellow')
-        exe('pfmzhen')
+        Execute('pfmzhen')
     end
     if job.party2 and job.party2 == '武当' and job.weapon == 'blade' then
         messageShow(
             '杀大米：遇到武当，装备武器：钢刀。使用奇属性PFM！',
             'greenyellow')
-        exe('pfmqi')
+        Execute('pfmqi')
     elseif job.party2 and job.party2 == '武当' then
         messageShow('杀大米：遇到武当。使用正属性PFM！',
                     'greenyellow')
-        exe('pfmzhen')
+        Execute('pfmzhen')
     end
     if job.party2 and job.party2 == '桃花' then
         messageShow('杀大米：遇到桃花岛。使用奇属性PFM！',
                     'greenyellow')
-        exe('pfmxian')
+        Execute('pfmxian')
     end
     if job.party2 and job.party2 == '华山' then
         messageShow('杀大米：遇到华山。使用正属性PFM！',
                     'greenyellow')
-        exe('pfmzhen')
+        Execute('pfmzhen')
     end
     if job.party2 and job.party2 == '昆仑' and job.weapon == 'sword' then
         messageShow(
             '杀大米：遇到昆仑派。武功：剑法。使用柔属性PFM！！',
             'greenyellow')
-        exe('pfmrou')
+        Execute('pfmrou')
     end
     if job.party2 and job.party2 == '昆仑' and job.weapon == 'unarmed' then
         messageShow(
             '杀大米：遇到昆仑派。武功：昆仑叠掌or穿云腿法。使用刚属性PFM！！',
             'greenyellow')
-        exe('pfmgang')
+        Execute('pfmgang')
     end
     exe('jifa all')
     return dummykill()

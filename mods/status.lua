@@ -546,7 +546,7 @@ function check_pot(p_cmd)
     return check_job()
 end
 
-function lingwu_trigger()impro
+function lingwu_trigger()
     DeleteTriggerGroup("lingwu")
     create_trigger_t('lingwu1',"^.*(你只能从特殊技能中领悟。|你不会这种技能。|你要领悟什么？)",'','lingwu_next')
     create_trigger_t('lingwu2',"^.*你从实战中得到的潜能已经用完了。",'','lingwu_finish1')
@@ -554,7 +554,7 @@ function lingwu_trigger()impro
     create_trigger_t('lingwu9',"^.*以你现在的基本内功修为，尚无法领悟基本内功。",'','lingwu_next')
     create_trigger_t('lingwu5',"^.*由于实战经验不足，阻碍了你的「\\D*」进步",'','lingwu_next')
     create_trigger_t('lingwu6','^.*(你深深吸了几口气，精神看起来好多了。|你现在精神饱满。)','','lingwu_goon')
-    create_trigger_t('lingwu7',"^.*你的内力不够。",'','lingwu_finish') 
+    create_trigger_t('lingwu7',"^.*你的内力不够",'','lingwu_next')
     SetTriggerOption("lingwu1","group","lingwu")
     SetTriggerOption("lingwu2","group","lingwu")
     SetTriggerOption("lingwu3","group","lingwu")

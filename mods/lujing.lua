@@ -208,7 +208,7 @@ function locate_trigger()
     -- create_trigger_t('locate5','^(> )*你把 "action" 设定为 "正在定位" 成功完成。$','','local_start')
     create_trigger_t('locate6',"^(> )*现在是\\D*年\\D*月\\D*日(\\D*)时",'','local_time')
     create_trigger_t('server_time','^您参与游戏的主机北京时间是\\s*星期(\\D*)\\s*\\d*-\\D*-\\s*\\d*\\s*(\\d*):(\\d*):','','local_time_cal')
-    create_trigger_t('locate7',"^\\D*这里没有任何明显的出路",'','local_exitt')
+    create_trigger_t('locate7',"^( )*这里没有任何明显的出路。$",'','local_exitt')
     SetTriggerOption("locate_unknown1","multi_line","y")
     SetTriggerOption("locate_unknown1","lines_to_match","7")
     EnableTrigger("locate_unknown1",true)
@@ -243,7 +243,8 @@ local_unknown_room=function(n,l,w)
 	end
     unknown_room_relation=(string.gsub(s,' ',''))
     r_r=string.reverse(unknown_room_relation)
-       _, i = string.find(r_r,'[\n]')
+    _, i = string.find(r_r,'[\n]')
+    if i==nil then i=0 end
     locl.room = (string.sub(unknown_room_relation, 1-i))
     exe('unset look')
 	locl.where=locl.area..locl.room
@@ -330,14 +331,14 @@ local_time_cal=function(n,l,w)
 	locl.weekday=Trim(tostring(w[1]))
 	locl.hour=tonumber(w[2])
 	locl.min=tonumber(w[3])
-	if locl.weekday == '四' and ((locl.hour ==6 and locl.min>=45) or locl.hour==7) and go_on_smy==1 then --20161117增加变量go_on_smy开关控制 防止系统重启后自动打开颂摩崖
+	if locl.weekday == '四' and (locl.hour==6 or locl.hour ==7 ) and locl.min<=45 and go_on_smy==1 then --20161117增加变量go_on_smy开关控制 防止系统重启后自动打开颂摩崖
 		Note('快重启服务器了！')
 		if job.zuhe["songmoya"]~=nil then
 			job.zuhe["songmoya"]=nil
 			Note('颂摩崖任务已关闭！')
 		end
 	end
-	if locl.weekday=='四' and locl.hour==8 and locl.min>=15 and go_on_smy==1 then
+	if locl.weekday=='四' and locl.hour==7 and locl.min>=15 and go_on_smy==1 then
 		if job.zuhe["songmoya"]==nil and tonumber(smydie)<2 then
 			job.zuhe["songmoya"]=true --重启之后继续加入颂摩崖
 		end
@@ -382,7 +383,6 @@ exit_set=function(exit)
     return l_set    
 end
 locate=function()
-        -- create_timer_s('loclWait',2,'locatecheck')
     wait.make(function()
         locate_trigger()
         localget=0
@@ -396,20 +396,7 @@ locate=function()
         local_start()
     end)
 end
--- locatecheck=function()
---     locatee()
--- end
--- locatee=function()
---     locate_trigger()
---     EnableTrigger("locate5",true)
--- 	localget=0
---     exe('alias action 正在定位')
---     exe('id here')
---     exe('set look;l;time')
--- end
 fastLocate=function()
-	-- fastLocatee()
-    -- create_timer_s('loclWait',1,'fastlocatecheck')
     wait.make(function()
         locate_trigger()
         EnableTrigger("locate5",true)
@@ -422,15 +409,6 @@ fastLocate=function()
         local_start()
     end)
 end
--- fastlocatecheck=function()
---     fastLocatee()
--- end
--- function fastLocatee()
--- 	locate_trigger()
---     EnableTrigger("locate5",true)
---     exe('alias action 正在定位')
---     exe('set look;l')
--- end
 function walk_trigger()
     DeleteTriggerGroup("walk")
     create_trigger_t('walk1','^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$','','walk_goon')
@@ -441,17 +419,41 @@ function walk_wait()
     flag.walkwait=true
     EnableTriggerGroup("walk",true)
     EnableTrigger("hp12",true)
-	   if tmp.find then
-	         create_timer_s('walkWait',0.4,'walkTimer')
-		  if cntr1() > 0 then
-                     exe('alias action 正在赶路中')
-		  else
-		     cntr1 = countR(15)
-		  end
-	   else
-             create_timer_s('walkWait',0.1,'walk_goon')
-	   end
+    if tmp.find then
+        create_timer_s('walkWait',0.1,'walkTimer')
+        if cntr1() > 0 then
+            exe('alias action 正在赶路中')
+        else
+            cntr1 = countR(15)
+        end
+    else
+            create_timer_s('walkWait',0.1,'walk_goon')
+    end
 end
+
+
+-- function walk_wait()
+--     EnableTrigger("hp12",true)
+--     if tmp.find then
+--         if cntr1() > 0 then
+--             walk_goon()
+--         else
+--             cntr1 = countR(15)
+--         end
+--     else
+--         walk_goon()
+--     end
+-- end
+
+-- function walk_goon()
+-- 	EnableTrigger("hp12",false)
+-- 	if tmp.find then
+-- 	   return searchFunc()
+-- 	end
+-- 	EnableTrigger("hp12",true)
+--     exe('alias action 正在赶路中')
+-- end
+
 function walkTimer()
     if flag.walkwait then
         exe('alias action 正在赶路中')
@@ -764,77 +766,116 @@ function path_create()
        end
     end
     l_set=utils.split(l_path,';')  --一个alias里有几个命令
-        l_settt=table.getn(l_set)
+    l_settt=table.getn(l_set)
         --print(l_path)
-   if wdgostart==1 then
-    if l_settt<= wd_distance then l_settt=wd_distance end
-      for i=1,table.getn(l_set) do
-        if i<l_settt-wd_distance-3 then
-            if string.find(l_set[i],'#') then
-                if l_num>0 then
-                   l_cnt=l_cnt+1
-                end
-                road.detail[l_cnt]=l_set[i]
-                l_cnt=l_cnt+1
-                l_num=0
-            else
-                if l_num==0 then
-                   road.detail[l_cnt]=l_set[i]
+    if wdgostart == 1 then
+        if l_settt <= wd_distance then l_settt = wd_distance end
+        for i = 1, table.getn(l_set) do
+            if i < l_settt - wd_distance - 3 then
+                if string.find(l_set[i], '#') then
+                    if l_num > 0 then l_cnt = l_cnt + 1 end
+                    road.detail[l_cnt] = l_set[i]
+                    l_cnt = l_cnt + 1
+                    l_num = 0
                 else
-                   road.detail[l_cnt]=road.detail[l_cnt]..';'..l_set[i]
+                    if l_num == 0 then
+                        road.detail[l_cnt] = l_set[i]
+                    else
+                        road.detail[l_cnt] = road.detail[l_cnt] .. ';' .. l_set[i]
+                    end
+                    l_num = l_num + 1
+                    if l_num > road.steps then
+                        l_cnt = l_cnt + 1
+                        l_num = 0
+                    end
                 end
-                l_num=l_num+1
-                if l_num>road.steps then
-                   l_cnt=l_cnt+1
-                   l_num=0
-                end
-            end
-        else
-            if string.find(l_set[i],'#') then
-                if l_num>0 then
-                   l_cnt=l_cnt+1
-                end
-                road.detail[l_cnt]=l_set[i]
-                l_cnt=l_cnt+1
-                l_num=0
             else
-                if l_num==0 then
-                   road.detail[l_cnt]=l_set[i]
+                if string.find(l_set[i], '#') then
+                    if l_num > 0 then l_cnt = l_cnt + 1 end
+                    road.detail[l_cnt] = l_set[i]
+                    l_cnt = l_cnt + 1
+                    l_num = 0
                 else
-                   road.detail[l_cnt]=road.detail[l_cnt]..';'..l_set[i]
-                end
-                l_num=l_num+1
-                if l_num>0 then
-                   l_cnt=l_cnt+1
-                   l_num=0
+                    if l_num == 0 then
+                        road.detail[l_cnt] = l_set[i]
+                    else
+                        road.detail[l_cnt] = road.detail[l_cnt] .. ';' .. l_set[i]
+                    end
+                    l_num = l_num + 1
+                    if l_num > 0 then
+                        l_cnt = l_cnt + 1
+                        l_num = 0
+                    end
                 end
             end
         end
-      end
-   else
-      for i=1,table.getn(l_set) do
-          if string.find(l_set[i],'#') then
-                if l_num>0 then
-                  l_cnt=l_cnt+1
-                end
-                road.detail[l_cnt]=l_set[i]
-                l_cnt=l_cnt+1
-                l_num=0
-          else
-                if l_num==0 then
-                  road.detail[l_cnt]=l_set[i]
+    else
+        for i = 1, table.getn(l_set) do
+            if string.find(l_set[i], '#') then
+                if l_num > 0 then l_cnt = l_cnt + 1 end
+                road.detail[l_cnt] = l_set[i]
+                l_cnt = l_cnt + 1
+                l_num = 0
+            else
+                if l_num == 0 then
+                    road.detail[l_cnt] = l_set[i]
                 else
-                  road.detail[l_cnt]=road.detail[l_cnt]..';'..l_set[i]
+                    road.detail[l_cnt] = road.detail[l_cnt] .. ';' .. l_set[i]
                 end
-                l_num=l_num+1
-                if l_num>road.steps then
-                   l_cnt=l_cnt+1
-                   l_num=0
+                l_num = l_num + 1
+                if l_num > road.steps then
+                    l_cnt = l_cnt + 1
+                    l_num = 0
                 end
-          end
-       end
-   end
+            end
+        end
+    end        
 end
+-- function path_start()
+--     EnableTrigger("hp12",false)
+--     EnableTimer("roadWait",false)
+--     DeleteTimer("roadWait",false)
+--     if flag.find==1 then return end 
+--     -- local l_road
+--     -- road.i=road.i + 1
+--     -- road.i = 0
+--     wait.make(function()
+--         for i,step in ipairs(road.detail) do    
+--             road.i= i  
+--             print("开始第".. i .. "步")
+--             print("步骤:" .. step )
+--             EnableTrigger("hp12",false)
+--             if step and string.find(step,'ta corpse') then
+--                 DeleteTriggerGroup('eyu')
+--                 create_trigger_t('eyu1','^>*\\s*鳄鱼\\(E yu\\)$','','jqgeyu')
+--                 create_trigger_t('eyu2','^>*\\s*鳄鱼\\(E yu\\) <昏迷不醒>$','','jqgeyu')
+--                 create_trigger_t('eyu3','^>*\\s*鳄鱼的尸体\\(Corpse\\)$','','jqgeyu')
+--                 create_trigger_t('eyu4','^>*\\s*鳄鱼神志迷糊，脚下一个不稳，倒在地上昏了过去。$','','jqgeyu')
+--                 create_trigger_t('eyu5','^>*\\s*鳄鱼一见你从水中浮出，都张开血盆大口，朝你游了过来。$','','jqgeyu')
+--                 create_trigger_t('eyu6','^>*\\s*鳄鱼潭 - $','','jqgeyu')
+--                 for i = 1,6 do SetTriggerOption("eyu" .. i,"group","eyu") end
+--                 create_timer_s('jqgeyu',30,'jqgeyuwait')
+--             end	        
+--             if string.find(step,'#') then
+--                 local _,_,func,params = string.find(step,"^#(%a%w*)%s*(.-)$")
+--                 if func then
+--                     _G[func](params)
+--                 end 
+--             else
+--                 exe(step)
+--                 walk_wait()
+--             end
+--             while true do
+--                 local l, w = wait.regexp('^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$',1)            
+--                 if l ~= nil then break end
+--             end             
+--         end
+--         locate_finish='go_confirm'
+--         return locate()
+--     end)
+-- end
+
+
 function path_start()
     EnableTrigger("hp12",false)
     EnableTimer("roadWait",false)
@@ -868,6 +909,7 @@ function path_start()
         return walk_wait()
     end
 end
+
 
 function go_confirm()
 	locate_finish=0
@@ -1538,7 +1580,7 @@ duhe_over=function()
 	weapon_unwield()
     weapon_wield()
 	djdh_open()
-	if road.i==0 then road.i=2 end
+	-- if road.i==0 then road.i=2 end
     return walk_wait()
 end
 duhe_wait=function()
@@ -2367,17 +2409,17 @@ function Wdmw2()
         return Wdmw3()
     end
 function Wdmw3()
-        wait.make(function() 
-                wait.time(1.2) --Wdmw2 exe中有28个指令
+    wait.make(function() 
+                -- wait.time(1.2) --Wdmw2 exe中有28个指令
         exe("ask tao hua about rumor")
         if flag.find == 1 then return end --后加
         if flag.wait==1 then return end
-        -- return Wdmw4()
-        wait.make(function()  --2019.1.13
-            wait.time(0.3)
-            return check_bei(Wdmw4)
-        end)
-
+                -- return Wdmw4()
+        -- wait.make(function()  --2019.1.13
+        --     wait.time(0.3)
+        --     return check_bei(Wdmw4)
+        -- end)
+        return check_bei(Wdmw4)    
     end)
 end
 function Wdmw4()        
@@ -2387,31 +2429,43 @@ function Wdmw4()
     return Wdmw5()
 end
 function Wdmw5()
-        wait.make(function() 
-        wait.time(1) -- 2019.1.13 Wdmw4 23个指令，这里等1s
-        exe("su;su;su;su;e;se;su;su;su;su")
-        if flag.find == 1 then return end --后加
-		if flag.wait==1 then return end
-                return Wdmw6()
-        end)
+        -- wait.make(function() 
+        -- wait.time(1) -- 2019.1.13 Wdmw4 23个指令，这里等1s
+        -- exe("su;su;su;su;e;se;su;su;su;su")
+        -- if flag.find == 1 then return end --后加
+		-- if flag.wait==1 then return end
+        --         return Wdmw6()
+        -- end)
+    exe("su;su;su;su;e;se;su;su;su;su")
+    if flag.find == 1 then return end --后加
+    if flag.wait==1 then return end
+    return Wdmw6()
 end
 function Wdmw6()
-        wait.make(function()
-        wait.time(0.4) -- 2019.1.13 Wdmw5 9个指令，这里等0.4s
-		if flag.find == 1 then return end --后加
-		if flag.wait==1 then return end
-        exe("pa up;e")
-            return Wdmw7()
-        end)
+        -- wait.make(function()
+        -- wait.time(0.4) -- 2019.1.13 Wdmw5 9个指令，这里等0.4s
+		-- if flag.find == 1 then return end --后加
+		-- if flag.wait==1 then return end
+        -- exe("pa up;e")
+        --     return Wdmw7()
+        -- end)
+    if flag.find == 1 then return end --后加
+    if flag.wait==1 then return end
+    exe("pa up;e")
+    return Wdmw7()        
 end
 function Wdmw7()
-        wait.make(function()
-        wait.time(0.4) -- 2019.1.13 Wdmw5 1个指令，这里等0.4s zuan shulin可以穿越，注意
-		if flag.find == 1 then return end --后加
-		if flag.wait==1 then return end
-        exe("zuan shulin")
-                return walk_wait()
-        end)
+        -- wait.make(function()
+        -- wait.time(0.4) -- 2019.1.13 Wdmw5 1个指令，这里等0.4s zuan shulin可以穿越，注意
+		-- if flag.find == 1 then return end --后加
+		-- if flag.wait==1 then return end
+        -- exe("zuan shulin")
+        --         return walk_wait()
+        -- end)
+    if flag.find == 1 then return end --后加
+    if flag.wait==1 then return end
+    exe("zuan shulin")
+    return walk_wait()        
 end
 --------------by fqyy武当后山搜索----------------
 function OutWdhs()
@@ -2741,8 +2795,8 @@ function Outsldsk()
 end
 ------------------------------------------
 function boatYell()
-    exe("yell boat;;enter")
-	locate()
+    exe("yell boat;enter")
+	fastLocate()
 	tmp.cnt = 0
 	DeleteTimer('boat')
 	create_timer_s('boat',3,'boatInCheck')
@@ -2754,14 +2808,14 @@ function boatInCheck()
 	   return boatWait()
 	elseif string.find(locl.room,'花丛中') then
 		exe('south;#3w;#2e;#3s;qu xiaozhu')
-	   locate()
+	   fastLocate()
 	   return create_timer_s('boat',3,'boatInCheck')
 	elseif string.find(locl.room,'岸边') or string.find(locl.room,'小岛边') then
-	   locate()
+        fastLocate()
 	   return create_timer_s('boat',3,'boatInCheck')
 	else
 	   return go(road.act)
-        end
+    end
  end
 function boatWait()
 	DeleteTimer('boat')
@@ -2774,7 +2828,7 @@ function CboatWait()
 end
 function Checkloboat()
 	DeleteTimer('boat')
-	locate()
+	fastLocate()
 	create_timer_s('boat',2,'Checkboat')
 end
 function Checkboat()

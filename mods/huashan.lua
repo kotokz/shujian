@@ -456,32 +456,32 @@ huashan_fight = function(n, l, w)
     SetTriggerOption("huashan_fight4", "group", "huashan_fight")
 
     -- hs flood后kill命令出不来的workaround by joyce@tj
-    addxml.trigger {
-        custom_colour = "2",
-        enabled = "y",
-        group = "huashan_fight",
-        match = "^(> )*你对着" .. job.target ..
-            "(大喝一声：|喝道：|猛吼一声：|吼道：)",
-        name = "huashan_fight_hskill",
-        regexp = "y",
-        script = "hskill_timer_stop",
-        sequence = "100"
-    }
-    create_timer_s('hskill', 0.4, 'hskill')
+    -- addxml.trigger {
+    --     custom_colour = "2",
+    --     enabled = "y",
+    --     group = "huashan_fight",
+    --     match = "^(> )*你对着" .. job.target ..
+    --         "(大喝一声：|喝道：|猛吼一声：|吼道：)",
+    --     name = "huashan_fight_hskill",
+    --     regexp = "y",
+    --     script = "hskill_timer_stop",
+    --     sequence = "100"
+    -- }
+    -- create_timer_s('hskill', 0.4, 'hskill')
 end
-function hskill() -- hs flood后kill命令出不来的workaround by joyce@tj
-    exe('unset no_kill_ap;yield no')
-    exe('set wimpycmd pfmpfm\\hp')
-    exe('follow ' .. job.id)
-    exe('kick ' .. job.id)
-    exe('kill ' .. job.id)
-    -- exe('set wimpy 100')
-end
-function hskill_timer_stop() -- hs flood后kill命令出不来的workaround by joyce@tj
-    DeleteTimer('hskill')
-    EnableTrigger("huashan_fight_hskill", false)
-    quick_locate = 1
-end
+-- function hskill() -- hs flood后kill命令出不来的workaround by joyce@tj
+--     exe('unset no_kill_ap;yield no')
+--     exe('set wimpycmd pfmpfm\\hp')
+--     exe('follow ' .. job.id)
+--     exe('kick ' .. job.id)
+--     exe('kill ' .. job.id)
+--     -- exe('set wimpy 100')
+-- end
+-- function hskill_timer_stop() -- hs flood后kill命令出不来的workaround by joyce@tj
+--     DeleteTimer('hskill')
+--     EnableTrigger("huashan_fight_hskill", false)
+--     quick_locate = 1
+-- end
 huashan_faint = function()
     exe('unset wimpy;unset no_kill_ap;yield no')
     exe('kill ' .. job.id)

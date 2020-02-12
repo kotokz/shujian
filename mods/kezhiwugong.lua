@@ -968,12 +968,18 @@ end
 function kezhiwugongStart()
     if job.name == 'diemenglou' or job.name == 'pk' or job.name == 'guanfu' or
         job.name == 'hubiao' then
-        create_alias('mypfm_buff', 'mypfm_buff',
-                     'alias mybuff ' .. GetVariable("mybuff"))
-        Execute('mypfm_buff')
-        create_alias('mypfm_debuff', 'mypfm_debuff',
-                     'alias mydebuff ' .. GetVariable("mydebuff"))
-        Execute('mypfm_debuff')
+        
+        local mybuff = GetVariable("mydebuff")
+        if mybuff then
+            create_alias('mypfm_buff', 'mypfm_buff',
+                     'alias mybuff ' .. mybuff)
+            Execute('mypfm_buff')
+        end
+        local debuff = GetVariable("mydebuff")
+        if debuff then
+            create_alias('mypfm_debuff', 'mypfm_debuff', 'alias mydebuff ' .. debuff)
+            Execute('mypfm_debuff')
+        end
     end
     -- print("¿ªÆô¼ì²â")
     npc_num = 0

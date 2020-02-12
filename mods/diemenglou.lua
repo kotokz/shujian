@@ -1080,14 +1080,25 @@ function dmlFight(n, l, w)
     delete_all_timers()
     npc_name = w[3]
     npc_id = string.lower(w[4])
-    create_alias('pkpfm_kezhi', 'pkpfm_kezhi',
-                 'alias pkpfm ' .. GetVariable("pkpfm"))
-    Execute('pkpfm_kezhi')
-    create_alias('mypfm_kezhi', 'mypfm_kezhi',
-                 'alias mypfm ' .. GetVariable("mypfm") .. ' ' .. npc_id)
-    Execute('mypfm_kezhi')
-    Execute('set wimpycmd pkpfm\\hp')
-    Execute('pkpfm')
+    local pkpfm = GetVariable("pkpfm")
+    if pkpfm then
+        create_alias('pkpfm_kezhi', 'pkpfm_kezhi', 'alias pkpfm ' .. pkpfm)        
+        Execute('pkpfm_kezhi')
+    else
+        messageShow('没有设置pkpfm， 请尽快设置')
+    end
+
+    local mypfm = GetVariable("mypfm")
+    if mypfm then
+        create_alias('mypfm_kezhi', 'mypfm_kezhi',
+                     'alias mypfm ' .. mypfm .. ' ' .. npc_id)
+        Execute('mypfm_kezhi')
+    else
+        messageShow('没有设置mypfm， 请尽快设置')
+    end
+
+    exe('set wimpycmd pkpfm\\hp')
+    exe('pkpfm')
     exe('set wimpy 100;yield no')
     exe('look ' .. npc_id)
     exe('nick 蝶梦楼战斗中')

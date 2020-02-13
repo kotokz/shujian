@@ -635,3 +635,14 @@ armorRepairOver = function()
     return check_halt(check_jobx)
 end
 
+function bqcheck()
+    if perform and perform.skill and skillEnable[perform.skill] and
+        weaponKind[skillEnable[perform.skill]] then
+        if weapon.first and Bag[weapon.first] then
+            exe('wield ' .. Bag[weapon.first].fullid)
+        else
+            exe('wield sanqing sword')
+            messageShow('»Ö¸´ÎäÆ÷²»¼ûÁË£¡', "red")
+        end
+    end
+end

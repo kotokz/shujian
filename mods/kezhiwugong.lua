@@ -968,16 +968,16 @@ end
 function kezhiwugongStart()
     if job.name == 'diemenglou' or job.name == 'pk' or job.name == 'guanfu' or
         job.name == 'hubiao' then
-        
+
         local mybuff = GetVariable("mydebuff")
         if mybuff then
-            create_alias('mypfm_buff', 'mypfm_buff',
-                     'alias mybuff ' .. mybuff)
+            create_alias('mypfm_buff', 'mypfm_buff', 'alias mybuff ' .. mybuff)
             Execute('mypfm_buff')
         end
         local debuff = GetVariable("mydebuff")
         if debuff then
-            create_alias('mypfm_debuff', 'mypfm_debuff', 'alias mydebuff ' .. debuff)
+            create_alias('mypfm_debuff', 'mypfm_debuff',
+                         'alias mydebuff ' .. debuff)
             Execute('mypfm_debuff')
         end
     end
@@ -1107,6 +1107,8 @@ function kezhiwugongkill(p_num)
         end
     end
 end
+npc_skill = ''
+npc_val = ''
 
 function kezhiwugongValue(kzValue, i, kezhiwugongName)
     local tflag = true
@@ -1153,6 +1155,8 @@ function kezhiwugongValue(kzValue, i, kezhiwugongName)
     ColourNote("red", "blue",
                npc_name[i] .. "使用武功【" .. kezhiwugongName ..
                    "】,武功属性：" .. kzValue)
+    npc_skill = kezhiwugongName
+    npc_val = kzValue
 end
 function kezhiwugongcheck1(n, l, w) kezhiwugongcheck(1, n, l, w) end
 function kezhiwugongcheck2(n, l, w) kezhiwugongcheck(2, n, l, w) end

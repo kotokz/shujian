@@ -243,6 +243,7 @@ need_waittime = 0
 common_walk = 1
 check_step_time = os.clock()
 quick_locate = 0
+g_stop_flag = false
 
 SMYID = { -- 武当失败开启上山的id
     ["kkfromch"] = true,
@@ -803,6 +804,12 @@ function wuxingzhenFinish() return check_heal() end
 function checkPrepare()
     EnableTriggerGroup("poison", false)
     DeleteTriggerGroup("poison")
+
+    if g_stop_flag == true then
+        print("任务结束，游戏暂停")
+        g_stop_flag = false
+        return disAll()
+    end
     drugPrepare = drugPrepare or {}
     exe('hp')
     if hp.exp < 150000 then return checkPrepareOver() end
@@ -3831,6 +3838,17 @@ function drugGetVar()
         for _, p in pairs(tmp.drug) do drugPrepare[p] = true end
     end
 end
+
+function g_stop()
+    if job.name == nil or job.name == 'idle' then
+        print("游戏停止")
+        disAll()
+    else
+        g_stop_flag = true
+        print("当前正在任务中：" .. job.name ..
+                  ". 将会在任务结束后停止")
+    end
+end
 function setAlias()
     create_alias_s('xxk', 'xxk', 'xxkFind')
     create_alias_s('kkr', 'kkr', 'kongkongFind')
@@ -3843,6 +3861,7 @@ function setAlias()
     create_alias_s('csgo', 'csgo', 'zhuacaishen_find')
     create_alias_s('gfgo', 'gfgo', 'guanfu_start')
     create_alias_s('stop', 'stop', 'disAll')
+    create_alias_s('gstop', 'gstop', 'g_stop')
     create_alias_s('iset', 'iset', 'shujian_set')
     create_alias_s('start', 'start', 'main')
     create_alias_s('pkset', 'pkset', 'setpk')

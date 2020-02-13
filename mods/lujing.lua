@@ -420,7 +420,7 @@ function walk_wait()
     EnableTriggerGroup("walk",true)
     EnableTrigger("hp12",true)
     if tmp.find then
-        create_timer_s('walkWait',0.1,'walkTimer')
+        create_timer_s('walkWait',0.2,'walkTimer')
         if cntr1() > 0 then
             exe('alias action 正在赶路中')
         else

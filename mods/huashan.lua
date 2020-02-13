@@ -1,4 +1,27 @@
 -------华山
+hstongji_total = 0
+hstongjilasttime_total = 0
+hstongji_1 = 0
+hstongji_2 = 0
+hstongji_zh = 0 -- 任务时间总和
+hstongji_lq = 0 -- hs领取次数
+hstongji_finish = 0 -- hs任务成功次数
+hstongji_fangqi = 0 -- hs失败次数
+hstongji_pingjun = 0 -- 平均时间 
+hstongji_thistime = 0 -- hs 本次战斗时间 
+hstongjilasttime_l = 0 -- 累计hs2战斗时间
+hstongjilasttime_l_2 = 0 -- 本次hs战斗时间
+hstongjilasttime_l_1 = 0 -- 累计hs1战斗时间
+hscheckhead = 0
+tosld = 0
+tocaidi = 0
+tomr = 0
+toyzw = 0
+tomtl = 0
+hstoszgf = 0
+hstohssd = 0
+hstoxct = 0
+hs2job = 0
 local huashanArea1 = {
     ["菜地"] = "华山村",
     ["杂货铺"] = "华山村",
@@ -64,23 +87,39 @@ faintFunc = faintFunc or {}
 faintFunc["huashan"] = "huashanFindAgain"
 function huashanFindAgain()
     EnableTriggerGroup("huashan_find", true)
-    if flag.times == 3 and dest.area == '华山村' then
-        return go(huashanFindAct, '华山村', '菜地')
-    end
     if flag.times == 3 and dest.area == '襄阳城' and dest.room ==
         '山间空地' then
         return go(huashanFindAct, '襄阳郊外', '瀑布')
     end
-    if flag.times == 2 and job.area == '明教' and
-        (job.room == "紫杉林" or string.find(job.room, "字门")) then
+    if flag.times == 2 and dest.area == '明教' and
+        (dest.room == "紫杉林" or string.find(dest.room, "字门")) then
         return go(huashanFindAct, '明教', '练武场')
     end
     if flag.times == 3 and job.area == '扬州城' and job.room == '南门' then
         return go(huashanFindAct, '扬州城', '长江南岸')
     end
+    if flag.times == 3 and job.area == '兰州城' and job.room == '大道' then
+        return go(huashanFindAct, '兰州城', '永登')
+    end
+    if flag.times == 3 and job.area == '铁掌山' and job.room == '山路' then
+        return go(huashanFindAct, '铁掌山', '中指峰')
+    end
+    if flag.times == 3 and job.area == '杭州城' and job.room ==
+        '青石大道' then
+        return go(huashanFindAct, '杭州城', '飞来峰')
+    end
+    if flag.times == 3 and job.area == '苗疆' and job.room == '山路' then
+        return go(huashanFindAct, '苗疆', '山洞')
+    end
+    if flag.times == 3 and job.area == '杭州城' and job.room == '山路' then
+        return go(huashanFindAct, '杭州城', '雷峰塔')
+    end
+    if flag.times == 3 and job.area == '嵩山少林' and job.room ==
+        '石板路' then return go(huashanFindAct, '嵩山少林', '法堂') end
     if flag.times == 3 and job.area == '兰州城' and job.room == '西城门' then
         return go(huashanFindAct, '兰州城', '永登')
     end
+
     if flag.times == 3 and job.area == '嵩山少林' and job.room ==
         "罗汉堂" then
         return go(huashanFindAct, '嵩山少林', '罗汉堂五部')
@@ -93,6 +132,8 @@ function huashanFindAgain()
 end
 function huashanFindFail() return go(huashan_shibai, '华山', '正气堂') end
 function huashan_start()
+    map.rooms["village/zhongxin"].ways["northwest"] = "village/caidi"
+    map.rooms["village/zhongxin"].ways["northeast"] = "village/caidi"
     DeleteTriggerGroup("all_fight")
     DeleteTriggerGroup("huashan_fight")
     DeleteTriggerGroup("huashan_cut")
@@ -194,6 +235,7 @@ function huashan_triggerDel()
     DeleteTriggerGroup("huashanQuest")
 end
 function huashan_ask()
+    dis_all()
     EnableTimer('walkWait4', false)
     EnableTriggerGroup("huashan_ask", false)
     EnableTriggerGroup("huashan_accept", true)
@@ -205,11 +247,13 @@ function huashan_nobody()
     return huashan_start()
 end
 function huashan_shibai()
+    EnableTimer('walkWait4', false)
     EnableTriggerGroup("huashan_accept", false)
     kezhiwugongclose()
     return check_busy(huashan_shibai_b)
 end
 function huashan_shibai_b()
+    EnableTimer('walkWait4', false)
     flag.idle = nil
     DeleteTriggerGroup("all_fight")
     kezhiwugongclose()
@@ -218,55 +262,65 @@ function huashan_shibai_b()
     if job.where ~= nil and string.find(job.where, "侠客岛") then
         mjlujingLog("侠客岛")
     end
-    messageShow('华山任务：任务失败。', "Plum")
+    hstongji_fangqi = hstongji_fangqi + 1
+    messageShow(
+        '华山任务：任务失败!华山失败[' .. hstongji_fangqi ..
+            ']次。')
     jobfailLog()
     return check_halt(check_food)
 end
 function huashan_fangqi()
+    EnableTimer('walkWait4', false)
     DeleteTriggerGroup("all_fight")
     kezhiwugongclose()
     huashan_triggerDel()
     job.last = "huashan"
     hsjob2 = 0
-    -- if job.zuhe["wudang"] then
-    --   job.last='wudang'
-    -- end
+    local weapon = Bag[weapon.first]
+
+    if weapon and weapon.fullid then exe('wield ' .. weapon.fullid) end
     return check_halt(check_food)
 end
 function huashan_busy()
+    EnableTimer('walkWait4', false)
     EnableTriggerGroup("huashan_accept", false)
-    return check_bei(huashan_busy_dazuo)
+    locate_finish = 'huashan_busy_dazuo'
+    return check_busy(locate)
 end
 function huashan_busy_dazuo()
+    locate_finish = 0
     exe('#3s')
-    return prepare_lianxi(check_food)
+    return prepare_lianxi(check_heal)
 end
 function huashan_npc()
     EnableTimer('walkWait4', false)
     exe('nick 华山任务中')
-    -- job.time.b=os.time()
+    job.time.b = os.time()
     EnableTriggerGroup("huashan_accept", false)
     job.last = "huashan"
     if hsjob2 < 1 then
-        job.time.b = os.time()
+        hstongji_lq = hstongji_lq + 1
+        -- job.time.b = os.time()
         messageShow('华山任务：开始任务。')
-        return check_bei(huashan_npc_go)
+        locate_finish = 'huashan_npc_go'
+        return check_busy(locate)
     else
-        return check_bei(huashan_npc_go2)
+        locate_finish = 'huashan_npc_go2'
+        return check_busy(locate)
     end
 
 end
 function huashan_npc_go()
+    locate_finish = 0
     go(huashan_npc_get, '华山', '山脚下', 'huashan/zhengqi')
 end
 function huashan_npc_go2()
+    locate_finish = 0
     go(huashan_npc_get, '华山', '山脚下', 'huashan/jitan')
 end
 function huashan_npc_get()
     EnableTriggerGroup("huashan_npc", true)
-    if score.id == 'kkfromch' then exe('set 兰花手 蝶舞式') end
     exe('unset wimpy;set wimpycmd pfmpfm\\hp')
-    exe('set no_kill_ap')
     exe('s')
     return check_bei(huashan_npc_goon)
 end
@@ -341,14 +395,23 @@ huashan_find = function(n, l, w)
     SetTriggerOption("huashan_find4", "group", "huashan_find")
     SetTriggerOption("huashan_find1", "keep_evaluating", "y")
     SetTriggerOption("huashan_find2", "keep_evaluating", "y")
-    if string.find(job.where, "洗象池") or
-        string.find(job.where, "地下黑拳市") or
-        string.find(job.where, '绝情谷石窟') then
+    if string.find(job.where, '神龙岛') then tosld = tosld + 1 end
+    if string.find(job.where, '菜地') then tocaidi = tocaidi + 1 end
+    if string.find(job.where, '姑苏慕容') then tomr = tomr + 1 end
+    if string.find(job.where, '燕子坞') then toyzw = toyzw + 1 end
+    if string.find(job.where, '曼佗罗山庄') then tomtl = tomtl + 1 end
+    if string.find(job.where, '苏州城闺房') then hstoszgf = hstoszgf + 1 end
+    if string.find(job.where, '华山石洞') then hstohssd = hstohssd + 1 end
+    if string.find(job.where, '嵩山少林心禅堂') then
+        hstoxct = hstoxct + 1
+    end
+    if string.find(job.where, '地下黑拳市') or
+        string.find(job.where, '曼佗罗山庄') or
+        string.find(job.where, '武当山小院') then
         messageShow('华山任务②：任务地点【' .. job.where ..
                         '】不可到达，任务放弃。')
         return check_halt(huashanFindFail)
     end
-    if string.find(job.where, "梅林") then job.where = '梅庄西湖边' end
     -- print("2"..job.where)
     if huashanArea1[job.where] then
         job.room = job.where
@@ -404,6 +467,7 @@ function huashanFindAct()
     EnableTriggerGroup("huashan_find", true)
     job.flag()
     exe('look')
+    wipe_kill = 1
     find()
 end
 function huashanFindKill()
@@ -418,6 +482,7 @@ huashan_dadao = function()
 end
 huashan_fight = function(n, l, w)
     flag.wait = 1
+    DiscardQueue()
     EnableTrigger("huashan_find2", false)
     job.id = string.lower(w[2])
     exe('unset no_kill_ap;yield no')
@@ -455,33 +520,8 @@ huashan_fight = function(n, l, w)
     SetTriggerOption("huashan_fight3", "group", "huashan_fight")
     SetTriggerOption("huashan_fight4", "group", "huashan_fight")
 
-    -- hs flood后kill命令出不来的workaround by joyce@tj
-    -- addxml.trigger {
-    --     custom_colour = "2",
-    --     enabled = "y",
-    --     group = "huashan_fight",
-    --     match = "^(> )*你对着" .. job.target ..
-    --         "(大喝一声：|喝道：|猛吼一声：|吼道：)",
-    --     name = "huashan_fight_hskill",
-    --     regexp = "y",
-    --     script = "hskill_timer_stop",
-    --     sequence = "100"
-    -- }
-    -- create_timer_s('hskill', 0.4, 'hskill')
 end
--- function hskill() -- hs flood后kill命令出不来的workaround by joyce@tj
---     exe('unset no_kill_ap;yield no')
---     exe('set wimpycmd pfmpfm\\hp')
---     exe('follow ' .. job.id)
---     exe('kick ' .. job.id)
---     exe('kill ' .. job.id)
---     -- exe('set wimpy 100')
--- end
--- function hskill_timer_stop() -- hs flood后kill命令出不来的workaround by joyce@tj
---     DeleteTimer('hskill')
---     EnableTrigger("huashan_fight_hskill", false)
---     quick_locate = 1
--- end
+
 huashan_faint = function()
     exe('unset wimpy;unset no_kill_ap;yield no')
     exe('kill ' .. job.id)
@@ -510,8 +550,36 @@ huashan_cut = function()
     job.killer = {}
     fight.time.e = os.time()
     fight.time.over = fight.time.e - fight.time.b
-    messageShowT('华山任务：战斗用时:【' .. fight.time.over ..
-                     '】秒,搞定蒙面人：【' .. job.target .. '】。')
+    if hsjob2 == 1 then
+        -- 开始统计次数
+        hstongjilasttime_l_2 = hstongji_thistime
+        hstongjilasttime_l = hstongjilasttime_l + hstongjilasttime_l_2
+        hstongji_2 = hstongji_2 + 1
+        hstongji_pingjun = string.format("%0.2f",
+                                         hstongjilasttime_l / hstongji_2)
+        messageShowT('华山任务：【' .. job.target .. '】【' .. job.id ..
+                         '】。使用武功【' .. npc_skill ..
+                         '】，武功属性【' .. npc_val .. '】。')
+        messageShowT('华山任务：战斗用时:【' .. fight.time.over ..
+                         '】秒,搞定蒙面人：【' .. job.target ..
+                         '】,华山2共计【' .. hstongji_2 ..
+                         '】次.平均用时【' .. hstongji_pingjun ..
+                         '】秒', 'aqua')
+        return check_halt(huashan_cut_act)
+    else
+        -- 开始统计次数
+        hstongjilasttime_l_2 = hstongji_thistime
+        hstongjilasttime_l_1 = hstongjilasttime_l_1 + hstongjilasttime_l_2
+        hstongji_1 = hstongji_1 + 1
+        hstongji_pingjun = string.format("%0.2f",
+                                         hstongjilasttime_l_1 / hstongji_1)
+        messageShowT('华山任务：战斗用时:【' .. fight.time.over ..
+                         '】秒,搞定蒙面人：【' .. job.target ..
+                         '】,华山1共计【' .. hstongji_1 ..
+                         '】次.平均用时【' .. hstongji_pingjun ..
+                         '】秒', 'aqua')
+        return check_halt(huashan_cut_act)
+    end
     -- return check_halt(huashan_cut_act)
     tmp.cnt = 0
     if job.area == '绝情谷' then
@@ -719,11 +787,13 @@ huashan_neili = function()
     end
 end
 huashan_yls_lbcx = function()
+    locate_finish = 0
     EnableTriggerGroup("huashan_yls_ask", true)
     weapon_unwield()
     return exe('drop head;askk yue lingshan about 力不从心')
 end
 huashan_yls_back = function()
+    locate_finish = 0
     EnableTimer('walkWait4', false)
     EnableTriggerGroup("huashan_yls_ask", false)
     EnableTriggerGroup("huashanQuest", true)
@@ -777,6 +847,16 @@ huashan_finish = function()
         count.gold_max and score.gold > count.gold_max) or
         (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt >
             count.gold_max * 4) then return check_gold() end
+    messageShow('华山任务地点统计：神龙岛【' .. tosld ..
+                    '】次 ！菜地【' .. tocaidi .. '】次 ！慕容【' ..
+                    tomr .. '】次 ！燕子坞【' .. toyzw ..
+                    '】次 ！曼佗罗山庄【' .. tomtl .. '】次 ！',
+                "cyan")
+    messageShow(
+        '华山2不可到达地点统计：华山石洞【' .. hstohssd ..
+            '】次 ！苏州闺房【' .. hstoszgf .. '】次 ！心禅堂【' ..
+            hstoxct .. '】次 ！', "cyan")
+
     hsruntime = hsruntime + 1
     if hsruntime > 9 then
         hsruntime = 0

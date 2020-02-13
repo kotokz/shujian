@@ -461,137 +461,118 @@ function hp_heqi_check(n, l, w)
     if (hp.qixue / (hp.qixue_max / hp.qixue_per) < 35) and cty_cur > 0 then
         exe('eat chantui yao')
     end
+    if score.party == "天龙寺" and hp.qixue_per < 80 then
+        exe('yun liao.. score.id')
+    end
     if hp.qixue < hp.qixue_max * 0.7 then exe('yun qi') end
     if hp.jingxue < hp.jingxue_max * 0.5 then exe('yun jing') end
     if hp.neili < hp.neili_max * 0.4 and cbw_cur > 0 then
         exe('eat ' .. drug.neili2)
     end
-    if hp.neili < hp.neili_max * 0.1 and hqd_cur > 0 then
+    if hp.neili < hp.neili_max * 0.3 and hqd_cur > 0 then
         exe('eat ' .. drug.neili3)
     end
     if hp.jingli < hp.jingli_max * 0.5 or hp.jingli < 500 then
         exe('yun jingli')
     end
-    if hp.neili < hp.neili_max * 0.05 and nxw_cur > 0 then
-        exe('eat ' .. drug.neili1)
+    if hp.neili < hp.neili_max * 0.1 and nxw_cur > 0 then
+        exe('eat ' .. drug.neili)
     end
-    if job.name == 'pk' or job.name == 'diemenglou' then pk_heqi_control() end
-    ------pk攒合气设置--------
-    if pkheqi == 1 and
-        (job.name == 'pk' or job.name == 'diemenglou' or job.name == 'guanfu') then
-        if heqi > tonumber(GetVariable("heqi_number")) then
-            print('合气憋足了！老子要放大招刷死你！')
-            print(
-                '天！地！玄！黄！唯！我！独！尊！杀。。。。。。')
-            exe('set wimpy 100;set wimpycmd mybuff\\mydebuff\\mypfm\\hp')
+    if job.name == 'songmoya' then
+        if hp.qixue_per < 80 then exe('eat ' .. drug.heal) end
+        if perform.force and perform.force == "dulong-dafa" and
+            (not flag.wudi or flag.wudi == 0) then exe('yun wudi') end
+        if perform.force and perform.force == "dulong-dafa" and hp.qixue_per <
+            70 then exe('yun wudi') end
+        if os.time() > fight.time.b + 120 then
+            exe('set wimpycmd halt\\down')
             return
         end
+        if heqi == 1000 and hp.qixue_per < 55 then
+            chats_log(
+                '报效国家任务：合气到达1000满值，放弃任务！',
+                'cyan')
+            exe('set wimpycmd halt\\down')
+            return
+        end
+        if yptjob.fengzhao == false then
+            if yptjob.name2 == '无威胁' then
+                if heqi > 320 then
+                    exe('ppp1;pp1;set wimpycmd pfmbuff\\ppp1\\pp1\\hp')
+                    hqpd = 0
+                    return
+                elseif hqpd == 0 then
+                    exe('set wimpycmd hp')
+                    hqpd = 1
+                    print('积攒合气！')
+                    return
+                end
+            end
+
+            if yptjob.name1 == '无威胁' then
+                if heqi > 320 then
+                    exe('ppp2;pp2;set wimpycmd pfmbuff\\ppp2\\pp2\\hp')
+                    hqpd = 0
+                    return
+                elseif hqpd == 0 then
+                    exe('set wimpycmd hp')
+                    hqpd = 1
+                    print('积攒合气！')
+                    return
+                end
+            end
+        end
+        if yptjob.name1 ~= '无威胁' and yptjob.name2 ~= '无威胁' then
+            if heqi > 400 then
+                if GetVariable("double_kill") ~= nil and
+                    GetVariable("double_kill") == "yes" then
+                    if sxkiller1 >= sxkiller2 then
+                        exe('set wimpycmd pfmbuff\\ppp1\\ppp2\\hp')
+                        hqpd = 0
+                    else
+                        exe('set wimpycmd pfmbuff\\ppp2\\ppp1\\hp')
+                        hqpd = 0
+                    end
+                else
+                    if sxkiller1 >= sxkiller2 then
+                        exe('ppp1;pp1;set wimpycmd pfmbuff\\ppp1\\pp1\\hp')
+                        hqpd = 0
+                    else
+                        exe('ppp2;pp2;set wimpycmd pfmbuff\\ppp2\\pp2\\hp')
+                        hqpd = 0
+                    end
+                end
+            elseif hqpd == 0 then
+                exe('set wimpycmd hp')
+                hqpd = 1
+                print('开始积攒合气！')
+            end
+        end
     end
 
-    ------pk攒合气设置--------
-    ------tls 狮子吼设置------
-    --[[if job.name=='pk' or job.name == 'guanfu' then
-			if score.party=='天龙寺' and heqi >160 and flag.yun_roar==0 then
-			   exe('yun roar')
-			end
-		end]]
-    ------tls 狮子吼设置------
-    ----旧公版颂摩崖code-----
-    --[[if job.name=='songmoya' then
-  if hp.qixue_per<80 then
-	exe('eat '.. drug.heal)
-   end
-   if perform.force and perform.force=="dulong-dafa" and (not flag.wudi or flag.wudi==0) then
-       exe('yun wudi')
-   end
-  if perform.force and perform.force=="dulong-dafa" and hp.qixue_per<70 then
-       exe('yun wudi')
-      end
-	if os.time()>fight.time.b+120 then
-     exe('set wimpycmd halt\\down')
-  return
-  end
-	if heqi==1000 and hp.qixue_per<55 then
-        chats_log('报效国家任务：合气到达1000满值，放弃任务！','cyan')
-  exe('set wimpycmd halt\\down')
-  return
-   end
-  if yptjob.fengzhao==false then
-   if yptjob.name2 == '无威胁' then
-              if heqi > 320 then
-                exe('ppp1;pp1;set wimpycmd pfmbuff\\ppp1\\pp1\\hp')
-                hqpd=0
-                return
-              elseif hqpd==0 then
-                exe('set wimpycmd hp')
-                hqpd=1
-                print ('积攒合气！')
-                return
-              end
+    if heqi == 1000 and hp.neili < hp.neili_max * 0.2 then
+        dis_all()
+        locate()
+        exe('yield yes;set wimpycmd halt\\hp\\' .. locl.dir)
+        geta()
+        EnableTrigger("hpheqi1", true)
+        if job.name == 'songxin' then
+            chats_log('送信任务：合气到达1000满值，放弃任务！',
+                      'cyan')
+            EnableTrigger("songxin_fight7", true)
+            return check_halt(songxinKillFail, 1)
         end
-
-   if yptjob.name1 == '无威胁' then 
-              if heqi > 320 then
-                exe('ppp2;pp2;set wimpycmd pfmbuff\\ppp2\\pp2\\hp')
-                hqpd=0
-                return
-              elseif hqpd==0 then
-                exe('set wimpycmd hp')
-                hqpd=1
-                print ('积攒合气！')
-                return
-              end
+        if job.name == 'wudang' then
+            chats_log('武当任务：合气到达1000满值，放弃任务！',
+                      'cyan')
+            return check_halt(wudangKillFail, 1)
         end
-  end
-  if yptjob.name1~='无威胁' and yptjob.name2~='无威胁' then      
-   if heqi > 400 then
-    if GetVariable("double_kill")~=nil and GetVariable("double_kill")=="yes" then
-     if sxkiller1 >= sxkiller2 then
-       exe('set wimpycmd pfmbuff\\ppp1\\ppp2\\hp')
-       hqpd=0
-     else
-       exe('set wimpycmd pfmbuff\\ppp2\\ppp1\\hp')
-       hqpd=0
-     end
-    else
-     if sxkiller1 >= sxkiller2 then
-       exe('ppp1;pp1;set wimpycmd pfmbuff\\ppp1\\pp1\\hp')
-       hqpd=0
-     else
-       exe('ppp2;pp2;set wimpycmd pfmbuff\\ppp2\\pp2\\hp')
-       hqpd=0
-     end
+        if job.name == 'xueshan' then
+            chats_log('雪山任务：合气到达1000满值，放弃任务！',
+                      'cyan')
+            return check_halt(xueshanKillFail, 1)
+        end
     end
-   elseif hqpd==0 then
-    exe('set wimpycmd hp')
-    hqpd=1
-    print ('开始积攒合气！')
-   end 
-  end
- end
- 
-  
-   if heqi==1000 and hp.neili<hp.neili_max*0.2  
-    then
-	dis_all()
-	locate()
-    exe('yield yes;set wimpycmd halt\\hp\\'..locl.dir)
-	geta()
-    EnableTrigger("hpheqi1",true)
-    if job.name=='songxin' then
-       chats_log('送信任务：合气到达1000满值，放弃任务！','cyan')
-    EnableTrigger("songxin_fight7",true)
-	return check_halt(songxinKillFail,1)
-    end
-    if job.name=='wudang' then
-       chats_log('武当任务：合气到达1000满值，放弃任务！','cyan')
-	return check_halt(wudangKillFail,1)
-    end
-        if job.name=='xueshan' then
-       chats_log('雪山任务：合气到达1000满值，放弃任务！','cyan')
-	return check_halt(xueshanKillFail,1)
-    end
-   end]]
 end
 function songxinKillFail()
     exe('yield no')
@@ -609,7 +590,7 @@ function noweaponpfm() Execute('pfmks') end
 
 function yunWudiDone() flag.wudi = 0 end
 function yunWudi() flag.wudi = 1 end
-function fightDrug() if isInBags(drug.neili3) then exe('eat ' .. drug.neili3) end end
+function fightDrug() if isInBags(drug.neili) then exe('eat ' .. drug.neili) end end
 function npcWeapon()
     DeleteTriggerGroup("npcWeapon")
     create_trigger_t('npcWeapon1', "^  □(\\D*)\\(", '', 'npcWP')
@@ -638,6 +619,8 @@ function npcWP(n, l, w)
         job.weapon = 'blade'
         exe('set po 刀')
     elseif string.find(n_words, "鞭") then
+        job.weapon = 'whip'
+    elseif string.find(n_words, "星月菩提") then
         job.weapon = 'whip'
         exe('set po 索')
     elseif string.find(n_words, "石") then
@@ -918,6 +901,9 @@ function fight_check(n, l, w, styles)
     end
 end
 function fightHpCheck()
+    if score.party and score.party == "天龙寺" and hp.qixue_per < 75 then
+        exe('yun liao.. score.id')
+    end
     -- if score.party and score.party=="峨嵋派" and hp.qixue_per<75 then
     --   exe('yun yinyang')
     -- end
@@ -933,14 +919,8 @@ function fightHpCheck()
     end
     if hp.qixue < hp.qixue_max * 0.7 then exe('yun qi') end
     if hp.jingxue < hp.jingxue_max * 0.5 then exe('yun jing') end
-    if hp.neili < hp.neili_max * 0.4 and cbw_cur > 0 then
-        exe('eat ' .. drug.neili2)
-    end
-    if hp.neili < hp.neili_max * 0.1 and hqd_cur > 0 then
-        exe('eat ' .. drug.neili3)
-    end
-    if hp.neili < hp.neili_max * 0.05 and nxw_cur > 0 then
-        exe('eat ' .. drug.neili1)
+    if hp.neili < hp.neili_max * 0.5 and nxw_cur > 0 then
+        exe('eat ' .. drug.neili)
     end
     if hp.jingli < hp.jingli_max * 0.5 or hp.jingli < 500 then
         exe('yun jingli')
@@ -1410,7 +1390,7 @@ prepare_neili_idle = function()
         lianxi(l_cnt)
     end
     if score.gold and score.gold > 1000 and hp.neili < hp.neili_max * 0.5 then
-        exe('eat ' .. drug.neili2)
+        exe('eat ' .. drug.neili)
     end
     exe('yun jingli;yun jing;yun qi')
     if hp.jingli_max < hp.jingli_lim - 500 and flag.lianxi == 1 and hp.neili >
@@ -2005,7 +1985,10 @@ gaibangCutAct = function()
     exe('halt;i')
     weapon_unwield()
     weaponWieldCut()
-    for i = 1, 3 do exe('qie corpse ' .. i) end
+    for i = 1, 3 do
+        exe('unwield puti ')
+        exe('qie corpse ' .. i)
+    end
     exe('alias action Cut')
 end
 gaibangCutFail = function()
@@ -3443,7 +3426,7 @@ zhunbeineili = function(func, p_cmd)
     else
         job.prepare = test
     end
-    if hp.neili >= hp.neili_max * 0.8 then return check_bei(job.prepare) end
+    if hp.neili >= hp.neili_max * 1.1 then return check_bei(job.prepare) end
 
     DeleteTriggerGroup("zbneili")
     create_trigger_t('zbneili1',
@@ -3466,11 +3449,8 @@ zhunbeineili = function(func, p_cmd)
     SetTriggerOption("zbneili3", "group", "zbneili")
     SetTriggerOption("zbneili4", "group", "zbneili")
     SetTriggerOption("zbneili5", "group", "zbneili")
-    wait.make(function()
-        wait.time(1)
-        exe('yun jing;yun jingli;yun qi;hp')
-        zhunbeineili_a()
-    end)
+    exe('yun jing;yun jingli;yun qi;hp')
+    zhunbeineili_a()
 end
 zbneili_w = function()
     locate()
@@ -3495,7 +3475,7 @@ zhunbeineili_b = function()
     check_bei(zhunbeineili_c)
 end
 zhunbeineili_c = function()
-    if hp.neili >= hp.neili_max * 0.8 then
+    if hp.neili >= hp.neili_max * 1.5 then
         EnableTriggerGroup("zbneili", false)
         DeleteTriggerGroup("zbneili")
         exe('yun jing;yun qi;yun jingli')

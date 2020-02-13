@@ -172,7 +172,7 @@ count.hxd_max = 5
 count.dhd_max = 5
 drug = {}
 drug.heal = 'chantui yao'
-drug.neili1 = 'neixi wan'
+drug.neili = 'neixi wan'
 drug.neili2 = 'chuanbei wan'
 drug.neili3 = 'huangqi dan'
 drug.jingxue = 'huoxue dan'
@@ -3001,7 +3001,7 @@ function checkNxwBuy()
     else
         if hqd_cur < count.hqd_max then exe('buy ' .. drug.neili3) end
         if cbw_cur < count.cbw_max then exe('buy ' .. drug.neili2) end
-        if nxw_cur < count.nxw_max then exe('buy ' .. drug.neili1) end
+        if nxw_cur < count.nxw_max then exe('buy ' .. drug.neili) end
         checkYaoBags()
         return check_bei(checkNxwi)
     end

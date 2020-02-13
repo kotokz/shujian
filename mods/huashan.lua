@@ -550,6 +550,7 @@ huashan_cut = function()
     job.killer = {}
     fight.time.e = os.time()
     fight.time.over = fight.time.e - fight.time.b
+    hstongji_thistime = fight.time.over
     if hsjob2 == 1 then
         -- 开始统计次数
         hstongjilasttime_l_2 = hstongji_thistime

@@ -22,7 +22,7 @@ road.wipe_id=nil
 road.wipe_who=nil
 road.wipe_con=nil
 road.resume=nil
-road.wait=0.2
+road.wait=0.12
 road.steps=100
 road.cmd=nil
 road.cmd_save=nil
@@ -48,6 +48,7 @@ local WipeNoPerform = {
 	 ["dali wujiang"] = true,
 	 ["yu guangbiao"] = true,
 	 ["wu guangsheng"] = true,
+	 ["ju mang"] = true,
 	 ["jia ding"] = true,
 	 ["ya huan"] = true,
 	 ["wu seng"] = true,
@@ -63,7 +64,12 @@ local WipeNoPerform = {
 	 ["wei shi"] = true,
 	 --["jiao zhong"] = true,
 }
-
+mjMenid = {
+    ["风字门"] = "mingjiao/didao/men-feng",
+	["雷字门"] = "mingjiao/didao/men-lei",
+	["天字门"] = "mingjiao/didao/men-tian",
+	["地字门"] = "mingjiao/didao/men-di",
+	}
 local ItemGet = {
     ["黄金"] = true,
 --  ["白银"] = true,
@@ -73,61 +79,13 @@ local ItemGet = {
     ["屠龙匠技残篇"] = true,
     ["倚天匠技残篇"] = true,
 }
-
-
--- function exe(cmd)
--- 	cmdck=0
--- 	cmd_check()
---     if GetConnectDuration() == 0 then
---        return Connect()
---     end
---     if cmd==nil then
---         if locl.room=='明霞门' or locl.room=='猛虎营' or locl.room=='佛照门' or locl.room_relation=='街道｜猛虎营-----街道-----招财大车店｜明霞门街道' then
--- 			return walk_wait()
---         end 
---         cmd='look' 
---     end
--- --	   if locl.area and locl.area~="峨嵋山" then
--- --       Execute('halt')
--- --   end
---         Execute(cmd)
--- 		--print(cmd..' '..check_step_num..' '..check_steptest)
---         check_steptest=1
--- 	    if string.find(cmd,';') then
--- 	        _check_step_num=utils.split(cmd,';')
--- 			check_steptest=table.getn(_check_step_num)
--- 	    end
--- 		check_step_num=check_step_num+check_steptest
--- 		if check_step_num>71 then
--- 			need_waittime=1
---            	    step_docheck()
--- 	            wait.make(function() 
---                     wait.time(road.wait)
---                     --Execute(cmd) 
--- 				    step_docheckdo()
---                 end)
---         else
--- 			need_waittime=0
--- 			road.wait=0.2
--- 			--Execute(cmd)
--- 		end
-		
--- end
 function exe(cmd)
-	-- cmdck=0
-	-- cmd_check()
     if GetConnectDuration() == 0 then
        return Connect()
     end
     if cmd==nil then
-        if locl.room=='明霞门' or locl.room=='猛虎营' or locl.room=='佛照门' or locl.room_relation=='街道｜猛虎营-----街道-----招财大车店｜明霞门街道' then
-			return walk_wait()
-        end 
         cmd='look' 
     end
---	   if locl.area and locl.area~="峨嵋山" then
---       Execute('halt')
---   end
     run(cmd)		
 end
 
@@ -159,39 +117,15 @@ function add_cmd_to_queue(cmd)
     end
 end
 
--- function cmd_check()
---     cmdck=1
--- 	create_timer_s('cmdckk',90,'cmd_ckset')
--- end
--- function cmd_ckset()
---     if cmdck==1 then
--- 		return walk_wait()
--- 	end
--- end
--- function step_docheck()
--- 	if need_waittime==1 then
--- 		    if os.clock()-check_step_time<3 then
--- 		        road.wait=3.01-os.clock()+check_step_time
--- 				--common_walk=string.format("%0.2f",common_walk)
--- 			    --print(common_walk..' '..check_step_num)
--- 		    else
--- 			    road.wait=0.2
--- 		        --print(common_walk..' '..check_step_num)
--- 		    end
--- 	end
--- end
--- function step_docheckdo()
--- 	    check_step_time=os.clock()
--- 		check_step_num=0
--- 		need_waittime=0
--- 		road.wait=0.2
--- end
 function exe_road(cmd)
     if GetConnectDuration() == 0 then
        return Connect()
     end
     if cmd==nil then cmd='look' end
     road.cmd=cmd
+    if locl.area and locl.area~="峨嵋山" then
+        Execute('halt')
+    end
     Execute(cmd)
 
 end
@@ -268,7 +202,23 @@ local_area=function(n,l,w)
     exe('unset look')
     locl.where=locl.area..locl.room
     locl.room_relation = (string.gsub(room_relation,'[\n]',''))
-	print(locl.room_relation)
+    print(locl.room_relation)
+    if string.find(locl.room_relation,"黄河渡船") and string.find(locl.room_relation,"∧") then
+	    locl.room_relation = string.gsub(locl.room_relation,"黄河渡船","")
+		locl.room_relation = string.gsub(locl.room_relation,"∧","")
+	end
+	if string.find(locl.room_relation,"长江渡船") and string.find(locl.room_relation,"∧") then
+	    locl.room_relation = string.gsub(locl.room_relation,"长江渡船","")
+		locl.room_relation = string.gsub(locl.room_relation,"∧","")
+	end
+	if string.find(locl.room_relation,"渡船") and string.find(locl.room_relation,"∧")then
+	    locl.room_relation = string.gsub(locl.room_relation,"渡船","")
+		locl.room_relation = string.gsub(locl.room_relation,"∧","")
+	end
+	if string.find(locl.room_relation,"竹篓") and string.find(locl.room_relation,"∧")then
+	    locl.room_relation = string.gsub(locl.room_relation,"竹篓","")
+		locl.room_relation = string.gsub(locl.room_relation,"∧","")
+	end
 end
 function room_relative(n,l,w)
     local s=w[3]
@@ -304,23 +254,44 @@ local_exit=function(n,l,w)
     if cnt==0 or cnt==nil then
        cnt=1
     end
+    if string.find(locl.room,"客栈") or string.find(locl.room,"客店") then
+	    local l_c=0
+          for i=1,table.getn(l_set) do
+            if l_set[i]=="up" then
+               l_c=i
+               break
+            end
+         end
+        table.remove(l_set,l_c)
+	end
+	if string.find(locl.room,"江边") or string.find(locl.room,"渡口") or string.find(locl.room,"长江") then
+	    local l_c=0
+          for i=1,table.getn(l_set) do
+            if l_set[i]=="enter" then
+               l_c=i
+               break
+            end
+         end
+        table.remove(l_set,l_c)
+	end
     cnt=math.random(1,cnt)
     locl.dir=l_set[cnt]
     if locl.dir==nil then
        locl.dir='east'
     end
-	for i=1,table.getn(exit.locl) do
-		locl.exit[exit.locl[i]]=true
-	end
+    for _,p in pairs(exit.locl) do
+        locl.exit[p]=true
+     end
     if locate_finish~=0 then
        return _G[locate_finish]()
     end
 end
 local_exitt=function()
     EnableTimer('loclWait',false)
+    localget=1
     if locate_finish~=0 then
-            return _G[locate_finish]()
-        end
+        return _G[locate_finish]()
+    end
 end
 local_time=function(n,l,w)
     EnableTriggerGroup("locate",false)
@@ -338,7 +309,7 @@ local_time_cal=function(n,l,w)
 			Note('颂摩崖任务已关闭！')
 		end
 	end
-	if locl.weekday=='四' and locl.hour==7 and locl.min>=15 and go_on_smy==1 then
+	if locl.weekday=='四' and locl.hour==8 and locl.min>=15 and go_on_smy==1 then
 		if job.zuhe["songmoya"]==nil and tonumber(smydie)<2 then
 			job.zuhe["songmoya"]=true --重启之后继续加入颂摩崖
 		end
@@ -576,25 +547,40 @@ function path_consider()
             return checkWait(goContinue,0.3)
          else
 			if locl.room_relation=='九老洞九老洞' or locl.room_relation=="不知道哪里九老洞 不知道哪里 九老洞" then
-         	exe('drop fire;leave;leave;leave;leave;leave;leave;out;ne;ed;ne;ed')	
-			--quick_locate=0
-            return checkWait(goContinue,0.3)
-           end
-	       if locl.room_relation=='西湖边↙｜白堤柳浪闻莺西湖边' then
-	          exe('sw')	
+         	    exe('drop fire;leave;leave;leave;leave;leave;leave;out;ne;ed;ne;ed')	
+			    --quick_locate=0
+                return checkWait(goContinue,0.3)
+            end
+	        if locl.room_relation=='西湖边↙｜白堤柳浪闻莺西湖边' then
+                exe('sw')	
 	          --quick_locate=0
-              return checkWait(goContinue,0.3)
-	       end
+                return checkWait(goContinue,0.3)
+	        end
 	       if locl.room=='梅林' then
 		     quick_locate=0
-		     exe('n;n;n')
-	         return checkWait(goContinue,0.2)
+		     exe('n')
+                  return mlOutt()
 	       end
 	       if locl.room=='渔船' then	
          	   exe('out;w;s;out;w;s;out;w;s')	
 			   --quick_locate=0
                return checkWait(goContinue,0.3)
            end
+           if locl.area=='绝情谷' and locl.room=='石壁' then
+            exe('pa down;pa up')	
+            quick_locate=0
+            return checkWait(goContinue,0.2)
+        end
+        
+        
+        if locl.room_relation=='南疆沙漠吐谷浑伏俟城南疆沙漠↖｜↗南疆沙漠---南疆沙漠---南疆沙漠↙｜↘南疆沙漠南疆沙漠南疆沙漠南疆沙漠' then  	
+               exe('look;hp;drink jiudai;n;n;n;n;n;n;n;n;n;n')   				
+                   return njsm_check()
+               end
+       if locl.room_relation=='清水温泉' then        
+                        exe('look;hp;drink jiudai;ne')        
+                   return walk_wait()
+               end
           if locl.room_relation~='' then
               chats_locate('定位系统：没有归属地的房间加入了room_relative，【可以尝试定位没有归属地的房间】','LimeGreen')
               --这里可以尝试定位没有归属地的房间
@@ -695,6 +681,7 @@ function path_consider()
        return false
     end
     path_create()
+    road.i=0
     return check_halt(path_start)
 end
 function path_cal()
@@ -879,7 +866,12 @@ end
 function path_start()
     EnableTrigger("hp12",false)
     EnableTimer("roadWait",false)
-	DeleteTimer("roadWait",false)
+    DeleteTimer("roadWait",false)
+    if flag.find==1 then return end
+	if flag.wait==1 then return end
+	if locl.room=="鳄鱼潭" then
+	exe('ta corpse')
+	end
     local l_road
     road.i=road.i + 1
     if flag.find==1 then return end 
@@ -888,17 +880,7 @@ function path_start()
        return locate()
     end
     l_road=road.detail[road.i]
-    if l_road and string.find(l_road,'ta corpse') then
-	   DeleteTriggerGroup('eyu')
-	   create_trigger_t('eyu1','^>*\\s*鳄鱼\\(E yu\\)$','','jqgeyu')
-	   create_trigger_t('eyu2','^>*\\s*鳄鱼\\(E yu\\) <昏迷不醒>$','','jqgeyu')
-	   create_trigger_t('eyu3','^>*\\s*鳄鱼的尸体\\(Corpse\\)$','','jqgeyu')
-	   create_trigger_t('eyu4','^>*\\s*鳄鱼神志迷糊，脚下一个不稳，倒在地上昏了过去。$','','jqgeyu')
-	   create_trigger_t('eyu5','^>*\\s*鳄鱼一见你从水中浮出，都张开血盆大口，朝你游了过来。$','','jqgeyu')
-	   create_trigger_t('eyu6','^>*\\s*鳄鱼潭 - $','','jqgeyu')
-	   for i = 1,6 do SetTriggerOption("eyu" .. i,"group","eyu") end
-	   create_timer_s('jqgeyu',30,'jqgeyuwait')
-	end	        
+
     if string.find(l_road,'#') then
        local _,_,func,params = string.find(l_road,"^#(%a%w*)%s*(.-)$")
        if func then
@@ -1011,7 +993,9 @@ find_nobody=function()
 		  return _G[p]()
 	   end
 	end
-	if job.name=='dolost' then return lookXin() end
+	if job.name=='dolost' then 
+        return go(lookXin,'襄阳城','白虎门内街')
+    end  
     return go(check_heal,'大理城','药铺')
 end
 List = {}
@@ -1064,50 +1048,72 @@ function searchPre()
 	--插入起始road.id 
 	starttime=os.clock() --测试计算时间
 	newrooms = {}
-	for id in pairs(rooms) do
-			table.insert(newrooms,id)
-	end
-
-	myrt={}
+	if job.room and job.area then SN_rooms=getRooms(job.room, job.area) end
+      if #SN_rooms>1 and locl.room==job.room then         
+                print('找到'..#SN_rooms..'个同名房间')
+                local Firstroom=getNearRoom({road.id},SN_rooms)
+                table.insert(newrooms,Firstroom)
+                for _,v in pairs(SN_rooms) do 
+                        if v~=Firstroom then                         
+                           table.insert(newrooms,v)
+                        end
+                end        
+        DFS()                
+        newrooms = {}
+      end
 	
-	for _,roomid in pairs(newrooms) do --插入房间链表
-			roomV = List.new(roomid)
-			local node = roomV
-			for k,v in pairs(newrooms) do --所有的房间id
-				for route,link_way in pairs(map.rooms[roomid].ways) do  --当前id的出口
-					local routeLength = map.rooms[roomid]:length(route) --获取路径方向是否可达，返回false标示此路不通，那么这个方向的路就不插入出口链表
-					--print("k="..k.."|link_way="..link_way.."|v="..v)
-					if routeLength then
-						---by fqyy 20170429 加入room.lengths的数值判断
-						if routeLength ==1 or routeLength >1 and flag.times>1 then
-							if v==link_way then 
-								node = List.addNode(node,List.new(k)) --插入节点生成第一个房间的出口链表
-							end
-						end
-					end
-				end
-			end
-			table.insert(myrt,roomV)
-	end
-	visited={}
-
-	for i=1 ,countTab(newrooms) do
-		visited[i]=false --初始化所有节点未曾访问
+	if job.name~='dolost' and job.name~='hubiao' then
+	   starttime=os.clock() --测试计算时间
+	   for id in pairs(rooms) do                        
+          table.insert(newrooms,id)
+       end        
+       DFS()
 	end
 	
-	if not visited[1] then
-		FastDFS(myrt,1) --计算起点的连通图
-	end
-	for i=1 ,countTab(newrooms) do
-		if visited[i]==false then--未曾访问的节点测试一下跟第一个起点的连通性，如果能联通，则递归这个节点
-			local path, len = map:getPath(myrt[1].index,myrt[i].index)
-			if path then
-				FastDFS(myrt,i) --继续遍历指定的myrt[i]这个节点
-				--messageShow("发现通路，遍历下一个节点！通路长度="..len,"red")
-			end
-		end
-	end
-	--messageShow("【"..job.name.."】深度优先计算结束，遍历【"..roomsnum.."】个房间，用时【"..os.clock()-starttime.."】秒","SandyBrown")
+	      
+	
+	
+end
+function DFS()
+    myrt={}
+
+    for _,roomid in pairs(newrooms) do --插入房间链表
+                roomV = List.new(roomid)
+                local node = roomV
+                for k,v in pairs(newrooms) do --所有的房间id
+                        for route,link_way in pairs(map.rooms[roomid].ways) do  --当前id的出口
+                                local routeLength = map.rooms[roomid]:length(route) --获取路径方向是否可达，返回false标示此路不通，那么这个方向的路就不插入出口链表
+                                --print("k="..k.."|link_way="..link_way.."|v="..v)
+                                if routeLength then
+                                        ---by fqyy 20170429 加入room.lengths的数值判断
+                                        if routeLength ==1 or routeLength >1 and flag.times>1 then
+                                                if v==link_way then 
+                                                        node = List.addNode(node,List.new(k)) --插入节点生成第一个房间的出口链表
+                                                end
+                                        end
+                                end
+                        end
+                end
+                table.insert(myrt,roomV)
+    end
+    visited={}
+
+    for i=1 ,countTab(newrooms) do
+        visited[i]=false --初始化所有节点未曾访问
+    end
+
+    if not visited[1] then
+        FastDFS(myrt,1) --计算起点的连通图
+    end
+    for i=1 ,countTab(newrooms) do
+        if visited[i]==false then--未曾访问的节点测试一下跟第一个起点的连通性，如果能联通，则递归这个节点
+                local path, len = map:getPath(myrt[1].index,myrt[i].index)
+                if path then
+                        FastDFS(myrt,i) --继续遍历指定的myrt[i]这个节点
+                        --messageShow("发现通路，遍历下一个节点！通路长度="..len,"red")
+                end
+        end
+    end                        
 end
 function FastDFS(myrt,i)
 	visited[i] = true          --设置下标为I的顶点为已访问  
@@ -1160,6 +1166,7 @@ function search()
     return check_halt(searchStart,1)
 end
 function searchStart()
+    EnableTriggerGroup("wipe",true) 
 	flag.search=1
 	--Note("run searchStart")
     if flag.find==1 then return end
@@ -1434,12 +1441,14 @@ end
 hscaidi_goon1=function()
     if caidiout==1 then
        EnableTriggerGroup("hscaidi",false)
-       return hscaidi_out()
+       locate_finish='hscaidi_out'
+       return checkNext(locate)
     else
        return hscaidi()
     end
 end
 hscaidi_out=function()
+    locate_finish=0
     caidiout=0
     EnableTriggerGroup("hscaidi",false)
     return walk_wait()
@@ -1510,8 +1519,10 @@ duHhe=function()
 end
 function duHhe_start()
     if string.find(locl.room,'渡') then
-	if ll_place and ll_place=='兰州大渡口' then return end
-       EnableTriggerGroup("duhe",true)
+        if ll_place and ll_place=='兰州大渡口' then return end
+        if ll_place and ll_place=='兰州城西夏渡口' then return end
+	    if ll_place and ll_place=='长安城陕晋渡口' then return end
+        EnableTriggerGroup("duhe",true)
        if flag.duhe==1 then
           exe('yell boat;duhe')
 		  create_timer_st('walkWait4',2,'duhe_wait2')
@@ -1585,7 +1596,11 @@ duhe_over=function()
 end
 duhe_wait=function()
     DeleteTimer('walkwait4')          
-    exe('yun jing;yun qi;yun jingli;sxlian;dazuo '..hp.dazuo)
+    if hp.exp>300000 then
+        exe('yun qi;yun jingli;sxlian;dazuo '..hp.dazuo)
+      else
+        exe('yun qi;yun jingli;dazuo '..hp.dazuo)
+      end
     create_timer_st('walkWait4',2,'dazuo_check')         
     --[[EnableTriggerGroup("duhe",false)
     DeleteTriggerGroup("duhe")    
@@ -1595,7 +1610,11 @@ duhe_wait=function()
 end
 duhe_waitb=function()
     DeleteTimer('walkwait4')          
-   exe('yun jing;yun qi;yun jingli;sxlian;dazuo '..hp.dazuo)
+    if hp.exp>300000 then
+        exe('yun qi;yun jingli;sxlian;dazuo '..hp.dazuo)
+      else
+        exe('yun qi;yun jingli;dazuo '..hp.dazuo)
+      end
     create_timer_st('walkWait4',2,'dazuo_check')   
     --[[djdh_open()        
     djdh_close()        
@@ -1831,46 +1850,45 @@ dujiang_move=function()
    return dujiang_dujiang()
 end
 jqgin=function()
-	locate()
-	return check_bei(jqgin_start,0.5)
-end
-function jqgin_start()
-	if locl.where ~= '绝情谷小溪边' then
-       return go(road.act)
-	else
-	   return jqgin1()
-    end
-end   
-function jqgin1()
    DeleteTriggerGroup("jqgin")
    create_trigger_t('jqgin1','^>*\\s*你要看什么？','','jqgin_look')
    create_trigger_t('jqgin2','^>*\\s*一叶小舟，飘飘忽忽地随着溪流而晃来晃去。','','jqgin_jump')
-   create_trigger_t('jqgin3','^>*\\s*又划出三四里，溪心忽有九块大石迎面耸立，犹如屏风一般，挡住了来船去路。','','jqgin_out') 
+   create_trigger_t('jqgin3','^>*\\s*又划出三四里，溪心忽有九块大石迎面耸立，犹如屏风一般，挡住了来船去路。','','jqgin_out')
+   create_trigger_t('jqgin4','^>*\\s*你屏气凝神，稳稳地站落在小舟之上','','jqglian')
    SetTriggerOption("jqgin1","group","jqgin")
    SetTriggerOption("jqgin2","group","jqgin")
    SetTriggerOption("jqgin3","group","jqgin")
+   SetTriggerOption("jqgin4","group","jqgin")
    road.temp=0
-   if locl.where == '绝情谷小溪边' then
-      exe('look boat')
-	  create_timer_st('walkWait4',3.0,'jqgin_look')
-   end
+   exe('look boat')
+   create_timer_s('walkWait111',1.0,'jqglook')    
+end
+jqglook=function()
+   exe('look boat')
 end
 jqgin_look=function()
-	DeleteTimer("walkWait4")
+   EnableTimer('walkWait111',false)
    road.temp = road.temp + 1
-   if road.temp > 30 then
+   if road.temp > 20 then
       dis_all()
       check_heal()
       return
    end
-   wait.make(function() 
-      wait.time(2)
-      exe('look boat')
-   end)
+    fastLocate()
+    wait.make(function() 
+          wait.time(1.0)
+        if locl.room=="小溪边" then
+            exe('look boat')
+            create_timer_s('walkWait111',1.0,'jqglook')   
+        else
+            return go_locate()
+        end
+    end)
 end
 jqgin_jump=function()
-	DeleteTimer("walkWait4")
-   exe('jump boat')
+   EnableTimer('walkWait111',false)
+   exe('jump boat')   
+   create_timer_s('walkWait111',0.5,'jqgjump')   
 end
 jqgin_out=function()
    EnableTriggerGroup("jqgin",false)
@@ -1977,10 +1995,12 @@ function outJjl_over()
 end
 
 function goHt()
-	exe("ask gongsun zhi about 绝情谷")
-	check_halt(goHt_act)
+    exe("ask gongsun zhi about 绝情谷")
+    locate_finish='goHt_act'
+	check_busy(goHt_act)
 end
 function goHt_act()
+    locate_finish=0
 	exe("xian hua;zuan dao")
 	walk_wait()
 end
@@ -2152,6 +2172,20 @@ function mjMen_check()
 		walk_wait()
 	end
 end
+function djdh_open()                                                                             --重新打开被封闭的渡江渡河路径
+	map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"]='dali/dalisouth/jiangbei'
+	map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"]='dali/dalisouth/jiangnan'
+	map.rooms["city/jiangbei"].ways["#duCjiang"]='city/jiangnan'		
+	map.rooms["city/jiangnan"].ways["#duCjiang"]='city/jiangbei'
+	map.rooms["lanzhou/road3"].ways["#duHhe"]='lanzhou/road2'
+	map.rooms["lanzhou/road2"].ways["#duHhe"]='lanzhou/road3'
+	map.rooms["lanzhou/dukou3"].ways["#duHhe"]='lanzhou/dukou2'		
+	map.rooms["lanzhou/dukou2"].ways["#duHhe"]='lanzhou/dukou3'
+	map.rooms["changan/road3"].ways["#duHhe"]='changan/road2'
+	map.rooms["changan/road2"].ways["#duHhe"]='changan/road3'
+	map.rooms["huanghe/road3"].ways["#duHhe"]='huanghe/road2'		
+	map.rooms["huanghe/road2"].ways["#duHhe"]='huanghe/road3'
+end
 --------------------------------------------------------------
 function outZyl()
    DeleteTriggerGroup("outzyl")
@@ -2165,8 +2199,8 @@ function outZyl()
 end
 function outZylCheck()
     wait.make(function() 
-       wait.time(2)
-        locate()
+       wait.time(1.5)
+       fastLocate()
         return check_busy(outZyl_goon,1)
     end)
 end
@@ -2255,14 +2289,15 @@ end
 function hmyUp()
     jifaDodge()
     exe('zong')
-	return check_halt(hmyUpLocate)
+    locate_finish='hmyUpLocate'
+	return check_busy(hmyUpLocate)
 end
 function hmyUpWait()
     exe('yun qi;dazuo '..hp.dazuo)
     check_busy(hmyUp)
 end
 function hmyUpLocate()
-        locate()
+    locate_finish=0
 	return check_halt(hmyUpCheck,1)
 end
 function hmyUpCheck()
@@ -2279,10 +2314,11 @@ end
 function hmyDown()
     jifaDodge()
     exe('zong')
-	check_halt(hmyDownLocate)
+	locate_finish='hmyDownLocate'
+	check_busy(locate,1.0)
 end
 function hmyDownLocate()
-        locate()
+    locate_finish=0
 	return check_halt(hmyDownCheck,1)
 end
 function hmyDownCheck()
@@ -2301,6 +2337,10 @@ function hmyDownOver()
 end
 
 function toRyp()
+    tmp.cnt=0
+        DeleteTriggerGroup("whisper_jiabu")
+        create_trigger_t('whisper_jiabu1',"^(> )*你要对谁耳语？",'','jiabudie')
+        SetTriggerOption("whisper_jiabu1","group","whisper_jiabu")
 	exe("whisper bu 教主文成武德，一统江湖")
 	exe("whisper bu 教主千秋万载，一统江湖")
 	exe("whisper bu 属下忠心为主，万死不辞")
@@ -2312,9 +2352,32 @@ function toRyp()
 	exe("wu")
     return walk_wait()
 end
+function jiabudie()
+        if tmp.cnt then
+           tmp.cnt = tmp.cnt + 1
+        end
+        if not tmp.cnt or tmp.cnt>30 then
+           tmp.cnt=0
+           dis_all()
+           if job.name=='wudang' then return wudangFindFail() end
+           if job.name=='huashan' then return huashanFindFail() end
+           if job.name=='xueshan' then return xueshanFindFail() end
+           if job.name=='songxin' or job.name=='songxin2' then return songxinFindFail() end
+        end
+end
+-------------------峨眉后山小路--------------
+function emhsxl()
+exe('move gancao;zuan dong')
+return check_busy(check_hsxl,1)
+end
+function check_hsxl()
+locate()
+return walk_wait()
+end
+
 ---------by fqyy test 峨嵋后山灌木丛-------------
 function emeishuitan()
-	exe('pa up')
+	exe('set look;l;pa up')
 	check_busy(walk_wait)
 end
 function outemgmc()
@@ -2324,9 +2387,11 @@ function outemgmc()
    SetTriggerOption("outemgmc1","group","outemgmc")
    SetTriggerOption("outemgmc2","group","outemgmc")
    cntr1 = countR(50)
-   return outemgmcCheck()
+   locate_finish='outemgmcCheck'
+   return check_busy(locate)
 end
 function outemgmcCheck()
+  locate_finish=0
     wait.make(function() 
        wait.time(2)
         locate()
@@ -2345,9 +2410,7 @@ function outemgmc_goon()
        tmp.zyl = p
 	   road.zyl[p] = nil
        exe('halt;ne')
-	   if flag.wait==1 then return end
        exe(p)
-	   if flag.wait==1 then return end
        return exe('alias action 离开峨嵋灌木丛了吗')
    end
 end
@@ -2373,31 +2436,28 @@ function Wdmw()
         SetTriggerOption("inwdmw2","group","inwdmw")
     exe("w;d;nd;nd;nd;nd;nw;ask caiyao about 药典")
     if flag.find==1 then return end
-	if flag.wait==1 then return end
 
-        --return check_bei(Wdmw1)
+        return check_bei(Wdmw1)
 end
 function Wdmw_error()
         DeleteTriggerGroup("inwdmw")
     exe("se;su;su;su;su;pa up")
     if flag.find==1 then return end
-    if flag.wait==1 then return end
         return walk_wait()
 end
 function Wdmw_find()
     -- return check_bei(Wdmw1)
     wait.make(function()  --2019.1.13
-            wait.time(0.6)
+            wait.time(1.0)
         return check_bei(Wdmw1)
     end)
 end
 function Wdmw1()
     if flag.find==1 then return end
-	if flag.wait==1 then return end
         exe("ask caiyao about 只是")
     -- return check_bei(Wdmw2) 
     wait.make(function()  --2019.1.13
-            wait.time(0.6)
+            wait.time(1.0)
         return check_bei(Wdmw2)
     end)
 end
@@ -2405,7 +2465,6 @@ function Wdmw2()
     DeleteTriggerGroup("inwdmw")
     exe("w;nd;nd;nd;nd;n;n;nd;out;nd;nd;nd;ed;nd;nd;nu;nd;nd;ed;nd;ed;nd;nd;nd;nd;nd;e;se")
     if flag.find==1 then return end
-	if flag.wait==1 then return end
         return Wdmw3()
     end
 function Wdmw3()
@@ -2413,7 +2472,6 @@ function Wdmw3()
                 -- wait.time(1.2) --Wdmw2 exe中有28个指令
         exe("ask tao hua about rumor")
         if flag.find == 1 then return end --后加
-        if flag.wait==1 then return end
                 -- return Wdmw4()
         -- wait.make(function()  --2019.1.13
         --     wait.time(0.3)
@@ -2425,7 +2483,6 @@ end
 function Wdmw4()        
     exe("nw;w;su;su;su;su;su;wu;su;wu;su;su;sd;su;su;wu;su;su;su;enter;su;s;s")
     if flag.find == 1 then return end --后加
-	if flag.wait==1 then return end
     return Wdmw5()
 end
 function Wdmw5()
@@ -2438,7 +2495,6 @@ function Wdmw5()
         -- end)
     exe("su;su;su;su;e;se;su;su;su;su")
     if flag.find == 1 then return end --后加
-    if flag.wait==1 then return end
     return Wdmw6()
 end
 function Wdmw6()
@@ -2450,7 +2506,6 @@ function Wdmw6()
         --     return Wdmw7()
         -- end)
     if flag.find == 1 then return end --后加
-    if flag.wait==1 then return end
     exe("pa up;e")
     return Wdmw7()        
 end
@@ -2463,7 +2518,6 @@ function Wdmw7()
         --         return walk_wait()
         -- end)
     if flag.find == 1 then return end --后加
-    if flag.wait==1 then return end
     exe("zuan shulin")
     return walk_wait()        
 end
@@ -3095,6 +3149,7 @@ function ptoSld()
 end
 function ptoSldCheck()
     locate()
+    exe('sxlian')
     check_halt(ptosldDukou,2)
 end
 function ptosldDukou()
@@ -3115,7 +3170,6 @@ sld_unwield=function()
        end
     end
   end
-  exe('unwield wuji xiao')
 end
 sld_weaponWieldCut=function()
     for p in pairs(Bag) do
@@ -3130,21 +3184,27 @@ sld_weaponWieldCut=function()
        end
     end
   end
-exe('wield lianyu sword;uweapon shape lianyu sword')
 end
 function toSld()
-	if locl.where ~= '神龙岛海滩' then
-       return toSldDkCheck()
-    end
-	sld_unwield()
-    sld_weaponWieldCut()
-	if not Bag["粗绳子"] then
-       exe('buy cu shengzi')
-       exe('drop cu shengzi 2')
+    locate()
+	wait.make(function()
+        wait.time(1)
+	if locl.room=='海滩' then
+	
+	    weapon_unwield()
+		exe('wield mu jian')
+        sld_weaponWieldCut()
+	    if not Bag["粗绳子"] then
+            exe('buy cu shengzi')
+            exe('drop cu shengzi 2')
+	    end
+        exe('get cu shengzi')
+        exe('drop cu shengzi 2')
+        return check_halt(toSldTrigger)
+	else
+		return go_locate()
 	end
-       exe('get cu shengzi')
-       exe('drop cu shengzi 2')
-    return check_halt(toSldTrigger,1.5)
+	end)
 end
 function toSldTrigger()
 	DeleteTriggerGroup("mufabusy")
@@ -3161,146 +3221,158 @@ function toSldTrigger()
     SetTriggerOption("mufabusy5","group","mufabusy")
     SetTriggerOption("mufabusy6","group","mufabusy")
     EnableTriggerGroup("mufabusy",true)
-if locl.where == '神龙岛海滩' then
-   toSldChop()
-end
+	locate_finish='toSldChop'
+	return check_busy(locate)
 end
 function toSldChop()
-    exe('chop tree;bang mu tou;zuo mufa')
-	create_timer_s('walkWait4',1.0,'toSldChop1')
-end
-function toSldChop1()
-	if tmp.cnt then
-	   tmp.cnt = tmp.cnt + 1
-	end
-	if not tmp.cnt or tmp.cnt>2 then
-	   EnableTimer('walkWait4',false)
-	end
-	exe('chop tree;bang mu tou;zuo mufa')
-end
-function toSldDelTrigger()
-	DeleteTriggerGroup("mufabusy")
-end
-function sld_need_weapon()
-  wait.make(function()
-            wait.time(1)
-            sld_unwield()
-            sld_weaponWieldCut()
-            return check_bei(toSldChop)
-          end)
-end
-function wait_mufa()
-	EnableTimer('walkWait4',false)
-  wait.make(function()
-            wait.time(0.2)
-            return check_bei(toSldChop)
-          end)
-end
-function mufaok(n,l,w)
-	EnableTimer('walkWait4',false)
-	print("mufaokw--"..w[2])
-	if string.find(w[2],"你") then
-		print("mufaokw--toslddk")
-		EnableTriggerGroup("mufabusy",false)
-		DeleteTriggerGroup("mufabusy")
-		toSldDukou()
-	else
-		sld_need_weapon()
-	end
-end
-function toSldCheck()
-    print("toSldCheck")
-	if locl.room=="小木筏" or locl.room=="木筏" then
-       return toSldHua()
-    else
-       return check_halt(toSld)
-    end
-end
-function toSldHua()
-	print("toSldHua")
-    sld_unwield()
-    exe('hua mufa')
-    wait.make(function()
-            wait.time(3)
-            return toSldDukou()
-          end)
-end
-function toSldDukou()
-    print("toSldDukou")
-	fastLocate()
-	wait.make(function()
-            wait.time(2)
-            return toSldDkCheck()
-    end)
-end
-function toSldDkCheck()
-     print("toSldDkCheck")
-	toSldDelTrigger()
-	if locl.room=="渡口" then
-       return toSldOver()
-    elseif locl.room=="小木筏" or locl.room=="木筏" then
-       return toSldHua()
-    elseif locl.area and locl.area=='神龙岛' and locl.room=='海滩' then
-       return toSld()
-    elseif locl.area and locl.area~='神龙岛' then
-       return walk_wait()
-    end
-end
-function toSldOver()
-    return walk_wait()
-end
-
-function outSld()
-    if score.party and score.party=="神龙教" then
-       exe('ask lu gaoxuan about ling pai')
-    else
-       exe('steal lingpai')
-    end
-    check_busy(outSldGive)
-end
-function outSldGive()
+    locate_finish=0
     wait.make(function() 
-       wait.time(2)
-        if score.party == '神龙教' and job.name == 'huashan' then
-           exe('out;#3s;give ling pai to chuan fu;give ling pai 2 to chuan fu')
-           check_busy(outSldWait,3)
-        else
-       exe('out;#3s;give ling pai to chuan fu')
-       check_busy(outSldWait,3)
-       end
-    end)
-end
-function outSldWait()
-    wait.make(function() 
-       wait.time(6)
-    locate()
-    check_busy(outSldCheck)
-    end)
-end
-function outSldCheck()
-    if locl.room=="渡口" then
-       exe('#3n;enter')
-       return outSld()
-    else
-	   --cntr1 = countR(20)
-       return walk_wait()
-    end
-end
-function outSldBoat()
-    if cntr1() < 1 then
-	   return go(road.act)
-	end
-    exe('order 开船')
-    locate()
-    return check_halt(outSldBoatCheck)
-end
-function outSldBoatCheck()
-    if locl.room=="海滩" then
-       return outSldOver()
-    else
-       return checkWait(outSldBoat,3)
-    end
-end
+        wait.time(1.0)
+     exe('chop tree;bang mu tou;zuo mufa')
+     end)
+ end
+ function toSldDelTrigger()
+     DeleteTriggerGroup("mufabusy")
+ end
+ function sld_need_weapon()
+   wait.make(function()
+             wait.time(1)
+             weapon_unwield()
+             sld_weaponWieldCut()
+             return check_bei(toSldChop)
+           end)
+ end
+ function wait_mufa()
+   wait.make(function()
+             wait.time(1.0)
+             return check_bei(toSldChop)
+           end)
+ end
+ function mufaok(n,l,w)
+     print("mufaokw--"..w[2])
+     if string.find(w[2],"你") then
+         print("mufaokw--toslddk")
+         EnableTriggerGroup("mufabusy",false)
+         DeleteTriggerGroup("mufabusy")
+         toSldDukou()
+     else
+         sld_need_weapon()
+     end
+ end
+ function toSldCheck()
+     print("toSldCheck")
+     flag.idle = nil
+     if locl.room=="小木筏" or locl.room=="木筏" then
+      exe('sxlian')
+      locate_finish='toSldHua'
+        return check_busy(locate)
+     else
+        return check_halt(toSld)
+     end
+ end
+ function toSldHua()
+     print("toSldHua")
+     locate_finish=0
+     sld_unwield()
+     exe('hua mufa')
+     wait.make(function()
+             wait.time(3)
+             return toSldDukou()
+           end)
+ end
+ function toSldDukou()
+     print("toSldDukou")
+     wait.make(function()
+             wait.time(2)
+             locate_finish='toSldDkCheck'
+             return check_busy(locate)
+     end)
+ end
+ function toSldDkCheck()
+      print("toSldDkCheck")
+      locate_finish=0
+     toSldDelTrigger()
+     if locl.room=="渡口" then
+        return toSldOver()
+     elseif locl.room=="小木筏" or locl.room=="木筏" then
+       exe('sxlian')
+        return toSldHua()
+     elseif locl.area and locl.area=='神龙岛' and locl.room=='海滩' then
+        return toSld()
+     elseif locl.area and locl.area~='神龙岛' then
+        return walk_wait()
+     end
+ end
+ function toSldOver()
+     bqcheck()
+     exe('bei none')
+     beiUnarmed()
+     return walk_wait()
+ end
+ 
+ function outSld()
+     if score.party and score.party=="神龙教" then
+        exe('ask lu gaoxuan about ling pai')
+     else
+        exe('steal lingpai')
+     end
+     check_busy(outSldGive)
+ end
+ function outSldGive()
+     wait.make(function() 
+        wait.time(2)
+     exe('out;#3s;give ling pai to chuan fu')
+     check_busy(outSldWait,3)
+     end)
+ end
+ function outSldWait()
+     EnableTriggerGroup("outSldGive_test",false)
+     EnableTimer('walkWait4',false)
+     wait.make(function() 
+        wait.time(6)
+     locate_finish='outSldCheck'
+     return check_busy(locate)
+     end)
+ end
+ function outSldCheck()
+     locate_finish=0
+     if locl.room=="渡口" then
+        return outSldGive_test()
+     else
+        --cntr1 = countR(20)
+        return walk_wait()
+     end
+ end
+ outSldGive_test=function()
+ DeleteTriggerGroup("outSldGive_test")
+ create_trigger_t('outSldGive_test1','^(> )*你给船夫一块通行令牌。','','outSldWait')
+ SetTriggerOption("outSldGive_test1","group","outSldGive_test")
+ EnableTriggerGroup("outSldGive_test",true)
+ sld_lp()
+ end
+ function sld_lp()
+ exe('give ling pai to chuan fu')
+ create_timer_s('walkWait4',1.0,'sld_duko_test')      
+ end
+ sld_duko_test=function()
+ exe('give ling pai to chuan fu')
+ end
+ 
+ function outSldBoat()
+     if cntr1() < 1 then
+        return go(road.act)
+     end
+     exe('order 开船')
+     locate()
+     return check_halt(outSldBoatCheck)
+ end
+ function outSldBoatCheck()
+     if locl.room=="海滩" then
+        return outSldOver()
+     else
+        return check_busy(outSldBoat,3)
+     end
+ end
 function outSldOver()
     walk_wait()
 end
@@ -4658,6 +4730,11 @@ function searchNpcLocate()
     locate()
 	return check_halt(searchNpcAdd,1)
 end
+    --昆仑山扶峰山climb之前的room函数等待<<EOF
+    klffsclimb=function()
+        exe('open door;out')
+        return walk_wait()
+    end--EOF
 function searchNpcAdd()
     tmp.objs = tmp.objs or {}
     for p,q in pairs(locl.id) do
@@ -4731,6 +4808,31 @@ function locateroom(where)
 	   end
    end
    return false
+end
+bohuacong=function()
+    exe('opendoor;tell mentonga 开门;tell mentongb 开门')
+     return bohuacong11()
+end
+bohuacong11=function()
+    wait.make(function() 
+        wait.time(0.5)
+        exe('right')
+        locate_finish='bohuacong1'
+        return fastLocate()
+    end)
+end
+bohuacong1=function()
+    locate_finish=0
+    wait.make(function() 
+        wait.time(2)
+        if locl.room=="山壁" then 
+            return bohuacong()
+        elseif locl.room=="花丛中" then
+            return walk_wait()
+        else
+            return go_locate()
+        end  
+    end)
 end
 
 dirReverse = {
@@ -5761,4 +5863,63 @@ function gozbd_go()
     if flag.find == 1 or flag.wait==1 then return end
        return walk_wait()
     end)
+end
+sxh_wait=function()
+    DeleteTriggerGroup("sxh_wait")
+    create_trigger_t('sxh_wait1',"^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",'','gosxh')
+    SetTriggerOption("sxh_wait1","group","sxh_wait")
+    flag.idle = nil
+    exe('yun qi;dazuo '..hp.dazuo)
+    end
+    zbd_wait=function()
+    DeleteTriggerGroup("zbd_wait")
+    create_trigger_t('zbd_wait1',"^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",'','gozbd')
+    SetTriggerOption("zbd_wait1","group","zbd_wait")
+    flag.idle = nil
+    exe('yun qi;dazuo '..hp.dazuo)
+end
+    -------------------王夫人up-----------------------------
+function wfrup()
+    locate_finish='wfrcheck'
+    return locate()
+end
+function wfrcheck()
+    locate_finish=0
+        if flag.find==1 then return end
+        if locl.room=='云锦楼' then
+            return check_halt(wfrcheckdo)
+        else
+            return go_locate()	
+        end
+end
+function wfrcheckdo()
+    DeleteTriggerGroup("ckwfr")
+    create_trigger_t('ckwfr1','^(> )*你手一扬，将白银对准王夫人掷了过去！','','wfrhit')
+    create_trigger_t('ckwfr2','^(> )*这里没有你的目标。','','wfrfinish')
+    create_trigger_t('ckwfr3','^(> )*王夫人神志迷糊，脚下一个不稳，倒在地上昏了过去。','','wfrget')
+    create_trigger_t('ckwfr4','^(> )*王夫人「啪」的一声倒在地上，挣扎着抽动了几下就死了。','','wfrfinish')
+    SetTriggerOption("ckwfr1","group","ckwfr")
+    SetTriggerOption("ckwfr2","group","ckwfr")
+    SetTriggerOption("ckwfr3","group","ckwfr")
+    SetTriggerOption("ckwfr4","group","ckwfr")
+    exe('throw silver at wang furen')
+end
+function wfrhit()
+    exe('unset wimpy;jiali max;hit wang furen')
+end
+function wfrget()
+    if flag.find==1 then return end
+    exe('get wang furen')
+    return check_halt(wfrfinish)
+end
+--[[function wfrdrop()
+    if flag.find==1 then return end
+    exe('drop wang furen;w')
+    return wfrfinish()
+end]]
+function wfrfinish()
+    EnableTriggerGroup("ckwfr",false)
+    DeleteTriggerGroup("ckwfr")
+    exe('up;drop wang')
+    return walk_wait()
 end

@@ -285,7 +285,7 @@ end
 function dmlHpCheck()
     exe('hp;cond')
     if vippoison == 1 then
-        local fn = 'logs\\diemenglou_mark_' .. score.id .. '.log'
+        local fn = GetInfo(67) .. 'logs\\diemenglou_mark_' .. score.id .. '.log'
         local f = io.open(fn, "w")
         local s = os.date("%Y%m%d%H")
         if tonumber(os.date('%H')) >= 22 then
@@ -504,7 +504,7 @@ function dmlCheckToplistAct(n, l, w)
     end
 end
 function dmlInfo()
-    local fn = 'logs\\diemenglou_lost_' .. score.id .. '.log'
+    local fn = GetInfo(67) .. 'logs\\diemenglou_lost_' .. score.id .. '.log'
     local f = io.open(fn, "r")
     if f then
         local s = f:read()
@@ -954,7 +954,7 @@ end
 function dmlFailed()
     CloseLog()
     local _cnt = l_cnt + 1
-    local fn = 'logs\\diemenglou_lost_' .. score.id .. '.log'
+    local fn = GetInfo(67) .. 'logs\\diemenglou_lost_' .. score.id .. '.log'
     local f = io.open(fn, "a")
     local s = ''
     if table.getn(target) >= 5 then
@@ -1082,7 +1082,7 @@ function dmlFight(n, l, w)
     npc_id = string.lower(w[4])
     local pkpfm = GetVariable("pkpfm")
     if pkpfm then
-        create_alias('pkpfm_kezhi', 'pkpfm_kezhi', 'alias pkpfm ' .. pkpfm)        
+        create_alias('pkpfm_kezhi', 'pkpfm_kezhi', 'alias pkpfm ' .. pkpfm)
         Execute('pkpfm_kezhi')
     else
         messageShow('没有设置pkpfm， 请尽快设置')
@@ -1144,7 +1144,7 @@ function dmlOut()
 end
 function dmlOver()
     if dmlFightCnt == 5 then
-        local fn = 'logs\\diemenglou_mark_' .. score.id .. '.log'
+        local fn = GetInfo(67) .. 'logs\\diemenglou_mark_' .. score.id .. '.log'
         local f = io.open(fn, "w")
         local s = os.date("%Y%m%d%H")
         if tonumber(os.date('%H')) >= 22 then

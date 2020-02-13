@@ -142,7 +142,11 @@ function chats_log(logs, color, bcolor)
 
     -- if not flag.log or flag.log=="no" then return end
 
-    if score.id then logs = '¡¾' .. score.id .. '¡¿' .. logs end
+    if score.id then
+        logs = '¡¾' .. score.id .. '¡¿' .. logs
+        score.zt = logs
+        draw_statuswindow()
+    end
 
     if flag.log and flag.log == "yes" then
         -- if not found, try to open it

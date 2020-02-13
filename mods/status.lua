@@ -38,6 +38,11 @@ score.gold = 0
 score.tb = 0
 score.yb = 0
 score.jjb = 0
+score.sww=0
+score.sw=0
+score.dj=0
+score.dz=0
+score.zt=''
 
 check_skills = function(n, l, w)
 
@@ -134,6 +139,7 @@ end
 hp_exp_check = function(n, l, w)
     hp.water = tonumber(w[1])
     hp.exp = tonumber(del_string(tostring(w[2]), ','))
+    draw_statuswindow()
 end
 hp_dazuo_check = function(n, l, w)
     hp.dazuo = trans(w[1])
@@ -439,6 +445,9 @@ function hp_trigger()
     create_trigger_t('score10','^┃致命抗性：\\d*.*理相：(\\D*)\\((\\d*)\\)\\s*┃','','score_check_xy')
     create_trigger_t('score11','^┃书剑通宝：(\\N*)\\s*书剑元宝：(\\N*)\\s*竞技币：(\\N*)\\s*┃','','score_tb_check')
     create_trigger_t('score12',"^本周您已经使用精英之书(\\D*)次。",'','score_ebook_check')
+    create_trigger_t('score13','^┃江湖声望：(\\d*)','','score_sw_check')
+
+    create_trigger_t('score14','^┃当前等级：(\\N*)\\s*死亡：(\\N*)\\s*打造机会：(\\N*)\\s*┃','','score_dz_check')    
     SetTriggerOption("score1","group","score")
     SetTriggerOption("score2","group","score")
     SetTriggerOption("score3","group","score")
@@ -452,7 +461,15 @@ function hp_trigger()
     SetTriggerOption("score11","group","score")
     SetTriggerOption("score12","group","score")
 end
+score_dz_check=function(n,l,w)
+    score.dj=tonumber(w[1])
+    score.sww=tonumber(w[2])
+    score.dz=tonumber(w[3])
+end
 
+score_sw_check=function(n,l,w)
+    score.sw=trans(w[1]) 
+end
 
 function check_pot(p_cmd)
     if hp.exp < 5000000 then
@@ -554,7 +571,7 @@ function lingwu_trigger()
     create_trigger_t('lingwu9',"^.*以你现在的基本内功修为，尚无法领悟基本内功。",'','lingwu_next')
     create_trigger_t('lingwu5',"^.*由于实战经验不足，阻碍了你的「\\D*」进步",'','lingwu_next')
     create_trigger_t('lingwu6','^.*(你深深吸了几口气，精神看起来好多了。|你现在精神饱满。)','','lingwu_goon')
-    create_trigger_t('lingwu7',"^.*你的内力不够",'','lingwu_next')
+    create_trigger_t('lingwu7',"^>*\\s*你的内力不够。",'','lingwu_finish') 
     SetTriggerOption("lingwu1","group","lingwu")
     SetTriggerOption("lingwu2","group","lingwu")
     SetTriggerOption("lingwu3","group","lingwu")
@@ -585,6 +602,7 @@ end
 function lingwu_go()
     exe('nick 少林领悟达摩院后殿')
     messageShow('去少林领悟')
+    draw_statuswindow()
     jifaAll()
     go(lingwu_unwield, '嵩山少林', '达摩院')
 end
@@ -750,6 +768,7 @@ end
 function xuexi()
     exe('nick 回门派学习')
     messageShow('回门派学习')
+    draw_statuswindow()
     master = {}
 
     if hp.exp < 150000 then

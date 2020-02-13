@@ -1228,7 +1228,7 @@ function check_job()
     if not dml_cnt then dml_cnt = 0 end
     if dml_cnt < 5 and (not condition.busy or condition.busy == 0) and vippoison ==
         0 then
-        local fn = 'logs\\diemenglou_mark_' .. score.id .. '.log'
+        local fn = GetInfo(67) .. 'logs\\diemenglou_mark_' .. score.id .. '.log'
         local f = io.open(fn, "r")
         if not f then
             ColourNote('orange', 'black',
@@ -1319,7 +1319,7 @@ end]]
 end
 function checkJob()
     if job.last ~= 'hqgzc' then
-        local fn = 'logs\\hqgzc_mark_' .. score.id .. '.log'
+        local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
         local f = io.open(fn, "r")
         if not f then
             return hqgzc()
@@ -2781,6 +2781,8 @@ function check_food()
     if flag.xuncheng_start then return xunCheng() end
     exe('nick 去武当吃喝;remove all;wear all')
     exe('hp;unset no_kill_ap;yield no')
+    score.zt = '去武当吃喝'
+    draw_statuswindow()
     wait.make(function()
         wait_busy()
         if (hp.food < 60 or hp.water < 60) and hp.exp < 500000 then

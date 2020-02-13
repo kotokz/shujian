@@ -527,7 +527,7 @@ function hqgzcFinishGold1(n, l, w)
         wait.time(5)
         exe('ask hong about finish')
     end)
-    local fn = 'logs\\hqgzc_mark_' .. score.id .. '.log'
+    local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
     local f = io.open(fn, "r")
     local s = os.date("%Y%m%d%H")
     if not f then
@@ -568,7 +568,7 @@ function hqgzcFinishGold(n, l, w)
     messageShowT('做菜任务：任务完成，用时:【' .. job.time.over ..
                      '】秒。')
     if hqgzcCnt >= 10 then
-        local fn = 'logs\\hqgzc_mark_' .. score.id .. '.log'
+        local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
         local f = io.open(fn, "r")
         local s = os.date("%Y%m%d%H")
         if not f then

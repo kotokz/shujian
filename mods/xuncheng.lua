@@ -92,6 +92,7 @@ function xuncheng_go()
     --     -- Execute('#8(du book)')
     -- end
     exe('hp')
+    job.name = "巡城"
     wait.make(function()
         for key, step in ipairs(xuncheng) do
             wait_busy()
@@ -204,6 +205,12 @@ end
 function xuncheng_check()
     DeleteTemporaryTriggers()
     flag.xuncheng_start = false
+    job.name = 'idle'
+    if g_stop_flag then
+        print("停止巡城")
+        g_stop_flag = false
+        return disAll()
+    end
     wait.make(function()
         exe('cha;score;yun jingli;hp')
         wait_busy()
@@ -237,6 +244,7 @@ function dushu(p_book)
     create_triggerex('dushu2',
                      "^(> )*(你仔细地读了一遍|你已经无法再从秘籍中学到什么|由于你的基本刀法火侯不够|你感觉自己对于五虎断门刀|你将整本秘籍研读至此)",
                      '', 'check_heal')
+    if p_book == nil then return print("请输入正确书名") end
     tmp.book = p_book
     return check_bei(dushuStart)
 end

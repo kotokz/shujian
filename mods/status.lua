@@ -571,7 +571,7 @@ function lingwu_trigger()
     create_trigger_t('lingwu9',"^.*以你现在的基本内功修为，尚无法领悟基本内功。",'','lingwu_next')
     create_trigger_t('lingwu5',"^.*由于实战经验不足，阻碍了你的「\\D*」进步",'','lingwu_next')
     create_trigger_t('lingwu6','^.*(你深深吸了几口气，精神看起来好多了。|你现在精神饱满。)','','lingwu_goon')
-    create_trigger_t('lingwu7',"^>*\\s*你的内力不够。",'','lingwu_finish') 
+    create_trigger_t('lingwu7',"^.*你的内力不够",'','lingwu_finish2')
     SetTriggerOption("lingwu1","group","lingwu")
     SetTriggerOption("lingwu2","group","lingwu")
     SetTriggerOption("lingwu3","group","lingwu")
@@ -699,6 +699,14 @@ function lingwu_finish1()
     -- EnableTimer('walkWait4', false)
     tmp.stop = true
     -- checkWait(lingwu_finish, 1)
+end
+function lingwu_finish2()
+    -- EnableTimer('walkWait4', false)
+    tmp.stop = true
+    wait.make(function()
+        wait_busy()
+        return lingwu_finish()
+    end)
 end
 function lingwu_finish()
     tmp.stop = true

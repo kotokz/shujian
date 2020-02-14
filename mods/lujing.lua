@@ -1890,6 +1890,10 @@ jqgin_jump=function()
    exe('jump boat')   
    create_timer_s('walkWait111',0.5,'jqgjump')   
 end
+function jqglian()
+    EnableTimer('walkWait111',false)
+    return job_lianstart()
+end
 jqgin_out=function()
    EnableTriggerGroup("jqgin",false)
    exe('out')

@@ -740,3 +740,16 @@ function pk_cut_corpse2()
     return exe('heng corpse')
 end
 
+function job_lianstart()
+    EnableTimer('walkWait111', false)
+    lian_times = 0
+    wait.make(function()
+        exe('hp;cha')
+        wait.time(1)
+        for i = 1, 15 do
+            if hp.neili > hp.neili_max / 6 * 5 then exe('sxlian') end
+            exe('cha;hp')
+            wait.time(0.5)
+        end
+    end)
+end

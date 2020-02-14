@@ -403,6 +403,7 @@ function hp_trigger()
 	create_trigger_t('hp28','^.*穷光蛋，一边呆着去','','newbie_qu_gold')
 	create_trigger_t('hp29','^.*狐疑地看着你：「这信怎么落到你的手上？」','','dolost_hitlog_open')
     create_trigger_t('hp30','^.*据说'..score.name..'被.*打傻了!','','dolost_hitlog_close')
+    create_trigger_t('hp31',"^\\D*你把钱交给船家，船家领你上了一条小舟",'','job_lianstart')
     create_trigger_t('hp71',"^(> )*【活动公告】书剑永恒天玑站砸金蛋活动开始了！",'','egg_huodong')
     SetTriggerOption("hp71","group","hp")
     SetTriggerOption("hp24","group","hp")
@@ -639,7 +640,7 @@ end
 function lingwu_goon()
     if locl.room ~= "达摩院后殿" then return lingwu_finish() end
     EnableTriggerGroup("lingwu", true)
-    local skill = skillsLingwu[tmp.lingwu]
+    -- local skill = skillsLingwu[tmp.lingwu]
 
     -- if not skills[skill] or skills[skill].lvl == 0 or skills[skill].lvl >=
     --     hp.pot_max - 100 then return lingwu_next() end
@@ -661,20 +662,30 @@ function lingwu_goon()
     --        exe('yun jing')
     --     end
     -- end)
+
+    local skill_max =  hp.pot_max - 100
     wait.make(function()    
         for i,skill in pairs(skillsLingwu) do
-            tmp.lingwunext = false      
-            local l, w
-            while true do                
-                exe('#9(lingwu ' .. skill .. ');yun jing')
-                l, w = wait.regexp('.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)',1)    
-                if l:find('内力不够') then 
-                    exe('eat ' .. drug.neili)
-                elseif l:find('潜能已经用完了') then
-                    return lingwu_finish()
-                elseif tmp.lingwunext then
-                    tmp.lingwunext = false
-                    break
+            if not skills[skill] or skills[skill].lvl == 0 or skills[skill].lvl >= skill_max then
+                print("不需要学习:" .. skill)
+            else
+                tmp.lingwunext = false      
+                local l, w
+                while true do                
+                    exe('#9(lingwu ' .. skill .. ');yun jing')
+                    l, w = wait.regexp('.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)',1)    
+                    if l == nil then
+                        -- 可能昏迷了，超时返回
+                        break
+                    elseif l:find('内力不够') then 
+                        exe('eat ' .. drug.neili)
+                        exe('eat ' .. drug.neili2)
+                    elseif l:find('潜能已经用完了') then
+                        return lingwu_finish()
+                    elseif tmp.lingwunext then
+                        tmp.lingwunext = false
+                        break
+                    end
                 end
             end
         end
@@ -682,6 +693,7 @@ function lingwu_goon()
         lingwudie = 1
         xxpot = hp.pot_max
         -- return check_bei(lingwu_finish)
+        wait_busy()
         return lingwu_finish()
     end)
 end

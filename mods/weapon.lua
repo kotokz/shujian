@@ -1,6 +1,8 @@
 weaponPrepare = {}
 weaponUsave = {}
 itemWield = {}
+bqxl = 0
+hujuxl = 0
 weaponStore = {
     ["箫"] = "city/yueqidian",
     ["木剑"] = "xiangyang/mujiangpu",
@@ -38,7 +40,9 @@ weaponStoreId = {
     ["石子"] = "shizi",
     ["飞镖"] = "dart",
     ["梅花针"] = "meihua zhen",
-    ["手裏剑"] = "shuriken"
+    ["手裏剑"] = "shuriken",
+    ["杖"] = "staff",
+    ["铜钱"] = "coin"
 }
 
 weaponFunc = {
@@ -67,6 +71,7 @@ armorKind = {
 }
 
 weaponKind = {
+    ["jian"] = "cut",
     ["ren"] = "cut",
     ["blade"] = "cut",
     ["sword"] = "cut",
@@ -80,6 +85,7 @@ weaponKind = {
     ["dagger"] = "cut",
     ["hook"] = "cut",
     ["spear"] = true,
+    ["gangzhang"] = true,
     ["throwing"] = true,
     ["xiao"] = true,
     ["fork"] = true,
@@ -182,8 +188,18 @@ weapon_wield = function()
             end
         end
     end
-    exe('wield wuji xiao')
     checkWield()
+end
+function bqcheck()
+    if perform and perform.skill and skillEnable[perform.skill] and
+        weaponKind[skillEnable[perform.skill]] then
+        if weapon.first and Bag[weapon.first] then
+            exe('wield ' .. Bag[weapon.first].fullid)
+        else
+            exe('wield sanqing sword')
+            messageShow('恢复武器不见了！', "red")
+        end
+    end
 end
 weaponWWalk = function()
     weapon_wield()
@@ -234,56 +250,41 @@ weaponWieldCut = function()
     checkWield()
 end
 weaponUcheck = function()
-    DeleteTriggerGroup("weapon")
-    create_trigger_t('weapon1',
-                     '^(> )*你把 "action" 设定为 "checkUweapon" 成功完成。',
-                     '', 'weaponUdone')
-    create_trigger_t('weapon2',
-                     '^(> )*这是一(柄)由\\D*(青铜|生铁|软铁|绿石|流花石|软银|金铁|玄铁|万年神铁|万年寒冰铁)制成，重\\D*的(\\D*)。$',
-                     '', 'weaponUtmp')
-    create_trigger_t('weapon3',
-                     '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏)了。',
-                     '', 'weaponUneed')
-    create_trigger_t('weapon4', '^(> )*看起来没有什么损坏。', '',
-                     'weaponUwell')
-    SetTriggerOption("weapon1", "group", "weapon")
-    SetTriggerOption("weapon2", "group", "weapon")
-    SetTriggerOption("weapon3", "group", "weapon")
-    SetTriggerOption("weapon4", "group", "weapon")
     weaponUcannt = weaponUcannt or {}
     tmp.uweapon = nil
-    for p in pairs(weaponUsave) do
-        if Bag[p] and Bag[p].kind and weaponKind[Bag[p].kind] and
-            not weaponUcannt[p] then exe('l ' .. Bag[p].fullid) end
-    end
-    exe('alias action checkUweapon')
-    create_timer_s('walkWait4', 1.0, 'weaponUcheck1')
-end
-function weaponUcheck1() exe('alias action checkUweapon') end
-weaponUtmp = function(n, l, w)
-    if weaponUsave[w[4]] and Bag[w[4]] then tmp.uweapon = w[4] end
-end
-weaponUneed = function()
-    if tmp.uweapon and weaponUsave[tmp.uweapon] then
-        weaponUsave[tmp.uweapon] = "repair"
-    end
-end
-weaponUwell = function()
-    if tmp.uweapon and weaponUsave[tmp.uweapon] then
-        weaponUsave[tmp.uweapon] = true
-    end
+    wait.make(function()
+        for p in pairs(weaponUsave) do
+            if Bag[p] and Bag[p].kind and weaponKind[Bag[p].kind] and
+                not weaponUcannt[p] then
+                local l, w
+                repeat
+                    exe('l ' .. Bag[p].fullid)
+                    l, w = wait.regexp(
+                               '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏|没有什么损坏)。')
+                until l ~= nil
+                if string.find(l, '没有什么损坏') then
+                    weaponUsave[p] = true
+                else
+                    weaponUsave[p] = 'repair'
+                end
+
+            end
+        end
+        tprint(weaponUsave)
+        return weaponUdone()
+    end)
 end
 weaponUdone = function()
-    DeleteTimer("walkWait4")
     EnableTriggerGroup("weapon", false)
     for p in pairs(weaponUsave) do
         if weaponUsave[p] and type(weaponUsave[p]) == "string" and
-            weaponUsave[p] == "repair" then
+            weaponUsave[p] == 'repair' then
             dis_all()
+            DiscardQueue()
             return weaponRepair(p)
         end
     end
-    return check_bei(weaponRepairOver)
+    return weaponRepairOver()
 end
 weaponRepair = function(p_weapon)
     tmp.uweapon = p_weapon
@@ -296,7 +297,7 @@ end
 weaponRepairQu = function()
     exe('qu tiechui')
     checkBags()
-    return check_bei(weaponRepairQuCheck, 1)
+    return check_bei(weaponRepairQuCheck)
 end
 weaponRepairQuCheck = function()
     if cntr1() > 0 and not Bag["铁锤"] then return weaponRepairQu() end
@@ -363,39 +364,45 @@ function ungeta()
     if u_cmd ~= nil then exe('unwield ' .. u_cmd) end
 end
 weaponRepairDo = function()
-    DeleteTriggerGroup("repair")
-    create_trigger_t('repair1',
-                     '^(> )*你开始仔细的维修(\\D*)，不时用铁锤敲敲打打',
-                     '', '')
-    create_trigger_t('repair2',
-                     '^(> )*你仔细的维修(\\D*)，总算大致恢复了它的原貌。$',
-                     '', 'weaponRepairGoCun')
-    create_trigger_t('repair3',
-                     '^(> )*这件兵器完好无损，无需修理。$', '',
-                     'weaponRepairGoCun')
-    create_trigger_t('repair4',
-                     '^(> )*对于这种武器，您了解不多，无法修理！$',
-                     '', 'weaponRepairCannt')
-    create_trigger_t('repair5', '^(> )*你带的零钱不够了！你需要',
-                     '', 'weaponRepairGold')
-    create_trigger_t('repair6', '^(> )*你的精神状态不佳$', '',
-                     'weaponRepairCannt')
-    create_trigger_t('repair7', '^(> )*你的铁锤坏掉了！$', '',
-                     'weaponRepairBuy')
-    SetTriggerOption("repair1", "group", "repair")
-    SetTriggerOption("repair2", "group", "repair")
-    SetTriggerOption("repair3", "group", "repair")
-    SetTriggerOption("repair4", "group", "repair")
-    SetTriggerOption("repair5", "group", "repair")
-    SetTriggerOption("repair6", "group", "repair")
-    weapon_unwield()
-    ungeta()
-    exe(
-        'unwield zhanlu;unwield mu jian;unwield taiji sword;unwield qiankun sword;unwield qiankun xiao')
-    exe('wield tie chui')
-    exe('uweapon shape ' .. Bag[tmp.uweapon].fullid)
-    exe('repair ' .. Bag[tmp.uweapon].fullid)
-    create_timer_m('repair', 3, 'weaponRepairGoCun')
+
+    wait.make(function()
+        weapon_unwield()
+        ungeta()
+        bqxl = bqxl + 1
+        exe(
+            'unwield zhanlu;unwield mu jian;unwield taiji sword;unwield qiankun sword;unwield qiankun xiao')
+        exe('wield tie chui')
+        local cannotRepair = false
+        local l, w = nil
+        for p in pairs(weaponUsave) do
+            if weaponUsave[p] and type(weaponUsave[p]) == "string" and
+                weaponUsave[p] == 'repair' and Bag[p] then
+                repeat
+                    exe('uweapon shape ' .. Bag[p].fullid)
+                    exe('repair ' .. Bag[p].fullid)
+                    l, w = wait.regexp(
+                               '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！)')
+                until l ~= nil
+                if l:find('恢复了它的原貌') or l:find('无需修理') then
+                    weaponUsave[p] = true
+                else
+                    cannotRepair = true
+                    break
+                end
+            end
+        end
+        if cannotRepair then
+            if l:find('无需修理') then
+                return weaponRepairBuy()
+            elseif l:find('你带的零钱不够了') then
+                return weaponRepairGold()
+            else
+                return weaponRepairCannt()
+            end
+        end
+        weaponRepairGoCun()
+
+    end)
 end
 function weaponRepairCannt()
     weaponUcannt = weaponUcannt or {}
@@ -404,8 +411,8 @@ end
 function weaponRepairGold()
     EnableTriggerGroup("repair", false)
     EnableTimer("repair", false)
-    exe('n;#3w;#3n;w;qu 50 gold;e;#3s;#3e;s')
-    return checkWait(weaponRepairDo, 2)
+    exe('n;#3w;#3n;w;qu 400 gold;e;#3s;#3e;s')
+    return weaponRepairDo()
 end
 weaponRepairOver = function()
     DeleteTriggerGroup("weapon")
@@ -424,7 +431,7 @@ weaponRepairGoCun = function()
     return go(weaponRepairCun, "扬州城", "杂货铺")
 end
 weaponRepairCun = function()
-    if not Bag["铁锤"] then return check_heal() end
+    if not Bag["铁锤"] then return checkPrepare() end
     if cntr2() > 0 and Bag["铁锤"] then
         weapon_unwield()
         exe('cun tie chui')
@@ -529,6 +536,7 @@ armorRepairDo = function()
     SetTriggerOption("repair4", "group", "repair")
     SetTriggerOption("repair5", "group", "repair")
     SetTriggerOption("repair6", "group", "repair")
+    hujuxl = hujuxl + 1
     weapon_unwield()
     ungeta()
     exe(
@@ -633,16 +641,4 @@ armorRepairOver = function()
     DeleteTimer("repair")
     DeleteTriggerGroup("repair")
     return check_halt(check_jobx)
-end
-
-function bqcheck()
-    if perform and perform.skill and skillEnable[perform.skill] and
-        weaponKind[skillEnable[perform.skill]] then
-        if weapon.first and Bag[weapon.first] then
-            exe('wield ' .. Bag[weapon.first].fullid)
-        else
-            exe('wield sanqing sword')
-            messageShow('恢复武器不见了！', "red")
-        end
-    end
 end

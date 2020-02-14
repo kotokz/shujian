@@ -202,13 +202,7 @@ function bqcheck()
     end
 end
 weaponWWalk = function()
-    -- weapon_wield()
-    local leweapon = GetVariable("learnweapon")
-    if leweapon then
-        exe('wield ' .. leweapon)
-    else
-        weapon_wield()
-    end
+    weapon_wield()
     return walk_wait()
 end
 weapon_unwield = function()
@@ -266,7 +260,8 @@ weaponUcheck = function()
                 repeat
                     exe('l ' .. Bag[p].fullid)
                     l, w = wait.regexp(
-                               '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏|没有什么损坏)')
+                               '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏|没有什么损坏)',
+                               1)
                 until l ~= nil
                 if string.find(l, '没有什么损坏') then
                     weaponUsave[p] = true
@@ -355,8 +350,8 @@ weaponRepairBuy = function()
     return checkWait(weaponRepairItem, 0.5)
 end
 weaponRepairItem = function()
-    if not Bag["铁锤"] then return weaponRepairBuy() end
-    -- if not Bag["铁锤"] then return weaponRepairGoCun() end
+    if cntr1() > 0 and not Bag["铁锤"] then return weaponRepairBuy() end
+    if not Bag["铁锤"] then return weaponRepairGoCun() end
     return weaponRepairGo()
 end
 weaponRepairGo =
@@ -387,7 +382,7 @@ weaponRepairDo = function()
                     exe('uweapon shape ' .. Bag[p].fullid)
                     exe('repair ' .. Bag[p].fullid)
                     l, w = wait.regexp(
-                               '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！)')
+                               '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！)',1)
                 until l ~= nil
                 if l:find('恢复了它的原貌') or l:find('无需修理') then
                     weaponUsave[p] = true

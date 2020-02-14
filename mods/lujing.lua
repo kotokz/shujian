@@ -361,7 +361,7 @@ locate=function()
             exe('alias action 正在定位')
             exe('id here')
             exe('set look;l;time')
-            local l, w = wait.regexp('^(> )*你把 "action" 设定为 "正在定位" 成功完成。$',1)
+            local l, w = wait.regexp('^(> )*你把 "action" 设定为 "正在定位" 成功完成。$',2)
             if l ~= nil then break end
         end
         local_start()

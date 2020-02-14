@@ -568,19 +568,13 @@ end
 function lingwu_trigger()
     DeleteTriggerGroup("lingwu")
     create_trigger_t('lingwu1',"^.*(你只能从特殊技能中领悟。|你不会这种技能。|你要领悟什么？)",'','lingwu_next')
-    -- create_trigger_t('lingwu2',"^.*你从实战中得到的潜能已经用完了。",'','lingwu_finish1')
-    create_trigger_t('lingwu3',"^.*你的\\D*不够，无法领悟更深一层的基本",'','lingwu_next')
-    create_trigger_t('lingwu9',"^.*以你现在的基本内功修为，尚无法领悟基本内功。",'','lingwu_next')
-    create_trigger_t('lingwu5',"^.*由于实战经验不足，阻碍了你的「\\D*」进步",'','lingwu_next')
-    -- create_trigger_t('lingwu6','^.*(你深深吸了几口气，精神看起来好多了。|你现在精神饱满。)','','lingwu_goon')
-    -- create_trigger_t('lingwu7',"^.*你的内力不够",'','lingwu_finish2')
+    create_trigger_t('lingwu2',"^.*你的\\D*不够，无法领悟更深一层的基本",'','lingwu_next')
+    create_trigger_t('lingwu3',"^.*以你现在的基本内功修为，尚无法领悟基本内功。",'','lingwu_next')
+    create_trigger_t('lingwu4',"^.*由于实战经验不足，阻碍了你的「\\D*」进步",'','lingwu_next')
     SetTriggerOption("lingwu1","group","lingwu")
-    -- SetTriggerOption("lingwu2","group","lingwu")
+    SetTriggerOption("lingwu2","group","lingwu")
     SetTriggerOption("lingwu3","group","lingwu")
-    SetTriggerOption("lingwu9","group","lingwu")
-    SetTriggerOption("lingwu5","group","lingwu")
-    -- SetTriggerOption("lingwu6","group","lingwu")
-    -- SetTriggerOption("lingwu7","group","lingwu")
+    SetTriggerOption("lingwu4","group","lingwu")
     EnableTriggerGroup("lingwu",false)
 end
 
@@ -673,7 +667,7 @@ function lingwu_goon()
             local l, w
             while true do                
                 exe('#9(lingwu ' .. skill .. ');yun jing')
-                l, w = wait.regexp('.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)')           
+                l, w = wait.regexp('.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)',1)    
                 if l:find('内力不够') then 
                     exe('eat ' .. drug.neili)
                 elseif l:find('潜能已经用完了') then
@@ -706,33 +700,6 @@ function lingwu_next()
     tmp.lingwunext = true
 end
 
--- function lingwu_next_check()
---     EnableTriggerGroup("lingwu", false)
---     if tmp.lingwu == nil then tmp.lingwu = 1 end
---     tmp.lingwu = tmp.lingwu + 1
---     local length = table.getn(skillsLingwu)
---     if tmp.lingwu > length then
---         flag.lingwu = 0
---         lingwudie = 1
---         xxpot = hp.pot_max
---         -- return check_bei(lingwu_finish)
---         return lingwu_finish()
---     else
---         local skill = skillsLingwu[tmp.lingwu]
---         -- print(skillsLingwu[tmp.lingwu])
---         if skills[skill] and skills[skill].lvl > 0 and skills[skill].lvl <
---             hp.pot_max - 100 then
---             return check_bei(lingwu_goon, 1)
---         else
---             return lingwu_next()
---         end
---     end
--- end
-function lingwu_finish1()
-    -- EnableTimer('walkWait4', false)
-    tmp.stop = true
-    -- checkWait(lingwu_finish, 1)
-end
 function lingwu_finish()
     tmp.stop = true
     messageShow('少林领悟完成')
@@ -745,11 +712,7 @@ function lingwu_finish()
         table.remove(skillsLingwu, tmp.lingwu)
         table.insert(skillsLingwu, 1, skill)
     end
-    -- weapon_unwield()
-    -- local leweapon=GetVariable("learnweapon")
-    -- exe('cha;unwield '..leweapon)
     return check_jobx()
-    -- return check_busy(check_food)
 end
 
 

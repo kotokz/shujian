@@ -289,7 +289,7 @@ end
 weaponRepair = function(p_weapon)
     tmp.uweapon = p_weapon
     if not Bag["Ìú´¸"] then
-        cntr1 = countR(3)
+        -- cntr1 = countR(3)
         return go(weaponRepairQu, "ÑïÖİ³Ç", "ÔÓ»õÆÌ")
     end
     return weaponRepairGo()
@@ -300,7 +300,7 @@ weaponRepairQu = function()
     return check_bei(weaponRepairQuCheck)
 end
 weaponRepairQuCheck = function()
-    if cntr1() > 0 and not Bag["Ìú´¸"] then return weaponRepairQu() end
+    -- if cntr1() > 0 and not Bag["Ìú´¸"] then return weaponRepairQu() end
     if Bag["Ìú´¸"] then
         return weaponRepairGo()
     else
@@ -349,8 +349,8 @@ weaponRepairBuy = function()
     return checkWait(weaponRepairItem, 0.5)
 end
 weaponRepairItem = function()
-    if cntr1() > 0 and not Bag["Ìú´¸"] then return weaponRepairBuy() end
-    if not Bag["Ìú´¸"] then return weaponRepairGoCun() end
+    if not Bag["Ìú´¸"] then return weaponRepairBuy() end
+    -- if not Bag["Ìú´¸"] then return weaponRepairGoCun() end
     return weaponRepairGo()
 end
 weaponRepairGo =

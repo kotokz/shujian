@@ -1103,9 +1103,46 @@ function goMark(n, l, w)
     llagain_finish()
     print('开始填写失落信件人物ID')
     local m_cmd = w[2]
-    OpenBrowser(m_cmd)
+    local fni = GetInfo(67) .. "plugs\\LLIN.ini"
+    local fi = io.open(fni, "w")
+    if fi then
+        fi:write(m_cmd)
+        fi:close()
+
+        local fno = GetInfo(67) .. "plugs\\LLOUT.ini"
+        local fo = io.open(fno, "w")
+        fo:write("")
+        fo:close()
+        return create_timer_s('llwait', 1.0, 'llwait')
+    else
+        OpenBrowser(m_cmd)
+    end
+    -- 插件结束
+
     return Markletter()
 end
+
+function llwait()
+    local f = io.open(GetInfo(67) .. "plugs\\LLOUT.ini", "r")
+    local s = f:read()
+
+    f:close() -- 关闭流
+
+    if not isNil(s) then
+        print(s)
+        if s ~= "" then
+            DeleteTimer('llwait')
+            SetVariable("lostname", s)
+
+            local fno = GetInfo(67) .. "plugs\\LLOUT.ini"
+            local fo = io.open(fno, "w")
+            fo:write("")
+            fo:close()
+            return MarkName()
+        end
+    end
+end
+
 function Markletter()
     l_result = utils.inputbox(
                    "输入信件人物ID，放弃请输入discard， 需要手动查找请输入help。",
@@ -2789,9 +2826,7 @@ function check_food()
     exe('nick 去武当吃喝;remove all;wear all')
     exe('hp;unset no_kill_ap;yield no')
     score.zt = '去武当吃喝'
-    if draw_statuswindow ~=nil then
-        draw_statuswindow()
-    end
+    if draw_statuswindow ~= nil then draw_statuswindow() end
     wait.make(function()
         wait_busy()
         if (hp.food < 60 or hp.water < 60) and hp.exp < 500000 then

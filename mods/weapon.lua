@@ -260,7 +260,7 @@ weaponUcheck = function()
                 repeat
                     exe('l ' .. Bag[p].fullid)
                     l, w = wait.regexp(
-                               '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏|没有什么损坏)。')
+                               '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏|没有什么损坏)')
                 until l ~= nil
                 if string.find(l, '没有什么损坏') then
                     weaponUsave[p] = true

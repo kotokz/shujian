@@ -691,5 +691,10 @@ function wudangFinish()
         wudang_cs = 0
         exe('score;ask song yuanqiao about 杂役')
     end
+    if g_stop_flag == true then
+        print("任务结束，游戏暂停")
+        g_stop_flag = false
+        return disAll()
+    end
     return checkPrepare()
 end

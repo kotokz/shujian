@@ -440,6 +440,13 @@ function xueshan_over()
     -- check_halt(check_food)--测试关闭雪山任务后check。
     button_smyteam() -- check_heal()里的挪到这里来。
     button_lostletter() -- check_heal()里的挪到这里来。
+
+    if g_stop_flag == true then
+        print("任务结束，游戏暂停")
+        g_stop_flag = false
+        return disAll()
+    end
+
     checkPrepareOver() -- 不check，直接over。
 end
 function xsgosongxin()

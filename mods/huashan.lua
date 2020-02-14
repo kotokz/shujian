@@ -858,6 +858,11 @@ huashan_finish = function()
             '】次 ！苏州闺房【' .. hstoszgf .. '】次 ！心禅堂【' ..
             hstoxct .. '】次 ！', "cyan")
 
+    if g_stop_flag == true then
+        print("任务结束，游戏暂停")
+        g_stop_flag = false
+        return disAll()
+    end
     hsruntime = hsruntime + 1
     if hsruntime > 9 then
         hsruntime = 0

@@ -652,7 +652,8 @@ function lingwu_goon()
 
     if hp.neili < 1000 then
         if hp.exp > 20000000 or score.gender == '无' then
-            return go(lingwu_eat, '武当山', '茶亭')
+            exe('eat ' .. drug.neili)
+            -- return go(lingwu_eat, '武当山', '茶亭')
         else
             return lingwuSleep()
         end
@@ -666,15 +667,16 @@ function lingwu_goon()
     --        exe('yun jing')
     --     end
     -- end)
-    wait.make(function()
-    
+    wait.make(function()    
         for i,skill in pairs(skillsLingwu) do
             tmp.lingwunext = false      
             local l, w
             while true do                
                 exe('#9(lingwu ' .. skill .. ');yun jing')
-                l, w = wait.regexp('^.*(你的内力不够|你深深吸了几口气，精神看起来好多了。|你现在精神饱满|潜能已经用完了)')                
-                if l:find('你的内力不够') or l:find('潜能已经用完了') then
+                l, w = wait.regexp('.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)')           
+                if l:find('内力不够') then 
+                    exe('eat ' .. drug.neili)
+                elseif l:find('潜能已经用完了') then
                     return lingwu_finish()
                 elseif tmp.lingwunext then
                     tmp.lingwunext = false

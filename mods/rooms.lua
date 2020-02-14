@@ -1,6 +1,3 @@
-
-
-
 lookCitys = {
 	["baituo"] = "白驼山",	["beijing"] = "京城",	["cangzhou"] = "沧州城",	["changan"] = "长安城",
 	["changle"] = "长乐帮",	["chengdu"] = "成都城",	["city"] = "扬州城",		["dali"] = "大理城",
@@ -112,7 +109,7 @@ function getAddr0(addr, citys)
 			return name, city
 		end
 	end
-	if tmp.goto then
+	if tmp.go_to then
 	   for _,v in pairs(map.rooms) do
 	      if addr and type(v)=="table" and v.name and addr==v.name then
 	         return v.name,getLookCity(v.id)
@@ -128,8 +125,10 @@ function getLookCity(path)
 	end
 	local place = getPlace(path)
 	for k,v in pairs(place) do
-		if (v == "zhiye" or v == "entry") and not tmp.goto then
-			return nil
+		if (v == "zhiye" or v == "entry") and not tmp.go_to then
+                        city = map.rooms[path].outdoor
+                        return city
+--屁哥			return nil
 		end
 		if v ~= "entry" then
 		   city = lookCitys[v]
@@ -138,6 +137,9 @@ function getLookCity(path)
 			return city
 		end
 	end
+--屁哥
+        city = map.rooms[path].outdoor
+        return city
 end
 
 function getPlace(path)
@@ -167,6 +169,30 @@ function getCityRooms(city)
 	end
 	return rooms
 end 
+function getRoom(name, city, type)  --瓦片用来定义同名的首个房间（与rooms[1]一个效果）
+	local type = type or "all"
+	local isLookCity = type == "all" or type == "look"
+	local isTaskCity = type == "all" or type == "task"
+	if string.find(name,"/") then
+		return {name}
+	end
+	for id,room in pairs(map.rooms) do
+		local roomName = isNameFw and getFirstWord(room.name) or room.name
+		if roomName == name then
+			if not city then
+				return id
+			else
+				local lookCity = isCityFw and getFirstWord(getLookCity(room.id)) or getLookCity(room.id)
+				local taskCity = isCityFw and getFirstWord(getCity(room.id)) or getCity(room.id)
+				if (isLookCity and city == lookCity) or (isTaskCity and city == taskCity) or (room.outdoor and room.outdoor == city) then
+				return id
+				end
+			end
+		end
+	end
+
+	return id
+end
 
 function getRooms(name, city, type)
 	local type = type or "all"
@@ -187,7 +213,6 @@ function getRooms(name, city, type)
 				local lookCity = isCityFw and getFirstWord(getLookCity(room.id)) or getLookCity(room.id)
 				local taskCity = isCityFw and getFirstWord(getCity(room.id)) or getCity(room.id)
 				if (isLookCity and city == lookCity) or (isTaskCity and city == taskCity) or (room.outdoor and room.outdoor == city) then
-				    --print('rooms.id='..id)
 					table.insert(rooms,id)
 				end
 			end
@@ -247,6 +272,45 @@ function getFindPath(from,name,city,length)
 
 	f_path=del_string(f_path,"halt;")
 	return f_path        
+end
+function getFirstRoom(name, city, type)
+	local type = type or "all"
+	local isLookCity = type == "all" or type == "look"
+	local isTaskCity = type == "all" or type == "task"
+	if string.find(name,"/") then
+		return {name}
+	end
+	local isNameFw = string.find(name,"^%l+$")
+	local isCityFw = city and string.find(city,"^%l+$")
+	local rooms = {}
+	for id,room in pairs(map.rooms) do
+		local roomName = isNameFw and getFirstWord(room.name) or room.name
+		if roomName == name then
+			if not city then
+				table.insert(rooms,id)
+			else
+				local lookCity = isCityFw and getFirstWord(getLookCity(room.id)) or getLookCity(room.id)
+				local taskCity = isCityFw and getFirstWord(getCity(room.id)) or getCity(room.id)
+				if (isLookCity and city == lookCity) or (isTaskCity and city == taskCity) or (room.outdoor and room.outdoor == city) then
+					table.insert(rooms,id)
+				end
+			end
+		end
+	end
+    if table.getn(rooms)>1 then
+	    table.sort(rooms) -- 按照房间id名排序，配合room.lua，可以获取同名房间中想要的那个房间。 -- playplay
+--		printTab(rooms)
+	end
+	repeat
+    	dest.id=rooms[table.getn(rooms)]
+    	if not path_cal() then
+	        table.remove(rooms,table.getn(rooms))
+	    end
+	 until path_cal() or table.getn(rooms)==0
+	if table.getn(rooms)~=0 then
+	    return rooms[table.getn(rooms)] 
+		else return false
+	end
 end
 
 function getNearRoom(from,to)
@@ -842,36 +906,43 @@ Room {
 Room {
 	id = "cangzhou/bank",
 	name = "天音阁",
+	outdoor = "沧州城",
 	ways = {
 		["west"] = "cangzhou/beijie1",
 	},
 	objs = {
           ["蒋调侯"] = "jiang tiaohou",
            },
+	room_relative="北街----天音阁天音阁",
 }
 Room {
 	id = "cangzhou/beijie1",
 	name = "北街",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "cangzhou/beijie2",
 		["north"] = "cangzhou/beimen",
 		["east"] = "cangzhou/bank",
 		["west"] = "cangzhou/mihang",
 	},
+	room_relative="北门｜米行-----北街-----天音阁｜北街北街",
 }
 Room {
 	id = "cangzhou/beijie2",
 	name = "北街",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "cangzhou/beijie3",
 		["east"] = "cangzhou/gongdi",
 		["north"] = "cangzhou/beijie1",
 		["west"] = "cangzhou/fuya",
 	},
+	room_relative="北街｜沧州府衙-----北街-----工地｜北街北街",
 }
 Room {
 	id = "cangzhou/beijie3",
 	name = "北街",
+	outdoor = "沧州城",
 	ways = {
 		["southeast"] = "cangzhou/dongjie1",
 		["southwest"] = "cangzhou/xijie1",
@@ -880,48 +951,60 @@ Room {
 		["north"] = "cangzhou/beijie2",
 		["west"] = "cangzhou/mingju",
 	},
+room_relative="北街｜民居-----北街-----废园↙｜↘西街大客栈东街北街",
 }
 Room {
 	id = "cangzhou/beimen",
 	name = "北门",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "cangzhou/beijie1",
 		["north"] = "cangzhou/dyd1",
 	},
+	room_relative="大驿道｜北门｜北街北门",
 }
 Room {
 	id = "cangzhou/dyd1",
 	name = "大驿道",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "cangzhou/beimen",
 		["north"] = "cangzhou/dyd2",
 	},
+	room_relative="大驿道｜大驿道｜北门大驿道",
 }
 Room {
 	id = "cangzhou/dyd2",
 	name = "大驿道",
+	outdoor = "沧州城",
 	ways = {
 		["northwest"] = "cangzhou/dyd3",
 		["south"] = "cangzhou/dyd1",
 	},
+	room_relative="大驿道↖大驿道｜大驿道大驿道",
 }
 Room {
 	id = "cangzhou/dyd3",
 	name = "大驿道",
+	outdoor = "沧州城",
 	ways = {
 		["southeast"] = "cangzhou/dyd2",
 	},
+room_relative="大驿道↘大驿道大驿道",
 }
 Room {
 	id = "cangzhou/changku",
 	name = "仓库",
+	outdoor = "沧州城",
 	ways = {
 		["north"] = "cangzhou/mihang",
 	},
+	room_relative="米行｜仓库仓库",
 }
 Room {
 	id = "cangzhou/dangpu",
 	name = "沧州当铺",
+	outdoor = "沧州城",
 	no_fight = true,
 	ways = {
 		["north"] = "cangzhou/xijie1",
@@ -929,27 +1012,33 @@ Room {
 	objs = {
           ["黄老板"] = "huang laoban",
            },
+	room_relative="西街｜沧州当铺沧州当铺",
 }
 Room {
 	id = "cangzhou/dongjie1",
 	name = "东街",
+	outdoor = "沧州城",
 	ways = {
 		["southwest"] = "cangzhou/nanjie1",
 		["northwest"] = "cangzhou/beijie3",
 		["east"] = "cangzhou/dongmen",
 	},
+room_relative="北街↖东街-----东门↙南街东街",
 }
 Room {
 	id = "cangzhou/dongmen",
 	name = "东门",
+	outdoor = "沧州城",
 	ways = {
 		["east"] = "cangzhou/eroad1",
 		["west"] = "cangzhou/dongjie1",
 	},
+	room_relative="东街-----东门-----大驿道东门",
 }
 Room {
 	id = "cangzhou/eroad1",
 	name = "大驿道",
+	outdoor = "沧州城",
 	ways = {
 		["east"] = "cangzhou/eroad2",
 		["west"] = "cangzhou/dongmen",
@@ -959,6 +1048,7 @@ Room {
 Room {
 	id = "cangzhou/eroad2",
 	name = "大驿道",
+	outdoor = "沧州城",
 	ways = {
 		["northeast"] = "group/entry/czeroad3",
 		["west"] = "cangzhou/eroad1",
@@ -968,6 +1058,7 @@ Room {
 Room {
 	id = "cangzhou/eroad4",
 	name = "大驿道",
+	outdoor = "沧州城",
 	ways = {
 		["southwest"] = "group/entry/czeroad3",
 		["northeast"] = "tanggu/wroad4",
@@ -980,6 +1071,7 @@ Room {
 Room {
 	id = "cangzhou/feiyuan",
 	name = "废园",
+	outdoor = "沧州城",
 	ways = {
 		["enter"] = "cangzhou/tingtang",
 		["west"] = "cangzhou/beijie3",
@@ -988,10 +1080,12 @@ Room {
           ["方舵主"] = "fang duozhu",
           ["简长老"] = "jian zhanglao",
            },
+	room_relative="厅堂∧北街-----废园废园",
 }
 Room {
 	id = "cangzhou/fuya",
 	name = "沧州府衙",
+	outdoor = "沧州城",
 	ways = {
 		["east"] = "cangzhou/beijie2",
 		["west"] = "cangzhou/zhenting",
@@ -1000,21 +1094,28 @@ Room {
 		["west"] = {
 			{id = "ya yi", exp = 17500},
 		},
+		precmds = {
+              ["west"] = "kill ya yi",
+	},
 	},
 }
 Room {
 	id = "cangzhou/gongdi",
 	name = "工地",
+	outdoor = "沧州城",
 	ways = {
 		["west"] = "cangzhou/beijie2",
 	},
+	room_relative="北街-----工地工地",
 }
 Room {
 	id = "cangzhou/huadian",
 	name = "花店",
+	outdoor = "沧州城",
 	ways = {
 		["west"] = "cangzhou/nanjie1",
 	},
+	room_relative="南街-----花店花店",
 }
 Room {
 	id = "cangzhou/kezhan",
@@ -1034,16 +1135,17 @@ Room {
 Room {
 	id = "cangzhou/kezhan2",
 	name = "客栈二楼",
+	outdoor = "沧州城",
 	no_fight = true,
 	ways = {
 		["enter"] = "cangzhou/sleeproom",
 		["down"] = "cangzhou/kezhan",
 	},
-	room_relative="客店二楼∧客栈二楼〓大客栈客栈二楼",
 }
 Room {
 	id = "cangzhou/mihang",
 	name = "米行",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "cangzhou/changku",
 		["east"] = "cangzhou/beijie1",
@@ -1051,17 +1153,21 @@ Room {
 	objs = {
           ["王大米"] = "wang dami",
            },
+	room_relative="米行-----北街｜仓库米行",
 }
 Room {
 	id = "cangzhou/mingju",
 	name = "民居",
+	outdoor = "沧州城",
 	ways = {
 		["east"] = "cangzhou/beijie3",
 	},
+	room_relative="民居-----北街民居",
 }
 Room {
 	id = "cangzhou/nanjie1",
 	name = "南街",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "cangzhou/nanmen",
 		["northwest"] = "cangzhou/xijie1",
@@ -1070,35 +1176,41 @@ Room {
 		["northeast"] = "cangzhou/dongjie1",
 		["west"] = "cangzhou/xiyuanzi",
 	},
+room_relative="西街大客栈东街↖｜↗戏园-----南街-----花店｜南门南街",
 }
 Room {
 	id = "cangzhou/nanmen",
 	name = "南门",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "cangzhou/sroad1",
 		["north"] = "cangzhou/nanjie1",
 	},
+	room_relative="南街｜南门｜官道南门",
 }
 Room {
 	id = "cangzhou/sancakou",
 	name = "三岔路",
+	outdoor = "沧州城",
 	ways = {
 		["southeast"] = "cangzhou/wroad4",
 		["west"] = "hmy/pingding/road9",
 	},
+room_relative="土路----三岔路↘驿道三岔路",
 }
 Room {
 	id = "cangzhou/sleeproom",
 	name = "客店二楼",
+	outdoor = "沧州城",
 	no_fight = true,
 	ways = {
 		["out"] = "cangzhou/kezhan2",
 	},
-	room_relative="客店二楼∨客栈二楼客店二楼",
 }
 Room {
 	id = "cangzhou/sroad1",
 	name = "官道",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "cangzhou/sroad2",
 		["north"] = "cangzhou/nanmen",
@@ -1108,6 +1220,7 @@ Room {
 Room {
 	id = "cangzhou/sroad2",
 	name = "官道",
+	outdoor = "沧州城",
 	ways = {
 		["southeast"] = "cangzhou/sroad3",
 		["north"] = "cangzhou/sroad1",
@@ -1117,6 +1230,7 @@ Room {
 Room {
 	id = "cangzhou/sroad3",
 	name = "官道",
+	outdoor = "沧州城",
 	ways = {
 		["southeast"] = "cangzhou/sroad4",
 		["northwest"] = "cangzhou/sroad2",
@@ -1126,6 +1240,7 @@ Room {
 Room {
 	id = "cangzhou/sroad4",
 	name = "官道",
+	outdoor = "沧州城",
 	ways = {
 		["south"] = "huanghe/road3",
 		["northwest"] = "cangzhou/sroad3",
@@ -1135,38 +1250,47 @@ Room {
 Room {
 	id = "cangzhou/tingtang",
 	name = "厅堂",
+	outdoor = "沧州城",
 	no_fight = true,
 	ways = {
 		["out"] = "cangzhou/feiyuan",
 	},
+	room_relative="厅堂∨废园厅堂",
 }
 Room {
 	id = "cangzhou/wroad1",
 	name = "驿道",
+	outdoor = "沧州城",
 	ways = {
 		["east"] = "cangzhou/ximen",
 		["west"] = "group/entry/czwroad2",
 	},
+room_relative="驿道-----驿道-----西门驿道",
 }
 Room {
 	id = "cangzhou/wroad3",
 	name = "驿道",
+	outdoor = "沧州城",
 	ways = {
 		["northeast"] = "group/entry/czwroad2",
 		["west"] = "cangzhou/wroad4",
 	},
+ room_relative="驿道↗驿道-----驿道驿道",
 }
 Room {
 	id = "cangzhou/wroad4",
 	name = "驿道",
+	outdoor = "沧州城",
 	ways = {
 		["northwest"] = "cangzhou/sancakou",
 		["east"] = "cangzhou/wroad3",
 	},
+	room_relative="三岔路↖驿道-----驿道驿道",
 }
 Room {
 	id = "cangzhou/xijie1",
 	name = "西街",
+	outdoor = "沧州城",
 	ways = {
 		["southeast"] = "cangzhou/nanjie1",
 		["south"] = "cangzhou/dangpu",
@@ -1174,39 +1298,49 @@ Room {
 		["northeast"] = "cangzhou/beijie3",
 		["west"] = "cangzhou/ximen",
 	},
+room_relative="驿站北街｜↗西门-----西街｜↘沧州当铺南街西街",
 }
 Room {
 	id = "cangzhou/ximen",
 	name = "西门",
+	outdoor = "沧州城",
 	ways = {
 		["east"] = "cangzhou/xijie1",
 		["west"] = "cangzhou/wroad1",
 	},
+	room_relative="驿道-----西门-----西街西门",
 }
 Room {
 	id = "cangzhou/xiyuanzi",
 	name = "戏园",
+	outdoor = "沧州城",
 	ways = {
 		["east"] = "cangzhou/nanjie1",
 	},
+	room_relative="南街｜戏园",
 }
 Room {
 	id = "cangzhou/yizhan",
 	name = "驿站",
+	outdoor = "沧州城",
 	ways = {
-		["south"] = "cangzhou/xijie1",
+		["south"] = "cangzhou/xijie1", 
 	},
+	room_relative="驿站｜西街驿站",
 }
 Room {
 	id = "cangzhou/zhenting",
 	name = "府衙正厅",
+	outdoor = "沧州城",
 	ways = {
 		["east"] = "cangzhou/fuya",
 	},
+	room_relative="沧州府衙｜府衙正厅",
 }
 Room {
 	id = "changan/baishulin1",
 	name = "柏树林",
+	outdoor = "长安城",
 	ways = {
 		["southeast"] = "changan/baishulin1",
 		["southwest"] = "changan/baishulin1",
@@ -1237,6 +1371,7 @@ Room {
 Room {
 	id = "changan/baishulin2",
 	name = "柏树林",
+	outdoor = "长安城",
 	ways = {
 		["northwest"] = "changan/baishulin2",
 		["east"] = "changan/baishulin2",
@@ -1263,38 +1398,47 @@ Room {
 Room {
 	id = "changan/beilin",
 	name = "碑林",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/baishulin1",
 	},
+	room_relative="柏树林｜碑林",
 }
 Room {
 	id = "changan/biaoju",
 	name = "虎威镖局",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/biaoju2",
 		["north"] = "changan/westjie3",
 	},
+	room_relative="西大街｜虎威镖局｜镖局大厅虎威镖局",
 }
 Room {
 	id = "changan/biaoju2",
 	name = "镖局大厅",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/biaoju",
 	},
 	objs = {
           ["周虎威"] = "zhou huwei",
      },
+	 room_relative="虎威镖局｜镖局大厅镖局大厅",
 }
 Room {
 	id = "changan/bingqipu",
 	name = "兵器铺",
+	outdoor = "长安城",
 	ways = {
 		["west"] = "changan/southjie2",
 	},
+	room_relative="南大街----兵器铺兵器铺",
 }
 Room {
 	id = "changan/bingying",
 	name = "兵营大门",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/bingying2",
 		["north"] = "changan/eastjie4",
@@ -1303,25 +1447,34 @@ Room {
 		["south"] = {
 			{id = "guan bing", exp = 10000},
 		},
+		precmds = {
+              ["south"] = "kill guan bing",
 	},
+	},
+	
 }
 Room {
 	id = "changan/bingying2",
 	name = "兵营",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/bingying",
 	},
+	room_relative="兵营｜兵营大门",
 }
 Room {
 	id = "changan/chaguan",
 	name = "茶馆",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastjie2",
 	},
+	room_relative="茶馆｜东大街茶馆",
 }
 Room {
 	id = "changan/changjie1",
 	name = "长街",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/changjie1",
 		["west"] = "changan/changjie1",
@@ -1340,55 +1493,68 @@ Room {
 Room {
 	id = "changan/changjie2",
 	name = "长街",
+	outdoor = "长安城",
 	ways = {
 		["southeast"] = "changan/ciensi",
 		["east"] = "changan/baishulin2",
 		["northeast"] = "changan/baishulin1",
 		["west"] = "changan/changjie1",
 	},
+	room_relative="柏树林｜柏树林--长街｜慈恩寺长街",
 }
 Room {
 	id = "changan/chm",
 	name = "城隍庙",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/westjie4",
 	},
+	room_relative="西大街--城隍庙",
 }
 Room {
 	id = "changan/ciensi",
 	name = "慈恩寺",
+	outdoor = "长安城",
 	ways = {
 		["northwest"] = "changan/changjie2",
 		["east"] = "changan/dayanta1",
 	},
+	room_relative="长街｜大雁塔慈恩寺",
 }
 Room {
 	id = "changan/dadian",
 	name = "大殿",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/qingzhensi",
 		["north"] = "changan/houdian",
 	},
+	room_relative="后殿｜大殿｜清真寺大殿",
 }
 Room {
 	id = "changan/dangpu",
 	name = "当铺",
+	outdoor = "长安城",
 	no_fight = true,
 	ways = {
 		["west"] = "changan/southjie1",
 	},
+	room_relative="南大街-----当铺当铺",
 }
 Room {
 	id = "changan/dayanta1",
 	name = "大雁塔",
+	outdoor = "长安城",
 	ways = {
 		["west"] = "changan/ciensi",
 		["up"] = "changan/dayanta2",
 	},
+	room_relative="大雁塔二层｜大雁塔慈恩寺",
 }
 Room {
 	id = "changan/dayanta2",
 	name = "大雁塔二层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/dayanta1",
 		["up"] = "changan/dayanta3",
@@ -1397,6 +1563,7 @@ Room {
 Room {
 	id = "changan/dayanta3",
 	name = "大雁塔三层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/dayanta2",
 		["up"] = "changan/dayanta4",
@@ -1405,6 +1572,7 @@ Room {
 Room {
 	id = "changan/dayanta4",
 	name = "大雁塔四层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/dayanta3",
 		["up"] = "changan/dayanta5",
@@ -1413,6 +1581,7 @@ Room {
 Room {
 	id = "changan/dayanta5",
 	name = "大雁塔五层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/dayanta4",
 		["up"] = "changan/dayanta6",
@@ -1421,6 +1590,7 @@ Room {
 Room {
 	id = "changan/dayanta6",
 	name = "大雁塔六层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/dayanta5",
 		["up"] = "changan/dayanta7",
@@ -1429,6 +1599,7 @@ Room {
 Room {
 	id = "changan/dayanta7",
 	name = "大雁塔七层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/dayanta6",
 	},
@@ -1436,23 +1607,28 @@ Room {
 Room {
 	id = "changan/dewentang",
 	name = "德文堂",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southjie2",
 	},
 	objs = {
           ["唐文德"] = "tang wende",
      },
+	 room_relative="德文堂----南大街德文堂",
 }
 Room {
 	id = "changan/duchang",
 	name = "赌场",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/eastjie1",
 	},
+	room_relative="东大街｜赌场赌场",
 }
 Room {
 	id = "changan/eastchl",
 	name = "东门城楼",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastjl2",
 		["down"] = "changan/eastmen",
@@ -1463,6 +1639,7 @@ Room {
 Room {
 	id = "changan/eastchq1",
 	name = "东城墙",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastchq2",
 		["north"] = "changan/lwtne",
@@ -1472,6 +1649,7 @@ Room {
 Room {
 	id = "changan/eastchq2",
 	name = "东城墙",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastjl1",
 		["north"] = "changan/eastchq1",
@@ -1481,6 +1659,7 @@ Room {
 Room {
 	id = "changan/eastchq3",
 	name = "东城墙",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastchq4",
 		["north"] = "changan/eastjl2",
@@ -1490,6 +1669,7 @@ Room {
 Room {
 	id = "changan/eastchq4",
 	name = "东城墙",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/lwtse",
 		["north"] = "changan/eastchq3",
@@ -1499,6 +1679,7 @@ Room {
 Room {
 	id = "changan/eastjie1",
 	name = "东大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/duchang",
 		["north"] = "changan/wanhonglou",
@@ -1510,6 +1691,7 @@ Room {
 Room {
 	id = "changan/eastjie2",
 	name = "东大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/qingchi",
 		["east"] = "changan/eastjie3",
@@ -1521,6 +1703,7 @@ Room {
 Room {
 	id = "changan/eastjie3",
 	name = "东大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/huadian",
 		["north"] = "changan/shuiguodian",
@@ -1532,6 +1715,7 @@ Room {
 Room {
 	id = "changan/eastjie4",
 	name = "东大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/bingying",
 		["north"] = "changan/neijie7",
@@ -1543,6 +1727,7 @@ Room {
 Room {
 	id = "changan/eastjl1",
 	name = "箭楼",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastchl",
 		["north"] = "changan/eastchq2",
@@ -1552,6 +1737,7 @@ Room {
 Room {
 	id = "changan/eastjl2",
 	name = "箭楼",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastchq3",
 		["north"] = "changan/eastchl",
@@ -1561,6 +1747,7 @@ Room {
 Room {
 	id = "changan/eastmen",
 	name = "长乐门",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/eastroad1",
 		["west"] = "changan/eastjie4",
@@ -1571,11 +1758,16 @@ Room {
 			{id = "guan bing", exp = 10000},
 			{id = "wu jiang", exp = 75000},
 		},
+		precmds = {
+              ["up"] = "kill guan bing;kill wu jiang",
 	},
+	},
+	
 }
 Room {
 	id = "changan/eastroad1",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/eastroad2",
 		["west"] = "changan/eastmen",
@@ -1586,6 +1778,7 @@ Room {
 Room {
 	id = "changan/eastroad2",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "group/entry/caeroad3",
 		["west"] = "changan/eastroad1",
@@ -1595,126 +1788,156 @@ Room {
 Room {
 	id = "changan/fengchi",
 	name = "凤池",
+	outdoor = "长安城",
 	no_fight = true,
 	ways = {
 		["west"] = "changan/qingchi",
 	},
+	room_relative="清池｜凤池",
 }
 Room {
 	id = "changan/gulou",
 	name = "鼓楼",
+	outdoor = "长安城",
 	ways = {
 		["southeast"] = "changan/zhonglou",
 		["south"] = "changan/westjie1",
 	},
+	room_relative="鼓楼｜↘西大街钟楼鼓楼",
 }
 Room {
 	id = "changan/heishi",
 	name = "黑市",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/shiji",
 	},
+	room_relative="黑市-----市集黑市",
 }
 Room {
 	id = "changan/houdian",
 	name = "后殿",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/dadian",
 	},
+	room_relative="后殿｜大殿后殿",
 }
 Room {
 	id = "changan/huadian",
 	name = "花店",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/eastjie3",
 	},
+	room_relative="东大街｜花店花店",
 }
 Room {
 	id = "changan/jiangjunfu",
 	name = "将军府",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/jjfzht",
 		["north"] = "changan/westjie2",
 		["west"] = "changan/jjfxf",
 	},
+	room_relative="西大街｜厢房----将军府｜正厅将军府",
 }
 Room {
 	id = "changan/jiashan",
 	name = "假山",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/jinghu",
 	},
+	room_relative="假山-----镜湖假山",
 }
 Room {
 	id = "changan/jinghu",
 	name = "镜湖",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southjie3",
 		["west"] = "changan/jiashan",
 	},
+	room_relative="假山-----镜湖-----南大街镜湖",
 }
 Room {
 	id = "changan/jiuguan",
 	name = "酒馆",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/neijie1",
 	},
+	room_relative="内街｜酒馆酒馆",
 }
 Room {
 	id = "changan/jjfhhy",
 	name = "后花园",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/jjfhm",
 		["west"] = "changan/jjflt",
 	},
+	room_relative="后门｜凉亭后花园",
 }
 Room {
 	id = "changan/jjfhm",
 	name = "后门",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/jjfhhy",
 		["north"] = "changan/jjfzht",
 	},
+	room_relative="后门｜正厅后花园",
 }
 Room {
 	id = "changan/jjflt",
 	name = "凉亭",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/jjfhhy",
 	},
+	room_relative="凉亭--后花园",
 }
 Room {
 	id = "changan/jjfws",
 	name = "卧室",
+	outdoor = "长安城",
 	no_fight = true,
 	ways = {
 		["east"] = "changan/jjfzht",
 	},
+	room_relative="正厅--卧室",
 }
 Room {
 	id = "changan/jjfxf",
 	name = "厢房",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/jiangjunfu",
 	},
+	room_relative="厢房-----将军府厢房",
 }
 Room {
 	id = "changan/jjfyt",
 	name = "宴厅",
+	outdoor = "长安城",
 	ways = {
 		["west"] = "changan/jjfzht",
 	},
+	room_relative="正厅--宴厅",
 }
 Room {
 	id = "changan/jjfzht",
 	name = "正厅",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/jjfhm",
 		["east"] = "changan/jjfyt",
 		["north"] = "changan/jiangjunfu",
 		["west"] = "changan/jjfws",
 	},
-	room_relative="将军府｜卧室-----正厅-----宴厅｜后门正厅",
 	blocks = {
 		["west"] = {
 			{id = "guan jia", exp = 10000},
@@ -1725,23 +1948,32 @@ Room {
 		["east"] = {
 			{id = "guan jia", exp = 10000},
 		},
+	precmds = {
+              ["west"] = "kill guan jia",
+			  ["south"] = "kill guan jia",
+			  ["east"] = "kill guan jia",
+	},
 	},
 }
 Room {
 	id = "changan/juhao",
 	name = "聚豪酒楼",
+	outdoor = "长安城",
 	ways = {
 		["west"] = "changan/northjie1",
 		["up"] = "changan/juhao2",
 	},
+	room_relative="酒楼二楼〓北大街---聚豪酒楼聚豪酒楼",
 }
 Room {
 	id = "changan/juhao2",
 	name = "酒楼二楼",
+	outdoor = "长安城",
 	no_fight = true,
 	ways = {
 		["down"] = "changan/juhao",
 	},
+	room_relative="酒楼二楼〓聚豪酒楼酒楼二楼",
 }
 Room {
 	id = "changan/kezhan",
@@ -1757,10 +1989,12 @@ Room {
 	lengths ={
 	    ["#jhkz"] = 5,
 	},
+	room_relative="走廊〓聚豪客栈---北大街聚豪客栈",
 }
 Room {
 	id = "changan/kezhan2",
 	name = "走廊",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/kezhan3",
 		["down"] = "changan/kezhan",
@@ -1769,6 +2003,7 @@ Room {
 Room {
 	id = "changan/kezhan3",
 	name = "客房",
+	outdoor = "长安城",
 	no_fight = true,
 	ways = {
 		["south"] = "changan/kezhan2",
@@ -1777,37 +2012,46 @@ Room {
 Room {
 	id = "changan/lijia",
 	name = "李家大院",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/neijie7",
 		["north"] = "changan/ljzhangfang",
 		["west"] = "changan/ljzt",
 	},
+	room_relative="帐房｜正厅---李家大院---内街李家大院",
 }
 Room {
 	id = "changan/ljwoshi",
 	name = "卧室",
+	outdoor = "长安城",
 	no_fight = true,
 	ways = {
 		["east"] = "changan/ljzt",
 	},
+	room_relative="卧室-----正厅卧室",
 }
 Room {
 	id = "changan/ljyanting",
 	name = "宴厅",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/ljzt",
 	},
+	room_relative="宴厅｜正厅宴厅",
 }
 Room {
 	id = "changan/ljzhangfang",
 	name = "帐房",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/lijia",
 	},
+	room_relative="帐房｜李家大院帐房",
 }
 Room {
 	id = "changan/ljzt",
 	name = "正厅",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/ljyanting",
 		["east"] = "changan/lijia",
@@ -1821,19 +2065,22 @@ Room {
 Room {
 	id = "changan/longchi",
 	name = "龙池",
+	outdoor = "长安城",
 	no_fight = true,
 	ways = {
 		["east"] = "changan/qingchi",
 	},
+	room_relative="清池--龙池",
 }
 Room {
 	id = "changan/lwtne",
 	name = "了望台",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastchq1",
 		["west"] = "changan/northchq6",
 	},
-	room_relative="北城墙----了望台｜东城墙了望台",
+	
 	blocks = {
 		["south"] = {
 			{id = "zhiqin bing", exp = 10000},
@@ -1841,6 +2088,10 @@ Room {
 		["west"] = {
 			{id = "zhiqin bing", exp = 10000},
 		},
+		 precmds = {
+              ["west"] = "kill zhiqin bing",
+			  ["south"] = "kill zhiqin bing",
+			  },
 	},
 	objs = {
           ["值勤兵"] = "zhiqin bing",
@@ -1849,11 +2100,12 @@ Room {
 Room {
 	id = "changan/lwtnw",
 	name = "了望台",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westchq1",
 		["east"] = "changan/northchq1",
 	},
-	room_relative="了望台----北城墙｜西城墙了望台",
+	
 	blocks = {
 		["south"] = {
 			{id = "zhiqin bing", exp = 10000},
@@ -1861,6 +2113,10 @@ Room {
 		["east"] = {
 			{id = "zhiqin bing", exp = 10000},
 		},
+		precmds = {
+              ["east"] = "kill zhiqin bing",
+			  ["south"] = "kill zhiqin bing",
+	},
 	},
 	objs = {
           ["值勤兵"] = "zhiqin bing",
@@ -1869,11 +2125,12 @@ Room {
 Room {
 	id = "changan/lwtse",
 	name = "了望台",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/eastchq4",
 		["west"] = "changan/southchq6",
 	},
-	room_relative="东城墙｜南城墙----了望台了望台",
+	
 	blocks = {
 		["north"] = {
 			{id = "zhiqin bing", exp = 10000},
@@ -1881,6 +2138,10 @@ Room {
 		["west"] = {
 			{id = "zhiqin bing", exp = 10000},
 		},
+		precmds = {
+              ["north"] = "kill zhiqin bing",
+			  ["west"] = "kill zhiqin bing",
+	},
 	},
 	objs = {
           ["值勤兵"] = "zhiqin bing",
@@ -1889,11 +2150,12 @@ Room {
 Room {
 	id = "changan/lwtsw",
 	name = "了望台",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/westchq4",
 		["east"] = "changan/southchq1",
 	},
-	room_relative="西城墙｜了望台----南城墙了望台",
+	
 	blocks = {
 		["north"] = {
 			{id = "zhiqin bing", exp = 10000},
@@ -1909,58 +2171,73 @@ Room {
 Room {
 	id = "changan/minju1",
 	name = "民居",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/shiji",
 	},
+	room_relative="民居｜市集民居",
 }
 Room {
 	id = "changan/minju2",
 	name = "民居",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/shiji",
 	},
 	objs = {
           ["大老鼠"] = "da laoshu",
      },
+	 room_relative="市集｜民居民居",
 }
 Room {
 	id = "changan/minju3",
 	name = "民居",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/neijie1",
 	},
+	room_relative="民居｜内街民居",
 }
 Room {
 	id = "changan/minju4",
 	name = "民居",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/neijie2",
 	},
+	room_relative="民居｜内街民居",
 }
 Room {
 	id = "changan/minju5",
 	name = "民居",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/neijie3",
 	},
+	room_relative="民居｜内街民居",
 }
 Room {
 	id = "changan/minju6",
 	name = "民居",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/neijie4",
 	},
+	room_relative="民居｜内街民居",
 }
 Room {
 	id = "changan/minju7",
 	name = "民居",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/neijie5",
 	},
+	room_relative="民居｜内街民居",
 }
 Room {
 	id = "changan/neijie1",
 	name = "内街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/jiuguan",
 		["east"] = "changan/northjie3",
@@ -1972,6 +2249,7 @@ Room {
 Room {
 	id = "changan/neijie2",
 	name = "内街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/xiyuan",
 		["east"] = "changan/neijie3",
@@ -1983,6 +2261,7 @@ Room {
 Room {
 	id = "changan/neijie3",
 	name = "内街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/tupiaoguan",
 		["east"] = "changan/neijie4",
@@ -1999,6 +2278,7 @@ Room {
 Room {
 	id = "changan/neijie4",
 	name = "内街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/zahuopu",
 		["east"] = "changan/neijie5",
@@ -2010,6 +2290,7 @@ Room {
 Room {
 	id = "changan/neijie5",
 	name = "内街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/neijie6",
 		["north"] = "changan/minju7",
@@ -2020,6 +2301,7 @@ Room {
 Room {
 	id = "changan/neijie6",
 	name = "内街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/neijie7",
 		["north"] = "changan/neijie5",
@@ -2032,6 +2314,7 @@ Room {
 Room {
 	id = "changan/neijie7",
 	name = "内街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastjie4",
 		["north"] = "changan/neijie6",
@@ -2042,6 +2325,7 @@ Room {
 Room {
 	id = "changan/northchl",
 	name = "北门城楼",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/northmen",
 		["east"] = "changan/northjl2",
@@ -2052,6 +2336,7 @@ Room {
 Room {
 	id = "changan/northchq1",
 	name = "北城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/northchq2",
 		["west"] = "changan/lwtnw",
@@ -2061,6 +2346,7 @@ Room {
 Room {
 	id = "changan/northchq2",
 	name = "北城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/northchq3",
 		["west"] = "changan/northchq1",
@@ -2070,6 +2356,7 @@ Room {
 Room {
 	id = "changan/northchq3",
 	name = "北城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/northjl1",
 		["west"] = "changan/northchq2",
@@ -2079,6 +2366,7 @@ Room {
 Room {
 	id = "changan/northchq4",
 	name = "北城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/northchq5",
 		["west"] = "changan/northjl2",
@@ -2088,6 +2376,7 @@ Room {
 Room {
 	id = "changan/northchq5",
 	name = "北城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/northchq6",
 		["west"] = "changan/northchq4",
@@ -2097,6 +2386,7 @@ Room {
 Room {
 	id = "changan/northchq6",
 	name = "北城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/lwtne",
 		["west"] = "changan/northchq5",
@@ -2106,6 +2396,7 @@ Room {
 Room {
 	id = "changan/northjie1",
 	name = "北大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/zhonglou",
 		["north"] = "changan/northjie2",
@@ -2117,6 +2408,7 @@ Room {
 Room {
 	id = "changan/northjie2",
 	name = "北大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/northjie1",
 		["east"] = "zhiye/zhibufang1",
@@ -2128,6 +2420,7 @@ Room {
 Room {
 	id = "changan/northjie3",
 	name = "北大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/northjie2",
 		["north"] = "changan/northmen",
@@ -2139,6 +2432,7 @@ Room {
 Room {
 	id = "changan/northjl1",
 	name = "箭楼",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/northchl",
 		["west"] = "changan/northchq3",
@@ -2148,6 +2442,7 @@ Room {
 Room {
 	id = "changan/northjl2",
 	name = "箭楼",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/northchq4",
 		["west"] = "changan/northchl",
@@ -2157,6 +2452,7 @@ Room {
 Room {
 	id = "changan/northmen",
 	name = "安远门",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/northjie3",
 		["north"] = "changan/northroad1",
@@ -2167,11 +2463,14 @@ Room {
 			{id = "guan bing", exp = 10000},
 			{id = "wu jiang", exp = 75000},
 		},
+	
 	},
+	
 }
 Room {
 	id = "changan/northroad1",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/northmen",
 		["north"] = "changan/northroad2",
@@ -2181,6 +2480,7 @@ Room {
 Room {
 	id = "changan/northroad10",
 	name = "大道",
+	outdoor = "长安城",
 	ways = {
 		["northup"] = "hengshan/jinlongxia",
 		["south"] = "changan/northroad9",
@@ -2191,6 +2491,7 @@ Room {
 Room {
 	id = "changan/northroad2",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/northroad1",
 		["north"] = "changan/northroad3",
@@ -2200,6 +2501,7 @@ Room {
 Room {
 	id = "changan/northroad3",
 	name = "大道",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/northroad2",
 		["northeast"] = "changan/northroad4",
@@ -2209,6 +2511,7 @@ Room {
 Room {
 	id = "changan/northroad4",
 	name = "土路",
+	outdoor = "长安城",
 	ways = {
 		["northup"] = "changan/northroad5",
 		["southwest"] = "changan/northroad3",
@@ -2220,6 +2523,7 @@ Room {
 Room {
 	id = "changan/northroad5",
 	name = "土路",
+	outdoor = "长安城",
 	ways = {
 		["northeast"] = "group/entry/canroad6",
 		["southdown"] = "changan/northroad4",
@@ -2229,6 +2533,7 @@ Room {
 Room {
 	id = "changan/northroad7",
 	name = "土路",
+	outdoor = "长安城",
 	ways = {
 		["southup"] = "group/entry/canroad6",
 		["northeast"] = "changan/northroad8",
@@ -2241,6 +2546,7 @@ Room {
 Room {
 	id = "changan/northroad8",
 	name = "土路",
+	outdoor = "长安城",
 	ways = {
 		["southwest"] = "changan/northroad7",
 		["north"] = "changan/road2",
@@ -2250,6 +2556,7 @@ Room {
 Room {
 	id = "changan/northroad9",
 	name = "大道",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/road3",
 		["north"] = "changan/northroad10",
@@ -2259,16 +2566,19 @@ Room {
 Room {
 	id = "changan/qianzhuang",
 	name = "威信钱庄",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southjie1",
 	},
 	objs = {
           ["钱眼开"] = "qian yankai",
      },
+	 room_relative="威信钱庄---南大街威信钱庄",
 }
 Room {
 	id = "changan/qingchi",
 	name = "清池",
+	outdoor = "长安城",
 	no_fight = true,
 	ways = {
 		["north"] = "changan/eastjie2",
@@ -2279,49 +2589,55 @@ Room {
 		["east"] = true,
 		["west"] = true,
 	},
+	
 }
 Room {
 	id = "changan/qingzhensi",
 	name = "清真寺",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westjie4",
 		["north"] = "changan/dadian",
 	},
+	room_relative="大殿｜清真寺｜西大街清真寺",
 }
 Room {
-	id = "changan/road2",
-	name = "陕晋渡口",
-	ways = {
-		["southeast"] = "huanghe/huangtu",
-		["south"] = "changan/northroad8",
-		["#duHhe"] = "changan/road3",
-	},
-	lengths = {
-		["#duHhe"] = 10000,
-	},
-	nolooks = {
-		["enter"] = true,
-		["#duHhe"] = true,
-	},
+	 id = "changan/road2",
+        name = "陕晋渡口",
+        ways = {
+                ["southeast"] = "huanghe/huangtu",
+                ["south"] = "changan/northroad8",
+                ["#duHhe"] = "changan/road3",
+        },
+        lengths = {
+                ["#duHhe"] = "if road.huanghe2 then return 10000 else return false end",
+        },
+        nolooks = {
+                ["enter"] = true,
+                ["#duHhe"] = true,
+        },
+		room_relative="陕晋渡口｜↘土路黄土高原陕晋渡口",
 }
 Room {
 	id = "changan/road3",
-	name = "陕晋渡口",
-	ways = {
-		["north"] = "changan/northroad9",
-		["#duHhe"] = "changan/road2",
-	},
-	lengths = {
-		["#duHhe"] = 10000,
-	},
-	nolooks = {
-		["enter"] = true,
-		["#duHhe"] = true,
-	},
+        name = "陕晋渡口",
+        ways = {
+                ["north"] = "changan/northroad9",
+                ["#duHhe"] = "changan/road2",
+        },
+        lengths = {
+                ["#duHhe"] = "if road.huanghe2 then return 10000 else return false end",
+        },
+        nolooks = {
+                ["enter"] = true,
+                ["#duHhe"] = true,
+        },
+		room_relative="大道｜陕晋渡口陕晋渡口",
 }
 Room {
 	id = "changan/shihuangling",
 	name = "始皇陵",
+	outdoor = "长安城",
 	ways = {
 		["southwest"] = "changan/baishulin2",
 		["east"] = "changan/yongkeng2",
@@ -2332,23 +2648,28 @@ Room {
 Room {
 	id = "changan/shiji",
 	name = "市集",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/minju2",
 		["east"] = "changan/neijie1",
 		["north"] = "changan/minju1",
 		["west"] = "changan/heishi",
 	},
+	room_relative="民居｜黑市-----市集-----内街｜民居市集",
 }
 Room {
 	id = "changan/shuiguodian",
 	name = "水果店",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastjie3",
 	},
+	room_relative="水果店｜东大街水果店",
 }
 Room {
 	id = "changan/southchl",
 	name = "南门城楼",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/southmen",
 		["east"] = "changan/southjl2",
@@ -2359,6 +2680,7 @@ Room {
 Room {
 	id = "changan/southchq1",
 	name = "南城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southchq2",
 		["west"] = "changan/lwtsw",
@@ -2368,6 +2690,7 @@ Room {
 Room {
 	id = "changan/southchq2",
 	name = "南城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southchq3",
 		["west"] = "changan/southchq1",
@@ -2377,6 +2700,7 @@ Room {
 Room {
 	id = "changan/southchq3",
 	name = "南城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southjl1",
 		["west"] = "changan/southchq2",
@@ -2386,6 +2710,7 @@ Room {
 Room {
 	id = "changan/southchq4",
 	name = "南城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southchq5",
 		["west"] = "changan/southjl2",
@@ -2395,6 +2720,7 @@ Room {
 Room {
 	id = "changan/southchq5",
 	name = "南城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southchq6",
 		["west"] = "changan/southchq4",
@@ -2404,6 +2730,7 @@ Room {
 Room {
 	id = "changan/southchq6",
 	name = "南城墙",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/lwtse",
 		["west"] = "changan/southchq5",
@@ -2413,6 +2740,7 @@ Room {
 Room {
 	id = "changan/southjie1",
 	name = "南大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/southjie2",
 		["north"] = "changan/zhonglou",
@@ -2424,6 +2752,7 @@ Room {
 Room {
 	id = "changan/southjie2",
 	name = "南大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/southjie3",
 		["north"] = "changan/southjie1",
@@ -2435,6 +2764,7 @@ Room {
 Room {
 	id = "changan/southjie3",
 	name = "南大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/southmen",
 		["north"] = "changan/southjie2",
@@ -2449,6 +2779,7 @@ Room {
 Room {
 	id = "changan/southjl1",
 	name = "箭楼",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southchl",
 		["west"] = "changan/southchq3",
@@ -2458,6 +2789,7 @@ Room {
 Room {
 	id = "changan/southjl2",
 	name = "箭楼",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/southchq4",
 		["west"] = "changan/southchl",
@@ -2467,6 +2799,7 @@ Room {
 Room {
 	id = "changan/southmen",
 	name = "永宁门",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/southroad1",
 		["north"] = "changan/southjie3",
@@ -2477,11 +2810,14 @@ Room {
 			{id = "wu jiang", exp = 75000},
 			{id = "guan bing", exp = 10000},
 		},
+	
 	},
+	
 }
 Room {
 	id = "changan/southroad1",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/southroad2",
 		["north"] = "changan/southmen",
@@ -2491,6 +2827,7 @@ Room {
 Room {
 	id = "changan/southroad2",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/southroad3",
 		["north"] = "changan/southroad1",
@@ -2500,6 +2837,7 @@ Room {
 Room {
 	id = "changan/southroad3",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "xiangyang/lantian",
 		["north"] = "changan/southroad2",
@@ -2510,30 +2848,37 @@ Room {
 Room {
 	id = "changan/tupiaoguan",
 	name = "土嫖馆",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/neijie3",
 	},
+	room_relative="内街｜土嫖馆土嫖馆",
 }
 Room {
 	id = "changan/wanhonglou",
 	name = "万红楼",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/eastjie1",
 	},
 	objs = {
           ["雪仙儿"] = "xue xianer",
      },
+	 room_relative="万红楼｜东大街万红楼",
 }
 Room {
 	id = "changan/wenquan",
 	name = "温泉",
+	outdoor = "长安城",
 	ways = {
 		["west"] = "changan/baishulin2",
 	},
+	room_relative="柏树林｜温泉",
 }
 Room {
 	id = "changan/westchl",
 	name = "西门城楼",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westjl2",
 		["down"] = "changan/westmen",
@@ -2544,6 +2889,7 @@ Room {
 Room {
 	id = "changan/westchq1",
 	name = "西城墙",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westchq2",
 		["north"] = "changan/lwtnw",
@@ -2553,6 +2899,7 @@ Room {
 Room {
 	id = "changan/westchq2",
 	name = "西城墙",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westjl1",
 		["north"] = "changan/westchq1",
@@ -2562,6 +2909,7 @@ Room {
 Room {
 	id = "changan/westchq3",
 	name = "西城墙",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westchq4",
 		["north"] = "changan/westjl2",
@@ -2571,6 +2919,7 @@ Room {
 Room {
 	id = "changan/westchq4",
 	name = "西城墙",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/lwtsw",
 		["north"] = "changan/westchq3",
@@ -2580,6 +2929,7 @@ Room {
 Room {
 	id = "changan/westjie1",
 	name = "西大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/zhubaohang",
 		["east"] = "changan/zhonglou",
@@ -2591,6 +2941,7 @@ Room {
 Room {
 	id = "changan/westjie2",
 	name = "西大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/jiangjunfu",
 		["north"] = "changan/yamen",
@@ -2602,6 +2953,7 @@ Room {
 Room {
 	id = "changan/westjie3",
 	name = "西大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/biaoju",
 		["north"] = "changan/yizhan",
@@ -2613,6 +2965,7 @@ Room {
 Room {
 	id = "changan/westjie4",
 	name = "西大街",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/chm",
 		["east"] = "changan/westjie3",
@@ -2624,6 +2977,7 @@ Room {
 Room {
 	id = "changan/westjl1",
 	name = "箭楼",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westchl",
 		["north"] = "changan/westchq2",
@@ -2633,6 +2987,7 @@ Room {
 Room {
 	id = "changan/westjl2",
 	name = "箭楼",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westchq3",
 		["north"] = "changan/westchl",
@@ -2642,6 +2997,7 @@ Room {
 Room {
 	id = "changan/westmen",
 	name = "安定门",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/westjie4",
 		["west"] = "changan/westroad1",
@@ -2652,11 +3008,16 @@ Room {
 			{id = "wu jiang", exp = 75000},
 			{id = "guan bing", exp = 10000},
 		},
+	precmds = {
+              ["up"] = "kill guan bing;kill wu jiang",
 	},
+	},
+	
 }
 Room {
 	id = "changan/westroad1",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["east"] = "changan/westmen",
 		["west"] = "changan/westroad2",
@@ -2666,6 +3027,7 @@ Room {
 Room {
 	id = "changan/westroad2",
 	name = "官道",
+	outdoor = "长安城",
 	ways = {
 		["northwest"] = "lanzhou/lpshan",
 		["east"] = "changan/westroad1",
@@ -2675,6 +3037,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta1",
 	name = "小雁塔",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/baishulin1",
 		["up"] = "changan/xiaoyanta2",
@@ -2683,6 +3046,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta10",
 	name = "小雁塔十层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta9",
 		["up"] = "changan/xiaoyanta11",
@@ -2691,6 +3055,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta11",
 	name = "小雁塔十一层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta10",
 		["up"] = "changan/xiaoyanta12",
@@ -2699,6 +3064,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta12",
 	name = "小雁塔十二层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta11",
 		["up"] = "changan/xiaoyanta13",
@@ -2707,6 +3073,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta13",
 	name = "小雁塔十三层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta12",
 		["up"] = "changan/xiaoyanta14",
@@ -2715,6 +3082,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta14",
 	name = "小雁塔十四层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta13",
 		["up"] = "changan/xiaoyanta15",
@@ -2723,6 +3091,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta15",
 	name = "小雁塔十五层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta14",
 	},
@@ -2730,6 +3099,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta2",
 	name = "小雁塔二层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta1",
 		["up"] = "changan/xiaoyanta3",
@@ -2738,6 +3108,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta3",
 	name = "小雁塔三层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta2",
 		["up"] = "changan/xiaoyanta4",
@@ -2746,6 +3117,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta4",
 	name = "小雁塔四层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta3",
 		["up"] = "changan/xiaoyanta5",
@@ -2754,6 +3126,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta5",
 	name = "小雁塔五层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta4",
 		["up"] = "changan/xiaoyanta6",
@@ -2762,6 +3135,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta6",
 	name = "小雁塔六层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta5",
 		["up"] = "changan/xiaoyanta7",
@@ -2770,6 +3144,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta7",
 	name = "小雁塔七层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta6",
 		["up"] = "changan/xiaoyanta8",
@@ -2778,6 +3153,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta8",
 	name = "小雁塔八层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta7",
 		["up"] = "changan/xiaoyanta9",
@@ -2786,6 +3162,7 @@ Room {
 Room {
 	id = "changan/xiaoyanta9",
 	name = "小雁塔九层",
+	outdoor = "长安城",
 	ways = {
 		["down"] = "changan/xiaoyanta8",
 		["up"] = "changan/xiaoyanta10",
@@ -2794,13 +3171,16 @@ Room {
 Room {
 	id = "changan/xiyuan",
 	name = "戏院",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/neijie2",
 	},
+	room_relative="内街｜戏院戏院",
 }
 Room {
 	id = "changan/yamen",
 	name = "衙门大门",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westjie2",
 		["north"] = "changan/yamen2",
@@ -2809,25 +3189,33 @@ Room {
 		["north"] = {
 			{id = "ya yi", exp = 17500},
 		},
+	precmds = {
+              ["north"] = "kill ya yi",
+	},
 	},
 }
 Room {
 	id = "changan/yamen2",
 	name = "衙门正厅",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/yamen",
 	},
+	room_relative="衙门正厅--衙门大门",
 }
 Room {
 	id = "changan/yizhan",
 	name = "驿站",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/westjie3",
 	},
+	room_relative="驿站｜西大街驿站",
 }
 Room {
 	id = "changan/yongkeng1",
 	name = "兵马俑坑",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/shihuangling",
 	},
@@ -2835,6 +3223,7 @@ Room {
 Room {
 	id = "changan/yongkeng2",
 	name = "兵马俑坑",
+	outdoor = "长安城",
 	ways = {
 		["west"] = "changan/shihuangling",
 	},
@@ -2842,16 +3231,19 @@ Room {
 Room {
 	id = "changan/zahuopu",
 	name = "杂货铺",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/neijie4",
 	},
 	objs = {
           ["刘老实"] = "liu laoshi",
      },
+	 room_relative="内街｜杂货铺杂货铺",
 }
 Room {
 	id = "changan/zhonglou",
 	name = "钟楼",
+	outdoor = "长安城",
 	ways = {
 		["south"] = "changan/southjie1",
 		["northwest"] = "changan/gulou",
@@ -2859,34 +3251,42 @@ Room {
 		["east"] = "changan/eastjie1",
 		["west"] = "changan/westjie1",
 	},
+	room_relative="鼓楼北大街↖｜西大街-----钟楼-----东大街｜南大街钟楼",
 }
 Room {
 	id = "changan/zhubaohang",
 	name = "珠宝行",
+	outdoor = "长安城",
 	ways = {
 		["north"] = "changan/westjie1",
 	},
+	room_relative="西大街｜珠宝行珠宝行",
 }
 Room {
 	id = "changle/bajiao",
 	name = "八角亭",
+	outdoor = "长乐帮",
 	ways = {
 		["west"] = "changle/huayuan",
 	},
 	objs = {
           ["丁当"] = "ding dang",
            },
+	room_relative="花园----八角亭八角亭",
 }
 Room {
 	id = "changle/chaifang",
 	name = "柴房",
+	outdoor = "长乐帮",
 	ways = {
 		["north"] = "changle/zoulang3",
 	},
+	room_relative="西走廊｜柴房柴房",
 }
 Room {
 	id = "changle/chufang",
 	name = "厨房",
+	outdoor = "长乐帮",
 	no_fight = true,
 	ways = {
 		["north"] = "changle/zoulang2",
@@ -2898,35 +3298,46 @@ Room {
           ["香茶"] = "xiang cha",
           ["米饭"] = "mi fan",
            },
+	room_relative="东走廊｜厨房厨房",
 }
 Room {
 	id = "changle/damen",
 	name = "大门",
+	outdoor = "长乐帮",
 	ways = {
 		["south"] = "changle/xiaolu",
 		["enter"] = "changle/dating",
+	},
+	objs = {
+          ["邱山风"] = "qiu shanfeng",  
+	room_relative="大厅∧大门｜青石路大门",
 	},
 }
 Room {
 	id = "changle/dating",
 	name = "大厅",
+	outdoor = "长乐帮",
 	ways = {
 		["north"] = "changle/zoulang4",
 		["out"] = "changle/damen",
 	},
+	room_relative="走廊｜大厅∨大门大厅",
 }
 Room {
 	id = "changle/huayuan",
 	name = "花园",
+	outdoor = "长乐帮",
 	ways = {
 		["north"] = "changle/yongdao",
 		["east"] = "changle/bajiao",
 		["west"] = "changle/xiaoting",
 	},
+  room_relative="小厅｜甬道-----八角亭花园",
 }
 Room {
 	id = "changle/road1",
 	name = "大驿道",
+	outdoor = "长乐帮",
 	ways = {
 		["southeast"] = "changle/road2",
 		["northwest"] = "city/eroad2",
@@ -2937,15 +3348,17 @@ Room {
 Room {
 	id = "changle/road2",
 	name = "青石路",
+	outdoor = "长乐帮",
 	ways = {
 		["northwest"] = "changle/road1",
 		["east"] = "changle/xiaolu",
 	},
-
+room_relative="大驿道↖青石路----青石路青石路",
 }
 Room {
 	id = "changle/road3",
 	name = "大驿道",
+	outdoor = "长乐帮",
 	ways = {
 		["southwest"] = "changle/road1",
 	},
@@ -2955,36 +3368,48 @@ Room {
 Room {
 	id = "changle/shishi",
 	name = "石室",
+	outdoor = "长乐帮",
 	ways = {
 		["west"] = "changle/yongdao",
+},
+	objs = {
+          ["展飞"] = "zhan fei",
 	},
+	room_relative="甬道-----石室石室",
 }
 Room {
 	id = "changle/shuifang",
 	name = "睡房",
+	outdoor = "长乐帮",
 	no_fight = true,
 	ways = {
 		["south"] = "changle/zoulang3",
 	},
+	room_relative="睡房｜西走廊睡房",
 }
 Room {
 	id = "changle/woshi",
 	name = "卧室",
+	outdoor = "长乐帮",
 	ways = {
 		["south"] = "changle/xiaoting",
 	},
+	room_relative="卧室｜小厅卧室",
 }
 Room {
 	id = "changle/xiaolu",
 	name = "青石路",
+	outdoor = "长乐帮",
 	ways = {
 		["north"] = "changle/damen",
 		["west"] = "changle/road2",
 	},
+	room_relative="大门｜青石路----青石路青石路",
 }
 Room {
 	id = "changle/xiaoting",
 	name = "小厅",
+	outdoor = "长乐帮",
 	ways = {
 		["south"] = "changle/zoulang4",
 		["north"] = "changle/woshi",
@@ -2993,75 +3418,91 @@ Room {
 	objs = {
           ["米横野"] = "mi hengye",
           ["贝海石"] = "bei haishi",
+  room_relative="卧室｜小厅-----花园｜走廊小厅",
            },
 }
 Room {
 	id = "changle/xiaowu",
 	name = "小屋",
+	outdoor = "长乐帮",
 	ways = {
 		["north"] = "changle/zoulang1",
 	},
+	room_relative="东走廊｜小屋小屋",
 }
 Room {
 	id = "changle/yongdao",
 	name = "甬道",
+	outdoor = "长乐帮",
 	ways = {
 		["south"] = "changle/huayuan",
 		["east"] = "changle/shishi",
 	},
+	room_relative="甬道-----石室｜花园甬道",
 }
 Room {
 	id = "changle/zoulang1",
 	name = "东走廊",
+	outdoor = "长乐帮",
 	ways = {
 		["south"] = "changle/xiaowu",
 		["east"] = "changle/zoulang2",
 		["west"] = "changle/zoulang4",
 	},
+	room_relative="走廊----东走廊----东走廊｜小屋东走廊",
 }
 Room {
 	id = "changle/zoulang2",
 	name = "东走廊",
+	outdoor = "长乐帮",
 	ways = {
 		["south"] = "changle/chufang",
 		["west"] = "changle/zoulang1",
 	},
 	objs = {
           ["陈冲之"] = "chen chongzhi",
+	room_relative="东走廊----东走廊｜厨房东走廊",
            },
 }
 Room {
 	id = "changle/zoulang3",
 	name = "西走廊",
+	outdoor = "长乐帮",
 	ways = {
 		["south"] = "changle/chaifang",
 		["east"] = "changle/zoulang4",
 		["north"] = "changle/shuifang",
 	},
+	room_relative="睡房｜西走廊----走廊｜柴房西走廊",
 }
 Room {
 	id = "changle/zoulang4",
 	name = "走廊",
+	outdoor = "长乐帮",
 	ways = {
 		["south"] = "changle/dating",
 		["north"] = "changle/xiaoting",
 		["east"] = "changle/zoulang1",
 		["west"] = "changle/zoulang3",
 	},
+	room_relative="小厅｜西走廊-----走廊-----东走廊｜大厅走廊",
 }
 Room {
 	id = "chengdu/bank",
 	name = "墨玉斋",
+	outdoor = "成都城",
 	ways = {
-		["east"] = "chengdu/nandajie2",
+		["east"] = "chengdu/nandajie2",  
 	},
 	objs = {
           ["王掌柜"] = "wang zhanggui",
            },
+		room_relative="墨玉斋----南大街墨玉斋",
 }
 Room {
 	id = "chengdu/beidajie1",
 	name = "北大街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/center",
 		["north"] = "chengdu/beidajie2",
@@ -3071,6 +3512,7 @@ Room {
 Room {
 	id = "chengdu/beidajie2",
 	name = "北大街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/beidajie1",
 		["east"] = "zhiye/yaochang1",
@@ -3082,6 +3524,7 @@ Room {
 Room {
 	id = "chengdu/beidajie3",
 	name = "北大街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/beidajie2",
 		["north"] = "chengdu/beidajie4",
@@ -3091,6 +3534,7 @@ Room {
 Room {
 	id = "chengdu/beidajie4",
 	name = "北大街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/beidajie3",
 		["north"] = "chengdu/dabeimen",
@@ -3101,16 +3545,19 @@ Room {
 Room {
 	id = "chengdu/center",
 	name = "城中心",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/nandajie1",
 		["east"] = "chengdu/ddajie1",
 		["north"] = "chengdu/beidajie1",
 		["west"] = "chengdu/xidajie1",
 	},
+	room_relative="北大街｜西大街----城中心----东大街｜南大街城中心",
 }
 Room {
 	id = "chengdu/cgenlu1",
 	name = "城跟路",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/cgenlu2",
 		["west"] = "chengdu/beidajie4",
@@ -3120,6 +3567,7 @@ Room {
 Room {
 	id = "chengdu/cgenlu2",
 	name = "城跟路",
+	outdoor = "成都城",
 	ways = {
 		["southeast"] = "chengdu/cgenlu3",
 		["west"] = "chengdu/cgenlu1",
@@ -3129,6 +3577,7 @@ Room {
 Room {
 	id = "chengdu/cgenlu3",
 	name = "城跟路",
+	outdoor = "成都城",
 	ways = {
 		["southeast"] = "chengdu/cgenlu4",
 		["northwest"] = "chengdu/cgenlu2",
@@ -3138,6 +3587,7 @@ Room {
 Room {
 	id = "chengdu/cgenlu4",
 	name = "城跟路",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/cgenlu5",
 		["northwest"] = "chengdu/cgenlu3",
@@ -3147,6 +3597,7 @@ Room {
 Room {
 	id = "chengdu/cgenlu5",
 	name = "城跟路",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/ddajie4",
 		["north"] = "chengdu/cgenlu4",
@@ -3156,38 +3607,47 @@ Room {
 Room {
 	id = "chengdu/dabeimen",
 	name = "大北门",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/beidajie4",
 		["north"] = "chengdu/road4",
 	},
+	room_relative="大道｜大北门｜北大街大北门",
 }
 Room {
 	id = "chengdu/dadongmen",
 	name = "大东门",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/eroad1",
 		["west"] = "chengdu/ddajie4",
 	},
+	room_relative="东大街----大东门----大道大东门",
 }
 Room {
 	id = "chengdu/dananmen",
 	name = "大南门",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/sroad1",
 		["north"] = "chengdu/nandajie2",
 	},
+	room_relative="南大街｜大南门｜南门外大南门",
 }
 Room {
 	id = "chengdu/daximen",
 	name = "大西门",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/xidajie2",
 		["west"] = "chengdu/wroad1",
 	},
+	room_relative="大道----大西门----西大街大西门",
 }
 Room {
 	id = "chengdu/ddajie1",
 	name = "东大街",
+	outdoor = "成都城",
 	ways = {
 		["north"] = "group/cailiao-hang",
 		["east"] = "chengdu/ddajie2",
@@ -3198,6 +3658,7 @@ Room {
 Room {
 	id = "chengdu/ddajie2",
 	name = "东大街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/zjmen",
 		["east"] = "chengdu/ddajie3",
@@ -3208,6 +3669,7 @@ Room {
 Room {
 	id = "chengdu/ddajie3",
 	name = "东大街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/nancejie1",
 		["east"] = "chengdu/ddajie4",
@@ -3218,6 +3680,7 @@ Room {
 Room {
 	id = "chengdu/ddajie4",
 	name = "东大街",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/dadongmen",
 		["north"] = "chengdu/cgenlu5",
@@ -3228,6 +3691,7 @@ Room {
 Room {
 	id = "chengdu/eroad1",
 	name = "大道",
+	outdoor = "成都城",
 	ways = {
 		["northeast"] = "chengdu/eroad2",
 		["west"] = "chengdu/dadongmen",
@@ -3240,6 +3704,7 @@ Room {
 Room {
 	id = "chengdu/eroad2",
 	name = "大道",
+	outdoor = "成都城",
 	ways = {
 		["southwest"] = "chengdu/eroad1",
 		["northeast"] = "chengdu/eroad3",
@@ -3249,6 +3714,7 @@ Room {
 Room {
 	id = "chengdu/eroad3",
 	name = "大道",
+	outdoor = "成都城",
 	ways = {
 		["southwest"] = "chengdu/eroad2",
 		["east"] = "group/entry/cderoad4",
@@ -3258,6 +3724,7 @@ Room {
 Room {
 	id = "chengdu/guandm",
 	name = "关帝庙",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/xidajie2",
 		["north"] = "chengdu/houyuan",
@@ -3266,10 +3733,12 @@ Room {
           ["全冠清"] = "quan guanqing",
           ["李春来"] = "li chunlai",
            },
+  room_relative="后院｜关帝庙｜西大街关帝庙",
 }
 Room {
 	id = "chengdu/houyuan",
 	name = "后院",
+	outdoor = "成都城",
 	no_fight = true,
 	ways = {
 		["south"] = "chengdu/guandm",
@@ -3277,10 +3746,12 @@ Room {
 	objs = {
           ["馒头"] = "man tou",
            },
+	room_relative="后院｜关帝庙后院",
 }
 Room {
 	id = "chengdu/nancejie1",
 	name = "南侧街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/nancejie2",
 		["north"] = "chengdu/ddajie3",
@@ -3290,6 +3761,7 @@ Room {
 Room {
 	id = "chengdu/nancejie2",
 	name = "南侧街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/nanmen",
 		["north"] = "chengdu/nancejie1",
@@ -3299,6 +3771,7 @@ Room {
 Room {
 	id = "chengdu/nandajie1",
 	name = "南大街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/nandajie2",
 		["north"] = "chengdu/center",
@@ -3308,6 +3781,7 @@ Room {
 Room {
 	id = "chengdu/nandajie2",
 	name = "南大街",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/dananmen",
 		["north"] = "chengdu/nandajie1",
@@ -3318,14 +3792,17 @@ Room {
 Room {
 	id = "chengdu/nanmen",
 	name = "小南门",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "dali/shanlu2",
 		["north"] = "chengdu/nancejie2",
 	},
+	room_relative="南侧街｜小南门｜山路小南门",
 }
 Room {
 	id = "chengdu/road1",
 	name = "大道",
+	outdoor = "成都城",
 	ways = {
 		["southwest"] = "chengdu/road4",
 		["east"] = "zhiye/gaoshan0",
@@ -3336,6 +3813,7 @@ Room {
 Room {
 	id = "chengdu/road4",
 	name = "大道",
+	outdoor = "成都城",
 	ways = {
 		["south"] = "chengdu/dabeimen",
 		["northeast"] = "chengdu/road1",
@@ -3345,37 +3823,46 @@ Room {
 Room {
 	id = "chengdu/shufang",
 	name = "书房",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/zjhall",
 	},
+	room_relative="大厅--书房",
 }
 Room {
 	id = "chengdu/sroad1",
 	name = "南门外",
+	outdoor = "成都城",
 	ways = {
 		["southwest"] = "chengdu/tulu3",
 		["north"] = "chengdu/dananmen",
 	},
+	room_relative="大南门｜南门外↙土路南门外",
 }
 Room {
 	id = "chengdu/tulu1",
 	name = "峨嵋山脚下",
+	outdoor = "成都城",
 	ways = {
-		["northeast"] = "group/entry/cdtulu2",
+		["northeast"] = "group/entry/cdtulu2",  
 		["west"] = "emei/qingshijie",
 	},
+	room_relative="土路↗青石阶--峨嵋山脚下峨嵋山脚下",	
 }
 Room {
 	id = "chengdu/tulu3",
 	name = "土路",
+	outdoor = "成都城",
 	ways = {
 		["southwest"] = "group/entry/cdtulu2",
-		["northeast"] = "chengdu/sroad1",
+		["northeast"] = "chengdu/sroad1",  
 	},
+	room_relative="南门外↗土路↙土路土路",	
 }
 Room {
 	id = "chengdu/wroad1",
 	name = "大道",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/daximen",
 		["west"] = "chengdu/wroad2",
@@ -3385,6 +3872,7 @@ Room {
 Room {
 	id = "chengdu/wroad2",
 	name = "大道",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/wroad1",
 		["west"] = "xueshan/tulu1",
@@ -3394,6 +3882,7 @@ Room {
 Room {
 	id = "chengdu/xidajie1",
 	name = "西大街",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/center",
 		["west"] = "chengdu/xidajie2",
@@ -3403,6 +3892,7 @@ Room {
 Room {
 	id = "chengdu/xidajie2",
 	name = "西大街",
+	outdoor = "成都城",
 	ways = {
 		["east"] = "chengdu/xidajie1",
 		["north"] = "chengdu/guandm",
@@ -3413,6 +3903,7 @@ Room {
 Room {
 	id = "chengdu/zjhall",
 	name = "大厅",
+	outdoor = "成都城",
 	no_fight = true,
 	ways = {
 		["north"] = "chengdu/zjmen",
@@ -3424,36 +3915,46 @@ Room {
 	objs = {
           ["刘好弈"] = "liu haoyi",
            },
+	room_relative="子爵府门｜书房-----大厅大厅",
 }
 Room {
 	id = "chengdu/zjmen",
 	name = "子爵府门",
+	outdoor = "成都城",
 	ways = {
-		["south"] = "chengdu/zjhall",
+		["south"] = "chengdu/zjhall",  
 		["north"] = "chengdu/ddajie2",
 	},
+	room_relative="东大街｜子爵府门｜大厅子爵府门",
 }
 Room {
 	id = "city/banfang",
-	name = "班房",
+	name = "班房",	
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/menlang",
 	},
+	room_relative="门廊---班房",
 }
 Room {
 	id = "city/beidajie1",
-	name = "北大街",
+	name = "北大街",	
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/beidajie2",
 		["east"] = "city/xiaochidian",
 		["north"] = "city/beimen",
 		["west"] = "city/chmiao",
 	},
+	precmds = {
+		["north"] = "#walkBusy",
+	},
 	room_relative="北门｜城隍庙----北大街----小吃店｜北大街北大街",
 }
 Room {
 	id = "city/beidajie2",
 	name = "北大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/beidajie3",
 		["east"] = "city/kedian",
@@ -3465,6 +3966,7 @@ Room {
 Room {
 	id = "city/beidajie3",
 	name = "北大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/guangchangdong",
 		["east"] = "city/yizhan",
@@ -3479,6 +3981,7 @@ Room {
 Room {
 	id = "city/beimen",
 	name = "北门",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/beidajie1",
 		["north"] = "city/hsroad1",
@@ -3486,55 +3989,70 @@ Room {
 	lengths = {
 	    ["north"] = "if job.name and job.area and (job.area=='黄河流域' or job.area=='泰山') and job.name=='hubiao' then return false else return 1 end",
 	},
+	room_relative="北门外｜北门｜北大街北门",
 }
 Room {
 	id = "city/bingqiku",
 	name = "兵器库",
+	outdoor = "扬州城",
 	ways = {
 		["north"] = "city/bingying",
 	},
+	room_relative="兵营---兵器库",
 }
 Room {
 	id = "city/bingying",
 	name = "兵营",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/bingyingmen",
-		["south"] = "city/bingqiku",
+		["south"] = "city/bingqiku"
 	},
 	blocks = {
-		["south"] = {
-			{id = "guan bing", exp = 17500},
-		},
+                ["south"] = {
+                        {id = "guan bing", exp = 10000},
+                },
+	precmds = {
+			  ["south"] = "kill guan bing",
 	},
+        },
 	objs = {
           ["史青山"] = "shi qingshan",
            },
+	
 }
 Room {
 	id = "city/bingyingmen",
 	name = "兵营大门",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/guangchangxi",
 		["west"] = "city/bingying",
 	},
+	room_relative="广场西｜兵营兵营大门",
 }
 Room {
 	id = "city/chaguan",
 	name = "茶馆",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/nandajie2",
 	},
+	room_relative="茶馆-----南大街茶馆",
 }
 Room {
 	id = "city/chemahang",
 	name = "车马行",
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/guangchangdong",
 	},
+	room_relative="广场东----车马行车马行",
 }
 Room {
 	id = "city/chmiao",
 	name = "城隍庙",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["northwest"] = "wizard/guest_room",
@@ -3548,21 +4066,26 @@ Room {
 Room {
 	id = "city/damingsi",
 	name = "大明寺",
+	outdoor = "扬州城",
 	ways = {
 		["north"] = "city/xidajie2",
 	},
+	room_relative="西大街｜大明寺大明寺",
 }
 Room {
 	id = "city/dangpu",
 	name = "当铺",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["north"] = "city/guangchangnan",
 	},
+	room_relative="广场南｜当铺当铺",
 }
 Room {
 	id = "city/dating1",
 	name = "赌场大厅",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["north"] = "city/duchang4",
@@ -3578,20 +4101,24 @@ Room {
 	objs = {
           ["平威"] = "ping wei",
            },
+	
 }
 
 Room {
 	id = "city/dhq",
 	name = "大虹桥",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/sxh",
 		["east"] = "city/xjs",
 		["north"] = "city/hubian1",
 	},
+	room_relative="瘦西湖边｜大虹桥----小金山｜瘦西湖大虹桥",
 }
 Room {
 	id = "city/diemenglou1",
 	name = "蝶梦楼一楼",
+	outdoor = "扬州城",
 	ways = {
 		["up"] = "city/diemenglou2",
 	},
@@ -3600,6 +4127,7 @@ Room {
 Room {
 	id = "city/laofang",
 	name = "牢房",
+	outdoor = "扬州城",
 	ways = {
 		["give 2 silver to yu zu;wear all"] = "city/dilao",
 	},
@@ -3610,13 +4138,16 @@ Room {
 Room {
 	id = "city/dilao",
 	name = "地牢",
+	outdoor = "扬州城",
 	ways = {
 		["southup"] = "city/fyhouyuan",
 	},
+	room_relative="府衙后院--地牢",
 }
 Room {
 	id = "city/dixiashi",
 	name = "地下黑拳市",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["up"] = "city/dating1",
@@ -3625,6 +4156,7 @@ Room {
 Room {
 	id = "city/dongdajie0",
 	name = "东大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "zhiye/bingqipu1",
 		["north"] = "zhiye/datiepu1",
@@ -3636,6 +4168,7 @@ Room {
 Room {
 	id = "city/dongdajie1",
 	name = "东大街",
+	outdoor = "扬州城",
 	ways = {
 		["southeast"] = "city/yltw",
 		["south"] = "zhiye/jimaidian1",
@@ -3648,6 +4181,7 @@ Room {
 Room {
 	id = "city/dongdajie2",
 	name = "东大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/zahuopu",
 		["north"] = "city/shuyuan",
@@ -3659,6 +4193,7 @@ Room {
 Room {
 	id = "city/dongdajie3",
 	name = "东大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/yueqidian",
 		["north"] = "city/guangchangdong",
@@ -3670,6 +4205,7 @@ Room {
 Room {
 	id = "city/dongmen",
 	name = "东门",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/yzyunhe",
 		["north"] = "zhiye/biaoju1",
@@ -3677,10 +4213,12 @@ Room {
 		["northeast"] = "city/guandimiao",
 		["west"] = "city/dongdajie0",
 	},
+	room_relative="龙门镖局关帝庙｜↗东大街-----东门-----大驿道｜码头东门",
 }
 Room {
 	id = "city/dongting",
 	name = "东厅",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["west"] = "city/ymzhengting",
@@ -3688,38 +4226,46 @@ Room {
 	objs = {
           ["张帐房"] = "zhang zhangfang",
            },
+	room_relative="衙门正厅---东厅",
 }
 Room {
 	id = "city/dongting2",
 	name = "盐局东厅",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["west"] = "city/yanju",
 	},
+	room_relative="扬州盐局---盐局东厅盐局东厅",
 }
 Room {
 	id = "city/dongxiangfang",
 	name = "东厢房",
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/lichunyuan",
 	},
 	objs = {
           ["茅十八"] = "mao shiba",
            },
+	room_relative="丽春院----东厢房东厢房",
 }
 Room {
 	id = "city/duchang",
 	name = "赌场",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/gusaifang",
 		["east"] = "city/nandajie3",
 		["west"] = "city/dating1",
 		["up"] = "city/duchang2",
 	},
+	room_relative="赌场〓赌场大厅-----赌场-----南大街｜赌场赌场",
 }
 Room {
 	id = "city/duchang2",
 	name = "赌场",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["down"] = "city/duchang",
@@ -3732,42 +4278,52 @@ Room {
           ["拱猪交流站"] = "board",
           ["钱老本"] = "qian laoben",
            },
+	room_relative="拱猪北房｜拱猪西房-----赌场-----拱猪东房｜拱猪南房赌场",
 }
 Room {
 	id = "city/eproom",
 	name = "拱猪东房",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["west"] = "city/duchang2",
 	},
+	room_relative="赌场--拱猪东房",
 }
 Room {
 	id = "city/nproom",
 	name = "拱猪北房",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["south"] = "city/duchang2",
 	},
+	room_relative="赌场--拱猪北房",
 }
 Room {
 	id = "city/wproom",
 	name = "拱猪西房",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["east"] = "city/duchang2",
 	},
+	room_relative="赌场--拱猪西房",
 }
 Room {
 	id = "city/sproom",
 	name = "拱猪南房",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["north"] = "city/duchang2",
 	},
+	room_relative="赌场--拱猪南房",
 }
 Room {
 	id = "city/duchang4",
 	name = "赛龟房",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/dating1",
 	},
@@ -3777,23 +4333,26 @@ Room {
           ["长寿龟"] = "sai gui",
           ["青鬏龟童"] = "gui tong",
            },
+	room_relative="赌场大厅---赛龟房",
 }
 Room {
 	id = "city/eroad2",
 	name = "大驿道",
+	outdoor = "扬州城",
 	ways = {
 		["southeast"] = "changle/road1",
 		["west"] = "group/entry/yzeroad1",
 	},
 	objs = {
 	 ["蒙面男子"] = "mn",
-     ["王公公"] = "wang gonggong",
-           },
+          ["王公公"] = "wang gonggong",
 	room_relative="大驿道----大驿道↘大驿道大驿道",
+           },
 }
 Room {
 	id = "city/fenduo2",
 	name = "墓室",
+	outdoor = "扬州城",
 	ways = {
 		["jump well"] = "city/shangang",
 		["north"] = "city/mszoulang",
@@ -3807,10 +4366,12 @@ Room {
           ["马舵主"] = "ma duozhu",
           ["丐帮-扬州大勇分舵留言板"] = "board",
            },
+	room_relative="山冈｜墓室通道墓室"
 }
 Room {
 	id = "city/fyhouyuan",
 	name = "府衙后院",
+	outdoor = "扬州城",
 	ways = {
 		["southeast"] = "city/ymzhengting",
 		["northdown"] = "city/dilao",
@@ -3819,36 +4380,44 @@ Room {
           ["大狼狗"] = "lang gou",
           ["敖翁"] = "ao weng",
            },
+		 room_relative="衙门正厅｜地牢府衙后院"
 }
 
 Room {
 	id = "city/geyuan",
 	name = "个园",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/nandajie1",
 		["west"] = "city/jiashan",
 	},
+	room_relative="假山-----个园-----南大街个园",
 }
 Room {
 	id = "city/guandimiao",
 	name = "关帝庙",
+	outdoor = "扬州城",
 	ways = {
 		["southwest"] = "city/dongmen",
 	},
+	room_relative="关帝庙↙东门关帝庙",
 }
 Room {
 	id = "city/guangchang",
 	name = "中央广场",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/guangchangnan",
 		["east"] = "city/guangchangdong",
 		["north"] = "city/guangchangbei",
 		["west"] = "city/guangchangxi",
 	},
+	room_relative="广场北｜广场西---中央广场---广场东｜广场南中央广场",
 }
 Room {
 	id = "city/guangchangbei",
 	name = "广场北",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/guangchang",
 		["north"] = "city/yamen",
@@ -3856,58 +4425,70 @@ Room {
 		["northeast"] = "city/kongchang",
 		["west"] = "city/xidajie3",
 	},
+	room_relative="衙门大门广场｜↗西大街----广场北----北大街｜中央广场广场北",
 }
 Room {
 	id = "city/guangchangdong",
 	name = "广场东",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/dongdajie3",
 		["east"] = "city/chemahang",
 		["north"] = "city/beidajie3",
 		["west"] = "city/guangchang",
 	},
+	room_relative="北大街｜中央广场----广场东----车马行｜东大街广场东",
 }
 Room {
 	id = "city/guangchangnan",
 	name = "广场南",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/dangpu",
 		["north"] = "city/guangchang",
 		["east"] = "city/dongdajie3",
 		["west"] = "city/nandajie3",
 	},
+   room_relative="中央广场｜南大街----广场南----东大街｜当铺广场南",
 }
 Room {
 	id = "city/guangchangxi",
 	name = "广场西",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/nandajie3",
 		["north"] = "city/xidajie3",
 		["east"] = "city/guangchang",
 		["west"] = "city/bingyingmen",
 	},
+	room_relative="西大街｜兵营大门----广场西----中央广场｜南大街广场西",
 }
 Room {
 	id = "city/gusaifang",
 	name = "赌场",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["north"] = "city/duchang",
 	},
+	room_relative="赌场｜赌场赌场",
 }
 
 Room {
 	id = "city/hsroad1",
 	name = "北门外",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/beimen",
 		["northwest"] = "city/shangang",
 		["north"] = "huanghe/caodi1",
 	},
+		room_relative="山冈草地↖｜北门外｜北门北门外",
 }
 Room {
 	id = "city/huadian",
 	name = "鲜花店",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["south"] = "city/yizhan",
@@ -3915,26 +4496,32 @@ Room {
 	objs = {
           ["紫竹"] = "zi zhu",
            },
+	room_relative="鲜花店｜驿站鲜花店",
 }
 Room {
 	id = "city/hubian",
 	name = "湖畔",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/xidajie2",
 		["north"] = "city/sxh",
 	},
+	room_relative="瘦西湖｜湖畔｜西大街湖畔",
 }
 Room {
 	id = "city/hubian1",
 	name = "瘦西湖边",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/dhq",
 		["west"] = "city/lxs",
 	},
+	room_relative="莲性寺白塔---瘦西湖边｜大虹桥瘦西湖边",
 }
 Room {
 	id = "city/jiangbei",
 	name = "长江北岸",
+	outdoor = "扬州城",
 	ways = {
 		["#duCjiang"] = "city/jiangnan",
 		["north"] = "city/nanmen",
@@ -3948,31 +4535,36 @@ Room {
 		["#duCjiang"] = true,
 		["enter"] = true,
 	},
-	room_relative="南门｜长江北岸---长江北岸---长江北岸长江北岸"
+	room_relative="南门｜长江北岸---长江北岸---长江南岸长江北岸"
 }
 Room {
 	id = "city/jiangbei1",
 	name = "长江北岸",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/jiangbei",
 	},
 	nolooks = {
 		["enter"] = true,
 	},
+	room_relative="长江北岸--长江北岸"
 }
 Room {
 	id = "city/jiangbei2",
 	name = "长江北岸",
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/jiangbei",
 	},
 	nolooks = {
 		["enter"] = true,
 	},
+	room_relative="长江北岸--长江北岸"
 }
 Room {
 	id = "city/jiangnan",
 	name = "长江南岸",
+	outdoor = "扬州城",
 	ways = {
 		["#duCjiang"] = "city/jiangbei",
 		["south"] = "city/sroad1",
@@ -3991,33 +4583,40 @@ Room {
 Room {
 	id = "city/jiangnan1",
 	name = "长江南岸",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/jiangnan",
 	},
 	nolooks = {
 		["enter"] = true,
 	},
+	room_relative="长江南岸--长江南岸"
 }
 Room {
 	id = "city/jiangnan2",
 	name = "长江南岸",
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/jiangnan",
 	},
 	nolooks = {
 		["enter"] = true,
 	},
+	room_relative="长江南岸--长江南岸"
 }
 Room {
 	id = "city/jiashan",
 	name = "假山",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/geyuan",
 	},
+	room_relative="假山-----个园假山"
 }
 Room {
 	id = "city/jiulou",
 	name = "瘦西湖酒馆",
+	outdoor = "扬州城",
 	ways = {
 		["stand;up"] = "city/jiulou2",
 		["stand;south"] = "city/xidajie1",
@@ -4026,16 +4625,19 @@ Room {
           ["冼掌柜"] = "xian zhanggui",
           ["贾老六"] = "jia laolu",
            },
+		room_relative="瘦西湖雅楼｜西大街瘦西湖酒馆",
 }
 Room {
 	id = "city/jiulou2",
 	name = "瘦西湖雅楼",
+	outdoor = "扬州城",
 	ways = {
 		["down"] = "city/jiulou",
 	},
 	nolooks = {
 		["up"] = true,
 	},
+	room_relative="瘦西湖雅楼--瘦西湖酒馆"
 }
 Room {
 	id = "city/kedian",
@@ -4055,10 +4657,12 @@ Room {
 	objs = {
           ["客店留言板"] = "board",
            },
+	room_relative="客店二楼〓北大街---宝昌客栈---偏厅宝昌客栈",
 }
 Room {
 	id = "city/kedian/pianting",
 	name = "偏厅",
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/kedian",
 	},
@@ -4068,10 +4672,12 @@ Room {
           ["技能研究讨论版"] = "board",
           ["鹿杖客"] = "lu zhangke",
            },
+		room_relative="宝昌客栈-----偏厅偏厅",
 }
 Room {
 	id = "city/kedian2",
 	name = "客店二楼",
+	outdoor = "扬州城",
 	ways = {
 		["enter"] = "city/kedian3",
 		["down"] = "city/kedian",
@@ -4080,6 +4686,7 @@ Room {
 Room {
 	id = "city/kedian3",
 	name = "客店二楼",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["out"] = "city/kedian2",
@@ -4088,13 +4695,16 @@ Room {
 Room {
 	id = "city/kongchang",
 	name = "广场",
+	outdoor = "扬州城",
 	ways = {
 		["southwest"] = "city/guangchangbei",
 	},
+	room_relative="广场↙广场北广场",
 }
 Room {
 	id = "city/lichunyuan",
 	name = "丽春院",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/mingyufang",
 		["east"] = "city/dongxiangfang",
@@ -4103,43 +4713,53 @@ Room {
 	objs = {
           ["韦春芳"] = "wei chunfang",
            },
+	room_relative="西厢房----丽春院----东厢房｜鸣玉坊丽春院",
 }
 Room {
 	id = "city/lxs",
 	name = "莲性寺白塔",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/hubian1",
 	},
+	room_relative="莲性寺白塔--瘦西湖边莲性寺白塔",
 }
 Room {
 	id = "city/menlang",
 	name = "门廊",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/yamen",
 		["north"] = "city/ymzhengting",
 		["east"] = "city/banfang",
 	},
+	room_relative="衙门大门｜衙门正厅--班房门廊",
 }
 Room {
 	id = "city/miao",
 	name = "英烈夫人庙",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["east"] = "city/winmo",
 	},
+	room_relative="英烈夫人庙--得胜山英烈夫人庙",
 }
 
 Room {
 	id = "city/mingyufang",
 	name = "鸣玉坊",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/xidajie3",
 		["north"] = "city/lichunyuan",
 	},
+	room_relative="丽春院｜鸣玉坊｜西大街鸣玉坊",
 }
 Room {
 	id = "city/ml1",
 	name = "青竹林",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/dongmen",
 		["east"] = "city/ml2",
@@ -4151,14 +4771,17 @@ Room {
 Room {
 	id = "city/mszoulang",
 	name = "墓室通道",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/fenduo2",
 		["west"] = "city/xmushi",
 	},
+	room_relative="墓室｜小墓室墓室通道",
 }
 Room {
 	id = "city/nandajie1",
 	name = "南大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/nanmen",
 		["east"] = "city/xiaopangu",
@@ -4175,6 +4798,7 @@ Room {
 Room {
 	id = "city/nandajie2",
 	name = "南大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/nandajie1",
 		["east"] = "city/yanju",
@@ -4186,6 +4810,7 @@ Room {
 Room {
 	id = "city/nandajie3",
 	name = "南大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/nandajie2",
 		["north"] = "city/guangchangxi",
@@ -4197,41 +4822,53 @@ Room {
 Room {
 	id = "city/nanmen",
 	name = "南门",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/jiangbei",
 		["north"] = "city/nandajie1",
 	},
+	precmds = {
+		["south"] = "#walkBusy",
+	},
+	room_relative="南大街｜南门｜长江北岸南门",
 }
 
 Room {
 	id = "city/pinqiting",
 	name = "品棋亭",
+	outdoor = "扬州城",
 	ways = {
 		["north"] = "city/yueqidian",
 	},
+	room_relative="乐器店｜品棋亭品棋亭",
 }
 
 Room {
 	id = "city/qianzhuang",
 	name = "天阁斋",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/beidajie2",
 	},
 	objs = {
           ["钱缝"] = "qian feng",
            },
+	room_relative="天阁斋----北大街天阁斋",
 }
 Room {
 	id = "city/shangang",
 	name = "山冈",
+	outdoor = "扬州城",
 	ways = {
 		["southeast"] = "city/hsroad1",
 		["north"] = "city/tomb",
 	},
+	room_relative="坟墓｜山冈↘北门外山冈",
 }
 Room {
 	id = "city/shuyuan",
 	name = "书院",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/dongdajie2",
 		["up"] = "city/wizroom",
@@ -4239,26 +4876,35 @@ Room {
 	objs = {
           ["顾炎武"] = "gu yanwu",
            },
+	room_relative="巫师雕像陈列室〓书院｜东大街书院",
 }
 Room {
 	id = "city/sroad1",
 	name = "江南官道",
+	outdoor = "扬州城",
 	ways = {
 		["southeast"] = "suzhou/qsgdao6",
 		["north"] = "city/jiangnan",
+		},
+		precmds = {
+		["north"] = "#walkBusy",
 	},
+	room_relative="长江南岸｜江南官道↘苏州北郊江南官道",
 }
 Room {
 	id = "city/sxh",
 	name = "瘦西湖",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/hubian",
 		["north"] = "city/dhq",
 	},
+	room_relative="大虹桥｜瘦西湖｜湖畔瘦西湖",
 }
 Room {
 	id = "city/tomb",
 	name = "坟墓",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/shangang",
 		["pull huan;d"] = "city/fenduo2",
@@ -4267,10 +4913,12 @@ Room {
 		["pull huan;d"] = true,
 		["down"] = true,
 	},
+	
 }
 Room {
 	id = "city/winmo",
 	name = "得胜山",
+	outdoor = "扬州城",
 	ways = {
 		["southeast"] = "city/wroad1",
 		["west"] = "city/miao",
@@ -4279,10 +4927,12 @@ Room {
           ["王潭"] = "wang tan",
           ["吴大鹏"] = "wu dapeng",
            },
+	room_relative="英烈夫人庙----得胜山↘西郊得胜山",
 }
 Room {
 	id = "city/wizroom",
 	name = "巫师雕像陈列室",
+	outdoor = "扬州城",
 	ways = {
 		["down"] = "city/shuyuan",
 	},
@@ -4294,23 +4944,28 @@ Room {
 Room {
 	id = "city/wroad1",
 	name = "西郊",
+	outdoor = "扬州城",
 	ways = {
 		["northwest"] = "city/winmo",
 		["east"] = "city/ximen",
 		["west"] = "city/wroad2",
 	},
+	room_relative="得胜山↖青石大道-----西郊-----西门西郊",
 }
 Room {
 	id = "city/wroad2",
 	name = "青石大道",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/wroad1",
 		["west"] = "city/wroad3",
 	},
+	room_relative="土路---青石大道---西郊青石大道",
 }
 Room {
 	id = "city/wroad3",
 	name = "土路",
+	outdoor = "扬州城",
 	ways = {
 		["north"] = "mingjiao/hdg/shanbi",
 		["east"] = "city/wroad2",
@@ -4319,23 +4974,28 @@ Room {
 	objs = {
           ["简捷"] = "jian jie",
            },
+	room_relative="山壁｜东门外-----土路-----青石大道土路",
 }
 Room {
 	id = "city/xiaochidian",
 	name = "小吃店",
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/beidajie1",
 	},
+	room_relative="北大街----小吃店小吃店",
 }
 Room {
 	id = "city/xiaopangu",
 	name = "小盘古",
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/nandajie1",
 	},
 	objs = {
           ["菊友"] = "ju you",
            },
+	room_relative="南大街----小盘古小盘古",
 }
 Room {
 	id = "city/xidajie1",
@@ -4362,6 +5022,7 @@ Room {
 Room {
 	id = "city/xidajie2",
 	name = "西大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/damingsi",
 		["east"] = "city/xidajie3",
@@ -4373,6 +5034,7 @@ Room {
 Room {
 	id = "city/xidajie3",
 	name = "西大街",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/guangchangxi",
 		["north"] = "city/mingyufang",
@@ -4384,6 +5046,7 @@ Room {
 Room {
 	id = "city/ximen",
 	name = "西门",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/xidajie1",
 		["west"] = "city/wroad1",
@@ -4391,35 +5054,43 @@ Room {
 	lengths = {
 	    ["west"] = "if job.name and job.area and job.area=='襄阳城' and job.name=='hubiao' then return false else return 1 end",
 	},
+	room_relative="西郊-----西门-----西大街西门",
 }
 Room {
 	id = "city/xiting",
 	name = "西厅",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/ymzhengting",
 	},
+	room_relative="衙门正厅--西厅",
 }
 
 Room {
 	id = "city/xixiangfang",
 	name = "西厢房",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/lichunyuan",
 	},
+	room_relative="西厢房----丽春院西厢房",
 }
 Room {
 	id = "city/xjs",
 	name = "小金山",
+	outdoor = "扬州城",
 	ways = {
 		["west"] = "city/dhq",
 	},
 	objs = {
           ["李式开"] = "li shikai",
            },
+	room_relative="大虹桥----小金山小金山",
 }
 Room {
 	id = "city/xmushi",
 	name = "小墓室",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["east"] = "city/mszoulang",
@@ -4427,10 +5098,12 @@ Room {
 	objs = {
           ["馒头"] = "man tou",
            },
+	room_relative="墓室通道小墓室",
 }
 Room {
 	id = "city/yamen",
 	name = "衙门大门",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/guangchangbei",
 		["north"] = "city/menlang",
@@ -4439,45 +5112,59 @@ Room {
 		["north"] = {
 			{id = "ya yi", exp = 17500},
 		},
+		 precmds = {
+              ["north"] = "kill ya yi",
+       
+	},
 	},
 	objs = {
           ["百姓鸣冤板"] = "board",
            },
+	
 }
 Room {
 	id = "city/yanju",
 	name = "扬州盐局",
+	outdoor = "扬州城",
 	ways = {
 		["east"] = "city/dongting2",
 		["west"] = "city/nandajie2",
 	},
+	room_relative="南大街---扬州盐局---盐局东厅扬州盐局",
 }
 Room {
 	id = "city/yaopu",
 	name = "药铺",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/dongdajie1",
 	},
+	room_relative="药铺｜东大街药铺",
 }
 Room {
 	id = "city/yizhan",
 	name = "驿站",
+	outdoor = "扬州城",
 	ways = {
 		["north"] = "city/huadian",
 		["west"] = "city/beidajie3",
 	},
+	room_relative="鲜花店｜北大街-----驿站驿站",
 }
 Room {
 	id = "city/yltw",
 	name = "月老亭外",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/yuelaoting",
 		["northwest"] = "city/dongdajie1",
 	},
+	room_relative="东大街↖月老亭外｜月老亭月老亭外",
 }
 Room {
 	id = "city/ymzhengting",
 	name = "衙门正厅",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/menlang",
 		["northwest"] = "city/fyhouyuan",
@@ -4488,15 +5175,20 @@ Room {
 		["northwest"] = {
 			{id = "da yayi", exp = 800000},
 		},
+	precmds = {
+              ["northwest"] = "kill da yayi",
+	},
 	},
 	objs = {
           ["赵城之"] = "zhao chengzhi",
           ["王坏水"] = "wang huaishui",
            },
+	
 }
 Room {
 	id = "city/yuelaoting",
 	name = "月老亭",
+	outdoor = "扬州城",
 	no_fight = true,
 	ways = {
 		["north"] = "city/yltw",
@@ -4507,10 +5199,12 @@ Room {
           ["天若有情天亦老"] = "board",
           ["月下老人"] = "yuexia laoren",
            },
+	room_relative="月老亭外｜乐器店----月老亭月老亭",
 }
 Room {
 	id = "city/yueqidian",
 	name = "乐器店",
+	outdoor = "扬州城",
 	ways = {
 		["south"] = "city/pinqiting",
 		["north"] = "city/dongdajie3",
@@ -4519,34 +5213,42 @@ Room {
 	objs = {
           ["萧老板"] = "xiao laoban",
            },
+	room_relative="东大街｜乐器店----月老亭｜品棋亭乐器店",
 }
 Room {
 	id = "city/yzyunhe",
 	name = "码头",
+	outdoor = "扬州城",
 	ways = {
 		["north"] = "city/dongmen",
 	},
+	room_relative="东门｜码头码头",
 }
 Room {
 	id = "city/zahuopu",
 	name = "杂货铺",
+	outdoor = "扬州城",
 	ways = {
 		["north"] = "city/dongdajie2",
 	},
+	room_relative="东大街｜杂货铺杂货铺",
 }
 Room {
 	id = "city/zhubaodian",
 	name = "珠宝店",
+	outdoor = "扬州城",
 	ways = {
 		["north"] = "city/xidajie1",
 	},
 	objs = {
           ["朱老板"] = "zhu laoban",
            },
+	room_relative="西大街---珠宝店",
 }
 Room {
 	id = "dali/beijie1",
 	name = "北大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/xijie1",
 		["north"] = "dali/yamen",
@@ -4558,56 +5260,64 @@ Room {
 Room {
 	id = "dali/beijie2",
 	name = "北大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/fengwei",
 		["east"] = "dali/beijie3",
 		["west"] = "dali/beijie1",
 	},
-	room_relative="北大街----北大街----太和北街｜风味小吃店北大街",
+	room_relative="北大街----太和北街｜风味小吃店北大街",
 }
 Room {
 	id = "dali/beijie3",
 	name = "太和北街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dalics",
 		["north"] = "dali/beimen",
 		["east"] = "dali/beijie4",
 		["west"] = "dali/beijie2",
 	},
-	room_relative="大理钱庄｜太和北街----北大街----北大街｜云雪楼北大街",
+	room_relative="北门｜北大街----北大街｜城中心太和北街",
 }
 Room {
 	id = "dali/beijie4",
 	name = "北大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/jiulou",
 		["north"] = "dali/qian",
 		["east"] = "dali/beijie5",
 		["west"] = "dali/beijie3",
 	},
-	room_relative="赌场｜北大街----北大街----作坊｜东大街北大街",
+	room_relative="云雪楼｜太和北街--北大街｜大理钱庄北大街",
 }
 Room {
 	id = "dali/beijie5",
 	name = "北大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dongjie1",
 		["east"] = "dali/yanju",
 		["north"] = "dali/duchang",
 		["west"] = "dali/beijie4",
 	},
+	room_relative="东大街｜作坊----赌场｜北大街北大街",
 }
 Room {
 	id = "dali/beimen",
 	name = "北门",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/beijie3",
 		["north"] = "dali/dadao4",
 	},
+	room_relative="北大街｜大道北门",
 }
 Room {
 	id = "dali/bingying",
 	name = "兵营",
+	outdoor = "大理城",
 	ways = {
 		["west"] = "dali/dongjie3",
 	},
@@ -4615,10 +5325,12 @@ Room {
           ["黄大雄"] = "huang daxiong",
           ["张泉"] = "zhang quan",
           },
+	room_relative="东大街--兵营",
 }
 Room {
 	id = "dali/caifeng",
 	name = "裁缝店",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["east"] = "dali/xijie1",
@@ -4626,30 +5338,36 @@ Room {
 	objs = {
           ["裁缝桌"] = "caifeng zhuo",
           },
+	room_relative="西大街--裁缝店",
 }
 Room {
 	id = "dali/chaguan",
 	name = "茶馆",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/beijie1",
 	},
 	objs = {
           ["瑛姑"] = "ying gu",
           },
+  room_relative="北大街--茶馆",
 }
 Room {
 	id = "dali/chouduan",
 	name = "绸缎庄",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/xijie3",
 	},
 	objs = {
           ["女店主"] = "nv dianzhu",
           },
+	room_relative="西大街--绸缎庄",
 }
 Room {
 	id = "dali/chyuan",
 	name = "茶花园",
+	outdoor = "大理城",
 	ways = {
 		["northup"] = "dali/chyuan2",
 		["west"] = "dali/dongjie6",
@@ -4657,10 +5375,12 @@ Room {
 	precmds = {
 		["northup"] = "give 5 silver to yizu xiaohuo",
 	},
+	
 }
 Room {
 	id = "dali/chyuan2",
 	name = "茶花园",
+	outdoor = "大理城",
 	ways = {
 		["northup"] = "dali/chyuan3",
 		["southdown"] = "dali/chyuan",
@@ -4668,10 +5388,12 @@ Room {
 	objs = {
           ["八仙过海"] = "baxian guohai",
           },
+	room_relative="茶花园｜茶花园茶花园",
 }
 Room {
 	id = "dali/chyuan3",
 	name = "茶花园",
+	outdoor = "大理城",
 	ways = {
 		["northwest"] = "dali/chyuan4",
 		["northeast"] = "dali/chyuan5",
@@ -4684,6 +5406,7 @@ Room {
 Room {
 	id = "dali/chyuan4",
 	name = "茶花园",
+	outdoor = "大理城",
 	ways = {
 		["southeast"] = "dali/chyuan3",
 	},
@@ -4694,6 +5417,7 @@ Room {
 Room {
 	id = "dali/chyuan5",
 	name = "茶花园",
+	outdoor = "大理城",
 	ways = {
 		["southwest"] = "dali/chyuan3",
 	},
@@ -4705,6 +5429,7 @@ Room {
 Room {
 	id = "dali/dadao1",
 	name = "大道",
+	outdoor = "大理城",
 	ways = {
 		["southwest"] = "dali/yuxu/xiaodao1",
 		["south"] = "group/entry/dlndao2",
@@ -4715,6 +5440,7 @@ Room {
 Room {
 	id = "dali/dadao3",
 	name = "大道",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dadao4",
 		["north"] = "group/entry/dlndao2",
@@ -4725,6 +5451,7 @@ Room {
 Room {
 	id = "dali/dadao4",
 	name = "大道",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/beimen",
 		["north"] = "dali/dadao3",
@@ -4734,70 +5461,85 @@ Room {
 Room {
 	id = "dali/dafujia",
 	name = "大富之家",
+	outdoor = "大理城",
 	ways = {
 		["north"] = "dali/nanjie4",
 	},
 	objs = {
           ["马五德"] = "ma wude",
           },
+   room_relative="南大街--大富之家",
 }
 Room {
 	id = "dali/dalics",
 	name = "城中心",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/qsjie1",
 		["east"] = "dali/jiulou",
 		["north"] = "dali/beijie3",
 		["west"] = "dali/fengwei",
 	},
+	room_relative="太和北街｜风味小吃店----城中心----云雪楼｜青石街城中心",
 }
 Room {
 	id = "dali/dalieast/chengj",
 	name = "澄江抚仙湖",
+	outdoor = "大理城东",
 	ways = {
 		["southup"] = "group/entry/dleyd",
 		["east"] = "dali/dalieast/yzh",
 		["north"] = "dali/dalieast/lunan",
 	},
+	room_relative="燕子洞｜阳宗海--路南大叠水｜澄江抚仙湖",
 }
 Room {
 	id = "dali/dalieast/dadian",
 	name = "大殿",
+	outdoor = "大理城东",
 	ways = {
 		["south"] = "dali/dalieast/yuan1",
 		["north"] = "dali/dalieast/houyuan1",
 	},
+	room_relative="寺间小路｜后院大殿",
 }
 Room {
 	id = "dali/dalieast/houyuan1",
 	name = "后院",
+	outdoor = "大理城东",
 	ways = {
 		["south"] = "dali/dalieast/dadian",
 	},
 	objs = {
           ["黄眉和尚"] = "huangmei heshang",
           },
+	room_relative="后院--大殿",
 }
 Room {
 	id = "dali/dalieast/lunan",
 	name = "路南大叠水",
+	outdoor = "大理城东",
 	ways = {
 		["south"] = "dali/dalieast/chengj",
 		["north"] = "dali/dalieast/xs1",
 		["east"] = "dali/dalieast/sl",
 	},
+	room_relative="澄江抚仙湖｜西山森林--石林｜路南大叠水",
 }
 Room {
 	id = "dali/dalieast/nianhuasi",
 	name = "寺间小路",
+	outdoor = "大理城东",
 	ways = {
 		["north"] = "dali/dalieast/yuan1",
 		["out"] = "dali/dalieast/simen",
 	},
+	room_relative="寺间小路｜寺间小路∨拈花寺寺间小路",
 }
 Room {
 	id = "dali/dalieast/road1",
 	name = "山间小路",
+	outdoor = "大理城东",
 	ways = {
 		["eastup"] = "dali/dalieast/road2",
 		["southwest"] = "dali/dalieast/shanlu7",
@@ -4807,6 +5549,7 @@ Room {
 Room {
 	id = "dali/dalieast/road2",
 	name = "山间小路",
+	outdoor = "大理城东",
 	ways = {
 		["eastup"] = "dali/dalieast/road3",
 		["westdown"] = "dali/dalieast/road1",
@@ -4816,6 +5559,7 @@ Room {
 Room {
 	id = "dali/dalieast/road3",
 	name = "山间小路",
+	outdoor = "大理城东",
 	ways = {
 		["westdown"] = "dali/dalieast/road2",
 		["southeast"] = "dali/dalieast/road4",
@@ -4825,6 +5569,7 @@ Room {
 Room {
 	id = "dali/dalieast/road4",
 	name = "山间小路",
+	outdoor = "大理城东",
 	ways = {
 		["southeast"] = "dali/dalieast/simen",
 		["northwest"] = "dali/dalieast/road3",
@@ -4834,30 +5579,37 @@ Room {
 Room {
 	id = "dali/dalieast/shanlu7",
 	name = "山路",
+	outdoor = "大理城东",
 	ways = {
 		["southeast"] = "dali/dalieast/xs1",
 		["northeast"] = "dali/dalieast/road1",
 		["west"] = "dali/dongmen",
 	},
+	room_relative="西山森林｜寺间小路--东门｜山路",
 }
 Room {
 	id = "dali/dalieast/simen",
 	name = "拈花寺",
+	outdoor = "大理城东",
 	ways = {
 		["northwest"] = "dali/dalieast/road4",
 		["enter"] = "dali/dalieast/nianhuasi",
 	},
+	room_relative="西山森林｜山间小路拈花寺",
 }
 Room {
 	id = "dali/dalieast/sl",
 	name = "石林",
+	outdoor = "大理城东",
 	ways = {
 		["west"] = "dali/dalieast/lunan",
 	},
+	room_relative="路南大叠水--石林",
 }
 Room {
 	id = "dali/dalieast/xs1",
 	name = "西山森林",
+	outdoor = "大理城东",
 	ways = {
 		["south"] = "dali/dalieast/lunan",
 		["northwest"] = "dali/dalieast/shanlu7",
@@ -4867,73 +5619,91 @@ Room {
           ["松鼠"] = "song shu",
           ["野兔"] = "ye tu",
           },
+	room_relative="西山森林｜路南大叠水--山路｜望海楼",
 }
 Room {
 	id = "dali/dalieast/xs2",
 	name = "望海楼",
+	outdoor = "大理城东",
 	ways = {
 		["south"] = "dali/dalieast/xs1",
 	},
+	room_relative="西山森林---望海楼",
 }
 Room {
 	id = "dali/dalieast/ydk",
 	name = "燕子洞口",
+	outdoor = "大理城东",
 	ways = {
 		["down"] = "dali/dalieast/ydn",
 		["out"] = "group/entry/dleyd",
 	},
+	room_relative="第一天｜燕子洞燕子洞口",
 }
 Room {
 	id = "dali/dalieast/ydn",
 	name = "第一天",
+	outdoor = "大理城东",
 	ways = {
 		["down"] = "dali/dalieast/ydx",
 		["up"] = "dali/dalieast/ydk",
 	},
+	room_relative="第二天｜第一天燕子洞口",
 }
 Room {
 	id = "dali/dalieast/ydx",
 	name = "第二天",
+	outdoor = "大理城东",
 	ways = {
 		["down"] = "dali/dalieast/ydxx",
 		["up"] = "dali/dalieast/ydn",
 	},
+	room_relative="第二天｜第三天第一天",
 }
 Room {
 	id = "dali/dalieast/ydxx",
 	name = "第三天",
+	outdoor = "大理城东",
 	ways = {
 		["east"] = "dali/dalieast/ydxxx",
 		["up"] = "dali/dalieast/ydx",
 	},
+	room_relative="观景楼｜第三天第二天",
 }
 Room {
 	id = "dali/dalieast/ydxxx",
 	name = "观景楼",
+	outdoor = "大理城东",
 	ways = {
 		["east"] = "dali/dalieast/ydxxxx",
 		["west"] = "dali/dalieast/ydxx",
 	},
+	room_relative="观景楼｜第三天观景楼边",
 }
 Room {
 	id = "dali/dalieast/ydxxxx",
 	name = "观景楼边",
+	outdoor = "大理城东",
 	ways = {
 		["west"] = "dali/dalieast/ydxxx",
 		["up"] = "dali/dalieast/ydxxxxx",
 	},
+	room_relative="观景楼｜洞顶观景楼边",
 }
 Room {
 	id = "dali/dalieast/ydxxxxx",
 	name = "洞顶",
+	outdoor = "大理城东",
 	ways = {
 		["east"] = "dali/dalieast/ydxxxxxx",
 		["down"] = "dali/dalieast/ydxxxx",
 	},
+	room_relative="燕子窝｜洞顶观景楼边",
 }
 Room {
 	id = "dali/dalieast/ydxxxxxx",
 	name = "燕子窝",
+	outdoor = "大理城东",
 	ways = {
 		["west"] = "dali/dalieast/ydxxxxx",
 	},
@@ -4941,21 +5711,26 @@ Room {
 Room {
 	id = "dali/dalieast/yuan1",
 	name = "寺间小路",
+	outdoor = "大理城东",
 	ways = {
 		["south"] = "dali/dalieast/nianhuasi",
 		["north"] = "dali/dalieast/dadian",
 	},
+	room_relative="拈花寺｜大殿寺间小路",
 }
 Room {
 	id = "dali/dalieast/yzh",
 	name = "阳宗海",
+	outdoor = "大理城东",
 	ways = {
 		["west"] = "dali/dalieast/chengj",
 	},
+	room_relative="澄江抚仙湖---阳宗海",
 }
 Room {
 	id = "dali/dalisouth/anning",
 	name = "安宁温泉",
+	outdoor = "大理城南",
 	ways = {
 		["west"] = "dali/dalisouth/xgf",
 	},
@@ -4964,58 +5739,72 @@ Room {
           ["岭南大侠"] = "lingnan daxia",
           ["菜花蛇"] = "caihua she",
           },
+	room_relative="下关风---安宁温泉",
 }
 Room {
 	id = "dali/dalisouth/dg1",
 	name = "大观楼",
+	outdoor = "大理城南",
 	ways = {
 		["southup"] = "dali/dalisouth/hg1",
 		["south"] = "group/entry/dlstulin",
 		["northwest"] = "dali/dalisouth/xgf",
 		["west"] = "dali/dalisouth/dg2",
 	},
+	room_relative="下关风↖荷花池----大观楼｜土林大观楼",
 }
 Room {
 	id = "dali/dalisouth/dg2",
 	name = "荷花池",
+	outdoor = "大理城南",
 	ways = {
 		["east"] = "dali/dalisouth/dg1",
 		["west"] = "dali/dalisouth/dg3",
 	},
+	room_relative="大观楼｜游园会荷花池",
 }
 Room {
 	id = "dali/dalisouth/dg3",
 	name = "游园会",
+	outdoor = "大理城南",
 	ways = {
 		["east"] = "dali/dalisouth/dg2",
 	},
+	room_relative="荷花池---游园会",
 }
 Room {
 	id = "dali/dalisouth/hg1",
 	name = "海埂",
+	outdoor = "大理城南",
 	ways = {
 		["south"] = "dali/dalisouth/hg2",
 		["north"] = "dali/dalisouth/hg3",
 		["northdown"] = "dali/dalisouth/dg1",
 	},
+	room_relative="海埂｜海埂南--海埂北｜大观楼",
 }
 Room {
 	id = "dali/dalisouth/hg2",
 	name = "海埂南",
+	outdoor = "大理城南",
 	ways = {
 		["north"] = "dali/dalisouth/hg1",
 	},
+	room_relative="海埂---海埂南",
 }
 Room {
 	id = "dali/dalisouth/hg3",
 	name = "海埂北",
+	outdoor = "大理城南",
 	ways = {
 		["south"] = "dali/dalisouth/hg1",
 	},
+	room_relative="海埂---海埂北",
 }
 Room {
 	id = "dali/dalisouth/jiangbei",
 	name = "澜沧江边",
+	outdoor = "大理城南",
 	ways = {
 		["east"] = "foshan/road6",
 		["#duCjiang"] = "dali/dalisouth/jiangnan",
@@ -5027,10 +5816,12 @@ Room {
 		["#duCjiang"] = true,
 		["enter"] = true,
 	},
+	room_relative="澜沧江边---林间道澜沧江边",
 }
 Room {
 	id = "dali/dalisouth/jiangnan",
 	name = "澜沧江边",
+	outdoor = "大理城南",
 	ways = {
 		["west"] = "dali/dalisouth/xishuang",
 		["#duCjiang"] = "dali/dalisouth/jiangbei",
@@ -5042,98 +5833,125 @@ Room {
 		["#duCjiang"] = true,
 		["enter"] = true,
 	},
+	room_relative="西双版纳---澜沧江边澜沧江边",
 }
 Room {
 	id = "dali/dalisouth/shanlu6",
 	name = "山路",
+	outdoor = "大理城南",
 	ways = {
 		["southup"] = "dali/dalisouth/xgf",
 		["north"] = "dali/nanmen",
 	},
+	room_relative="南门｜山路↓下关风山路",
 }
 Room {
 	id = "dali/dalisouth/xgf",
 	name = "下关风",
+	outdoor = "大理城南",
 	ways = {
 		["southeast"] = "dali/dalisouth/dg1",
 		["east"] = "dali/dalisouth/anning",
 		["northdown"] = "dali/dalisouth/shanlu6",
 	},
+	room_relative="山路↓下关风----安宁温泉↘大观楼下关风",
 }
 Room {
 	id = "dali/dalisouth/xishuang",
 	name = "西双版纳",
+	outdoor = "大理城南",
 	ways = {
 		["east"] = "dali/dalisouth/jiangnan",
 		["northeast"] = "dali/dalisouth/xiushan",
 	},
+	precmds = {
+		["east"] = "#walkBusy",
+	},
+	room_relative="秀山↗西双版纳---澜沧江边西双版纳",
 }
 Room {
 	id = "dali/dalisouth/xiushan",
 	name = "秀山",
+	outdoor = "大理城南",
 	ways = {
 		["southwest"] = "dali/dalisouth/xishuang",
 		["northdown"] = "group/entry/dlstulin",
 	},
+	room_relative="土林↓秀山↙西双版纳秀山",
 }
 Room {
 	id = "dali/daliwest/futiao",
 	name = "虎跳峡",
+	outdoor = "大理城西",
 	ways = {
 		["southwest"] = "dali/daliwest/ninglang",
 		["northwest"] = "group/entry/dlwqunsh",
 		["east"] = "dali/daliwest/nj",
 	},
+	room_relative="宁浪泸沽湖｜梅里雪山--虎跳峡｜怒江",
 }
 Room {
 	id = "dali/daliwest/ninglang",
 	name = "宁浪泸沽湖",
+	outdoor = "大理城西",
 	ways = {
 		["southup"] = "dali/daliwest/yuelong",
 		["northeast"] = "dali/daliwest/futiao",
 	},
+	room_relative="宁浪泸沽湖｜玉龙雪山虎跳峡",
 }
 Room {
 	id = "dali/daliwest/nj",
 	name = "怒江",
+	outdoor = "大理城西",
 	ways = {
 		["southup"] = "dali/daliwest/xueshan",
 		["northeast"] = "tls/diancang",
 		["west"] = "dali/daliwest/futiao",
 	},
+	room_relative="轿子雪山｜点苍山--虎跳峡｜怒江",
 }
 Room {
 	id = "dali/daliwest/tianchi1",
 	name = "天池",
+	outdoor = "大理城西",
 	ways = {
 		["northeast"] = "group/entry/dlwqunsh",
 		["up"] = "dali/daliwest/tianchi2",
 	},
+	room_relative="梅里雪山｜天池半山天池",
 }
 Room {
 	id = "dali/daliwest/tianchi2",
 	name = "天池半山",
+	outdoor = "大理城西",
 	ways = {
 		["down"] = "dali/daliwest/tianchi1",
 	},
+	room_relative="天池半山--天池",
 }
 Room {
 	id = "dali/daliwest/xueshan",
 	name = "轿子雪山",
+	outdoor = "大理城西",
 	ways = {
 		["northdown"] = "dali/daliwest/nj",
 	},
+	room_relative="轿子雪山--怒江",
 }
 Room {
 	id = "dali/daliwest/yuelong",
 	name = "玉龙雪山",
+	outdoor = "大理城西",
 	ways = {
 		["northdown"] = "dali/daliwest/ninglang",
 	},
+	room_relative="玉龙雪山---宁浪泸沽湖",
 }
 Room {
 	id = "dali/dangpu",
 	name = "当铺",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["west"] = "dali/dongjie1",
@@ -5141,26 +5959,32 @@ Room {
 	objs = {
           ["沈老板"] = "shen laoban",
           },
+	room_relative="东大街--当铺",
 }
 Room {
 	id = "dali/datiepu",
 	name = "打铁铺",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["east"] = "dali/nanjie1",
 	},
+	room_relative="南大街---打铁铺",
 }
 Room {
 	id = "dali/dinganfu",
 	name = "定安府",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["north"] = "dali/nanjie2",
 	},
+	room_relative="南大街---定安府",
 }
 Room {
 	id = "dali/dlhg/chitang",
 	name = "池塘",
+	outdoor = "大理皇宫",
 	ways = {
 		["southeast"] = "dali/dlhg/xiaoqiao",
 		["northwest"] = "dali/dlhg/jiashan",
@@ -5169,6 +5993,7 @@ Room {
 Room {
 	id = "dali/dlhg/chufang",
 	name = "御膳房",
+	outdoor = "大理皇宫",
 	ways = {
 		["east"] = "dali/dlhg/huating",
 	},
@@ -5179,6 +6004,7 @@ Room {
 Room {
 	id = "dali/dlhg/dadian",
 	name = "大殿",
+	outdoor = "大理皇宫",
 	ways = {
 		["east"] = "dali/dlhg/zoulang2",
 	},
@@ -5186,6 +6012,7 @@ Room {
 Room {
 	id = "dali/dlhg/houyuan",
 	name = "后院",
+	outdoor = "大理皇宫",
 	ways = {
 		["south"] = "dali/dlhg/xiaoqiao",
 		["north"] = "dali/dlhg/qingong",
@@ -5194,6 +6021,7 @@ Room {
 Room {
 	id = "dali/dlhg/huating",
 	name = "正厅",
+	outdoor = "大理皇宫",
 	ways = {
 		["south"] = "dali/dlhg/zoulang1",
 		["east"] = "dali/dlhg/shufang",
@@ -5209,6 +6037,7 @@ Room {
 Room {
 	id = "dali/dlhg/jiashan",
 	name = "大山石",
+	outdoor = "大理皇宫",
 	ways = {
 		["southeast"] = "dali/dlhg/chitang",
 	},
@@ -5216,6 +6045,7 @@ Room {
 Room {
 	id = "dali/dlhg/qingong",
 	name = "寝宫",
+	outdoor = "大理皇宫",
 	ways = {
 		["south"] = "dali/dlhg/houyuan",
 	},
@@ -5223,6 +6053,7 @@ Room {
 Room {
 	id = "dali/dlhg/shufang",
 	name = "书房",
+	outdoor = "大理皇宫",
 	ways = {
 		["west"] = "dali/dlhg/huating",
 	},
@@ -5230,6 +6061,7 @@ Room {
 Room {
 	id = "dali/dlhg/xiangfang",
 	name = "厢房",
+	outdoor = "大理皇宫",
 	ways = {
 		["west"] = "dali/dlhg/zoulang2",
 	},
@@ -5237,6 +6069,7 @@ Room {
 Room {
 	id = "dali/dlhg/xiaoqiao",
 	name = "小桥",
+	outdoor = "大理皇宫",
 	ways = {
 		["south"] = "dali/dlhg/zoulang2",
 		["northwest"] = "dali/dlhg/chitang",
@@ -5246,6 +6079,7 @@ Room {
 Room {
 	id = "dali/dlhg/zhengmen",
 	name = "皇宫正门",
+	outdoor = "大理皇宫",
 	ways = {
 		["south"] = "dali/qsjie2",
 		["north"] = "dali/dlhg/zoulang1",
@@ -5254,6 +6088,9 @@ Room {
 		["north"] = {
 			{id = "huanggong shiwei", exp = 500000, party = "天龙寺"},
 		},
+	precmds = {
+              ["north"] = "kill huanggong shiwei",
+	},
 	},
 	objs = {
           ["皇宫侍卫"] = "huanggong shiwei",
@@ -5262,6 +6099,7 @@ Room {
 Room {
 	id = "dali/dlhg/zoulang1",
 	name = "走廊",
+	outdoor = "大理皇宫",
 	ways = {
 		["south"] = "dali/dlhg/zhengmen",
 		["north"] = "dali/dlhg/huating",
@@ -5270,6 +6108,7 @@ Room {
 Room {
 	id = "dali/dlhg/zoulang2",
 	name = "走廊",
+	outdoor = "大理皇宫",
 	ways = {
 		["south"] = "dali/dlhg/huating",
 		["north"] = "dali/dlhg/xiaoqiao",
@@ -5280,6 +6119,7 @@ Room {
 Room {
 	id = "dali/dongjie1",
 	name = "东大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dongjie2",
 		["east"] = "dali/dangpu",
@@ -5291,6 +6131,7 @@ Room {
 Room {
 	id = "dali/dongjie2",
 	name = "东大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dongjie3",
 		["east"] = "dali/yaopu",
@@ -5302,6 +6143,7 @@ Room {
 Room {
 	id = "dali/dongjie3",
 	name = "东大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dongjie4",
 		["north"] = "dali/dongjie2",
@@ -5312,15 +6154,18 @@ Room {
 Room {
 	id = "dali/dongjie4",
 	name = "太和东街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dongjie5",
 		["east"] = "dali/dongmen",
 		["north"] = "dali/dongjie3",
 	},
+	room_relative="东大街｜太和东街---东门｜东大街太和东街",
 }
 Room {
 	id = "dali/dongjie5",
 	name = "东大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dongjie6",
 		["east"] = "dali/wangfu/damen",
@@ -5331,6 +6176,7 @@ Room {
 Room {
 	id = "dali/dongjie6",
 	name = "东大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dongjie7",
 		["north"] = "dali/dongjie5",
@@ -5341,6 +6187,7 @@ Room {
 Room {
 	id = "dali/dongjie7",
 	name = "东大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/nanjie5",
 		["east"] = "dali/huadian",
@@ -5351,14 +6198,17 @@ Room {
 Room {
 	id = "dali/dongmen",
 	name = "东门",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/dalieast/shanlu7",
 		["west"] = "dali/dongjie4",
 	},
+	room_relative="山路｜太和东街东门",
 }
 Room {
 	id = "dali/doufufang",
 	name = "豆腐坊",
+	outdoor = "大理城",
 	ways = {
 		["north"] = "dali/jiulou",
 		["east"] = "dali/dongjie2",
@@ -5367,25 +6217,31 @@ Room {
 	objs = {
           ["豆腐西施"] = "doufu xishi",
           },
+	room_relative="云雪楼｜青石街----豆腐坊----东大街豆腐坊",
 }
 Room {
 	id = "dali/duchang",
 	name = "赌场",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/beijie5",
 	},
+	room_relative="北大街--赌场",
 }
 Room {
 	id = "dali/erhai",
 	name = "洱海园",
+	outdoor = "大理城",
 	ways = {
 		["eastup"] = "dali/jzs3",
 		["west"] = "dali/hth",
 	},
+	room_relative="灵山一会｜蝴蝶会洱海园",
 }
 Room {
 	id = "dali/fengwei",
 	name = "风味小吃店",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/dalics",
 		["north"] = "dali/beijie2",
@@ -5394,33 +6250,41 @@ Room {
 	objs = {
           ["张千"] = "zhang qian",
           },
+	room_relative="城中心｜北大街--西大街｜风味小吃店",
 }
 Room {
 	id = "dali/hth",
 	name = "蝴蝶会",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/erhai",
 		["west"] = "dali/htq",
 	},
+	room_relative="洱海园｜蝴蝶泉蝴蝶会",
 }
 Room {
 	id = "dali/htq",
 	name = "蝴蝶泉",
+	outdoor = "大理城",
 	ways = {
 		["southwest"] = "dali/dadao3",
 		["east"] = "dali/hth",
 	},
+	room_relative="大道｜蝴蝶泉蝴蝶会",
 }
 Room {
 	id = "dali/huadian",
 	name = "花店",
+	outdoor = "大理城",
 	ways = {
 		["west"] = "dali/dongjie7",
 	},
+	room_relative="东大街--花店",
 }
 Room {
 	id = "dali/jiulou",
 	name = "云雪楼",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/doufufang",
 		["east"] = "dali/dongjie1",
@@ -5430,33 +6294,41 @@ Room {
 	objs = {
           ["欧阳老板"] = "ouyang laoban",
           },
+	room_relative="北大街｜城中心----云雪楼----东大街｜豆腐坊云雪楼",
 }
 Room {
 	id = "dali/jzs1",
 	name = "鸡足山",
+	outdoor = "大理城",
 	ways = {
 		["westdown"] = "dali/jzs2",
 	},
+	room_relative="鸡足山上--鸡足山",
 }
 Room {
 	id = "dali/jzs2",
 	name = "鸡足山上",
+	outdoor = "大理城",
 	ways = {
 		["westdown"] = "dali/jzs3",
 		["eastup"] = "dali/jzs1",
 	},
+	room_relative="鸡足山｜灵山一会鸡足山上",
 }
 Room {
 	id = "dali/jzs3",
 	name = "灵山一会",
+	outdoor = "大理城",
 	ways = {
 		["eastup"] = "dali/jzs2",
 		["westdown"] = "dali/erhai",
 	},
+	room_relative="鸡足山上｜洱海园灵山一会",
 }
 Room {
 	id = "dali/kedian",
 	name = "迎宾馆",
+	outdoor = "大理城",
 	ways = {
 		-- ["enter"] = "dali/kedian2",
 		["north"] = "dali/qsjie1",
@@ -5464,10 +6336,12 @@ Room {
 	nolooks = {
 		["enter"] = true,
 	},
+	room_relative="青石街--迎宾馆",
 }
 Room {
 	id = "dali/kedian2",
 	name = "走廊",
+	outdoor = "大理城",
 	ways = {
 		["north"] = "dali/kedian3",
 		["out"] = "dali/kedian",
@@ -5476,6 +6350,7 @@ Room {
 Room {
 	id = "dali/kedian3",
 	name = "客房",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["south"] = "dali/kedian2",
@@ -5484,16 +6359,19 @@ Room {
 Room {
 	id = "dali/mafang",
 	name = "马房",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/qsjie2",
 	},
 	objs = {
           ["马夫子"] = "ma fuzi",
           },
+	room_relative="马房-----青石街马房",
 }
 Room {
 	id = "dali/nanjie1",
 	name = "南大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/shudian",
 		["north"] = "dali/xijie7",
@@ -5505,6 +6383,7 @@ Room {
 Room {
 	id = "dali/nanjie2",
 	name = "南大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dinganfu",
 		["east"] = "dali/nanjie3",
@@ -5515,16 +6394,19 @@ Room {
 Room {
 	id = "dali/nanjie3",
 	name = "太和南街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/nanmen",
 		["north"] = "dali/qsjie2",
 		["east"] = "dali/nanjie4",
 		["west"] = "dali/nanjie2",
 	},
+	room_relative='青石街｜南大街---太和南街---南大街｜南门太和南街',
 }
 Room {
 	id = "dali/nanjie4",
 	name = "南大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dafujia",
 		["east"] = "dali/nanjie5",
@@ -5535,64 +6417,76 @@ Room {
 Room {
 	id = "dali/nanjie5",
 	name = "南大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/zahuopu",
 		["east"] = "dali/shuyuan",
 		["north"] = "dali/dongjie7",
 		["west"] = "dali/nanjie4",
 	},
-	room_relative='东大街｜南大街----南大街----书院｜杂货铺南大街',
+	room_relative='东大街｜南大街---书院｜杂货铺南大街',
 }
 Room {
 	id = "dali/nanmen",
 	name = "南门",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dalisouth/shanlu6",
 		["north"] = "dali/nanjie3",
 	},
+	room_relative='太和南街｜南门｜山路南门',
 }
 Room {
 	id = "dali/qian",
 	name = "大理钱庄",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/beijie4",
 	},
 	objs = {
           ["严掌柜"] = "yan zhanggui",
           },
+  room_relative='大理钱庄｜北大街大理钱庄',
 }
 Room {
 	id = "dali/qsjie1",
 	name = "青石街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/kedian",
 		["north"] = "dali/dalics",
 		["east"] = "dali/doufufang",
 	},
+	room_relative='城中心｜青石街----豆腐坊｜迎宾馆青石街',
 }
 Room {
 	id = "dali/qsjie2",
 	name = "青石街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/nanjie3",
 		["east"] = "dali/yizhan",
 		["north"] = "dali/dlhg/zhengmen",
 		["west"] = "dali/mafang",
 	},
+	room_relative='皇宫正门｜马房----青石街----驿站｜太和南街青石街',
 }
 Room {
 	id = "dali/shanhou",
 	name = "善阐侯府",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/xijie5",
 	},
 	objs = {
           ["高升泰"] = "gao shengtai",
           },
+	room_relative='善阐侯府---西大街善阐侯府',
 }
 Room {
 	id = "dali/shanlu2",
 	name = "山路",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/shanlu3",
 		["north"] = "chengdu/nanmen",
@@ -5602,6 +6496,7 @@ Room {
 Room {
 	id = "dali/shanlu3",
 	name = "山路",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/shanlu4",
 		["north"] = "dali/shanlu2",
@@ -5612,6 +6507,7 @@ Room {
 Room {
 	id = "dali/shanlu4",
 	name = "山路",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/dadao1",
 		["north"] = "dali/shanlu3",
@@ -5621,50 +6517,61 @@ Room {
 Room {
 	id = "dali/shudian",
 	name = "书肆",
+	outdoor = "大理城",
 	ways = {
 		["north"] = "dali/nanjie1",
 	},
+	room_relative="南大街--书肆",
 }
 Room {
 	id = "dali/shuyuan",
 	name = "书院",
+	outdoor = "大理城",
 	ways = {
 		["west"] = "dali/nanjie5",
 	},
+	room_relative="南大街--书院",
 }
 Room {
 	id = "dali/sikong",
 	name = "司空堂",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/yamen",
 	},
 	objs = {
           ["巴天石"] = "ba tianshi",
           },
+	room_relative="府衙前厅--司空堂",
 }
 Room {
 	id = "dali/sima",
 	name = "司马堂",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/yamen",
 	},
 	objs = {
           ["范晔"] = "fan ye",
           },
+	room_relative="府衙前厅---司马堂",
 }
 Room {
 	id = "dali/situ",
 	name = "司徒堂",
+	outdoor = "大理城",
 	ways = {
 		["west"] = "dali/yamen",
 	},
 	objs = {
           ["华赫艮"] = "hua hegen",
           },
+	room_relative="府衙前厅---司徒堂",
 }
 Room {
 	id = "dali/wangfu/chufang",
 	name = "王府厨房",
+	outdoor = "大理王府",
 	ways = {
 		["west"] = "dali/wangfu/lang4",
 	},
@@ -5676,6 +6583,7 @@ Room {
 Room {
 	id = "dali/wangfu/damen",
 	name = "镇南王府大门",
+	outdoor = "大理王府",
 	ways = {
 		["south"] = "dali/wangfu/dating",
 		["west"] = "dali/dongjie5",
@@ -5683,10 +6591,12 @@ Room {
 	objs = {
           ["大理留言板"] = "board",
      },
+	 room_relative="王府大厅｜东大街镇南王府大门",
 }
 Room {
 	id = "dali/wangfu/dating",
 	name = "王府大厅",
+	outdoor = "大理王府",
 	ways = {
 		["east"] = "dali/wangfu/lang2",
 		["north"] = "dali/wangfu/damen",
@@ -5699,6 +6609,10 @@ Room {
 		["west"] = {
 			{id = "dali guanbing", exp = 10000,party = "天龙寺"},
 		},
+	precmds = {
+              ["west"] = "kill guanbing",
+			  ["east"] = "kill guanbing",
+	},
 	},
 	objs = {
           ["傅思归"] = "fu sigui",
@@ -5707,6 +6621,7 @@ Room {
 Room {
 	id = "dali/wangfu/huayuan",
 	name = "花园",
+	outdoor = "大理王府",
 	ways = {
 		["east"] = "dali/wangfu/lang8",
 		["west"] = "dali/wangfu/lang7",
@@ -5718,6 +6633,7 @@ Room {
 Room {
 	id = "dali/wangfu/lang1",
 	name = "长廊",
+	outdoor = "大理王府",
 	ways = {
 		["south"] = "dali/wangfu/lang3",
 		["east"] = "dali/wangfu/dating",
@@ -5727,6 +6643,7 @@ Room {
 Room {
 	id = "dali/wangfu/lang2",
 	name = "长廊",
+	outdoor = "大理王府",
 	ways = {
 		["south"] = "dali/wangfu/lang4",
 		["west"] = "dali/wangfu/dating",
@@ -5736,6 +6653,7 @@ Room {
 Room {
 	id = "dali/wangfu/lang3",
 	name = "长廊",
+	outdoor = "大理王府",
 	ways = {
 		["south"] = "dali/wangfu/lang5",
 		["east"] = "dali/wangfu/nuange",
@@ -5747,6 +6665,7 @@ Room {
 Room {
 	id = "dali/wangfu/lang4",
 	name = "长廊",
+	outdoor = "大理王府",
 	ways = {
 		["south"] = "dali/wangfu/lang6",
 		["north"] = "dali/wangfu/lang2",
@@ -5758,6 +6677,7 @@ Room {
 Room {
 	id = "dali/wangfu/lang5",
 	name = "长廊",
+	outdoor = "大理王府",
 	ways = {
 		["southeast"] = "dali/wangfu/lang7",
 		["east"] = "dali/wangfu/shufang",
@@ -5769,6 +6689,7 @@ Room {
 Room {
 	id = "dali/wangfu/lang6",
 	name = "长廊",
+	outdoor = "大理王府",
 	ways = {
 		["southwest"] = "dali/wangfu/lang8",
 		["east"] = "dali/wangfu/wupinfang",
@@ -5780,6 +6701,7 @@ Room {
 Room {
 	id = "dali/wangfu/lang7",
 	name = "长廊",
+	outdoor = "大理王府",
 	ways = {
 		["northwest"] = "dali/wangfu/lang5",
 		["east"] = "dali/wangfu/huayuan",
@@ -5789,6 +6711,7 @@ Room {
 Room {
 	id = "dali/wangfu/lang8",
 	name = "长廊",
+	outdoor = "大理王府",
 	ways = {
 		["northeast"] = "dali/wangfu/lang6",
 		["west"] = "dali/wangfu/huayuan",
@@ -5798,6 +6721,7 @@ Room {
 Room {
 	id = "dali/wangfu/nuange",
 	name = "暖阁",
+	outdoor = "大理王府",
 	ways = {
 		["west"] = "dali/wangfu/lang3",
 	},
@@ -5808,6 +6732,7 @@ Room {
 Room {
 	id = "dali/wangfu/shufang",
 	name = "书房",
+	outdoor = "大理王府",
 	ways = {
 		["west"] = "dali/wangfu/lang5",
 	},
@@ -5818,6 +6743,7 @@ Room {
 Room {
 	id = "dali/wangfu/woshi1",
 	name = "卧室",
+	outdoor = "大理王府",
 	ways = {
 		["east"] = "dali/wangfu/lang5",
 	},
@@ -5825,6 +6751,7 @@ Room {
 Room {
 	id = "dali/wangfu/woshi2",
 	name = "卧室",
+	outdoor = "大理王府",
 	ways = {
 		["east"] = "dali/wangfu/lang6",
 	},
@@ -5832,6 +6759,7 @@ Room {
 Room {
 	id = "dali/wangfu/wupinfang",
 	name = "兵器房",
+	outdoor = "大理王府",
 	ways = {
 		["west"] = "dali/wangfu/lang6",
 	},
@@ -5839,6 +6767,7 @@ Room {
 Room {
 	id = "dali/wangfu/yizheng",
 	name = "议政厅",
+	outdoor = "大理王府",
 	ways = {
 		["east"] = "dali/wangfu/lang3",
 	},
@@ -5846,6 +6775,7 @@ Room {
 Room {
 	id = "dali/wangfu/zhangfang",
 	name = "帐房",
+	outdoor = "大理王府",
 	ways = {
 		["east"] = "dali/wangfu/lang4",
 	},
@@ -5853,21 +6783,26 @@ Room {
 Room {
 	id = "dali/wuliang/anbian",
 	name = "澜沧江边",
+	outdoor = "无量山",
 	ways = {
 		["eastup"] = "dali/wuliang/gaoshan",
 	},
+	room_relative="无量山峰---澜沧江边",
 }
 Room {
 	id = "dali/wuliang/anbian1",
 	name = "澜沧江畔",
+	outdoor = "无量山",
 	ways = {
 		["east"] = "dali/wuliang/jiangan",
 		["west"] = "dali/wuliang/shanlu8",
 	},
+room_relative="江岸｜荆棘林澜沧江畔",
 }
 Room {
 	id = "dali/wuliang/banshan1",
 	name = "半山",
+	outdoor = "无量山",
 	ways = {
 		["down"] = "dali/wuliang/banshan2",
 	},
@@ -5875,6 +6810,7 @@ Room {
 Room {
 	id = "dali/wuliang/banshan2",
 	name = "半山",
+	outdoor = "无量山",
 	ways = {
 		["down"] = "dali/wuliang/banshan3",
 	},
@@ -5882,6 +6818,7 @@ Room {
 Room {
 	id = "dali/wuliang/banshan3",
 	name = "半山",
+	outdoor = "无量山",
 	ways = {
 		["down"] = "dali/wuliang/banshan4",
 	},
@@ -5889,30 +6826,37 @@ Room {
 Room {
 	id = "dali/wuliang/banshan4",
 	name = "半山",
+	outdoor = "无量山",
 	ways = {
 		["down"] = "dali/wuliang/gudi",
 	},
+	room_relative="山谷底部---半山",
 }
 Room {
 	id = "dali/wuliang/beihubian",
 	name = "北湖边",
+	outdoor = "无量山",
 	ways = {
 		["southeast"] = "dali/wuliang/nanhubian",
 		["north"] = "dali/wuliang/shulin4",
 		["northeast"] = "dali/wuliang/donghubian",
 	},
+	room_relative="山中密林｜南湖边--东湖边北湖边",
 }
 Room {
 	id = "dali/wuliang/caodi",
 	name = "万劫谷谷口",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/xiaojing",
 		["out"] = "dali/wuliang/hslin",
 	},
+	room_relative="谷中小径｜黑森林万劫谷谷口",
 }
 Room {
 	id = "dali/wuliang/dlgong",
 	name = "东练武厅",
+	outdoor = "无量山",
 	ways = {
 		["west"] = "dali/wuliang/jhg",
 	},
@@ -5920,6 +6864,7 @@ Room {
 Room {
 	id = "dali/wuliang/dong1",
 	name = "石室",
+	outdoor = "无量山",
 	ways = {
 		["enter"] = "dali/wuliang/dong2",
 		["up"] = "dali/wuliang/taijie",
@@ -5929,6 +6874,7 @@ Room {
 Room {
 	id = "dali/wuliang/dong2",
 	name = "内室",
+	outdoor = "无量山",
 	ways = {
 		["out"] = "dali/wuliang/dong1",
 	},
@@ -5936,6 +6882,7 @@ Room {
 Room {
 	id = "dali/wuliang/donghubian",
 	name = "东湖边",
+	outdoor = "无量山",
 	ways = {
 		["southwest"] = "dali/wuliang/beihubian",
 		["north"] = "dali/wuliang/shulin1",
@@ -5946,6 +6893,7 @@ Room {
 Room {
 	id = "dali/wuliang/dongkou",
 	name = "洞口",
+	outdoor = "无量山",
 	ways = {
 		["out"] = "dali/wuliang/shibi",
 		["knock huan;tui huan;enter"] = "dali/wuliang/dong1",
@@ -5954,6 +6902,7 @@ Room {
 Room {
 	id = "dali/wuliang/dting",
 	name = "东厅",
+	outdoor = "无量山",
 	ways = {
 		["west"] = "dali/wuliang/wlj",
 	},
@@ -5961,6 +6910,7 @@ Room {
 Room {
 	id = "dali/wuliang/gaoshan",
 	name = "无量山峰",
+	outdoor = "无量山",
 	ways = {
 		["westdown"] = "dali/wuliang/anbian",
 		["south"] = "dali/wuliang/shanlu12",
@@ -5969,6 +6919,7 @@ Room {
 Room {
 	id = "dali/wuliang/gudi",
 	name = "山谷底部",
+	outdoor = "无量山",
 	ways = {
 		["west"] = "dali/wuliang/donghubian",
 	},
@@ -5976,6 +6927,7 @@ Room {
 Room {
 	id = "dali/wuliang/guzhong",
 	name = "万劫谷",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/keting",
 		["north"] = "dali/wuliang/xiaojing",
@@ -5989,6 +6941,7 @@ Room {
 Room {
 	id = "dali/wuliang/houyuan",
 	name = "后院",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/jhg",
 		["north"] = "dali/wuliang/songlin1",
@@ -6003,6 +6956,7 @@ Room {
 Room {
 	id = "dali/wuliang/hslin",
 	name = "黑森林",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/tiesuo",
 		["enter 第四株"] = "dali/wuliang/caodi",
@@ -6014,6 +6968,7 @@ Room {
 Room {
 	id = "dali/wuliang/jhg",
 	name = "剑湖宫",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/wlj",
 		["north"] = "dali/wuliang/houyuan",
@@ -6046,6 +7001,7 @@ Room {
 Room {
 	id = "dali/wuliang/jiangan",
 	name = "江岸",
+	outdoor = "无量山",
 	ways = {
 		["north"] = "dali/wuliang/tiesuo",
 		["west"] = "dali/wuliang/anbian1",
@@ -6054,6 +7010,7 @@ Room {
 Room {
 	id = "dali/wuliang/jiangpan",
 	name = "江畔",
+	outdoor = "无量山",
 	ways = {
 		["enter"] = "dali/wuliang/taijie",
 		["down"] = "dali/wuliang/anbian1",
@@ -6062,6 +7019,7 @@ Room {
 Room {
 	id = "dali/wuliang/keting",
 	name = "客厅",
+	outdoor = "无量山",
 	ways = {
 		["north"] = "dali/wuliang/guzhong",
 		["east"] = "dali/wuliang/xiangfang",
@@ -6075,6 +7033,7 @@ Room {
 Room {
 	id = "dali/wuliang/lsdui",
 	name = "乱石堆",
+	outdoor = "无量山",
 	ways = {
 		["southwest"] = "dali/wuliang/xiaolu2",
 	},
@@ -6085,6 +7044,7 @@ Room {
 Room {
 	id = "dali/wuliang/midao1",
 	name = "密道",
+	outdoor = "无量山",
 	ways = {
 		["southdown"] = "dali/wuliang/midao2",
 	},
@@ -6092,6 +7052,7 @@ Room {
 Room {
 	id = "dali/wuliang/midao2",
 	name = "密道",
+	outdoor = "无量山",
 	ways = {
 		["northup"] = "dali/wuliang/midao1",
 		["south"] = "dali/wuliang/midao3",
@@ -6100,6 +7061,7 @@ Room {
 Room {
 	id = "dali/wuliang/midao3",
 	name = "密道",
+	outdoor = "无量山",
 	ways = {
 		["east"] = "dali/wuliang/midao4",
 		["north"] = "dali/wuliang/midao2",
@@ -6108,6 +7070,7 @@ Room {
 Room {
 	id = "dali/wuliang/midao4",
 	name = "密道",
+	outdoor = "无量山",
 	ways = {
 		["southdown"] = "dali/wuliang/midao5",
 		["west"] = "dali/wuliang/midao3",
@@ -6116,6 +7079,7 @@ Room {
 Room {
 	id = "dali/wuliang/midao5",
 	name = "密道",
+	outdoor = "无量山",
 	ways = {
 		["northup"] = "dali/wuliang/midao4",
 		["out"] = "dali/shanlu3",
@@ -6124,6 +7088,7 @@ Room {
 Room {
 	id = "dali/wuliang/muwu1",
 	name = "空地",
+	outdoor = "无量山",
 	ways = {
 		["north"] = "dali/wuliang/muwu2",
 	},
@@ -6131,6 +7096,7 @@ Room {
 Room {
 	id = "dali/wuliang/muwu2",
 	name = "石屋",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/muwu1",
 	},
@@ -6138,6 +7104,7 @@ Room {
 Room {
 	id = "dali/wuliang/nanhubian",
 	name = "南湖边",
+	outdoor = "无量山",
 	ways = {
 		["northwest"] = "dali/wuliang/beihubian",
 		["north"] = "dali/wuliang/shulin3",
@@ -6147,6 +7114,7 @@ Room {
 Room {
 	id = "dali/wuliang/pubu",
 	name = "大瀑布",
+	outdoor = "无量山",
 	ways = {
 		["southeast"] = "dali/wuliang/shanya",
 		["west;south"] = "dali/wuliang/houyuan",
@@ -6161,6 +7129,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlin-1",
 	name = "石道",
+	outdoor = "无量山",
 	ways = {
 		["east"] = "dali/wuliang/shanlin-2",
 		["west"] = "dali/wuliang/shanlu12",
@@ -6169,6 +7138,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlin-2",
 	name = "山坡",
+	outdoor = "无量山",
 	ways = {
 		["eastup"] = "dali/wuliang/shanlin-3",
 		["west"] = "dali/wuliang/shanlin-1",
@@ -6177,6 +7147,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlin-3",
 	name = "森林",
+	outdoor = "无量山",
 	ways = {
 		["westdown"] = "dali/wuliang/shanlin-2",
 		["north"] = "dali/wuliang/shanlin-4",
@@ -6185,6 +7156,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlin-4",
 	name = "森林",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/shanlin-3",
 		["west"] = "dali/wuliang/shanlin-5",
@@ -6193,6 +7165,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlin-5",
 	name = "森林",
+	outdoor = "无量山",
 	ways = {
 		["north"] = "dali/wuliang/shanlin-6",
 		["east"] = "dali/wuliang/shanlin-4",
@@ -6201,6 +7174,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlin-6",
 	name = "森林",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/shanlin-5",
 	},
@@ -6208,6 +7182,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlu8",
 	name = "荆棘林",
+	outdoor = "无量山",
 	ways = {
 		["west"] = "dali/wuliang/shanlu8",
 		["east"] = "dali/wuliang/anbian1",
@@ -6218,6 +7193,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlu9",
 	name = "荆棘林",
+	outdoor = "无量山",
 	ways = {
 		["west"] = "dali/wuliang/shanlu10",
 		["east"] = "dali/wuliang/shanlu10",
@@ -6228,6 +7204,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlu10",
 	name = "荆棘林",
+	outdoor = "无量山",
 	ways = {
 		["west"] = "dali/wuliang/shanlu13",
 		["east"] = "dali/wuliang/shanlu14",
@@ -6238,6 +7215,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlu11",
 	name = "山路",
+	outdoor = "无量山",
 	ways = {
 		["#outJjl"] = "dali/wuliang/xiaoxi",
 	},
@@ -6258,6 +7236,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlu12",
 	name = "荆棘林",
+	outdoor = "无量山",
 	ways = {
 		["west"] = "dali/wuliang/shanlu14",
 		["east"] = "dali/wuliang/shanlu13",
@@ -6268,6 +7247,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlu13",
 	name = "斜坡",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/shanlu10",
 		["north"] = "dali/wuliang/shanlu10",
@@ -6278,6 +7258,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlu14",
 	name = "斜坡",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/shanlu10",
 		["north"] = "dali/wuliang/shanlu10",
@@ -6288,6 +7269,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanlu5",
 	name = "无量山路",
+	outdoor = "无量山",
 	ways = {
 		["eastup"] = "dali/wuliang/xiaolu1",
 		["northdown"] = "dali/wuliang/xiaoxi",
@@ -6296,6 +7278,7 @@ Room {
 Room {
 	id = "dali/wuliang/shanya",
 	name = "白龙峰",
+	outdoor = "无量山",
 	ways = {
 		["northwest"] = "dali/wuliang/pubu",
 		["jump down"] = "dali/wuliang/banshan1",
@@ -6307,6 +7290,7 @@ Room {
 Room {
 	id = "dali/wuliang/shibi",
 	name = "石壁下",
+	outdoor = "无量山",
 	ways = {
 		["out"] = "dali/wuliang/shuhou",
 		["si teng;huang dashi left;huang dashi left;tui dashi right;tui dashi right;enter"] = "dali/wuliang/dongkou",
@@ -6315,6 +7299,7 @@ Room {
 Room {
 	id = "dali/wuliang/shuhou",
 	name = "树丛后",
+	outdoor = "无量山",
 	ways = {
 		["out"] = "dali/wuliang/shulin1",
 		["si teng"] = "dali/wuliang/shibi",
@@ -6323,6 +7308,7 @@ Room {
 Room {
 	id = "dali/wuliang/shulin1",
 	name = "山中密林",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/donghubian",
 		["enter"] = "dali/wuliang/shuhou",
@@ -6334,6 +7320,7 @@ Room {
 Room {
 	id = "dali/wuliang/shulin2",
 	name = "山中密林",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/xihubian",
 	},
@@ -6344,6 +7331,7 @@ Room {
 Room {
 	id = "dali/wuliang/shulin3",
 	name = "山中密林",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/nanhubian",
 	},
@@ -6354,6 +7342,7 @@ Room {
 Room {
 	id = "dali/wuliang/shulin4",
 	name = "山中密林",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/beihubian",
 	},
@@ -6364,6 +7353,7 @@ Room {
 Room {
 	id = "dali/wuliang/songlin1",
 	name = "大松林",
+	outdoor = "无量山",
 	ways = {
 		--["south"] = "dali/wuliang/houyuan",
 		--["east"] = "dali/wuliang/pubu",
@@ -6378,6 +7368,7 @@ Room {
 Room {
 	id = "dali/wuliang/taijie",
 	name = "台阶",
+	outdoor = "无量山",
 	ways = {
 		["down"] = "dali/wuliang/dong1",
 		["out"] = "dali/wuliang/jiangpan",
@@ -6386,6 +7377,7 @@ Room {
 Room {
 	id = "dali/wuliang/tiesuo",
 	name = "铁索桥",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/jiangan",
 		["north"] = "dali/wuliang/hslin",
@@ -6394,6 +7386,7 @@ Room {
 Room {
 	id = "dali/wuliang/wlj",
 	name = "石板路",
+	outdoor = "无量山",
 	ways = {
 		["north"] = "dali/wuliang/jhg",
 		["east"] = "dali/wuliang/dting",
@@ -6418,6 +7411,7 @@ Room {
 Room {
 	id = "dali/wuliang/wljmen",
 	name = "无量剑宗",
+	outdoor = "无量山",
 	ways = {
 		["enter"] = "dali/wuliang/wlj",
 		["southdown"] = "dali/wuliang/xiaolu5",
@@ -6436,6 +7430,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiangfang",
 	name = "厢房",
+	outdoor = "无量山",
 	ways = {
 		["west"] = "dali/wuliang/keting",
 	},
@@ -6446,6 +7441,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiaojing",
 	name = "谷中小径",
+	outdoor = "无量山",
 	ways = {
 		["south"] = "dali/wuliang/guzhong",
 		["north"] = "dali/wuliang/caodi",
@@ -6454,6 +7450,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiaolu1",
 	name = "青石小路",
+	outdoor = "无量山",
 	ways = {
 		["eastup"] = "dali/wuliang/xiaolu2",
 		["westdown"] = "dali/wuliang/shanlu5",
@@ -6462,6 +7459,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiaolu2",
 	name = "青石小路",
+	outdoor = "无量山",
 	ways = {
 		["northup"] = "dali/wuliang/xiaolu3",
 		["westdown"] = "dali/wuliang/xiaolu1",
@@ -6471,6 +7469,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiaolu3",
 	name = "青石小路",
+	outdoor = "无量山",
 	ways = {
 		["northup"] = "dali/wuliang/xiaolu4",
 		["southdown"] = "dali/wuliang/xiaolu2",
@@ -6479,6 +7478,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiaolu4",
 	name = "青石台阶",
+	outdoor = "无量山",
 	ways = {
 		["westup"] = "dali/wuliang/xiaolu5",
 		["southdown"] = "dali/wuliang/xiaolu3",
@@ -6487,6 +7487,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiaolu5",
 	name = "青石台阶",
+	outdoor = "无量山",
 	ways = {
 		["northup"] = "dali/wuliang/wljmen",
 		["eastdown"] = "dali/wuliang/xiaolu4",
@@ -6495,6 +7496,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiaoting",
 	name = "小厅",
+	outdoor = "无量山",
 	ways = {
 		["east"] = "dali/wuliang/guzhong",
 	},
@@ -6505,6 +7507,7 @@ Room {
 Room {
 	id = "dali/wuliang/xiaoxi",
 	name = "山中小溪",
+	outdoor = "无量山",
 	ways = {
 		["southup"] = "dali/wuliang/shanlu5",
 		["southwest"] = "dali/shanlu3",
@@ -6514,6 +7517,7 @@ Room {
 Room {
 	id = "dali/wuliang/xihubian",
 	name = "西湖边",
+	outdoor = "无量山",
 	ways = {
 		["southwest"] = "dali/wuliang/nanhubian",
 		["north"] = "dali/wuliang/shulin2",
@@ -6523,6 +7527,7 @@ Room {
 Room {
 	id = "dali/wuliang/xlgong",
 	name = "西练武厅",
+	outdoor = "无量山",
 	ways = {
 		["east"] = "dali/wuliang/jhg",
 	},
@@ -6530,6 +7535,7 @@ Room {
 Room {
 	id = "dali/wuliang/xting",
 	name = "西厅",
+	outdoor = "无量山",
 	ways = {
 		["east"] = "dali/wuliang/wlj",
 	},
@@ -6537,6 +7543,7 @@ Room {
 Room {
 	id = "dali/xijie1",
 	name = "西大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/xijie2",
 		["east"] = "dali/fengwei",
@@ -6548,6 +7555,7 @@ Room {
 Room {
 	id = "dali/xijie2",
 	name = "西大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/xijie3",
 		["north"] = "dali/xijie1",
@@ -6558,6 +7566,7 @@ Room {
 Room {
 	id = "dali/xijie3",
 	name = "西大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/xijie4",
 		["north"] = "dali/xijie2",
@@ -6568,15 +7577,18 @@ Room {
 Room {
 	id = "dali/xijie4",
 	name = "太和西街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/xijie5",
 		["north"] = "dali/xijie3",
 		["west"] = "dali/ximen",
 	},
+	room_relative="西大街｜西门---太和西街｜西大街太和西街",
 }
 Room {
 	id = "dali/xijie5",
 	name = "西大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/xijie6",
 		["north"] = "dali/xijie4",
@@ -6587,6 +7599,7 @@ Room {
 Room {
 	id = "dali/xijie6",
 	name = "西大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/xijie7",
 		["north"] = "dali/xijie5",
@@ -6597,6 +7610,7 @@ Room {
 Room {
 	id = "dali/xijie7",
 	name = "西大街",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/nanjie1",
 		["north"] = "dali/xijie6",
@@ -6607,6 +7621,7 @@ Room {
 Room {
 	id = "dali/ximen",
 	name = "西门",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["westup"] = "tls/diancang",
@@ -6615,25 +7630,31 @@ Room {
 	objs = {
           ["朱丹臣"] = "zhu danchen",
           },
+	room_relative="点苍山｜太和西街西门",
 }
 Room {
 	id = "dali/xiulou",
 	name = "绣楼",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["east"] = "dali/xijie2",
 	},
+	room_relative="西大街---绣楼",
 }
 Room {
 	id = "dali/xiyuan",
 	name = "戏园子",
+	outdoor = "大理城",
 	ways = {
 		["east"] = "dali/xijie6",
 	},
+	room_relative="西大街---戏园子",
 }
 Room {
 	id = "dali/yamen",
 	name = "府衙前厅",
+	outdoor = "大理城",
 	ways = {
 		["south"] = "dali/beijie1",
 		["east"] = "dali/situ",
@@ -6654,34 +7675,42 @@ Room {
 			{id = "dali wujiang", exp = 75000, party = "天龙寺"},
 		},
 	},
+	
 }
 Room {
 	id = "dali/yanju",
 	name = "作坊",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["west"] = "dali/beijie5",
 	},
+	room_relative="北大街--作坊",
 }
 Room {
 	id = "dali/yanzhi",
 	name = "铸剑房",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["east"] = "dali/xijie7",
 	},
+	room_relative="西大街---铸剑房",
 }
 Room {
 	id = "dali/yaopu",
 	name = "药铺",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["west"] = "dali/dongjie2",
 	},
+	room_relative="东大街---药铺",
 }
 Room {
 	id = "dali/yideng/anbian",
 	name = "岸边",
+	outdoor = "桃源县",
 	ways = {
 		["enter"] = "dali/yideng/shandong",
 	    ["#jiaoZi"] = "dali/yideng/shanding",
@@ -6693,6 +7722,7 @@ Room {
 Room {
 	id = "dali/yideng/caowu",
 	name = "茅屋",
+	outdoor = "桃源县",
 	ways = {
 		["east"] = "dali/yideng/pubu",
 		["enter tongdao"] = "dali/yideng/hetang",
@@ -6704,6 +7734,7 @@ Room {
 Room {
 	id = "dali/yideng/chufang",
 	name = "斋堂",
+	outdoor = "桃源县",
 	ways = {
 		["east"] = "dali/yideng/houyuan",
 	},
@@ -6711,6 +7742,7 @@ Room {
 Room {
 	id = "dali/yideng/dadian",
 	name = "禅院大殿",
+	outdoor = "桃源县",
 	ways = {
 		["south"] = "dali/yideng/shiqiao",
 		["north"] = "dali/yideng/houyuan",
@@ -6720,6 +7752,7 @@ Room {
 Room {
 	id = "dali/yideng/dfang",
 	name = "东厢房",
+	outdoor = "桃源县",
 	ways = {
 		["west"] = "dali/yideng/dadian",
 	},
@@ -6727,6 +7760,7 @@ Room {
 Room {
 	id = "dali/yideng/fanpu",
 	name = "小饭铺",
+	outdoor = "桃源县",
 
 	ways = {
 		["southwest"] = "dali/yideng/xiaolu1",
@@ -6736,6 +7770,7 @@ Room {
 Room {
 	id = "dali/yideng/hetang",
 	name = "河塘",
+	outdoor = "桃源县",
 	ways = {
 		["south"] = "dali/yideng/liang",
 		["north"] = "dali/yideng/shiqiao",
@@ -6748,6 +7783,7 @@ Room {
 Room {
 	id = "dali/yideng/houyuan",
 	name = "禅院后院",
+	outdoor = "桃源县",
 	ways = {
 		["south"] = "dali/yideng/dadian",
 		["northwest"] = "dali/yideng/xiaojing1",
@@ -6758,6 +7794,7 @@ Room {
 Room {
 	id = "dali/yideng/liang",
 	name = "石梁尽头",
+	outdoor = "桃源县",
 	ways = {
 		["#duZi"] = "dali/yideng/hetang",
 	},
@@ -6768,6 +7805,7 @@ Room {
 Room {
 	id = "dali/yideng/liangong",
 	name = "练功房",
+	outdoor = "桃源县",
 	ways = {
 		["west"] = "dali/yideng/houyuan",
 	},
@@ -6775,6 +7813,7 @@ Room {
 Room {
 	id = "dali/yideng/pubu",
 	name = "山谷瀑布",
+	outdoor = "桃源县",
 	ways = {
 		["north"] = "dali/yideng/xiaolu2",
 		["west"] = "dali/yideng/caowu",
@@ -6787,6 +7826,7 @@ Room {
 Room {
 	id = "dali/yideng/shanding",
 	name = "山顶",
+	outdoor = "桃源县",
 	ways = {
 		["eastup"] = "dali/yideng/shanpo",
 	},
@@ -6794,6 +7834,7 @@ Room {
 Room {
 	id = "dali/yideng/shandong",
 	name = "山洞",
+	outdoor = "桃源县",
 	ways = {
 		["out"] = "dali/yideng/anbian",
 	},
@@ -6801,6 +7842,7 @@ Room {
 Room {
 	id = "dali/yideng/shanpo",
 	name = "山坡",
+	outdoor = "桃源县",
 	nofind = true,
 	ways = {
 		["westdown"] = "dali/yideng/shanding",
@@ -6816,6 +7858,7 @@ Room {
 Room {
 	id = "dali/yideng/shiliang",
 	name = "石梁",
+	outdoor = "桃源县",
 	ways = {
 		["west"] = "dali/yideng/shanpo",
 		["#liangFront"] = "dali/yideng/liang1",
@@ -6824,6 +7867,7 @@ Room {
 Room {
 	id = "dali/yideng/liang1",
 	name = "石梁",
+	outdoor = "桃源县",
 	ways = {
 		["#liangBack"] = "dali/yideng/shiliang",
 		["#liangFront"] = "dali/yideng/liang2",
@@ -6832,6 +7876,7 @@ Room {
 Room {
 	id = "dali/yideng/liang2",
 	name = "石梁",
+	outdoor = "桃源县",
 	ways = {
 		["#liangBack"] = "dali/yideng/liang1",
 		["#liangFront"] = "dali/yideng/liang3",
@@ -6840,6 +7885,7 @@ Room {
 Room {
 	id = "dali/yideng/liang3",
 	name = "石梁",
+	outdoor = "桃源县",
 	ways = {
 		["#liangBack"] = "dali/yideng/liang2",
 		["#liangFront"] = "dali/yideng/liang4",
@@ -6848,6 +7894,7 @@ Room {
 Room {
 	id = "dali/yideng/liang4",
 	name = "石梁",
+	outdoor = "桃源县",
 	ways = {
 		["#liangBack"] = "dali/yideng/liang3",
 		["#liangFront"] = "dali/yideng/liang5",
@@ -6856,6 +7903,7 @@ Room {
 Room {
 	id = "dali/yideng/liang5",
 	name = "石梁",
+	outdoor = "桃源县",
 	ways = {
 		["#liangBack"] = "dali/yideng/liang4",
 		["#liangFront"] = "dali/yideng/liang6",
@@ -6865,6 +7913,7 @@ Room {
 
 	id = "dali/yideng/liang6",
 	name = "石梁",
+	outdoor = "桃源县",
 	ways = {
 		["#liangBack"] = "dali/yideng/liang5",
 		["#liangFront"] = "dali/yideng/liang",
@@ -6873,6 +7922,7 @@ Room {
 Room {
 	id = "dali/yideng/shiqiao",
 	name = "小石桥",
+	outdoor = "桃源县",
 	ways = {
 		["south"] = "dali/yideng/hetang",
 		["north"] = "dali/yideng/dadian",
@@ -6881,6 +7931,7 @@ Room {
 Room {
 	id = "dali/yideng/shiwu",
 	name = "石屋正房",
+	outdoor = "桃源县",
 	ways = {
 		["south"] = "dali/yideng/zhulin",
 		["east"] = "dali/yideng/xiangfang",
@@ -6892,6 +7943,7 @@ Room {
 Room {
 	id = "dali/yideng/xfang",
 	name = "西厢房",
+	outdoor = "桃源县",
 	ways = {
 		["east"] = "dali/yideng/dadian",
 	},
@@ -6899,6 +7951,7 @@ Room {
 Room {
 	id = "dali/yideng/xiangfang",
 	name = "石屋厢房",
+	outdoor = "桃源县",
 	ways = {
 		["west"] = "dali/yideng/shiwu",
 	},
@@ -6906,6 +7959,7 @@ Room {
 Room {
 	id = "dali/yideng/xiaojing1",
 	name = "青石小径",
+	outdoor = "桃源县",
 	ways = {
 		["southeast"] = "dali/yideng/houyuan",
 		["northeast"] = "dali/yideng/xiaojing2",
@@ -6914,6 +7968,7 @@ Room {
 Room {
 	id = "dali/yideng/xiaojing2",
 	name = "青石小径",
+	outdoor = "桃源县",
 	ways = {
 		["southwest"] = "dali/yideng/xiaojing1",
 		["west"] = "dali/yideng/xiaojing3",
@@ -6923,6 +7978,7 @@ Room {
 Room {
 	id = "dali/yideng/xiaojing3",
 	name = "青石小径",
+	outdoor = "桃源县",
 	ways = {
 		["east"] = "dali/yideng/xiaojing2",
 		["west"] = "dali/yideng/zhulin",
@@ -6931,6 +7987,7 @@ Room {
 Room {
 	id = "dali/yideng/xiaolu1",
 	name = "山间小路",
+	outdoor = "桃源县",
 	ways = {
 		["southwest"] = "dali/yideng/xiaolu2",
 		["northeast"] = "dali/yideng/fanpu",
@@ -6939,6 +7996,7 @@ Room {
 Room {
 	id = "dali/yideng/xiaolu2",
 	name = "陡路上岭",
+	outdoor = "桃源县",
 	ways = {
 		["south"] = "dali/yideng/pubu",
 		["northeast"] = "dali/yideng/xiaolu1",
@@ -6947,6 +8005,7 @@ Room {
 Room {
 	id = "dali/yideng/zhulin",
 	name = "竹林",
+	outdoor = "桃源县",
 	ways = {
 		["east"] = "dali/yideng/xiaojing3",
 		["north"] = "dali/yideng/shiwu",
@@ -6955,6 +8014,7 @@ Room {
 Room {
 	id = "dali/yizhan",
 	name = "驿站",
+	outdoor = "大理城",
 	no_fight = true,
 	ways = {
 		["west"] = "dali/qsjie2",
@@ -6962,10 +8022,12 @@ Room {
 	objs = {
           ["褚万里"] = "zhu wanli",
           },
+	room_relative="青石街--驿站",
 }
 Room {
 	id = "dali/yuxu/guanmen",
 	name = "玉虚观门",
+	outdoor = "玉虚观",
 	ways = {
 		["enter"] = "dali/yuxu/yuxuguan",
 		["east"] = "group/entry/dlndao5",
@@ -6974,6 +8036,7 @@ Room {
 Room {
 	id = "dali/yuxu/shangang",
 	name = "山岗",
+	outdoor = "玉虚观",
 	ways = {
 		["northwest"] = "group/entry/dlndao5",
 		["east"] = "dali/yuxu/xiaodao2",
@@ -6985,6 +8048,7 @@ Room {
 Room {
 	id = "dali/yuxu/shufang1",
 	name = "书房",
+	outdoor = "玉虚观",
 	ways = {
 		["east"] = "dali/yuxu/yuxuguan",
 	},
@@ -6992,6 +8056,7 @@ Room {
 Room {
 	id = "dali/yuxu/shuifang",
 	name = "睡房",
+	outdoor = "玉虚观",
 	ways = {
 		["west"] = "dali/yuxu/yuxuguan",
 	},
@@ -6999,6 +8064,7 @@ Room {
 Room {
 	id = "dali/yuxu/xiaodao1",
 	name = "道旁田野",
+	outdoor = "玉虚观",
 	ways = {
 		["northeast"] = "dali/dadao1",
 		["west"] = "dali/yuxu/xiaodao2",
@@ -7007,6 +8073,7 @@ Room {
 Room {
 	id = "dali/yuxu/xiaodao2",
 	name = "道旁田野",
+	outdoor = "玉虚观",
 	ways = {
 		["east"] = "dali/yuxu/xiaodao1",
 		["west"] = "dali/yuxu/shangang",
@@ -7015,6 +8082,7 @@ Room {
 Room {
 	id = "dali/yuxu/yuxuguan",
 	name = "玉虚观",
+	outdoor = "玉虚观",
 	ways = {
 		["east"] = "dali/yuxu/shuifang",
 		["west"] = "dali/yuxu/shufang1",
@@ -7027,17 +8095,19 @@ Room {
 Room {
 	id = "dali/zahuopu",
 	name = "杂货铺",
+	outdoor = "大理城",
 	ways = {
 		["north"] = "dali/nanjie5",
 	},
 	objs = {
           ["赵老板"] = "zhao laoban",
           },
+		  room_relative="南大街---杂货铺",
 }
 Room {
 	id = "death/gate",
 	name = "鬼门关",
-	ways = {
+		ways = {
 		["enter"] = "death/gateway",
 	},
 }
@@ -7065,47 +8135,58 @@ Room {
 Room {
 	id = "emei/bailongdong",
 	name = "白龙洞",
+	outdoor = "峨眉山",
 	ways = {
 		["northup"] = "emei/wannianan",
 		["southeast"] = "emei/qingyinge",
 		["west"] = "emei/gudelin",
 	},
+	room_relative="万年庵↑古德林----白龙洞↘清音阁白龙洞",
 }
 Room {
 	id = "emei/baoguosi",
 	name = "报国寺",
+	outdoor = "峨眉山",
 	ways = {
 		["southwest"] = "emei/milin",
 		["enter"] = "emei/daxiongdian",
 		["east"] = "emei/baoguosm",
 		["west"] = "emei/baoguosixq",
 	},
+room_relative="大雄殿∧报国寺西墙----报国寺----报国寺山门↙密林报国寺",
 }
 Room {
 	id = "emei/baoguosicf",
 	name = "报国寺禅房",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/daxiongdian",
 	},
+	room_relative="报国寺禅房--大雄殿报国寺禅房",
 }
 Room {
 	id = "emei/baoguosixq",
 	name = "报国寺西墙",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/baoguosi",
 	},
+	room_relative="报国寺西墙--报国寺报国寺西墙",
 }
 Room {
 	id = "emei/baoguosm",
 	name = "报国寺山门",
+	outdoor = "峨眉山",
 	ways = {
 		["northdown"] = "emei/qingshijie",
 		["west"] = "emei/baoguosi",
 	},
+	room_relative="青石阶↓报国寺--报国寺山门报国寺山门",
 }
 Room {
 	id = "emei/basipan1",
 	name = "八十四盘",
+	outdoor = "峨眉山",
 	ways = {
 		["southwest"] = "emei/basipan2",
 		["northwest"] = "emei/lengshanlin",
@@ -7116,6 +8197,7 @@ Room {
 Room {
 	id = "emei/basipan2",
 	name = "八十四盘",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/basipan3",
 		["southeast"] = "emei/lengshanlin1",
@@ -7126,6 +8208,7 @@ Room {
 Room {
 	id = "emei/basipan3",
 	name = "八十四盘",
+	outdoor = "峨眉山",
 	ways = {
 		["southeast"] = "emei/jieyindian",
 		["northwest"] = "emei/lengshanlin2",
@@ -7136,46 +8219,57 @@ Room {
 Room {
 	id = "emei/cangjinglou",
 	name = "藏经楼",
+	outdoor = "峨眉山",
 	ways = {
 		["out"] = "emei/daxiongdian",
 	},
+	room_relative="大雄殿---藏经楼",
 }
 Room {
 	id = "emei/caodi",
 	name = "草地",
+	outdoor = "峨眉山",
 	ways = {
 		["southwest"] = "emei/xiaojing",
 		["east"] = "emei/xiaowu",
 		["north"] = "emei/mu",
 		["northeast"] = "emei/xiaojing2",
 	},
+	room_relative="山谷小径｜小屋--郭襄之墓｜小径草地",
 }
 Room {
 	id = "emei/caopeng",
 	name = "草棚",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/qingshijie",
 	},
+	room_relative="草棚-----青石阶草棚",
 }
 Room {
 	id = "emei/chanfang",
 	name = "禅房",
+	outdoor = "峨眉山",
 	no_fight = true,
 	ways = {
 		["west"] = "emei/lingwenge",
 	},
+	room_relative="灵文阁-----禅房禅房",
 }
 Room {
 	id = "emei/chanfang2",
 	name = "禅房",
+	outdoor = "峨眉山",
 	no_fight = true,
 	ways = {
 		["west"] = "emei/qianfoandd",
 	},
+	room_relative="千佛庵大殿-----禅房禅房",
 }
 Room {
 	id = "emei/chanfang3",
 	name = "禅房",
+	outdoor = "峨眉山",
 	no_fight = true,
 	ways = {
 		["west"] = "emei/wanniananzd",
@@ -7190,6 +8284,7 @@ Room {
 Room {
 	id = "emei/chunyangdian",
 	name = "纯阳殿",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/guiyunge",
 		["westup"] = "emei/shenshuian",
@@ -7197,10 +8292,12 @@ Room {
 	objs = {
           ["丁敏君"] = "ding minjun",
            },
+	room_relative="神水庵←纯阳殿←归云阁纯阳殿",
 }
 Room {
 	id = "emei/chuwujian",
 	name = "储物间",
+	outdoor = "峨眉山",
 	ways = {
 		["north"] = "emei/huazanganzt",
 		["up"] = "emei/huazangancj",
@@ -7212,11 +8309,16 @@ Room {
 		["up"] = {
 			{id = "jingfeng shitai", exp = 2000000},
 		},
-	},	
+	precmds = {
+              ["up"] = "kill jingfeng shitai",
+	},
+	},
+   
 }
 Room {
 	id = "emei/daxiong",
 	name = "华藏庵大雄宝殿",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/houdian",
 		["east"] = "emei/huazanganzt",
@@ -7229,20 +8331,24 @@ Room {
 	precmds = {
 		["south"] = "open door",
 	},
+	room_relative="藏经楼∧报国寺禅房----大雄殿----休息室∨报国寺大雄殿",
 }
 Room {
 	id = "emei/daxiongdian",
 	name = "大雄殿",
+	outdoor = "峨眉山",
 	ways = {
 		["enter"] = "emei/cangjinglou",
 		["east"] = "emei/xiuxishi2",
 		["west"] = "emei/baoguosicf",
 		["out"] = "emei/baoguosi",
 	},
+	room_relative="华藏庵广场↓禅房--华藏庵大雄宝殿--斋堂｜后殿华藏庵大雄宝殿",
 }
 Room {
 	id = "emei/dcedian",
 	name = "东侧殿",
+	outdoor = "峨眉山",
 	ways = {
 		["west"] = "emei/huazanganzd",
 	},
@@ -7250,26 +8356,32 @@ Room {
           ["文晖小师太"] = "wen hui",
           ["静和师太"] = "jinghe shitai",
            },
+	room_relative="华藏庵正殿----东侧殿东侧殿",
 }
 Room {
 	id = "emei/dcelang",
 	name = "东侧廊",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/huazanganzt",
-		["west"] = "emei/huazangangc",
+		["west"] = "emei/huazangangc",  
 	},
+	room_relative="华藏庵广场----东侧廊｜斋堂东侧廊",
 }
 Room {
 	id = "emei/dongkou",
 	name = "九老洞口",
+	outdoor = "峨眉山",
 	ways = {
 		["enter"] = "emei/jiulaodong1",
 		["out"] = "emei/jiulaodong",
 	},
+	
 }
 Room {
 	id = "emei/duguangtai",
 	name = "睹光台",
+	outdoor = "峨眉山",
 	ways = {
 		["north"] = "emei/huazangan",
 		["northdown"] = "emei/woyunan",
@@ -7278,60 +8390,74 @@ Room {
 	objs = {
           ["贝锦仪"] = "bei jinyi",
            },
+	room_relative="华藏庵｜睹光台舍身崖----睹光台睹光台",
 }
 Room {
 	id = "emei/fuhusi",
 	name = "伏虎寺",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/milin2",
 		["east"] = "emei/milin",
 	},
+room_relative="密林←伏虎寺----密林伏虎寺",
 }
 Room {
 	id = "emei/fushouan",
 	name = "福寿庵",
+	outdoor = "峨眉山",
 	ways = {
 		["enter"] = "emei/lingwenge",
 		["north"] = "emei/shenshuian",
 	},
+	room_relative="神水庵｜福寿庵福寿庵",
 }
 Room {
 	id = "emei/fushouanxxs",
 	name = "休息室",
+	outdoor = "峨眉山",
 	no_fight = true,
 	ways = {
 		["southdown"] = "emei/fushouanzt",
 	},
+	room_relative="福寿庵斋堂---休息室",
 }
 Room {
 	id = "emei/fushouanzt",
 	name = "福寿庵斋堂",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/lingwenge",
 	},
 	nolooks = {
 		["northup"] = true,
 	},
+	room_relative="休息室↑福寿庵斋堂--灵文阁福寿庵斋堂",
 }
 Room {
 	id = "emei/guanyinqiao",
 	name = "观音桥",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/jietuopo",
 		["west"] = "emei/guanyintang",
 	},
+	room_relative="观音堂----观音桥----解脱坡观音桥",
 }
 Room {
 	id = "emei/guanyintang",
 	name = "观音堂",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/guiyunge",
 		["east"] = "emei/guanyinqiao",
 	},
+	room_relative="归云阁←观音堂----观音桥观音堂",
 }
 Room {
 	id = "emei/gudelin",
 	name = "古德林",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/gudelin",
 		["north"] = "emei/gudelin2",
@@ -7342,6 +8468,7 @@ Room {
 Room {
 	id = "emei/gudelin2",
 	name = "古德林",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/gudelin3",
 		["north"] = "emei/gudelin2",
@@ -7352,6 +8479,7 @@ Room {
 Room {
 	id = "emei/gudelin3",
 	name = "古德林",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/bailongdong",
 		["north"] = "emei/gudelin3",
@@ -7362,35 +8490,43 @@ Room {
 	nolooks = {
 		["jump zhuang"] = true,
 	},
+	room_relative="白龙洞｜古德林--古德林｜古德林古德林",
 }
 Room {
 	id = "emei/guiyunge",
 	name = "归云阁",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/yunvfeng",
 		["eastdown"] = "emei/guanyintang",
 		["westup"] = "emei/chunyangdian",
 	},
+	room_relative="纯阳殿←归云阁←观音堂↓玉女峰归云阁",
 }
 Room {
 	id = "emei/heilongjiangzd",
 	name = "黑龙江栈道",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/heilongjiangzd2",
 		["northeast"] = "emei/qingyinge",
 	},
+	room_relative="清音阁↗黑龙江栈道｜黑龙江栈道黑龙江栈道",
 }
 Room {
 	id = "emei/heilongjiangzd2",
 	name = "黑龙江栈道",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/qianfoan",
 		["north"] = "emei/heilongjiangzd",
 	},
+	room_relative="黑龙江栈道｜黑龙江栈道｜千佛庵黑龙江栈道",
 }
 Room {
 	id = "emei/houdian",
 	name = "后殿",
+	outdoor = "峨眉山",
 	ways = {
 		["north"] = "emei/daxiong",
 	},
@@ -7403,26 +8539,32 @@ Room {
 	objs = {
           ["灭绝师太"] = "miejue shitai",
            },
+	room_relative="华藏庵大雄宝殿｜后殿后殿",
 }
 Room {
 	id = "emei/houshan",
 	name = "后山",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/houshanxl2",
 		["east"] = "emei/houshansl",
 		["northeast"] = "emei/houshanty",
 	},
+	room_relative="炭窑↗后山-----后山树林↓后山小路后山",
 }
 Room {
 	id = "emei/houshandk",
 	name = "洞口",
+	outdoor = "峨眉山",
 	ways = {
 		["enter"] = "emei/houshansd",
 	},
+	room_relative="洞口｜山洞",
 }
 Room {
 	id = "emei/houshangm",
 	name = "灌木丛",
+	outdoor = "峨眉山",
 	ways = {
 	    ["#outemgmc"] = "emei/houshangm1",
 	    ["eastdown"] = "emei/houshangm",
@@ -7438,6 +8580,7 @@ Room {
 Room {
 	id = "emei/houshangm1",
 	name = "灌木丛",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/houshangm",
         ["yue qiaobi"] = "emei/houshandk",  
@@ -7450,6 +8593,7 @@ Room {
 Room {
 	id = "emei/houshansd",
 	name = "山洞",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/qingyinge",
 		["out"] = "emei/houshandk",
@@ -7458,50 +8602,63 @@ Room {
           ["孤鸿子"] = "guhong zi",
 
     },
+	room_relative="清音阁｜洞口山洞",
 }
 Room {
 	id = "emei/shuitan",
 	name = "水潭",
+	outdoor = "峨眉山",
 	ways = {
 		["#emeishuitan"] = "emei/qingyinge",
+		["pa up"] = "emei/shuitan",
 	},
 	nolooks = {
 		["#emeishuitan"] = true,
-	},
+		},
+    room_relative="清音阁｜水潭",
 }
 Room {
 	id = "emei/houshansl",
 	name = "后山树林",
+	outdoor = "峨眉山",
 	ways = {
 		["northdown"] = "emei/houshanxl3",
 		["west"] = "emei/houshan",
 	},
+	room_relative="后山小路↓后山---后山树林后山树林",
 }
 Room {
 	id = "emei/houshanty",
 	name = "炭窑",
+	outdoor = "峨眉山",
 	ways = {
 		["southwest"] = "emei/houshan",
 	},
+	room_relative="炭窑↙后山炭窑",
 }
 Room {
 	id = "emei/houshanxl",
 	name = "后山小路",
+	outdoor = "峨眉山",
 	ways = {
 		["northeast"] = "emei/houshanxl2",
 	},
+	room_relative="后山小路↗后山小路后山小路",
 }
 Room {
 	id = "emei/houshanxl2",
 	name = "后山小路",
+	outdoor = "峨眉山",
 	ways = {
 		["southwest"] = "emei/houshanxl",
 		["northdown"] = "emei/houshan",
 	},
+	room_relative="后山↓后山小路↙后山小路后山小路",
 }
 Room {
 	id = "emei/houshanxl3",
 	name = "后山小路",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/houshansl",
 		["northdown"] = "emei/houshanxl4",
@@ -7513,44 +8670,45 @@ Room {
 	lengths = {
 		["#Toghz"] = 30,
 	},
+	room_relative="后山小路↓后山小路↓后山树林后山小路",
 }
 Room {
 	id = "emei/houshanxl4",
 	name = "后山小路",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/houshanxl3",
 		["move stone;nd"] = "emei/qingyinge",
 	},
-	--nolooks = {
-	--	["#hsToQyg"] = true,
-	--	["northdown"] = true,
-	--},
-	--lengths = {
-	--	["#hsToQyg"] = 50,
-	--},
+	room_relative="清音阁↓后山小路↓后山小路后山小路",
 }
 Room {
 	id = "emei/huayanding",
 	name = "华严顶",
+	outdoor = "峨眉山",
 	ways = {
 		["eastup"] = "emei/xianfengsi",
 		["westup"] = "emei/lianhuashi",
 		["down"] = "emei/shierpan4",
 		["north"] = "emei/maji",
 	},
+	room_relative="马厩｜莲花石←华严顶→仙峰寺〓十二盘华严顶",
 }
 Room {
 	id = "emei/huazangan",
 	name = "华藏庵",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/duguangtai",
-		["enter"] = "emei/huazanganzd",
+		["enter"] = "emei/huazanganzd",  
 		["northdown"] = "emei/jinding",
 	},
+	room_relative="金顶↓华藏庵｜睹光台华藏庵",
 }
 Room {
 	id = "emei/huazangancf",
 	name = "禅房",
+	outdoor = "峨眉山",
 	no_fight = true,
 	ways = {
 		["south"] = "emei/xiuxishi",
@@ -7566,10 +8724,12 @@ Room {
 	precmds = {
 		["south"] = "open door",
 	},
+	room_relative="西侧廊｜禅房-----华藏庵大雄宝殿｜休息室禅房",
 }
 Room {
 	id = "emei/huazangancj",
 	name = "藏经楼",
+	outdoor = "峨眉山",
 	ways = {
 		["down"] = "emei/chuwujian",
 	},
@@ -7578,26 +8738,30 @@ Room {
           ["静道师太"] = "jingdao shitai",
           ["愣迦经"] = "shu",
            },
+	room_relative="藏经楼｜储物间",
 }
 Room {
 	id = "emei/huazangangc",
 	name = "华藏庵广场",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/daxiong",
-		["north"] = "emei/huazanganzd",
+		["north"] = "emei/huazanganzd",  
 		["east"] = "emei/dcelang",
-		["west"] = "emei/xcelang",
+		["west"] = "emei/xcelang",       
 	},
 	objs = {
           ["静虚师太"] = "jingxu shitai",
           ["佛渡有缘功德碑"] = "board",
            },
+	room_relative="华藏庵正殿｜西侧廊--华藏庵广场--东侧廊↓华藏庵大雄宝殿华藏庵广场",
 }
 Room {
 	id = "emei/huazanganzd",
 	name = "华藏庵正殿",
+	outdoor = "峨眉山",
 	ways = {
-		["south"] = "emei/huazangangc",
+		["south"] = "emei/huazangangc",   
 		["east"] = "emei/dcedian",
 		["west"] = "emei/xcedian",
 		["out"] = "emei/huazangan",
@@ -7605,10 +8769,12 @@ Room {
 	objs = {
           ["静心师太"] = "jingxin shitai",
            },
+	room_relative="西侧殿--华藏庵正殿--东侧殿｜华藏庵广场华藏庵正殿",
 }
 Room {
 	id = "emei/huazanganzt",
 	name = "斋堂",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/chuwujian",
 		["north"] = "emei/dcelang",
@@ -7620,67 +8786,83 @@ Room {
           ["密汁甜藕"] = "mizhi tianou",
           ["清水葫芦"] = "qingshui hulu",
            },
+	room_relative="东侧廊｜华藏庵大雄宝殿-----斋堂｜储物间斋堂",	
 }
 Room {
 	id = "emei/jietuopo",
 	name = "解脱坡",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/milin2",
 		["west"] = "emei/guanyinqiao",
 	},
+	room_relative="观音桥----解脱坡←密林解脱坡",
 }
 Room {
 	id = "emei/jieyindian",
 	name = "接引殿",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/wanxingan",
 		["northwest"] = "emei/basipan3",
 	},
+	room_relative="八十四盘↖万行庵←接引殿接引殿",
 }
 Room {
 	id = "emei/jinding",
 	name = "金顶",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/huazangan",
-		["southwest"] = "emei/woyunan",
-		["northdown"] = "emei/wanxingan",
+		["southwest"] = "emei/woyunan",  
+		["northdown"] = "emei/wanxingan",  
 	},
+	room_relative="万行庵↓金顶↙↓卧云庵华藏庵金顶",
 }
 Room {
 	id = "emei/jiudaoguai1",
 	name = "九十九道拐",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/jiudaoguai2",
-		["northeast"] = "emei/qianfoan",
+		["northeast"] = "emei/qianfoan",  
 	},
+	room_relative="千佛庵↗九十九道拐←九十九道拐九十九道拐",
 }
 Room {
 	id = "emei/jiudaoguai2",
 	name = "九十九道拐",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/jiudaoguai1",
 		["southwest"] = "emei/jiudaoguai3",
 	},
+	room_relative="九十九道拐←九十九道拐↙九十九道拐九十九道拐",
 }
 Room {
 	id = "emei/jiudaoguai3",
 	name = "九十九道拐",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/jiudaoguai4",
 		["northeast"] = "emei/jiudaoguai2",
 	},
+	room_relative="九十九道拐↗九十九道拐←九十九道拐九十九道拐",
 }
 Room {
 	id = "emei/jiudaoguai4",
 	name = "九十九道拐",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/jiudaoguai3",
 		["southwest"] = "emei/jiulaodong",
 	},
+	room_relative="九十九道拐←九十九道拐↙九老洞九十九道拐",
 }
 Room {
 	id = "emei/jiulaodong",
 	name = "九老洞",
+	outdoor = "峨眉山",
 	ways = {
 		["northwest"] = "emei/lianhuashi",
 		["enter"] = "emei/dongkou",
@@ -7704,14 +8886,17 @@ Room {
 Room {
 	id = "emei/leidongping",
 	name = "雷洞坪",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/basipan1",
 		["northdown"] = "emei/lingyunti",
 	},
+	room_relative="凌云梯↓雷洞坪↓八十四盘雷洞坪",
 }
 Room {
 	id = "emei/lengshanlin",
 	name = "冷杉林",
+	outdoor = "峨眉山",
 	ways = {
 		["southeast"] = "emei/basipan1",
 		["southwest"] = "emei/lengshanlin",
@@ -7723,17 +8908,19 @@ Room {
 Room {
 	id = "emei/lengshanlin1",
 	name = "冷杉林",
+	outdoor = "峨眉山",
 	ways = {
 		["southeast"] = "emei/lengshanlin1",
 		["southwest"] = "emei/lengshanlin2",
 		["northwest"] = "emei/lengshanlin1",
 		--["northeast"] = "emei/zhulin",
 	},
-	room_relative="冷杉林小竹林↖↗冷杉林↙↘冷杉林冷杉林冷杉林",
+	room_relative="冷杉林↗冷杉林↙↘冷杉林冷杉林冷杉林",
 }
 Room {
 	id = "emei/lengshanlin2",
 	name = "冷杉林",
+	outdoor = "峨眉山",
 	ways = {
 		["southeast"] = "emei/basipan3",
 		["southwest"] = "emei/lengshanlin2",
@@ -7744,6 +8931,7 @@ Room {
 Room {
 	id = "emei/lianhuashi",
 	name = "莲花石",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/huayanding",
 		["southeast"] = "emei/jiulaodong",
@@ -7752,80 +8940,92 @@ Room {
 	objs = {
           ["赵灵珠"] = "zhao lingzhu",
           ["苏梦清"] = "su mengqing",
+	room_relative="钻天坡←莲花石←华严顶↘九老洞莲花石",
            },
 }
 Room {
 	id = "emei/lingwenge",
 	name = "灵文阁",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/chanfang",
 		["west"] = "emei/fushouanzt",
 		["out"] = "emei/fushouan",
 	},
+	room_relative="福寿庵斋堂----灵文阁----禅房∨福寿庵灵文阁",
 }
 Room {
 	id = "emei/lingyunti",
 	name = "凌云梯",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/leidongping",
 		["northdown;eastdown"] = "emei/zuantianpo2",
 	},
+	room_relative="洗象池边↓凌云梯↓雷洞坪凌云梯",
 }
 Room {
 	id = "emei/maji",
 	name = "马厩",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/huayanding",
-		["move gancao;zuan dong"] = "emei/houshanxl",
+		["#emhsxl"] = "emei/houshanxl",
 	},
-	nolooks = {
-		["move gancao;zuan dong"] = true,
-	},
-	lengths = {
-		["move gancao;zuan dong"] = 2,
-	},
+	room_relative="马厩｜华严顶马厩",
 }
 Room {
 	id = "emei/milin",
 	name = "密林",
+	outdoor = "峨眉山",
 	ways = {
 		["northeast"] = "emei/baoguosi",
 		["west"] = "emei/fuhusi",
 	},
+	room_relative="报国寺↗伏虎寺-----密林密林",
 }
 Room {
 	id = "emei/milin2",
 	name = "密林",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/fuhusi",
 		["westup"] = "emei/jietuopo",
 	},
+	room_relative="解脱坡←密林←伏虎寺密林",
 }
 Room {
 	id = "emei/mu",
 	name = "郭襄之墓",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/caodi",
 		["east"] = "emei/xiaojing2",
 	},
+	room_relative="草地｜小径郭襄之墓",
 }
 Room {
 	id = "emei/mu2",
 	name = "墓室",
+	outdoor = "峨眉山",
 	ways = {
-		["up"] = "emei/mu",
+		["up"] = "emei/mu", 
 	},
+	room_relative="墓室｜郭襄之墓",
 }
 Room {
 	id = "emei/mupeng",
 	name = "木棚",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/wanfoding",
 	},
+	room_relative="木棚｜万佛顶",
 }
 Room {
 	id = "emei/muzhuang",
 	name = "梅花桩",
+	outdoor = "峨眉山",
 	ways = {
 		["down"] = "emei/gudelin3",
 	},
@@ -7833,30 +9033,37 @@ Room {
 Room {
 	id = "emei/podao1",
 	name = "坡道",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/podao2",
 		["east"] = "emei/lianhuashi",
 	},
+	room_relative="莲花石｜坡道坡道",
 }
 Room {
 	id = "emei/podao2",
 	name = "坡道",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/podao1",
 	},
+	room_relative="坡道--坡道",
 }
 Room {
 	id = "emei/qianfoan",
 	name = "千佛庵",
+	outdoor = "峨眉山",
 	ways = {
 		["southwest"] = "emei/jiudaoguai1",
 		["enter"] = "emei/qianfoandd",
 		["north"] = "emei/heilongjiangzd2",
 	},
+	room_relative="黑龙江栈道｜千佛庵↙∧千佛庵大殿｜九十九道拐千佛庵",
 }
 Room {
 	id = "emei/qianfoandd",
 	name = "千佛庵大殿",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/chanfang2",
 		["out"] = "emei/qianfoan",
@@ -7867,19 +9074,23 @@ Room {
 	precmds = {
 		["east"] = "open door",
 	},
+	room_relative="千佛庵大殿--禅房∨千佛庵千佛庵大殿",
 }
 Room {
 	id = "emei/qingshijie",
 	name = "青石阶",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/baoguosm",
 		["east"] = "chengdu/tulu1",
 		["west"] = "emei/caopeng",
 	},
+ room_relative="草棚----青石阶----峨嵋山脚下↓报国寺山门青石阶",
 }
 Room {
 	id = "emei/qingyinge",
 	name = "清音阁",
+	outdoor = "峨眉山",
 	ways = {
 		["southeast"] = "emei/zhongfengsi",
 		["southwest"] = "emei/heilongjiangzd",
@@ -7887,11 +9098,13 @@ Room {
 	},
 	objs = {
           ["静闲师太"] = "jingxian shitai",
+	room_relative="白龙洞↖清音阁↙↘黑龙江栈道中峰寺清音阁",
            },
 }
 Room {
 	id = "emei/shangu",
 	name = "山谷",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/xiaojing",
 	},
@@ -7899,32 +9112,39 @@ Room {
 Room {
 	id = "emei/shanpo",
 	name = "山坡",
+	outdoor = "峨眉山",
 	ways = {
 		["enter"] = "emei/jiulaodong1",
 	},
 	objs = {
         ["周芷若"] = "zhou zhiruo",
     },
+	
 }
 Room {
 	id = "emei/shenshuian",
 	name = "神水庵",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/chunyangdian",
 		["westup"] = "emei/zhongfengsi",
 		["south"] = "emei/fushouan",
 	},
+	room_relative="中峰寺←神水庵←纯阳殿｜福寿庵神水庵",
 }
 Room {
 	id = "emei/sheshenya",
 	name = "睹光台舍身崖",
+	outdoor = "峨眉山",
 	ways = {
-		["east"] = "emei/duguangtai",
+		["east"] = "emei/duguangtai",  
 	},
+	room_relative="睹光台舍身崖--睹光台睹光台舍身崖",
 }
 Room {
 	id = "emei/shierpan",
 	name = "十二盘",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/wannianan",
 		["southwest"] = "emei/shierpan2",
@@ -7934,6 +9154,7 @@ Room {
 Room {
 	id = "emei/shierpan2",
 	name = "十二盘",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/shierpan3",
 		["northeast"] = "emei/shierpan",
@@ -7943,6 +9164,7 @@ Room {
 Room {
 	id = "emei/shierpan3",
 	name = "十二盘",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/shierpan2",
 		["southwest"] = "emei/shierpan4",
@@ -7952,6 +9174,7 @@ Room {
 Room {
 	id = "emei/shierpan4",
 	name = "十二盘",
+	outdoor = "峨眉山",
 	ways = {
 		["northeast"] = "emei/shierpan3",
 		["up"] = "emei/huayanding",
@@ -7961,6 +9184,7 @@ Room {
 Room {
 	id = "emei/shushang",
 	name = "树上",
+	outdoor = "峨眉山",
 	ways = {
 		["down"] = "emei/jiudaoguai3",
 	},
@@ -7968,42 +9192,51 @@ Room {
 		["down"] = {
 			{id = "ju mang", exp = 0},
 		},
+
 	},	
+   room_relative="树上〓九十九道拐树上",
 }
 Room {
 	id = "emei/wanfoding",
 	name = "万佛顶",
+	outdoor = "峨眉山",
 	ways = {
 		["enter"] = "emei/wanfota",
 		["north"] = "emei/mupeng",
 		["west"] = "emei/jiulaodong",
 	},
 	lengths = {
-		["enter"] = "if score.party and score.party=='峨嵋派' then return 1 else return false end",
+		--["enter"] = "if score.party and score.party=='峨嵋派' then return 1 else return false end",
 	},
 	lengths = {
 		["north"] = "if score.party and score.party=='峨嵋派' then return 1 else return false end",
 	},
+	room_relative="万佛塔｜木棚-----九老洞万佛顶",
 }
 Room {
 	id = "emei/wanfota",
 	name = "万佛塔",
+	outdoor = "峨眉山",
 	ways = {
 		["out"] = "emei/wanfoding",
 	},
+	room_relative="万佛塔｜万佛顶",
 }
 Room {
 	id = "emei/wannianan",
 	name = "万年庵",
+	outdoor = "峨眉山",
 	ways = {
 		["westup"] = "emei/shierpan",
 		["enter"] = "emei/wanniananzd",
 		["southdown"] = "emei/bailongdong",
 	},
+	room_relative="万年庵砖殿∧十二盘←万年庵↑白龙洞万年庵",
 }
 Room {
 	id = "emei/wanniananzd",
 	name = "万年庵砖殿",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/chanfang3",
 		["out"] = "emei/wannianan",
@@ -8014,10 +9247,12 @@ Room {
 	precmds = {
 		["east"] = "open door",
 	},
+	
 }
 Room {
 	id = "emei/wanxingan",
 	name = "万行庵",
+	outdoor = "峨眉山",
 	ways = {
 		["southup"] = "emei/jinding",
 		["eastdown"] = "emei/jieyindian",
@@ -8025,21 +9260,25 @@ Room {
 	objs = {
           ["静迦师太"] = "jingjia shitai",
            },
+   room_relative="万行庵←接引殿↓金顶万行庵",
 }
 Room {
 	id = "emei/woyunan",
 	name = "卧云庵",
+	outdoor = "峨眉山",
 	ways = {
-		["southup"] = "emei/duguangtai",
+		["southup"] = "emei/duguangtai",  
 		["northeast"] = "emei/jinding",
 	},
 	objs = {
           ["静玄师太"] = "jingxuan shitai",
            },
+	room_relative="金顶↗卧云庵↓睹光台卧云庵",
 }
 Room {
 	id = "emei/xcedian",
 	name = "西侧殿",
+	outdoor = "峨眉山",
 	ways = {
 		["east"] = "emei/huazanganzd",
 	},
@@ -8047,25 +9286,31 @@ Room {
           ["文清小师太"] = "wen qing",
           ["风陵师太"] = "fengling shitai",
            },
+	room_relative="西侧殿----华藏庵正殿西侧殿",
 }
 Room {
 	id = "emei/xcelang",
 	name = "西侧廊",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/huazangancf",
 		["east"] = "emei/huazangangc",
 	},
+	room_relative="西侧廊----华藏庵广场｜禅房西侧廊",
 }
 Room {
 	id = "emei/xianfengsi",
 	name = "仙峰寺",
+	outdoor = "峨眉山",
 	ways = {
 		["westdown"] = "emei/huayanding",
 	},
+	room_relative="华严顶→仙峰寺仙峰寺",
 }
 Room {
 	id = "emei/xiaojing",
 	name = "山谷小径",
+	outdoor = "峨眉山",
 	ways = {
 		["northeast"] = "emei/caodi",
 		["west"] = "emei/shangu",
@@ -8074,56 +9319,69 @@ Room {
 Room {
 	id = "emei/xiaojing2",
 	name = "小径",
+	outdoor = "峨眉山",
 	ways = {
 		["southwest"] = "emei/caodi",
 		["northdown"] = "emei/jiudaoguai3",
-		["west"] = "emei/mu",
+		["west"] = "emei/mu", 
 	},
+	room_relative="草地｜郭襄之墓--九十九道拐小径",
 }
 Room {
 	id = "emei/xiaowu",
 	name = "小屋",
+	outdoor = "峨眉山",
 	ways = {
 		["west"] = "emei/caodi",
 	},
+	room_relative="草地｜小屋",
 }
 Room {
 	id = "emei/xiuxishi",
 	name = "休息室",
+	outdoor = "峨眉山",
 	no_fight = true,
 	ways = {
 		["north"] = "emei/huazangancf",
 	},
+	room_relative="禅房｜休息室",
 }
 Room {
 	id = "emei/xiuxishi2",
 	name = "休息室",
+	outdoor = "峨眉山",
 	no_fight = true,
 	ways = {
-		["west"] = "emei/daxiongdian",
+		["west"] = "emei/daxiongdian", 
 	},
+	room_relative="大雄殿----休息室休息室",
 }
 Room {
 	id = "emei/yunvfeng",
 	name = "玉女峰",
+	outdoor = "峨眉山",
 	ways = {
 		["northdown"] = "emei/guiyunge",
 	},
 	objs = {
           ["方碧琳"] = "fang bilin",
            },
+	room_relative="归云阁↓玉女峰玉女峰",
 }
 Room {
 	id = "emei/zhongfengsi",
 	name = "中峰寺",
+	outdoor = "峨眉山",
 	ways = {
-		["eastdown"] = "emei/shenshuian",
+		["eastdown"] = "emei/shenshuian", 
 		["northwest"] = "emei/qingyinge",
 	},
+	room_relative="清音阁↖中峰寺←神水庵中峰寺",
 }
 Room {
 	id = "emei/zhulin",
 	name = "小竹林",
+	outdoor = "峨眉山",
 	ways = {
 		["south"] = "emei/zhulin",
 		["north"] = "emei/zhulin",
@@ -8134,6 +9392,7 @@ Room {
 Room {
 	id = "emei/zuantianpo",
 	name = "钻天坡",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/lianhuashi",
 		["westup"] = "emei/zuantianpo2",
@@ -8143,11 +9402,36 @@ Room {
 Room {
 	id = "emei/zuantianpo2",
 	name = "钻天坡",
+	outdoor = "峨眉山",
 	ways = {
 		["eastdown"] = "emei/zuantianpo",
-		["westup;southup"] = "emei/lingyunti",
+		["westup"] = "emei/xixiangchi",
 	},
 	room_relative="洗象池边←钻天坡←钻天坡钻天坡",
+	
+}
+Room {
+	id = "emei/xixiangchi",
+	name = "洗象池边",
+	outdoor = "峨眉山",
+	ways = {
+		["#emxxc"] = "emei/zuantianpo2",
+		["southup"] = "emei/lingyunti",
+		["north"] = "emei/xixiangchi1",
+	},
+	 postcmds = {
+                ["eastdown"] = "#walkBusy", 
+	room_relative="洗象池边｜洗象池边←钻天坡↓凌云梯洗象池边",
+	},
+}
+Room {
+	id = "emei/xixiangchi1",
+	name = "洗象池边",
+	outdoor = "峨眉山",
+	ways = {
+		["south"] = "emei/xixiangchi",
+	},
+	room_relative="洗象池边--洗象池边",
 }
 Room {
 	id = "fairyland/conglin2",
@@ -8157,10 +9441,12 @@ Room {
 		["westup"] = "fairyland/xuanya",
 		["southdown"] = "group/entry/klclin1",
 	},
+	room_relative="悬崖←雪山丛林↑雪山丛林雪山丛林",
 }
 Room {
 	id = "fairyland/cuigu",
 	name = "洞天福地",
+	outdoor = "昆仑山",
 	ways = {
 		["eastup"] = "fairyland/shanbi",
 		["south"] = "fairyland/cuigu3",
@@ -8171,6 +9457,7 @@ Room {
 Room {
 	id = "fairyland/cuigu1",
 	name = "翠谷",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "fairyland/shanlu6",
 	},
@@ -8178,6 +9465,7 @@ Room {
 Room {
 	id = "fairyland/cuigu3",
 	name = "翠谷",
+	outdoor = "昆仑山",
 	ways = {
 		["north"] = "fairyland/cuigu",
 	},
@@ -8185,6 +9473,7 @@ Room {
 Room {
 	id = "fairyland/dapingtai",
 	name = "大平台",
+	outdoor = "昆仑山",
 	ways = {
 		["west"] = "fairyland/dashibi",
 	},
@@ -8192,6 +9481,7 @@ Room {
 Room {
 	id = "fairyland/dashibi",
 	name = "大石壁",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "fairyland/dapingtai",
 	},
@@ -8199,6 +9489,7 @@ Room {
 Room {
 	id = "fairyland/dating",
 	name = "大厅",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "fairyland/hmzhuang",
 		["north"] = "fairyland/nuange",
@@ -8207,10 +9498,12 @@ Room {
 	objs = {
           ["朱长龄"] = "zhu changling",
      },
+	 room_relative="红梅山庄｜暖阁--后院大厅",
 }
 Room {
 	id = "fairyland/hmzhuang",
 	name = "红梅山庄",
+	outdoor = "昆仑山",
 	ways = {
 		["westdown"] = "fairyland/shanxi",
 		["east"] = "fairyland/shanlu2",
@@ -8219,18 +9512,22 @@ Room {
 	objs = {
           ["乔福"] = "qiao fu",
      },
+	 room_relative="大厅｜山溪边→红梅山庄---山路红梅山庄",
 }
 Room {
 	id = "fairyland/houyuan",
 	name = "后院",
+	outdoor = "昆仑山",
 	ways = {
 		["north"] = "fairyland/lggong",
 		["west"] = "fairyland/dating",
 	},
+	room_relative="灵獒宫｜后院｜大厅",
 }
 Room {
 	id = "fairyland/lggong",
 	name = "灵獒宫",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "fairyland/houyuan",
 	},
@@ -8250,25 +9547,31 @@ Room {
 			{id = "zhechong jiangjun", exp = 150000},
 		},
 	},
+	
 }
 Room {
 	id = "fairyland/nuange",
 	name = "暖阁",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "fairyland/dating",
 	},
+	room_relative="大厅｜暖阁",
 }
 Room {
 	id = "fairyland/pubu",
 	name = "瀑布",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "fairyland/shanlu4",
 		["southdown"] = "fairyland/tanbian",
 	},
+	room_relative="翠谷｜翠谷瀑布",
 }
 Room {
 	id = "fairyland/shanbi",
 	name = "山壁",
+	outdoor = "昆仑山",
 	ways = {
 		["eastdown"] = "fairyland/shangou",
 		["westdown"] = "fairyland/cuigu",
@@ -8277,6 +9580,7 @@ Room {
 Room {
 	id = "fairyland/shangou",
 	name = "山沟",
+	outdoor = "昆仑山",
 	ways = {
 		["westup"] = "fairyland/shanbi",
 	},
@@ -8284,31 +9588,38 @@ Room {
 Room {
 	id = "fairyland/shanlu1",
 	name = "山路",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "kunlun/klshanlu",
 		["southdown"] = "fairyland/xuedi1",
 		["west"] = "fairyland/shanlu2",
 	},
+	room_relative="山路-----山路-----昆仑山麓↑雪地山路",
 }
 Room {
 	id = "fairyland/shanlu2",
 	name = "山路",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "fairyland/shanlu1",
 		["west"] = "fairyland/hmzhuang",
 	},
+	room_relative="红梅山庄-----山路-----山路山路",
 }
 Room {
 	id = "fairyland/shanlu3",
 	name = "翠谷",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "fairyland/cuigu",
 		["west"] = "fairyland/shanlu4",
 	},
+	room_relative="翠谷｜翠谷翠谷",
 }
 Room {
 	id = "fairyland/shanlu4",
 	name = "翠谷",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "fairyland/shanlu3",
 		["west"] = "fairyland/pubu",
@@ -8317,6 +9628,7 @@ Room {
 Room {
 	id = "fairyland/shanlu5",
 	name = "翠谷",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "fairyland/cuigu",
 		["north"] = "fairyland/shanlu6",
@@ -8325,6 +9637,7 @@ Room {
 Room {
 	id = "fairyland/shanlu6",
 	name = "翠谷",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "fairyland/shanlu5",
 		["north"] = "fairyland/cuigu1",
@@ -8333,6 +9646,7 @@ Room {
 Room {
 	id = "fairyland/shanxi",
 	name = "山溪边",
+	outdoor = "昆仑山",
 	ways = {
 		["eastup"] = "fairyland/hmzhuang",
 		["westup"] = "group/entry/klclin1",
@@ -8340,10 +9654,12 @@ Room {
 	nolooks = {
 		["down"] = true,
 	},
+	room_relative="雪山丛林←山溪边→红梅山庄山溪边",
 }
 Room {
 	id = "fairyland/tanbian",
 	name = "翠谷",
+	outdoor = "昆仑山",
 	no_fight = true,
 	ways = {
 		["northup"] = "fairyland/pubu",
@@ -8352,78 +9668,97 @@ Room {
 Room {
 	id = "fairyland/xuanya",
 	name = "悬崖",
+	outdoor = "昆仑山",
 	ways = {
 		["eastdown"] = "fairyland/conglin2",
 	},
+	room_relative="悬崖←雪山丛林悬崖",
 }
 Room {
 	id = "fairyland/xuedi",
 	name = "雪地",
+	outdoor = "昆仑山",
 	ways = {
 		["northeast"] = "fairyland/xuedi1",
 	},
+	room_relative="雪地↗雪地雪地",
 }
 Room {
 	id = "fairyland/xuedi1",
 	name = "雪地",
+	outdoor = "昆仑山",
 	ways = {
 		["northup"] = "fairyland/shanlu1",
 		["southwest"] = "fairyland/xuedi",
 	},
+	room_relative="山路↑雪地↙雪地雪地",
 }
 Room {
 	id = "foshan/alleyway",
 	name = "小巷",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/zhongjia",
 		["west"] = "foshan/nanjie2",
 	},
+	room_relative="佛山南街-----小巷｜钟家小巷",
 }
 Room {
 	id = "foshan/beidimiao",
 	name = "北帝庙",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/xijie2",
 	},
 	objs = {
           ["凤一鸣"] = "feng yiming",
       },
+	  room_relative="北帝庙｜佛山西街北帝庙",
 }
 Room {
 	id = "foshan/beijie",
 	name = "佛山北街",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/guangchang",
 		["north"] = "foshan/beimen",
 	},
+	room_relative="佛山北门｜佛山北街｜佛山广场佛山北街",
 }
 Room {
 	id = "foshan/beimen",
 	name = "佛山北门",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/beijie",
 		["north"] = "foshan/lingnan",
 	},
+	room_relative="岭南｜佛山北门｜佛山北街佛山北门",
 }
 Room {
 	id = "foshan/caidi",
 	name = "菜地",
+	outdoor = "佛山镇",
 	ways = {
 		["west"] = "foshan/zhongjia",
 	},
+	room_relative="钟家｜菜地",
 }
 Room {
 	id = "foshan/caomeidi",
 	name = "草莓地",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/dukou_tanbao",
 		["northeast"] = "foshan/shulin1",
 		["west"] = "foshan/shulin2",
 	},
+	room_relative="树林↗树林----草莓地｜老渡口草莓地",
 }
 Room {
 	id = "foshan/dangpu",
 	name = "当铺",
+	outdoor = "佛山镇",
 	no_fight = true,
 	ways = {
 		["north"] = "foshan/dongjie3",
@@ -8431,10 +9766,12 @@ Room {
 	objs = {
           ["俞朝奉"] = "yu chaofeng",
       },
+	room_relative="佛山东街｜当铺当铺",
 }
 Room {
 	id = "foshan/dating",
 	name = "凤府大厅",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/shufang",
 		["west"] = "foshan/dayuan",
@@ -8443,28 +9780,33 @@ Room {
           ["公孙盈"] = "gongsun ying",
           ["何师爷"] = "he shiye",
       },
+	  room_relative="凤府大院---凤府大厅｜书房凤府大厅",
 }
 Room {
 	id = "foshan/dayuan",
 	name = "凤府大院",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/dating",
 		["west"] = "foshan/villa-gate",
 	},
+	room_relative="凤府大门---凤府大院---凤府大厅凤府大院",
 }
 Room {
 	id = "foshan/dongjie",
 	name = "佛山东街",
+	outdoor = "佛山镇",
 	ways = {
 		["north"] = "foshan/grocer",
 		["east"] = "foshan/dongjie2",
 		["west"] = "foshan/guangchang",
 	},
-	room_relative="杂货店｜佛山广场---佛山东街---佛山东街佛山东街",
+	room_relative="杂货店｜佛山广场---佛山东街佛山东街",
 }
 Room {
 	id = "foshan/dongjie2",
 	name = "佛山东街",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/ironsmith",
 		["north"] = "foshan/shaobing",
@@ -8476,34 +9818,40 @@ Room {
 Room {
 	id = "foshan/dongjie3",
 	name = "佛山东街",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/dangpu",
 		["east"] = "foshan/dongmen",
 		["west"] = "foshan/dongjie2",
 	},
-	room_relative="佛山东街---佛山东街---佛山东门｜当铺佛山东街",
+	room_relative="佛山东街---佛山东门｜当铺佛山东街",
 }
 Room {
 	id = "foshan/dongmen",
 	name = "佛山东门",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/road8",
-		["west"] = "foshan/dongjie3",
+		["west"] = "foshan/dongjie3",  
 	},
+	room_relative="佛山东街---佛山东门---林间道佛山东门",
 }
 Room {
 	id = "foshan/duchang",
 	name = "英雄会馆",
+	outdoor = "佛山镇",
 	ways = {
 		["north"] = "foshan/xijie",
 	},
 	objs = {
           ["邝宝官"] = "kuang baoguan",
       },
+	  room_relative="佛山西街｜英雄会馆英雄会馆",
 }
 Room {
 	id = "foshan/dukou",
 	name = "老渡口",
+	outdoor = "佛山镇",
 	no_fight = true,
 	ways = {
 		["north"] = "foshan/shulin_dzd",
@@ -8513,61 +9861,75 @@ Room {
 	lengths = {
 		["southwest"] = "if false then return 1 else return false end",
 	},
+	room_relative="树林｜老渡口老渡口",
 }
 
 Room {
 	id = "foshan/haibing",
 	name = "海滨",
+	outdoor = "佛山镇",
 	ways = {
 		["west"] = "foshan/dukou",
 	},
+	room_relative="海滨｜老渡口",
 }
 
 Room {
 	id = "foshan/dukou_tanbao",
 	name = "老渡口",
+	outdoor = "佛山镇",
 	no_fight = true,
 	ways = {
 		["north"] = "foshan/caomeidi",
 	},
+	room_relative="草莓地｜老渡口老渡口",
 }
 Room {
 	id = "foshan/fenchang",
 	name = "坟场",
+	outdoor = "佛山镇",
 	ways = {
 		["southwest"] = "foshan/xiaolu1",
 	},
+	room_relative="坟场↙小路坟场",
 }
 Room {
 	id = "foshan/grocer",
 	name = "杂货店",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/dongjie",
 	},
 	objs = {
           ["李老板"] = "li",
       },
+	  room_relative="杂货店｜佛山东街杂货店",
 }
 Room {
 	id = "foshan/guangchang",
 	name = "佛山广场",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/herohotel",
 		["east"] = "foshan/dongjie",
 		["north"] = "foshan/beijie",
 		["west"] = "foshan/xijie",
 	},
+	room_relative="佛山北街｜佛山西街---佛山广场---佛山东街｜英雄楼佛山广场",
 }
 Room {
 	id = "foshan/hanghai_room",
 	name = "【南海探宝】船只",
+	outdoor = "佛山镇",
 	ways = {
-		["out"] = "foshan/dukou_tanbao",
+		["out"] = "foshan/dukou_tanbao",  
 	},
+	room_relative="老渡口｜【南海探宝】船只",
 }
 Room {
 	id = "foshan/herohotel",
 	name = "英雄楼",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/nanjie",
 		["north"] = "foshan/guangchang",
@@ -8576,42 +9938,46 @@ Room {
 	objs = {
           ["万老板"] = "wan laoban",
       },
+	  room_relative="佛山广场｜英雄楼｜佛山南街英雄楼",
 }
 Room {
 	id = "foshan/herohotel2",
 	name = "英雄楼二楼",
+	outdoor = "佛山镇",
 	ways = {
 		["down"] = "foshan/herohotel",
 	},
+	room_relative="英雄楼二楼｜英雄楼",
 }
 Room {
 	id = "foshan/ironsmith",
 	name = "铁匠铺",
+	outdoor = "佛山镇",
 	ways = {
 		["north"] = "foshan/dongjie2",
 	},
 	objs = {
           ["沈铁匠"] = "shen tiejiang",
       },
+	  room_relative="佛山东街｜铁匠铺铁匠铺",
 }
 Room {
 	id = "foshan/kedian",
 	name = "英雄客栈",
 	no_fight = true,
 	ways = {
-		["#yxkedianoutgosleep"] = "foshan/nanjie",
-		["#yingxiongkedian"] = "foshan/kedian2",
+		["#fskzout"] = "foshan/nanjie",
+		["#fskz"] = "foshan/kedian2",
 	},
-	nolooks = {
-		["up"] = true,
+	lengths = {
+		["#fskz"] = 5,
 	},
-	lengths ={
-	    ["#yingxiongkedian"] = 5,
-	},
+	room_relative="客栈二楼〓英雄客栈---佛山南街英雄客栈",
 }
 Room {
 	id = "foshan/kedian2",
 	name = "客栈二楼",
+	outdoor = "佛山镇",
 	ways = {
 		["enter"] = "foshan/kedian3",
 		["down"] = "foshan/kedian",
@@ -8620,6 +9986,7 @@ Room {
 Room {
 	id = "foshan/kedian3",
 	name = "客店二楼",
+	outdoor = "佛山镇",
 	no_fight = true,
 	ways = {
 		["out"] = "foshan/kedian2",
@@ -8628,14 +9995,17 @@ Room {
 Room {
 	id = "foshan/lingnan",
 	name = "岭南",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/beimen",
 		["north"] = "foshan/xiaolu1",
 	},
+	room_relative="小路｜岭南｜佛山北门岭南",
 }
 Room {
 	id = "foshan/milin",
 	name = "密林",
+	outdoor = "佛山镇",
 	ways = {
 		["southwest"] = "foshan/xiaolu3",
 	},
@@ -8643,18 +10013,25 @@ Room {
 	    ["southwest"] = {
 			{id = "ma zei", exp = 150000},
 		},
+	precmds = {
+              ["southwest"] = "kill ma zei",
 	},
+	},
+	
 }
 Room {
 	id = "foshan/mishi",
 	name = "密室",
+	outdoor = "佛山镇",
 	ways = {
 		["up"] = "foshan/shufang",
 	},
+	room_relative="书房｜密室",
 }
 Room {
 	id = "foshan/nanjie",
 	name = "佛山南街",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/nanjie2",
 		["east"] = "foshan/villa-gate",
@@ -8666,6 +10043,7 @@ Room {
 Room {
 	id = "foshan/nanjie2",
 	name = "佛山南街",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/nanmen",
 		["north"] = "foshan/nanjie",
@@ -8677,24 +10055,29 @@ Room {
 Room {
 	id = "foshan/nanmen",
 	name = "南门",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/shulin1",
 		["north"] = "foshan/nanjie2",
 	},
+	room_relative="佛山南街｜南门｜树林南门",
 }
 Room {
 	id = "foshan/noshery",
 	name = "小吃店",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/nanjie2",
 	},
 	objs = {
           ["宋老板"] = "song",
       },
+	  room_relative="小吃店----佛山南街小吃店",
 }
 Room {
 	id = "foshan/road1",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/ximen",
 		["west"] = "foshan/road2",
@@ -8702,10 +10085,12 @@ Room {
 	objs = {
           ["小树枝"] = "shu zhi",
       },
+	  room_relative="林间道----林间道----西门林间道",
 }
 Room {
 	id = "foshan/road10",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["southeast"] = "foshan/road12",
 		["northeast"] = "foshan/road11",
@@ -8714,10 +10099,12 @@ Room {
 	objs = {
           ["蕙兰花"] = "huilan hua",
       },
+	  room_relative="林间道↗林间道----林间道↘林间道林间道",
 }
 Room {
 	id = "foshan/road11",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["southwest"] = "foshan/road10",
 		["northeast"] = "group/entry/fsroad13",
@@ -8726,17 +10113,21 @@ Room {
           ["石块"] = "shi kuai",
           ["土匪"] = "tu fei",
       },
+	  room_relative="林间道↗林间道↙林间道林间道",
 }
 Room {
 	id = "foshan/road12",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["northwest"] = "foshan/road10",
 	},
+	room_relative="林间道｜林间道林间道",
 }
 Room {
 	id = "foshan/road14",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["southwest"] = "group/entry/fsroad13",
 		["north"] = "fuzhou/bridge",
@@ -8744,10 +10135,12 @@ Room {
 	objs = {
           ["蕙兰花"] = "huilan hua",
       },
+	  room_relative="南门吊桥｜林间道↙林间道林间道",
 }
 Room {
 	id = "foshan/road2",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/road1",
 		["west"] = "foshan/road3",
@@ -8755,38 +10148,49 @@ Room {
 	objs = {
           ["石块"] = "shi kuai",
       },
+	  room_relative="林间道----林间道----林间道林间道",
 }
 Room {
 	id = "foshan/road3",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["northwest"] = "foshan/road4",
 		["east"] = "foshan/road2",
 	},
+	room_relative="林间道↖林间道----林间道林间道",
 }
 Room {
 	id = "foshan/road4",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["southeast"] = "foshan/road3",
 		["southwest"] = "group/entry/fsroad5",
 	},
+	room_relative="林间道↙↘林间道林间道林间道",
 }
 Room {
 	id = "foshan/road6",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "group/entry/fsroad5",
 		["west"] = "dali/dalisouth/jiangbei",
+	},
+	precmds = {
+		["west"] = "#walkBusy",
 	},
 	objs = {
           ["蜜蜂"] = "mi feng",
           ["白合花"] = "baihe hua",
       },
+	  room_relative="澜沧江边----林间道----林间道林间道",
 }
 Room {
 	id = "foshan/road8",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/road9",
 		["west"] = "foshan/dongmen",
@@ -8795,10 +10199,12 @@ Room {
           ["张朝唐"] = "zhang chaotang",
           ["张康"] = "zhang kang",
       },
+	  room_relative="佛山东门----林间道----林间道林间道",
 }
 Room {
 	id = "foshan/road9",
 	name = "林间道",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/road10",
 		["west"] = "foshan/road8",
@@ -8806,63 +10212,77 @@ Room {
 	objs = {
           ["莎椤花"] = "shaluo huaflower",
       },
+	  room_relative="林间道----林间道----林间道林间道",
 }
 Room {
 	id = "foshan/shaobing",
 	name = "烧饼摊",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/dongjie2",
 	},
 	objs = {
           ["王老汉"] = "wang laohan",
       },
+	  room_relative="烧饼摊｜佛山东街烧饼摊",
 }
 Room {
 	id = "foshan/shufang",
 	name = "书房",
+	outdoor = "佛山镇",
 	ways = {
 		["north"] = "foshan/dating",
 	},
+	room_relative="凤府大厅｜书房书房",
 }
 Room {
 	id = "foshan/shulin1",
 	name = "树林",
+	outdoor = "佛山镇",
 	ways = {
 		["southeast"] = "foshan/shulin_dzd",
 		["southwest"] = "foshan/caomeidi",
 		["north"] = "foshan/nanmen",
 		["east"] = "foshan/pingyuanxiaolu",
 	},
+	room_relative="南门｜树林-----平原小路↙↘草莓地树林树林",
 }
 Room {
 	id = "foshan/shulin2",
 	name = "树林",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/caomeidi",
 	},
 	objs = {
           ["老虎"] = "lao hu",
       },
+	room_relative="树林-----草莓地树林",  
 }
 Room {
 	id = "foshan/shulin_dzd",
 	name = "树林",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/dukou",
 		["northwest"] = "foshan/shulin1",
 	},
+	room_relative="树林↖树林｜老渡口树林",
 }
 Room {
 	id = "foshan/villa-gate",
 	name = "凤府大门",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/dayuan",
 		["west"] = "foshan/nanjie",
 	},
+	room_relative="佛山南街---凤府大门---凤府大院凤府大门",
 }
 Room {
 	id = "foshan/xiaolu1",
 	name = "小路",
+	outdoor = "佛山镇",
 	ways = {
 		["northup"] = "foshan/xiaolu2",
 		["south"] = "foshan/lingnan",
@@ -8874,6 +10294,7 @@ Room {
 Room {
 	id = "foshan/xiaolu2",
 	name = "小路",
+	outdoor = "佛山镇",
 	ways = {
 		["northup"] = "foshan/xiaolu3",
 		["southdown"] = "foshan/xiaolu1",
@@ -8883,6 +10304,7 @@ Room {
 Room {
 	id = "foshan/xiaolu3",
 	name = "小路",
+	outdoor = "佛山镇",
 	ways = {
 		["north"] = "fuzhou/wroad10",
 		["northeast"] = "foshan/milin",
@@ -8893,6 +10315,7 @@ Room {
 Room {
 	id = "foshan/xijie",
 	name = "佛山西街",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/duchang",
 		["east"] = "foshan/guangchang",
@@ -8903,6 +10326,7 @@ Room {
 Room {
 	id = "foshan/xijie2",
 	name = "佛山西街",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/xijie",
 		["north"] = "foshan/beidimiao",
@@ -8913,14 +10337,17 @@ Room {
 Room {
 	id = "foshan/ximen",
 	name = "西门",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/xijie2",
 		["west"] = "foshan/road1",
 	},
+	room_relative="林间道-----西门-----佛山西街西门",
 }
 Room {
 	id = "foshan/zhongjia",
 	name = "钟家",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/caidi",
 		["north"] = "foshan/alleyway",
@@ -8937,45 +10364,55 @@ Room {
           ["鲁群维"] = "lu qunwei",
           ["钟小二"] = "zhong xiaoer",
       },
+	  
 }
 Room {
 	id = "foshan/zumiao",
 	name = "佛山祖庙",
+	outdoor = "佛山镇",
 	ways = {
 		["southeast"] = "foshan/xiaolu1",
 	},
+	room_relative="佛山祖庙↘小路佛山祖庙",
 }
 --add by xieky@sj 20170809
 Room {
 	id = "foshan/pingyuanxiaolu",
 	name = "平原小路",
+	outdoor = "佛山镇",
 	ways = {
 		["west"] = "foshan/shulin1",
 		["south"] = "foshan/nanhaiyucun",
 	},
+	 room_relative="树林---平原小路｜南海渔村平原小路",
 }
 Room {
 	id = "foshan/nanhaiyucun",
 	name = "南海渔村",
+	outdoor = "佛山镇",
 	ways = {
 		["north"] = "foshan/pingyuanxiaolu",
 		["west"] = "foshan/yugang",
 		["east"] = "foshan/shaiwangchang",
 	},
+	room_relative="平原小路｜渔港---南海渔村---渔村晒网场南海渔村",
 }
 Room {
 	id = "foshan/yugang",
 	name = "渔港",
+	outdoor = "佛山镇",
 	ways = {
 		["east"] = "foshan/nanhaiyucun",
 	},
 	objs = {
           ["黄衣使者"] = "shi zhe",
            },
+	room_relative="渔港-----南海渔村渔港",
 }
 Room {
 	id = "foshan/shaiwangchang",
 	name = "渔村晒网场",
+	outdoor = "佛山镇",
 	ways = {
 		["west"] = "foshan/nanhaiyucun",
 		["north"] = "foshan/yucunxiaowu",
@@ -8985,47 +10422,57 @@ Room {
           ["女孩"] = "girl",
           ["渔夫"] = "yu fu",
            },
+	room_relative="渔村小屋｜南海渔村--渔村晒网场渔村晒网场",
 }
 Room {
 	id = "foshan/yucunxiaowu",
 	name = "渔村小屋",
+	outdoor = "佛山镇",
 	ways = {
 		["south"] = "foshan/shaiwangchang",
 	},
 	objs = {
           ["小孩"] = "kid",
     },
+	room_relative="渔村小屋｜渔村晒网场渔村小屋",
 }
 --add end
 Room {
 	id = "fuzhou/bank",
 	name = "通宝斋",
+	outdoor = "福州城",
 	ways = {
 		["west"] = "fuzhou/dongxiang2",
 	},
 	objs = {
           ["刘老板"] = "liu laoban",
            },
+	room_relative="东巷----通宝斋通宝斋",
 }
 Room {
 	id = "fuzhou/beijie",
 	name = "北街",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/zhongxin",
 		["north"] = "fuzhou/beimen",
 	},
+	room_relative="北门｜北街｜城中心北街",
 }
 Room {
 	id = "fuzhou/beimen",
 	name = "北门",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/beijie",
-		["north"] = "fuzhou/road5",
+		["north"] = "fuzhou/road6",
 	},
+	room_relative="武夷山路｜北门｜北街北门",
 }
 Room {
 	id = "fuzhou/biaoju",
 	name = "福威镖局",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/zhengting",
 		["east"] = "fuzhou/zhangfang",
@@ -9036,38 +10483,49 @@ Room {
           ["张镖头"] = "zhang biaotou",
           ["许镖头"] = "xu biaotou",
            },
+	room_relative="西街｜福威镖局---镖局帐房｜镖局正厅福威镖局",
 }
 Room {
-        id = "fuzhou/bridge",
-        name = "南门吊桥",
-        ways = {
-                ["south"] = "foshan/road14",
-                ["north"] = "fuzhou/nanmen",
-                ["#fznmdq"] = "fuzhou/nanmen",
-        },
-        lengths = {
+	id = "fuzhou/bridge",
+	name = "南门吊桥",
+	outdoor = "福州城",
+	ways = {
+		["south"] = "foshan/road14",
+		["north"] = "fuzhou/nanmen",
+		["#fznmdq"] = "fuzhou/nanmen",
+	},
+	nolooks = {
+		["north"] = true,
+	},
+	lengths = {
                 ["north"] = "if MidNight[locl.time] or MidHsDay[locl.time] then return false else return 1 end",
                 ["#fznmdq"] = "if tmp.find then return 3 else return false end",
-        },
+	},
+	room_relative="南门｜南门吊桥｜林间道南门吊桥",
 }
 Room {
 	id = "fuzhou/chalou",
 	name = "茶楼",
+	outdoor = "福州城",
 	ways = {
 		["east"] = "fuzhou/xixiang4",
 		["up"] = "fuzhou/chalou2",
 	},
+	room_relative="茶楼〓茶楼-----西巷茶楼",
 }
 Room {
 	id = "fuzhou/chalou2",
 	name = "茶楼",
+	outdoor = "福州城",
 	ways = {
 		["down"] = "fuzhou/chalou",
 	},
+	room_relative="茶楼〓茶楼茶楼",
 }
 Room {
 	id = "fuzhou/dangpu",
 	name = "当铺",
+	outdoor = "福州城",
 	no_fight = true,
 	ways = {
 		["south"] = "fuzhou/xijie",
@@ -9075,44 +10533,54 @@ Room {
 	objs = {
           ["张老板"] = "lao ban",
            },
+	room_relative="当铺｜西街当铺",
 }
 Room {
 	id = "fuzhou/dongjie",
 	name = "东街",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/shiqiao",
 		["east"] = "fuzhou/haigang",
 		["north"] = "fuzhou/dongxiang",
 		["west"] = "fuzhou/zhongxin",
 	},
+	room_relative="东巷｜城中心-----东街-----海港｜石桥东街",
 }
 Room {
 	id = "fuzhou/dongxiang",
 	name = "东巷",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/dongjie",
 		["east"] = "fuzhou/jiuguan",
 		["north"] = "fuzhou/dongxiang2",
 	},
+	room_relative="东巷｜东巷-----酒馆｜东街东巷",
 }
 Room {
 	id = "fuzhou/dongxiang2",
 	name = "东巷",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/dongxiang",
 		["east"] = "fuzhou/bank",
 	},
+	room_relative="东巷-----通宝斋｜东巷东巷",
 }
 Room {
 	id = "fuzhou/feiyuan",
 	name = "废园",
+	outdoor = "福州城",
 	ways = {
 		["west"] = "fuzhou/xyxiang",
 	},
+	room_relative="向阳巷-----废园废园",
 }
 Room {
 	id = "fuzhou/fenduo1",
 	name = "船舱",
+	outdoor = "福州城",
 	ways = {
 		["out"] = "fuzhou/yuchuan5",
 	},
@@ -9125,6 +10593,7 @@ Room {
 Room {
 	id = "fuzhou/haigang",
 	name = "海港",
+	outdoor = "福州城",
 	ways = {
 		["east"] = "fuzhou/yugang",
 		["west"] = "fuzhou/dongjie",
@@ -9136,24 +10605,30 @@ Room {
 	lengths = {
 		["swim"] = 10,
 	},
+	room_relative="东街-----海港-----渔港码头海港",
 }
 Room {
 	id = "fuzhou/houyuan",
 	name = "老宅后院",
+	outdoor = "福州城",
 	ways = {
 		["down"] = "fuzhou/well",
 	},
+	room_relative="井中---老宅后院"
 }
 Room {
 	id = "fuzhou/huadian",
 	name = "花店",
+	outdoor = "福州城",
 	ways = {
 		["east"] = "fuzhou/xixiang3",
 	},
+	room_relative="花店-----西巷花店"
 }
 Room {
 	id = "fuzhou/island1",
 	name = "小岛",
+	outdoor = "福州城",
 	ways = {
 		["north"] = "fuzhou/island3",
 		["swim"] = "fuzhou/haigang",
@@ -9171,6 +10646,7 @@ Room {
 Room {
 	id = "fuzhou/island2",
 	name = "沙滩",
+	outdoor = "福州城",
 	ways = {
 		["west"] = "fuzhou/island1",
 	},
@@ -9183,15 +10659,18 @@ Room {
 Room {
 	id = "fuzhou/island3",
 	name = "沙滩",
+	outdoor = "福州城",
 	ways = {
 		["north"] = "fuzhou/rock",
 		["east"] = "fuzhou/island1",
 		["west"] = "fuzhou/island4",
 	},
+	room_relative="巨岩｜沙滩-----沙滩-----小岛沙滩"
 }
 Room {
 	id = "fuzhou/island4",
 	name = "沙滩",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/island5",
 		["east"] = "fuzhou/island3",
@@ -9201,6 +10680,7 @@ Room {
 Room {
 	id = "fuzhou/island5",
 	name = "沙滩",
+	outdoor = "福州城",
 	ways = {
 		["eastup"] = "fuzhou/lagoon",
 		["north"] = "fuzhou/island4",
@@ -9209,9 +10689,11 @@ Room {
 Room {
 	id = "fuzhou/jiuguan",
 	name = "酒馆",
+	outdoor = "福州城",
 	ways = {
 		["west"] = "fuzhou/dongxiang",
 	},
+	room_relative="东巷-----酒馆酒馆"
 }
 Room {
 	id = "fuzhou/kezhan",
@@ -9219,15 +10701,17 @@ Room {
 	no_fight = true,
 	ways = {
 		["north"] = "fuzhou/xixiang4",
-		["give xiao 5 silver;up"] = "fuzhou/kezhan2",
+		-- ["up"] = "fuzhou/kezhan2",
 	},
 	nolooks = {
 		["up"] = true,
 	},
+	room_relative="西巷｜吉祥客栈吉祥客栈"
 }
 Room {
 	id = "fuzhou/kezhan2",
 	name = "客栈二楼",
+	outdoor = "福州城",
 	no_fight = true,
 	ways = {
 		["down"] = "fuzhou/kezhan",
@@ -9236,6 +10720,7 @@ Room {
 Room {
 	id = "fuzhou/lagoon",
 	name = "礁石",
+	outdoor = "福州城",
 	ways = {
 		["westdown"] = "fuzhou/island5",
 	},
@@ -9246,13 +10731,16 @@ Room {
 Room {
 	id = "fuzhou/laozhai",
 	name = "向阳老宅",
+	outdoor = "福州城",
 	ways = {
 		["west"] = "fuzhou/xyxiang2",
 	},
+	room_relative="向阳巷---向阳老宅向阳老宅"
 }
 Room {
 	id = "fuzhou/liang",
 	name = "密室房梁",
+	outdoor = "福州城",
 	ways = {
 		["down"] = "fuzhou/mishi",
 	},
@@ -9267,13 +10755,16 @@ Room {
 Room {
 	id = "fuzhou/minzhai",
 	name = "民宅",
+	outdoor = "福州城",
 	ways = {
 		["east"] = "fuzhou/xixiang",
 	},
+	room_relative="民宅-----西巷民宅",
 }
 Room {
 	id = "fuzhou/mishi",
 	name = "密室",
+	outdoor = "福州城",
 	ways = {
 		["out"] = "fuzhou/midao",
 	},
@@ -9281,111 +10772,142 @@ Room {
 Room {
 	id = "fuzhou/mupeng",
 	name = "小木棚",
+	outdoor = "福州城",
 	ways = {
 		["out"] = "fuzhou/rock",
 	},
+	room_relative="小木棚∨巨岩小木棚",
 }
 Room {
 	id = "fuzhou/nanjie",
 	name = "南街",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/nanmen",
 		["north"] = "fuzhou/zhongxin",
 	},
+	room_relative="城中心｜南街｜南门南街",
 }
 Room {
-        id = "fuzhou/nanmen",
-        name = "南门",
-        ways = {
-                ["north"] = "fuzhou/nanjie",
-                ["south"] = "fuzhou/bridge",
-                ["#fznm"] = "fuzhou/bridge",
-        },
-        --nolooks = {
-                --["south"] = true,
-        --},
-        lengths = {
+	id = "fuzhou/nanmen",
+	name = "南门",
+	outdoor = "福州城",
+	ways = {
+		["north"] = "fuzhou/nanjie",
+		["south"] = "fuzhou/bridge",
+		 ["#fznm"] = "fuzhou/bridge",
+	},
+	--nolooks = {
+		--["south"] = true,
+	--},
+	lengths = {
                 ["south"] = "if MidNight[locl.time] or MidHsDay[locl.time] then return false else return 1 end",
                 ["#fznm"] = "if tmp.find then return 3 else return false end",
-        },
+	},
+	room_relative="南街｜南门｜南门吊桥南门",
 }
+
 Room {
-	id = "fuzhou/road1",
+	id = "fuzhou/road2",
 	name = "山路",
-	ways = {
-		["southwest"] = "fuzhou/road2",
+	outdoor = "福州城",
+		ways = {
+		["southwest"] = "fuzhou/road3",
 		["northeast"] = "ningbo/ttcsi",
 	},
 	room_relative="天童禅寺↗山路↙山路山路",
 }
 Room {
-	id = "fuzhou/road2",
+	id = "fuzhou/road3",
 	name = "山路",
-	ways = {
-		["southeast"] = "putian/road01",
-		["southwest"] = "group/entry/fzroad3",
-		["northeast"] = "fuzhou/road1",
-	},
-	room_relative="山路↗山路↙↘山路山路山路",
+	outdoor = "福州城",
+		ways = {
+	    ["southeast"] = "putian/road01",
+		["southwest"] = "fuzhou/road4",
+		["northeast"] = "fuzhou/road2",
+			},
+	  room_relative="山路↗山路↙↘山路山路山路",
 }
 Room {
 	id = "fuzhou/road4",
 	name = "山路",
-	ways = {
+	outdoor = "福州城",
+		ways = {
 		["south"] = "fuzhou/road5",
-		["north"] = "group/entry/fzroad3",
+		["northeast"] = "fuzhou/road3",
+   		},
+		room_relative="不知道哪里山路 不知道哪里 山路",
+}
+Room {
+	id = "fuzhou/road5",
+	name = "山路",
+	outdoor = "福州城",
+		ways = {
+		["south"] = "fuzhou/road6",
+		["north"] = "fuzhou/road4",
 	},
 	room_relative="山路｜山路｜武夷山路山路",
 }
 Room {
-	id = "fuzhou/road5",
+	id = "fuzhou/road6",
 	name = "武夷山路",
-	ways = {
+	outdoor = "福州城",
+		ways = {
 		["south"] = "fuzhou/beimen",
-		["north"] = "fuzhou/road4",
+		["north"] = "fuzhou/road5",
 	},
 	objs = {
           ["野兔"] = "ye tu",
           ["白袍剑侠"] = "baipao jianxia",
            },
+		   room_relative="山路｜武夷山路｜北门武夷山路",
 }
 Room {
 	id = "fuzhou/rock",
 	name = "巨岩",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/island3",
 		["enter"] = "fuzhou/mupeng",
 	},
+	room_relative="小木棚∧巨岩｜沙滩巨岩",
 }
 Room {
 	id = "fuzhou/shanpo",
 	name = "山坡",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/wroad2",
 	},
 	objs = {
           ["野兔"] = "ye tu",
            },
+  room_relative="山坡｜小路山坡",
 }
 Room {
 	id = "fuzhou/shiqiao",
 	name = "石桥",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/xyxiang",
 		["north"] = "fuzhou/dongjie",
 	},
+  room_relative="东街｜石桥｜向阳巷石桥",
 }
 Room {
 	id = "fuzhou/well",
 	name = "井中",
+	outdoor = "福州城",
 	ways = {
 		["down"] = "fuzhou/well1",
 		["up"] = "fuzhou/houyuan",
 	},
+	room_relative="井底｜老宅后院井中",
 }
 Room {
 	id = "fuzhou/well1",
 	name = "井底",
+	outdoor = "福州城",
 	ways = {
 		["up"] = "fuzhou/well",
 	},
@@ -9393,16 +10915,19 @@ Room {
 Room {
 	id = "fuzhou/wjiuguan",
 	name = "小酒馆",
+	outdoor = "福州城",
 	ways = {
 		["east"] = "fuzhou/wroad2",
 	},
 	objs = {
           ["萨老板"] = "sa laoban",
            },
+	room_relative="小酒馆----小路小酒馆",
 }
 Room {
 	id = "fuzhou/wroad",
 	name = "山路",
+	outdoor = "福州城",
 	ways = {
 		["northwest"] = "fuzhou/wroad2",
 		["east"] = "fuzhou/ximen",
@@ -9415,6 +10940,7 @@ Room {
 Room {
 	id = "fuzhou/wroad10",
 	name = "山路",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "foshan/xiaolu3",
 		["east"] = "fuzhou/wroad9",
@@ -9424,6 +10950,7 @@ Room {
 Room {
 	id = "fuzhou/wroad2",
 	name = "小路",
+	outdoor = "福州城",
 	ways = {
 		["southeast"] = "fuzhou/wroad",
 		["southwest"] = "fuzhou/wroad3",
@@ -9435,6 +10962,7 @@ Room {
 Room {
 	id = "fuzhou/wroad3",
 	name = "山路",
+	outdoor = "福州城",
 	ways = {
 		["southwest"] = "fuzhou/wroad4",
 		["northeast"] = "fuzhou/wroad2",
@@ -9444,6 +10972,7 @@ Room {
 Room {
 	id = "fuzhou/wroad4",
 	name = "山路",
+	outdoor = "福州城",
 	ways = {
 		["northeast"] = "fuzhou/wroad3",
 		["west"] = "group/entry/fzwroad5",
@@ -9454,6 +10983,7 @@ Room {
 Room {
 	id = "fuzhou/wroad6",
 	name = "山路",
+	outdoor = "福州城",
 	ways = {
 		["southwest"] = "fuzhou/wroad7",
 		["northeast"] = "group/entry/fzwroad5",
@@ -9463,6 +10993,7 @@ Room {
 Room {
 	id = "fuzhou/wroad7",
 	name = "山路",
+	outdoor = "福州城",
 	ways = {
 		["southwest"] = "fuzhou/wroad8",
 		["northeast"] = "fuzhou/wroad6",
@@ -9472,15 +11003,21 @@ Room {
 Room {
 	id = "fuzhou/wroad8",
 	name = "山路",
+	outdoor = "福州城",
 	ways = {
 		["southwest"] = "fuzhou/wroad9",
 		["northeast"] = "fuzhou/wroad7",
-	},
+},
+	objs = {
+          ["挑夫"] = "tiao fu",
 	room_relative="山路↗山路↙山路山路",
+	},
+	
 }
 Room {
 	id = "fuzhou/wroad9",
 	name = "山路",
+	outdoor = "福州城",
 	ways = {
 		["northeast"] = "fuzhou/wroad8",
 		["west"] = "fuzhou/wroad10",
@@ -9490,6 +11027,7 @@ Room {
 Room {
 	id = "fuzhou/xijie",
 	name = "西街",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/biaoju",
 		["east"] = "fuzhou/zhongxin",
@@ -9501,20 +11039,24 @@ Room {
           ["蒋旭"] = "jiang xu",
           ["史镖头"] = "shi biaotou",
            },
+   room_relative="当铺｜西街-----西街-----城中心｜福威镖局西街",
 }
 Room {
 	id = "fuzhou/xijie2",
 	name = "西街",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/xixiang3",
 		["north"] = "fuzhou/xixiang2",
 		["east"] = "fuzhou/xijie",
 		["west"] = "fuzhou/ximen",
 	},
+	room_relative="西巷｜西门-----西街-----西街｜西巷西街",
 }
 Room {
 	id = "fuzhou/ximen",
 	name = "西门",
+	outdoor = "福州城",
 	ways = {
 		["east"] = "fuzhou/xijie2",
 		["west"] = "fuzhou/wroad",
@@ -9522,70 +11064,86 @@ Room {
 	nolooks = {
 		["west"] = true,
 	},
+	room_relative="山路-----西门-----西街西门",
 }
 Room {
 	id = "fuzhou/xixiang",
 	name = "西巷",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/xixiang2",
 		["east"] = "fuzhou/zahuopu",
 		["west"] = "fuzhou/minzhai",
 	},
+	room_relative="民宅-----西巷-----杂货铺｜西巷西巷",
 }
 Room {
 	id = "fuzhou/xixiang2",
 	name = "西巷",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/xijie2",
 		["north"] = "fuzhou/xixiang",
 		["west"] = "fuzhou/yaopu",
 	},
+	room_relative="西巷｜药铺-----西巷｜西街西巷",
 }
 Room {
 	id = "fuzhou/xixiang3",
 	name = "西巷",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/xixiang4",
 		["north"] = "fuzhou/xijie2",
 		["west"] = "fuzhou/huadian",
 	},
+	room_relative="西街｜花店-----西巷｜西巷西巷",
 }
 Room {
 	id = "fuzhou/xixiang4",
 	name = "西巷",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/kezhan",
 		["north"] = "fuzhou/xixiang3",
 		["west"] = "fuzhou/chalou",
 	},
+	room_relative="西巷｜茶楼-----西巷｜吉祥客栈西巷",
 }
 Room {
 	id = "fuzhou/xyxiang",
 	name = "向阳巷",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/xyxiang2",
 		["north"] = "fuzhou/shiqiao",
 		["east"] = "fuzhou/feiyuan",
 	},
+	room_relative="石桥｜向阳巷----废园｜向阳巷向阳巷",
 }
 Room {
 	id = "fuzhou/xyxiang2",
 	name = "向阳巷",
+	outdoor = "福州城",
 	ways = {
 		["north"] = "fuzhou/xyxiang",
 		["east"] = "fuzhou/laozhai",
 	},
+	room_relative="向阳巷｜向阳巷----向阳老宅向阳巷",
 }
 Room {
 	id = "fuzhou/yaopu",
 	name = "药铺",
+	outdoor = "福州城",
 	ways = {
 		["east"] = "fuzhou/xixiang2",
 	},
+	room_relative="药铺-----西巷药铺",
 }
 Room {
 	id = "fuzhou/yuchuan1",
 	name = "渔船",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/yuchuan1",
 		["east"] = "fuzhou/yuchuan2",
@@ -9597,16 +11155,19 @@ Room {
 Room {
 	id = "fuzhou/yuchuan2",
 	name = "渔船",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/yuchuan2",
 		["east"] = "fuzhou/yuchuan3",
 		["north"] = "fuzhou/yuchuan2",
 		["west"] = "fuzhou/yuchuan1",
 	},
+	room_relative="渔船｜渔船-----渔船-----渔船｜渔船渔船",
 }
 Room {
 	id = "fuzhou/yuchuan3",
 	name = "渔船",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/yuchuan3",
 		["east"] = "fuzhou/yuchuan4",
@@ -9617,6 +11178,7 @@ Room {
 Room {
 	id = "fuzhou/yuchuan4",
 	name = "渔船",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/yuchuan4",
 		["east"] = "fuzhou/yuchuan5",
@@ -9627,6 +11189,7 @@ Room {
 Room {
 	id = "fuzhou/yuchuan5",
 	name = "渔船",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/yuchuan5",
 		["enter"] = "fuzhou/fenduo1",
@@ -9638,35 +11201,42 @@ Room {
 Room {
 	id = "fuzhou/yugang",
 	name = "渔港码头",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/yuchuan1",
 		["enter"] = "fuzhou/yuchuan1",
 		["west"] = "fuzhou/haigang",
 	},
+	room_relative="渔船∧海港---渔港码头｜渔船渔港码头",
 }
 Room {
 	id = "fuzhou/zahuopu",
 	name = "杂货铺",
+	outdoor = "福州城",
 	ways = {
 		["west"] = "fuzhou/xixiang",
 	},
 	objs = {
           ["陈阿婆"] = "chen apo",
            },
+	room_relative="西巷----杂货铺杂货铺",
 }
 Room {
 	id = "fuzhou/zhangfang",
 	name = "镖局帐房",
+	outdoor = "福州城",
 	ways = {
 		["west"] = "fuzhou/biaoju",
 	},
 	objs = {
           ["董帐房"] = "zhang fang",
            },
+	room_relative="福威镖局---镖局帐房镖局帐房",
 }
 Room {
 	id = "fuzhou/zhengting",
 	name = "镖局正厅",
+	outdoor = "福州城",
 	no_fight = true,
 	ways = {
 		["north"] = "fuzhou/biaoju",
@@ -9674,20 +11244,24 @@ Room {
 	objs = {
           ["林震南"] = "lin zhennan",
            },
+	room_relative="福威镖局｜镖局正厅镖局正厅",
 }
 Room {
 	id = "fuzhou/zhongxin",
 	name = "城中心",
+	outdoor = "福州城",
 	ways = {
 		["south"] = "fuzhou/nanjie",
 		["east"] = "fuzhou/dongjie",
 		["north"] = "fuzhou/beijie",
 		["west"] = "fuzhou/xijie",
 	},
+	room_relative="北街｜西街----城中心----东街｜南街城中心",
 }
 Room {
 	id = "gb/houyuan",
 	name = "后院",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/pomiao",
 	},
@@ -9700,50 +11274,62 @@ Room {
 	objs = {
           ["洪七公"] = "hong qigong",
            },
+	
 }
 Room {
 	id = "gb/island1",
 	name = "小岛",
+	outdoor = "丐帮",
 	ways = {
 		["north"] = "gb/island3",
 	},
+	room_relative="小岛--小岛",
 }
 Room {
 	id = "gb/island2",
 	name = "小岛",
+	outdoor = "丐帮",
 	ways = {
 		["west"] = "gb/island1",
 	},
+	room_relative="小岛--小岛",
 }
 Room {
 	id = "gb/island3",
 	name = "沙滩",
+	outdoor = "丐帮",
 	ways = {
 		["north"] = "gb/rock",
 		["east"] = "gb/island1",
 		["west"] = "gb/island4",
 	},
+	room_relative="巨岩｜小岛-----沙滩沙滩",
 }
 Room {
 	id = "gb/island4",
 	name = "沙滩",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/island5",
 		["east"] = "gb/island3",
 		["west"] = "gb/island1",
 	},
+	room_relative="沙滩｜沙滩-----小岛沙滩",
 }
 Room {
 	id = "gb/island5",
 	name = "沙滩",
+	outdoor = "丐帮",
 	ways = {
 		["eastup"] = "gb/lagoon",
 		["north"] = "gb/island4",
 	},
+	room_relative="沙滩｜礁石沙滩",
 }
 Room {
 	id = "gb/kongdi2",
 	name = "空地",
+	outdoor = "丐帮",
 	ways = {
 		["east"] = "gb/xinglin9",
 	},
@@ -9755,59 +11341,74 @@ Room {
 Room {
 	id = "gb/lagoon",
 	name = "礁石",
+	outdoor = "丐帮",
 	ways = {
 		["westdown"] = "gb/island5",
 	},
+	room_relative="沙滩--礁石",
 }
 Room {
 	id = "gb/liangcang1",
 	name = "后仓",
+	outdoor = "丐帮",
 	ways = {
 		["northup"] = "gb/xiaodao",
 		["south"] = "gb/liangcang2",
 	},
+	room_relative="小路｜中仓后仓",
 }
 Room {
 	id = "gb/liangcang2",
 	name = "中仓",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/liangcang3",
 		["east"] = "gb/liangcang4",
 		["north"] = "gb/liangcang1",
 		["west"] = "gb/liangcang5",
 	},
+	room_relative="前仓｜左仓----后仓｜右仓中仓",
 }
 Room {
 	id = "gb/liangcang3",
 	name = "前仓",
+	outdoor = "丐帮",
 	ways = {
 		["north"] = "gb/liangcang2",
 	},
+	room_relative="中仓--前仓",
 }
 Room {
 	id = "gb/liangcang4",
 	name = "左仓",
+	outdoor = "丐帮",
 	ways = {
 		["west"] = "gb/liangcang2",
 	},
+	room_relative="中仓--前仓",
 }
 Room {
 	id = "gb/liangcang5",
 	name = "右仓",
+	outdoor = "丐帮",
 	ways = {
 		["east"] = "gb/liangcang2",
 	},
+	room_relative="中仓--右仓",
 }
 Room {
 	id = "gb/mupeng",
 	name = "小木棚",
+	outdoor = "丐帮",
 	ways = {
 		["out"] = "gb/rock",
 	},
+	room_relative="巨岩--小木棚",
 }
 Room {
 	id = "gb/pomiao",
 	name = "土地庙",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/xinglin9",
 		["north"] = "gb/houyuan",
@@ -9821,34 +11422,42 @@ Room {
 	objs = {
           ["鲁有脚"] = "lu youjiao",
            },
+	
 }
 Room {
 	id = "gb/rock",
 	name = "巨岩",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/island3",
 		["enter"] = "gb/mupeng",
 	},
+	room_relative="小木棚｜沙滩巨岩",
 }
 Room {
 	id = "gb/tianjing",
 	name = "田径",
+	outdoor = "丐帮",
 	ways = {
 		["east"] = "suzhou/qsgdao6",
 		["north"] = "gb/xinglin1",
 	},
+	room_relative="杏子林｜田径-----苏州北郊田径",
 }
 Room {
 	id = "gb/xiaodao",
 	name = "小路",
+	outdoor = "丐帮",
 	ways = {
 		["northup"] = "gb/yading",
 		["southdown"] = "gb/liangcang1",
 	},
+	room_relative="崖顶｜后仓小路",
 }
 Room {
 	id = "gb/xinglin1",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/tianjing",
 		["east"] = "gb/xinglin2",
@@ -9859,6 +11468,7 @@ Room {
 Room {
 	id = "gb/xinglin2",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/tianjing",
 		["north"] = "gb/xinglin3",
@@ -9869,6 +11479,7 @@ Room {
 Room {
 	id = "gb/xinglin3",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/tianjing",
 	--	["east"] = "gb/xinglin3",
@@ -9879,6 +11490,7 @@ Room {
 Room {
 	id = "gb/xinglin4",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/tianjing",
 		["north"] = "gb/xinglin5",
@@ -9889,6 +11501,7 @@ Room {
 Room {
 	id = "gb/xinglin5",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/tianjing",
 		["east"] = "gb/xinglin6",
@@ -9899,6 +11512,7 @@ Room {
 Room {
 	id = "gb/xinglin6",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/tianjing",
 	--	["north"] = "gb/xinglin6",
@@ -9909,6 +11523,7 @@ Room {
 Room {
 	id = "gb/xinglin7",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/tianjing",
 		["north"] = "gb/xinglin8",
@@ -9919,6 +11534,7 @@ Room {
 Room {
 	id = "gb/xinglin8",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/xinglin7",
 		["north"] = "gb/xinglin9",
@@ -9927,10 +11543,12 @@ Room {
          ["白世镜"] = "bai shijing",
           ["宋长老"] = "song zhanglao",
            },
+	room_relative="杏子林｜杏子林｜杏子林杏子林",
 }
 Room {
 	id = "gb/xinglin9",
 	name = "杏子林",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/xinglin8",
 		["north"] = "gb/pomiao",
@@ -9939,52 +11557,65 @@ Room {
 	objs = {
           ["梁长老"] = "liang zhanglao",
            },
+	room_relative="土地庙｜空地----杏子林｜杏子林杏子林",
 }
 Room {
 	id = "gb/yading",
 	name = "崖顶",
+	outdoor = "丐帮",
 	ways = {
 		["down"] = "nanyang/duanya",
 		["southdown"] = "gb/xiaodao",
 	},
+	room_relative="断崖｜小路崖顶",
 }
 Room {
 	id = "gb/zhongjun1",
 	name = "中军辕门",
+	outdoor = "丐帮",
 	ways = {
 		["north"] = "gb/zhongjun2",
 	},
+	room_relative="中军--中军辕门",
 }
 Room {
 	id = "gb/zhongjun2",
 	name = "中军",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/zhongjun1",
 		["north"] = "gb/zhongjun3",
 	},
+	room_relative="中军辕门｜中军中军",
 }
 Room {
 	id = "gb/zhongjun3",
 	name = "中军",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/zhongjun2",
 		["north"] = "gb/zhongjun4",
 	},
+	room_relative="中军｜中军中军",
 }
 Room {
 	id = "gb/zhongjun4",
 	name = "中军",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/zhongjun3",
 		["north"] = "gb/zhongjun5",
 	},
+	room_relative="中军｜中军中军",
 }
 Room {
 	id = "gb/zhongjun5",
 	name = "中军大帐",
+	outdoor = "丐帮",
 	ways = {
 		["south"] = "gb/zhongjun4",
 	},
+	room_relative="中军中军",
 }
 Room {
 	id = "group/cailiao-hang",
@@ -9996,6 +11627,7 @@ Room {
 	objs = {
           ["王掌柜"] = "wang zhanggui",
            },
+	room_relative="材料行｜东大街材料行",
 }
 Room {
 	id = "group/entry/caeroad3",
@@ -10005,7 +11637,7 @@ Room {
 		["southeast"] = "village/shilu5",
 		["west"] = "changan/eastroad2",
 	},
-	room_relative="官道-----土路↘碎石路土路",
+	room_relative="不知道哪里土路 不知道哪里 土路",
 }
 Room {
 	id = "group/entry/canroad6",
@@ -10015,7 +11647,8 @@ Room {
 		["southwest"] = "changan/northroad5",
 		["northdown"] = "changan/northroad7",
 	},
-	room_relative="土路↓土路↙土路土路",
+	
+	room_relative="不知道哪里土路 不知道哪里 土路",
 }
 Room {
 	id = "group/entry/cderoad4",
@@ -10025,7 +11658,7 @@ Room {
 		["east"] = "xiangyang/xiaolu2",
 		["west"] = "chengdu/eroad3",
 	},
-	room_relative="大道-----大道-----小路大道",
+	room_relative="不知道哪里大道 不知道哪里 大道",
 }
 Room {
 	id = "group/entry/cdtulu2",
@@ -10035,6 +11668,7 @@ Room {
 		["southwest"] = "chengdu/tulu1",
 		["northeast"] = "chengdu/tulu3",
 	},
+room_relative="土路-----峨嵋山脚下",
 }
 Room {
 	id = "group/entry/czeroad3",
@@ -10044,6 +11678,7 @@ Room {
 		["southwest"] = "cangzhou/eroad2",
 		["northeast"] = "cangzhou/eroad4",
 	},
+	room_relative="不知道哪里大驿道 不知道哪里 大驿道",
 }
 Room {
 	id = "group/entry/czwroad2",
@@ -10053,6 +11688,7 @@ Room {
 		["southwest"] = "cangzhou/wroad3",
 		["east"] = "cangzhou/wroad1",
 	},
+	room_relative="不知道哪里驿道 不知道哪里 驿道",
 }
 Room {
 	id = "group/entry/dleyd",
@@ -10071,7 +11707,7 @@ Room {
 		["south"] = "dali/dadao3",
 		["north"] = "dali/dadao1",
 	},
-	room_relative="大道｜大道｜大道大道",
+	room_relative="不知道哪里大道 不知道哪里 大道",
 }
 Room {
 	id = "group/entry/dlndao5",
@@ -10081,6 +11717,7 @@ Room {
 		["southeast"] = "dali/yuxu/shangang",
 		["west"] = "dali/yuxu/guanmen",
 	},
+	room_relative="山岗｜玉虚观门｜大道",
 }
 Room {
 	id = "group/entry/dlstulin",
@@ -10091,6 +11728,7 @@ Room {
 		["north"] = "dali/dalisouth/dg1",
 		["west"] = "dali/yideng/fanpu",
 	},
+	room_relative="不知道哪里土林 不知道哪里 土林",
 }
 Room {
 	id = "group/entry/dlwqunsh",
@@ -10100,6 +11738,7 @@ Room {
 		["southeast"] = "dali/daliwest/futiao",
 		["southwest"] = "dali/daliwest/tianchi1",
 	},
+	room_relative="虎跳峡｜天池｜梅里雪山",
 }
 Room {
 	id = "group/entry/fsroad13",
@@ -10109,6 +11748,7 @@ Room {
 		["southwest"] = "foshan/road11",
 		["northeast"] = "foshan/road14",
 	},
+	room_relative="不知道哪里林间道 不知道哪里 林间道",
 }
 Room {
 	id = "group/entry/fsroad5",
@@ -10118,17 +11758,9 @@ Room {
 		["northeast"] = "foshan/road4",
 		["west"] = "foshan/road6",
 	},
+	room_relative="不知道哪里林间道 不知道哪里 林间道",
 }
-Room {
-	id = "group/entry/fzroad3",
-	name = "山路",
-	outdoor = "福州城",
-	ways = {
-		["south"] = "fuzhou/road4",
-		["northeast"] = "fuzhou/road2",
-	},
-	room_relative="山路↗山路｜山路山路",
-}
+
 Room {
 	id = "group/entry/fzwroad5",
 	name = "山路",
@@ -10137,7 +11769,7 @@ Room {
 		["southwest"] = "fuzhou/wroad6",
 		["east"] = "fuzhou/wroad4",
 	},
-	room_relative="福州城山路 福州城 山路",
+	room_relative="不知道哪里山路 不知道哪里 山路",
 }
 Room {
 	id = "group/entry/gmchang",
@@ -10147,6 +11779,7 @@ Room {
 		["southeast"] = "gumu/jishi",
 		["northwest"] = "gumu/xiaolu2",
 	},
+	room_relative="不知道哪里终南广场 不知道哪里 终南广场",
 }
 Room {
 	id = "group/entry/hhshulin5",
@@ -10157,6 +11790,7 @@ Room {
 		["northeast"] = "huanghe/tiandi2",
 		["west"] = "huanghe/shulin6",
 	},
+	room_relative="不知道哪里树林 不知道哪里 树林",
 }
 Room {
 	id = "group/entry/hjroad",
@@ -10166,6 +11800,7 @@ Room {
 		["westup"] = "hj/shanqiu",
 		["east"] = "hj/pmchang",
 	},
+	room_relative="不知道哪里小路 不知道哪里 小路",
 }
 Room {
 	id = "group/entry/hmyroad2",
@@ -10175,6 +11810,7 @@ Room {
 		["eastup"] = "hmy/pingding/road3",
 		["southwest"] = "hmy/pingding/road1",
 	},
+	room_relative="不知道哪里土路 不知道哪里 土路",
 }
 Room {
 	id = "group/entry/hmyroad8",
@@ -10184,6 +11820,7 @@ Room {
 		["southeast"] = "hmy/pingding/road9",
 		["west"] = "hmy/pingding/road7",
 	},
+room_relative="不知道哪里土路 不知道哪里 土路",
 }
 Room {
 	id = "group/entry/hzqsd7",
@@ -10193,6 +11830,7 @@ Room {
 		["south"] = "hz/beimen",
 		["north"] = "hz/shanlu3",
 	},
+	room_relative="不知道哪里青石大道 不知道哪里 青石大道",
 }
 Room {
 	id = "group/entry/klclin1",
@@ -10202,6 +11840,7 @@ Room {
 		["northup"] = "fairyland/conglin2",
 		["eastdown"] = "fairyland/shanxi",
 	},
+	room_relative="不知道哪里雪山丛林 不知道哪里 雪山丛林",
 }
 Room {
 	id = "group/entry/lzroad1",
@@ -10211,6 +11850,7 @@ Room {
 		["southwest"] = "lanzhou/road5",
 		["northeast"] = "lanzhou/jingyuan",
 	},
+	room_relative="不知道哪里大道 不知道哪里 大道",
 }
 Room {
 	id = "group/entry/lzshixia",
@@ -10220,6 +11860,7 @@ Room {
 		["southwest"] = "lanzhou/tumenzi",
 		["northeast"] = "lanzhou/bingcao",
 	},
+	room_relative="不知道哪里石峡子 不知道哪里 石峡子",
 }
 Room {
 	id = "group/entry/lzsroad3",
@@ -10228,8 +11869,9 @@ Room {
 	ways = {
 		["southeast"] = "lanzhou/qingcheng",
 		["northwest"] = "lanzhou/sroad2",
-	},
-}
+	    },
+        room_relative="不知道哪里大道 不知道哪里 大道",
+	}
 Room {
 	id = "group/entry/mjshamo1",
 	name = "大沙漠",
@@ -10238,6 +11880,7 @@ Room {
 		["northeast"] = "xingxiu/silk6",
 		["west"] = "mingjiao/shaqiu1",
 	},
+	room_relative="丝绸之路｜小沙丘大沙漠",
 }
 Room {
 	id = "group/entry/mjshan2",
@@ -10247,6 +11890,7 @@ Room {
 		["south"] = "miaojiang/shandao2",
 		["northeast"] = "xiangyang/hunanroad2",
 	},
+ room_relative="不知道哪里山路 不知道哪里 山路",
 }
 Room {
 	id = "group/entry/nbqsddao",
@@ -10256,6 +11900,7 @@ Room {
 		["southeast"] = "ningbo/shilu",
 		["northwest"] = "ningbo/qsddao1",
 	},
+	room_relative="不知道哪里青石官道 不知道哪里 青石官道",
 }
 Room {
 	id = "group/entry/slxiaoj1",
@@ -10265,6 +11910,7 @@ Room {
 		["northup"] = "shaolin/xiaojing2",
 		["east"] = "shaolin/shijie1",
 	},
+	room_relative="不知道哪里山坡 不知道哪里 山坡",
 }
 Room {
 	id = "group/entry/sztulu2",
@@ -10274,6 +11920,7 @@ Room {
 		["southwest"] = "suzhou/jiangbian",
 		["northeast"] = "suzhou/tulu1",
 	},
+	room_relative="不知道哪里土路 不知道哪里 土路",
 }
 Room {
 	id = "group/entry/thdroad1",
@@ -10283,6 +11930,7 @@ Room {
 		["southeast"] = "thd/niujia/road2",
 		["north"] = "thd/niujia/road",
 	},
+	room_relative="不知道哪里土路 不知道哪里 土路",
 }
 Room {
 	id = "group/entry/tsyidao3",
@@ -10292,6 +11940,7 @@ Room {
 		["north"] = "taishan/daizong",
 		["west"] = "taishan/yidao2",
 	},
+	room_relative="不知道哪里大驿道 不知道哪里 大驿道",
 }
 Room {
 	id = "group/entry/wdroad7",
@@ -10301,6 +11950,7 @@ Room {
 		["east"] = "wudang/wdroad6",
 		["west"] = "wudang/wdroad8",
 	},
+	room_relative="不知道哪里黄土路 不知道哪里 黄土路",
 }
 Room {
 	id = "group/entry/xstulu2",
@@ -10310,6 +11960,7 @@ Room {
 		["southwest"] = "xueshan/tulu3",
 		["northeast"] = "xueshan/tulu1",
 	},
+	room_relative="不知道哪里藏边土路 不知道哪里 藏边土路",
 }
 Room {
 	id = "group/entry/xsxiao2",
@@ -10319,6 +11970,7 @@ Room {
 		["northwest"] = "xueshan/xiaolu1",
 		["east"] = "xueshan/xiaolu3",
 	},
+	room_relative="不知道哪里湖边小路 不知道哪里 湖边小路",
 }
 Room {
 	id = "group/entry/yzeroad1",
@@ -10337,17 +11989,21 @@ Room {
 		["southup"] = "gumu/lyy",
 		["eastdown"] = "gumu/ryy",
 	},
+	room_relative="抱子岩←日月岩↓老妪岩抱子岩",
 }
 Room {
 	id = "gumu/dongkou",
 	name = "洞口",
+	outdoor = "终南山",
 	ways = {
 		["out"] = "gumu/shanxia",
 	},
+	room_relative="终南山下--洞口",
 }
 Room {
 	id = "gumu/fang",
 	name = "石室",
+	outdoor = "终南山",
 	ways = {
 		["open door;south"] = "gumu/gmcc",
 		["open door;east"] = "gumu/yaofang",
@@ -10357,14 +12013,17 @@ Room {
 Room {
 	id = "gumu/fchuan",
 	name = "樊川",
+	outdoor = "终南山",
 	ways = {
 		["east"] = "xiangyang/shanxiroad1",
 		["west"] = "gumu/xiaolu1",
 	},
+	room_relative="田间小路-----樊川-----土路樊川",
 }
 Room {
 	id = "gumu/gmanhe1",
 	name = "暗河",
+	outdoor = "终南山",
 	ways = {
 		["northup"] = "gumu/sshi1",
 		["westdown"] = "gumu/gmql1",
@@ -10373,6 +12032,7 @@ Room {
 Room {
 	id = "gumu/gmanhe2",
 	name = "暗河",
+	outdoor = "终南山",
 	ways = {
 		["northup"] = "gumu/dongkou",
 		["eastdown"] = "gumu/gmql2",
@@ -10381,6 +12041,7 @@ Room {
 Room {
 	id = "gumu/gmcc",
 	name = "储藏室",
+	outdoor = "终南山",
 	ways = {
 		["open door;north"] = "gumu/fang",
 	},
@@ -10388,6 +12049,7 @@ Room {
 Room {
 	id = "gumu/gmht",
 	name = "后堂",
+	outdoor = "终南山",
 	ways = {
 		["open door;south"] = "gumu/gmws",
 		["open door;north"] = "gumu/gmws1",
@@ -10398,6 +12060,7 @@ Room {
 Room {
 	id = "gumu/gmlg1",
 	name = "石室",
+	outdoor = "终南山",
 	ways = {
 		["open door;enter"] = "gumu/gmlg4",
 		["open door;north"] = "gumu/gmzt",
@@ -10406,6 +12069,7 @@ Room {
 Room {
 	id = "gumu/gmlg2",
 	name = "练功房",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/gmzt",
 	},
@@ -10413,6 +12077,7 @@ Room {
 Room {
 	id = "gumu/gmlg4",
 	name = "石室",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/gmlg5",
 		["out"] = "gumu/gmlg1",
@@ -10421,6 +12086,7 @@ Room {
 Room {
 	id = "gumu/gmlg5",
 	name = "石室",
+	outdoor = "终南山",
 	ways = {
 		["north"] = "gumu/gmlg4",
 	},
@@ -10428,6 +12094,7 @@ Room {
 Room {
 	id = "gumu/gmlw",
 	name = "领悟室",
+	outdoor = "终南山",
 	ways = {
 		["open door;south"] = "gumu/gmqt",
 	},
@@ -10435,6 +12102,7 @@ Room {
 Room {
 	id = "gumu/gmqc",
 	name = "切磋室",
+	outdoor = "终南山",
 	no_fight = true,
 	ways = {
 		["open door;north"] = "gumu/gmqt",
@@ -10443,6 +12111,7 @@ Room {
 Room {
 	id = "gumu/gmql1",
 	name = "潜流",
+	outdoor = "终南山",
 	ways = {
 		["eastup"] = "gumu/gmanhe1",
 		["west"] = "gumu/gmql2",
@@ -10451,6 +12120,7 @@ Room {
 Room {
 	id = "gumu/gmql2",
 	name = "潜流",
+	outdoor = "终南山",
 	ways = {
 		["westup"] = "gumu/gmanhe2",
 		["east"] = "gumu/gmql1",
@@ -10459,9 +12129,10 @@ Room {
 Room {
 	id = "gumu/gmqs",
 	name = "琴室",
+	outdoor = "终南山",
 	ways = {
 		["open door;south"] = "gumu/fang",
-		["open door;east"] = "gumu/shitou",
+		["open door;east"] = "gumu/shitou",   
 		["open door;north"] = "gumu/jianshi",
 		["open door;west"] = "gumu/gmht",
 	},
@@ -10469,6 +12140,7 @@ Room {
 Room {
 	id = "gumu/gmqt",
 	name = "前厅",
+	outdoor = "终南山",
 	ways = {
 		["open door;south"] = "gumu/gmqc",
 		["open door;east"] = "gumu/gmzt",
@@ -10479,6 +12151,7 @@ Room {
 Room {
 	id = "gumu/gmws",
 	name = "休息室",
+	outdoor = "终南山",
 	no_fight = true,
 	ways = {
 		["north"] = "gumu/gmht",
@@ -10487,6 +12160,7 @@ Room {
 Room {
 	id = "gumu/gmws1",
         name = "卧室",
+		outdoor = "终南山",
         ways = {
                 ["south"] = "gumu/gmht",
                 ["tang bed;ban shiban"] = "gumu/ss0",
@@ -10498,6 +12172,7 @@ Room {
 Room {
 	id = "gumu/gmzt",
 	name = "中堂",
+	outdoor = "终南山",
 	ways = {
 		["open door;south"] = "gumu/gmlg1",
 		["open door;north"] = "gumu/gmlg2",
@@ -10512,6 +12187,7 @@ Room {
 Room {
 	id = "gumu/bianhou",
 	name = "匾后",
+	outdoor = "终南山",
 	ways = {
 		["jump down"] = "gumu/gmzt",
 	},
@@ -10522,6 +12198,7 @@ Room {
 Room {
 	id = "gumu/guolin1",
 	name = "果林",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/guoyuan",
 		["north"] = "gumu/guolin1",
@@ -10532,6 +12209,7 @@ Room {
 Room {
 	id = "gumu/guolin2",
 	name = "果林",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/guolin2",
 		["east"] = "gumu/guolin3",
@@ -10542,6 +12220,7 @@ Room {
 Room {
 	id = "gumu/guolin3",
 	name = "果林",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/guolin4",
 		["north"] = "gumu/guolin3",
@@ -10552,6 +12231,7 @@ Room {
 Room {
 	id = "gumu/guolin4",
 	name = "果林",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/guolin4",
 		["east"] = "gumu/huacong",
@@ -10562,6 +12242,7 @@ Room {
 Room {
 	id = "gumu/guolin5",
 	name = "果林",
+	outdoor = "终南山",
 	ways = {
 		["east"] = "gumu/guoyuan",
 	},
@@ -10569,6 +12250,7 @@ Room {
 Room {
 	id = "gumu/guoyuan",
 	name = "果园",
+	outdoor = "终南山",
 	ways = {
 		["eastup"] = "gumu/shanpo",
 		["south"] = "gumu/rukou",
@@ -10579,6 +12261,7 @@ Room {
 Room {
 	id = "gumu/huacong",
 	name = "红花丛",
+	outdoor = "终南山",
 	no_fight = true,
 	ways = {
 		["south"] = "gumu/guolin5",
@@ -10588,6 +12271,7 @@ Room {
 Room {
 	id = "gumu/jianshi",
 	name = "剑室",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/gmqs",
 	},
@@ -10595,31 +12279,38 @@ Room {
 Room {
 	id = "gumu/jishi",
 	name = "集市",
+	outdoor = "终南山",
 	ways = {
 		["northwest"] = "group/entry/gmchang",
 	},
+	room_relative="终南广场↖集市集市",
 }
 Room {
 	id = "gumu/jlg",
 	name = "金莲阁",
+	outdoor = "终南山",
 	ways = {
-		["northup"] = "gumu/ztm",
+		["northup"] = "gumu/ztm",  
 		["southup"] = "gumu/ryy",
 	},
 	objs = {
           ["马钰"] = "ma yu",
      },
+	 room_relative="中天门↑金莲阁↓日月岩金莲阁",
 }
 Room {
 	id = "gumu/jqg/boat2",
 	name = "小舟",
+	outdoor = "绝情谷",
 	ways = {
-		["out"] = "gumu/jqg/xiaoxi",
+		["out"] = "gumu/jqg/xiaoxi",  
 	},
+	
 }
 Room {
 	id = "gumu/jqg/boat5",
 	name = "小舟",
+	outdoor = "绝情谷",
 	ways = {
 		["out"] = "gumu/jqg/xibian",
 	},
@@ -10627,6 +12318,7 @@ Room {
 Room {
 	id = "gumu/jqg/cave3",
 	name = "隧洞",
+	outdoor = "绝情谷",
 	ways = {
 		["west"] = "gumu/jqg/shiyao",
 	},
@@ -10634,141 +12326,28 @@ Room {
 Room {
 	id = "gumu/jqg/danfang",
 	name = "丹房",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "gumu/jqg/lang2",
-		["#weaponUnWalk;tui middlelu;#walkBusy"] = "gumu/jqg/danfang1"
 	},
-	nolooks = {
-		["#weaponUnWalk;tui middlelu;#walkBusy"] = true,
-	},
-	lengths = {
-		--["#weaponUnWalk;tui middlelu;#walkBusy"] = "if job.where == '绝情谷石窟' then return 1 else return false end",
-		["#weaponUnWalk;tui middlelu;#walkBusy"] = 1,
-	},
-}
-Room {
-	id = "gumu/jqg/danfang1",
-	name = "丹房",
-	ways = {
-		["tui eastlu middle;#walkBusy"] = "gumu/jqg/danfang2"
-	},
-	nolooks = {
-		["tui eastlu middle;#walkBusy"] = true,
-	},
-	lengths = {
-		["tui eastlu middle;#walkBusy"] = 10,
-	},
-}
-Room {
-	id = "gumu/jqg/danfang2",
-	name = "丹房",
-	ways = {
-		["tui westlu east;#walkBusy"] = "gumu/jqg/danfang3"
-	},
-	nolooks = {
-		["tui westlu east;#walkBusy"] = true,
-	},
-	lengths = {
-		["tui westlu east;#walkBusy"] = 10,
-	},
-}
-Room {
-	id = "gumu/jqg/danfang3",
-	name = "丹房",
-	ways = {
-		["tui middlelu west;#walkBusy"] = "gumu/jqg/eytan",
-	},
-	nolooks = {
-		["tui middlelu west;#walkBusy"] = true,
-	},
-	lengths = {
-		["tui middlelu west;#walkBusy"] = 10,
-	},
-}
-Room {
-	id = "gumu/jqg/eytan",
-	name = "鳄鱼潭",
-	ways = {
-		["ta corpse"] = "gumu/jqg/cave1",
-	},
-	blocks = {
-		["ta corpse"] = {
-			{id = "e yu", exp = 350000},
-		},
-	},
-	objs = {
-          ["鳄鱼"] = "e yu",
-     },
-}
-Room {
-	id = "gumu/jqg/cave1",
-	name = "洞口",
-	ways = {
-		["zuan dong;#walkBusy;zuan dong"] = "gumu/jqg/cave2",
-	},
-	nolooks = {
-		["zuan dong;#walkBusy;zuan dong"] = true,
-	},
-	lengths = {
-		["zuan dong;#walkBusy;zuan dong"] = 10,
-	},
-}
-Room {
-	id = "gumu/jqg/cave2",
-	name = "山洞",
-	ways = {
-		["pa down;#walkBusy"] = "gumu/jqg/cave3",
-	},
-}
-Room {
-	id = "gumu/jqg/cave3",
-	name = "隧洞",
-	ways = {
-		["west"] = "gumu/jqg/shiyao",
-	},
-}
-Room {
-	id = "gumu/jqg/shiyao",
-	name = "石窟",
-	ways = {
-		["east"] = "gumu/jqg/cave3",
-		["#outJqg"] = "gumu/jqg/shibi"
-	},
-	objs = {
-          ["裘千尺"] = "qiu qianchi",
-     },
-	nolooks = {
-		["#outJqg"] = true,
-	},
-	lengths = {
-		["#outJqg"] = 10000,
-	},
-}
-Room {
-	id = "gumu/jqg/shibi",
-	name = "石壁",
-	ways = {
-		["pa down"] = "gumu/jqg/shiyao",
-		["pa up"] = "gumu/jqg/shanlu6",
-	},
-	nolooks = {
-		["pa down"] = true,
-		["pa up"] = true,
-	},
+	
 }
 Room {
 	id = "gumu/jqg/dashi",
 	name = "大室",
+	outdoor = "绝情谷",
 	ways = {
 		["west"] = "gumu/jqg/xiaoshi",
 	},
 	objs = {
           ["小龙女"] = "xiao longnv",
            },
+	room_relative="小室-----大室大室",
 }
 Room {
 	id = "gumu/jqg/dating",
 	name = "大厅",
+	outdoor = "绝情谷",
 	ways = {
 		["out"] = "gumu/jqg/shiwu",
 		["#goHt"] = "gumu/jqg/houtang",
@@ -10779,85 +12358,105 @@ Room {
 	lengths = {
 		["#goHt"] = "if hp.exp < 200000 then return false else return 1 end",
 	},
+	
 }
 Room {
 	id = "gumu/jqg/fyy",
 	name = "飞云岩",
+	outdoor = "绝情谷",
 	ways = {
 		["northup"] = "gumu/jqg/shanjing",
 		["southdown"] = "gumu/jqg/xqx",
 	},
+	room_relative="山径｜飞云岩响琴榭",
 }
 Room {
 	id = "gumu/jqg/glt",
 	name = "观澜亭",
+	outdoor = "绝情谷",
 	ways = {
 		["east"] = "gumu/jqg/xqx",
 		["southdown"] = "gumu/jqg/xiaoxi",
 	},
+	room_relative="响琴榭｜独峰岭观澜亭",
 }
 Room {
 	id = "gumu/jqg/houtang",
 	name = "后堂",
+	outdoor = "绝情谷",
 	no_fight = true,
 	ways = {
 		["south"] = "gumu/jqg/dating",
 		["north"] = "gumu/jqg/lang1",
 	},
+	room_relative="长廊｜后堂｜大厅后堂",
 }
 Room {
 	id = "gumu/jqg/huacong",
 	name = "花丛",
+	outdoor = "绝情谷",
 	no_fight = true,
 	ways = {
 		["west"] = "gumu/jqg/xiaolu",
 	},
+	room_relative="谷中小路-----花丛花丛",
 }
 Room {
 	id = "gumu/jqg/huayuan",
 	name = "花园",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "gumu/jqg/lang1",
 	},
+	room_relative="花园｜长廊花园",
 }
 Room {
 	id = "gumu/jqg/jianshi",
 	name = "剑室",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "gumu/jqg/lang5",
 	},
+	
 }
 Room {
 	id = "gumu/jqg/lang1",
 	name = "长廊",
+	outdoor = "绝情谷",
 	ways = {
-		["south"] = "gumu/jqg/houtang",
+		["south"] = "gumu/jqg/houtang",  
 		["east"] = "gumu/jqg/lang2",
 		["north"] = "gumu/jqg/huayuan",
 		["west"] = "gumu/jqg/lang4",
 	},
+	room_relative="花园｜西厢长廊-----长廊-----东厢长廊｜后堂长廊",
 }
 Room {
 	id = "gumu/jqg/lang2",
 	name = "东厢长廊",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "gumu/jqg/lgf",
 		["east"] = "gumu/jqg/lang3",
 		["north"] = "gumu/jqg/danfang",
-		["west"] = "gumu/jqg/lang1",
+		["west"] = "gumu/jqg/lang1",  
 	},
+	room_relative="丹房｜长廊---东厢长廊---东厢长廊｜练功房东厢长廊",
 }
 Room {
 	id = "gumu/jqg/lang3",
 	name = "东厢长廊",
+	outdoor = "绝情谷",
 	ways = {
 		["east"] = "gumu/jqg/shufang",
-		["west"] = "gumu/jqg/lang2",
+		["west"] = "gumu/jqg/lang2",   
 	},
+	room_relative="东厢长廊---东厢长廊---书房东厢长廊",
 }
 Room {
 	id = "gumu/jqg/lang4",
 	name = "西厢长廊",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "gumu/jqg/sleep2",
 		["north"] = "gumu/jqg/sleep1",
@@ -10873,14 +12472,12 @@ Room {
 Room {
 	id = "gumu/jqg/lang5",
 	name = "西厢长廊",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "gumu/jqg/zhifang",
 		["east"] = "gumu/jqg/lang4",
 		["north"] = "gumu/jqg/jianshi",
 	},
-	postcmds = {
-        ["north"] = "#walkBusy",
-    },
 	lengths = {
 		["north"] = "if not skills['dodge'] or skills['dodge'].lvl>130 then return 1 else return false end",
 	},
@@ -10889,55 +12486,68 @@ Room {
 Room {
 	id = "gumu/jqg/lgf",
 	name = "练功房",
+	outdoor = "绝情谷",
 	ways = {
-		["north"] = "gumu/jqg/lang2",
+		["north"] = "gumu/jqg/lang2",  
 	},
+	room_relative="东厢长廊｜练功房练功房",
 }
 Room {
 	id = "gumu/jqg/qsroad",
 	name = "青石板路",
+	outdoor = "绝情谷",
 	ways = {
 		["eastup"] = "gumu/jqg/shuitang",
 		["north"] = "gumu/jqg/shiwu",
 	},
+	room_relative="大石屋｜青石板路→水塘青石板路",
 }
 Room {
 	id = "gumu/jqg/shanding",
 	name = "山顶平地",
+	outdoor = "绝情谷",
 	ways = {
 		["east"] = "gumu/jqg/shanlu4",
 		["southdown"] = "gumu/jqg/shanjing1",
 		["northdown"] = "gumu/jqg/zhulinn",
 		["west"] = "gumu/jqg/xshiwu",
 	},
+	room_relative="水塘↓小石屋---山顶平地---山路↑山径山顶平地",
 }
 Room {
 	id = "gumu/jqg/shanjing",
 	name = "山径",
+	outdoor = "绝情谷",
 	ways = {
 		["northup"] = "gumu/jqg/shanjing1",
 		["southdown"] = "gumu/jqg/fyy",
 	},
+	room_relative="山径｜飞云岩山径",
 }
 Room {
 	id = "gumu/jqg/shanjing1",
 	name = "山径",
+	outdoor = "绝情谷",
 	ways = {
 		["northup"] = "gumu/jqg/shanding",
-		["southdown"] = "gumu/jqg/shanjing",
+		["southdown"] = "gumu/jqg/shanjing",  
 	},
+	room_relative="山顶平地｜山径山径",
 }
 Room {
 	id = "gumu/jqg/shanlu1",
 	name = "山间小路",
+	outdoor = "绝情谷",
 	ways = {
 		["southeast"] = "gumu/jqg/shanlu2",
 		["north"] = "gumu/jqg/xibian",
 	},
+room_relative="小溪边｜山间小路↘山间小路山间小路",
 }
 Room {
 	id = "gumu/jqg/shanlu10",
 	name = "断肠崖",
+	outdoor = "绝情谷",
 	ways = {
 		["westdown"] = "gumu/jqg/shanlu9",
 		["l ya;jump qiaobi;xiao"] = "gumu/jqg/tanan",
@@ -10951,10 +12561,12 @@ Room {
 		["l ya;jump qiaobi;xiao"] = "if score.party and score.party=='古墓派' and job.name~='tdh' then return 10 else return false end",
 		["l ya;jump qiaobi"] = "if score.party and score.party~='古墓派' and job.name=='tdh' then return false else return 10 end",
 	},
+	
 }
 Room {
 	id = "gumu/jqg/qiaobi",
 	name = "峭壁",
+	outdoor = "绝情谷",
 	ways = {
 		["#Togudi"] = "gumu/jqg/gudi",
 		["jump back"] = "gumu/jqg/shanlu10",
@@ -10967,10 +12579,12 @@ Room {
 		["#Togudi"] = 100,
 		["jump back"] = 100,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/yabi",
 	name = "崖壁",
+	outdoor = "绝情谷",
 	ways = {
 		["#Goyadi"] = "gumu/jqg/gudi",
 		["#Goqiaobi"] = "gumu/jqg/qiaobi",
@@ -10983,10 +12597,12 @@ Room {
 		["#Goyadi"] = 100,
 		["#Goqiaobi"] = 100,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/gudishuitan",
 	name = "谷底水潭",
+	outdoor = "绝情谷",
 	ways = {
 		["#Hyadi"] = "gumu/jqg/gudi",
 	},
@@ -10996,10 +12612,12 @@ Room {
 	lengths = {
 		["#Hyadi"] = 100,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/shuiditongdao",
 	name = "水底通道",
+	outdoor = "绝情谷",
 	ways = {
 		["#qQydok"] = "gumu/jqg/tanan",
 	},
@@ -11009,10 +12627,12 @@ Room {
 	lengths = {
 		["#qQydok"] = 100,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/shuitanbiaomian",
 	name = "水潭表面",
+	outdoor = "绝情谷",
 	ways = {
 		["pa up"] = "gumu/jqg/tanan",
 	},
@@ -11022,10 +12642,12 @@ Room {
 	lengths = {
 		["pa up"] = 100,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/gudi",
 	name = "谷底",
+	outdoor = "绝情谷",
 	ways = {
 		["#Toqiaobi"] = "gumu/jqg/qiaobi",
 		["#Totanan"] = "gumu/jqg/tanan",
@@ -11038,58 +12660,72 @@ Room {
 		["#Toqiaobi"] = 100,
 		["#Totanan"] = 100,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/shanlu2",
 	name = "山间小路",
+	outdoor = "绝情谷",
 	ways = {
 		["southeast"] = "gumu/jqg/shanlu3",
 		["northwest"] = "gumu/jqg/shanlu1",
 	},
+	room_relative="山间小路↖山间小路↘山间小路山间小路",
 }
 Room {
 	id = "gumu/jqg/shanlu3",
 	name = "山间小路",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "xiangyang/outwroad1",
 		["northwest"] = "gumu/jqg/shanlu2",
 	},
+	room_relative="山间小路↖山间小路｜西门外山间小路",
 }
 Room {
 	id = "gumu/jqg/shanlu4",
 	name = "山路",
+	outdoor = "绝情谷",
 	ways = {
 		["east"] = "gumu/jqg/shanlu5",
 		["west"] = "gumu/jqg/shanding",
 	},
+	room_relative="山路｜山顶平地山路",
 }
 Room {
 	id = "gumu/jqg/shanlu5",
 	name = "山路",
+	outdoor = "绝情谷",
 	ways = {
 		["northup"] = "gumu/jqg/shanlu6",
 		["eastup"] = "gumu/jqg/shanlu9",
-		["west"] = "gumu/jqg/shanlu4",
+		["west"] = "gumu/jqg/shanlu4",  
 	},
+	
 }
 Room {
 	id = "gumu/jqg/shanlu6",
 	name = "厉鬼峰",
+	outdoor = "绝情谷",
 	ways = {
 		["southdown"] = "gumu/jqg/shanlu5",
 	},
+	
 }
 Room {
 	id = "gumu/jqg/shanlu9",
 	name = "山路",
+	outdoor = "绝情谷",
 	ways = {
 		["westdown"] = "gumu/jqg/shanlu5",
 		["eastup"] = "gumu/jqg/shanlu10",
 	},
+	
 }
 Room {
 	id = "gumu/jqg/shiwu",
 	name = "大石屋",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "gumu/jqg/qsroad",
 		["enter"] = "gumu/jqg/dating",
@@ -11099,17 +12735,29 @@ Room {
 			{id = "fan yiweng", exp = 400000},
 		},
 	},
+	
+}
+Room {
+	id = "gumu/jqg/shiyao",
+	name = "石窟",
+	outdoor = "绝情谷",
+	ways = {
+		["east"] = "gumu/jqg/cave3",
+	},
 }
 Room {
 	id = "gumu/jqg/shufang",
 	name = "书房",
+	outdoor = "绝情谷",
 	ways = {
 		["west"] = "gumu/jqg/lang3",
 	},
+	room_relative="东厢长廊-----书房书房",
 }
 Room {
 	id = "gumu/jqg/shuitang",
 	name = "水塘",
+	outdoor = "绝情谷",
 	ways = {
 		["#jqgzlout"] = "gumu/jqg/shanding",
 		["westdown"] = "gumu/jqg/qsroad",
@@ -11121,30 +12769,36 @@ Room {
 	lengths = {
 		["#jqgzlout"] = 100,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/sleep1",
 	name = "休息室",
+	outdoor = "绝情谷",
 	no_fight = true,
 	ways = {
-		["south"] = "gumu/jqg/lang4",
+		["south"] = "gumu/jqg/lang4",  
 	},
+	
 }
 Room {
 	id = "gumu/jqg/sleep2",
 	name = "休息室",
+	outdoor = "绝情谷",
 	no_fight = true,
 	ways = {
-		["north"] = "gumu/jqg/lang4",
+		["north"] = "gumu/jqg/lang4",  
 	},
+	
 }
 Room {
 	id = "gumu/jqg/tanan",
 	name = "水潭岸边",
+	outdoor = "绝情谷",
 	ways = {
 		["north"] = "gumu/jqg/xiaolu",
-		["xiao;jump back"] = "gumu/jqg/shanlu10",
-		["#Hgudi"] = "gumu/jqg/gudi",
+		["xiao;jump back"] = "gumu/jqg/shanlu10", 
+		["#Hgudi"] = "gumu/jqg/gudi",  
 	},
 	nolooks = {
 		["xiao;jump back"] = true,
@@ -11154,27 +12808,33 @@ Room {
 		["xiao;jump back"] = "if score.party and score.party=='古墓派' then return 10 else return false end",
 		["#Hgudi"] = "if score.party and score.party=='古墓派' then return false else return 10 end",
 	},
+	
 }
 Room {
 	id = "gumu/jqg/wshi",
 	name = "卧室",
+	outdoor = "绝情谷",
 	no_fight = true,
 	ways = {
 		["south"] = "gumu/jqg/zhongtang",
 	},
+	room_relative="卧室｜中堂卧室",
 }
 Room {
 	id = "gumu/jqg/xiaolu",
 	name = "谷中小路",
+	outdoor = "绝情谷",
 	ways = {
-		["south"] = "gumu/jqg/tanan",
+		["south"] = "gumu/jqg/tanan",  
 		["enter"] = "gumu/jqg/zhongtang",
 		["east"] = "gumu/jqg/huacong",
 	},
+	room_relative="中堂∧谷中小路---花丛｜水潭岸边谷中小路",
 }
 Room {
 	id = "gumu/jqg/xiaoshi",
 	name = "小室",
+	outdoor = "绝情谷",
 	ways = {
 		["east"] = "gumu/jqg/dashi",
 		["west"] = "gumu/jqg/zhongtang",
@@ -11182,10 +12842,12 @@ Room {
 	objs = {
           ["杨过"] = "yang guo",
            },
+	room_relative="中堂-----小室-----大室小室",
 }
 Room {
 	id = "gumu/jqg/xiaoxi",
 	name = "独峰岭",
+	outdoor = "绝情谷",
 	ways = {
 		["northup"] = "gumu/jqg/glt",
 		["#jqgout"] = "gumu/jqg/xibian",
@@ -11196,13 +12858,15 @@ Room {
 	lengths = {
 		["#jqgout"] = 200,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/xibian",
 	name = "小溪边",
+	outdoor = "绝情谷",
 	ways = {
 		["south"] = "gumu/jqg/shanlu1",
-		["#jqgin"] = "gumu/jqg/xiaoxi",
+		["#jqgin"] = "gumu/jqg/xiaoxi",  
 	},
 	nolooks = {
 		["#jqgin"] = true,
@@ -11210,61 +12874,75 @@ Room {
 	lengths = {
 		["#jqgin"] = 200,
 	},
+	
 }
 Room {
 	id = "gumu/jqg/xqx",
 	name = "响琴榭",
+	outdoor = "绝情谷",
 	ways = {
 		["northup"] = "gumu/jqg/fyy",
 		["west"] = "gumu/jqg/glt",
 	},
+	
 }
 Room {
 	id = "gumu/jqg/xshiwu",
 	name = "小石屋",
+	outdoor = "绝情谷",
 	no_fight = true,
 	ways = {
 		["east"] = "gumu/jqg/shanding",
 	},
+	
 }
 Room {
 	id = "gumu/jqg/zhifang",
 	name = "芝房",
+	outdoor = "绝情谷",
 	ways = {
-		["north"] = "gumu/jqg/lang5",
+		["north"] = "gumu/jqg/lang5",  
 	},
+	room_relative="西厢长廊｜芝房芝房",
 }
 Room {
 	id = "gumu/jqg/zhongtang",
 	name = "中堂",
+	outdoor = "绝情谷",
 	ways = {
-		["east"] = "gumu/jqg/xiaoshi",
+		["east"] = "gumu/jqg/xiaoshi",  
 		["north"] = "gumu/jqg/wshi",
-		["out"] = "gumu/jqg/xiaolu",
+		["out"] = "gumu/jqg/xiaolu",   
 	},
+	room_relative="卧室｜中堂-----小室∨谷中小路中堂",
 }
 Room {
 	id = "gumu/jqg/zhulinn",
 	name = "竹林",
+	outdoor = "绝情谷",
 	ways = {
-		["#jqgzlin"] = "gumu/jqg/shuitang",
+		["#jqgzlin"] = "gumu/jqg/shuitang",   
 		["#jqgzlout"] = "gumu/jqg/shanding",
 	},
 	lengths = {
 		["#jqgzlin"] = 50,
 		["#jqgzlout"] = 50,
 	},
+	
 }
 Room {
 	id = "gumu/lgf",
 	name = "练功房",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/shitou",
 	},
+	
 }
 Room {
         id = "gumu/lingshi",
         name = "灵室",
+		outdoor = "终南山",
         ways = {
                 ["out"] = "gumu/ss5",
                 ["get fire;tui guangai;tang guan;use fire;search;search;search;search;search;search;search;search;search;turn ao left;#walkBusy;ti up"] = "gumu/sshi1",
@@ -11278,79 +12956,98 @@ Room {
 Room {
 	id = "gumu/lyy",
 	name = "老妪岩",
+	outdoor = "终南山",
 	ways = {
 		["east"] = "gumu/shulin1",
 		["northdown"] = "gumu/bzy",
 	},
+	room_relative="抱子岩↓老妪岩----树林老妪岩",
 }
 Room {
 	id = "gumu/rukou",
 	name = "古墓",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/xuanya",
 		["enter"] = "gumu/gmqt",
 		["north"] = "gumu/guoyuan",
 	},
+	room_relative="悬崖｜前厅--果园古墓",
 }
 Room {
 	id = "gumu/ryy",
 	name = "日月岩",
+	outdoor = "终南山",
 	ways = {
 		["westup"] = "gumu/bzy",
 		["northdown"] = "gumu/jlg",
 	},
+	room_relative="金莲阁↓抱子岩←日月岩日月岩",
 }
 Room {
 	id = "gumu/shanlu1",
 	name = "山麓",
+	outdoor = "终南山",
 	ways = {
 		["southup"] = "gumu/shanlu2",
 		["northdown"] = "gumu/xiaolu3",
 	},
+	room_relative="乡间小道↓山麓↓岗顶山麓",
 }
 Room {
 	id = "gumu/shanlu2",
 	name = "岗顶",
+	outdoor = "终南山",
 	ways = {
 		["southup"] = "gumu/shanlu3",
 		["northdown"] = "gumu/shanlu1",
 	},
+	room_relative="山麓↓岗顶↓山路岗顶",
 }
 Room {
 	id = "gumu/shanlu3",
 	name = "山路",
+	outdoor = "终南山",
 	ways = {
 		["eastup"] = "gumu/ztm",
 		["northdown"] = "gumu/shanlu2",
 	},
+	room_relative="岗顶↓山路→中天门山路",
 }
 Room {
 	id = "gumu/shanpo",
 	name = "山坡",
+	outdoor = "终南山",
 	ways = {
 		["westdown"] = "gumu/guoyuan",
 		["northeast"] = "gumu/shanpo1",
 	},
+	room_relative="中天门｜果园山坡",
 }
 Room {
 	id = "gumu/shanpo1",
 	name = "山坡",
+	outdoor = "终南山",
 	ways = {
 		["southwest"] = "gumu/shanpo",
 	},
+	room_relative="山坡｜山坡",
 }
 Room {
 	id = "gumu/shanxia",
 	name = "终南山下",
+	outdoor = "终南山",
 	ways = {
 		["northwest"] = "gumu/xiaolu3",
 		["enter"] = "gumu/dongkou",
 	},
+	room_relative="乡间小道洞口↖∧终南山下终南山下",
 }
 
 Room {
         id = "gumu/shengou",
         name = "深沟",
+		outdoor = "终南山",
         ways = {
                 ["west"] = "gumu/shulin2",
                 ["tiao gou"] = "gumu/rukou",
@@ -11369,6 +13066,7 @@ Room {
 Room {
 	id = "gumu/shiguan",
 	name = "石棺内",
+	outdoor = "终南山",
 	no_fight = true,
 	ways = {
 		["out"] = "gumu/lingshi",
@@ -11377,6 +13075,7 @@ Room {
 Room {
 	id = "gumu/shitou",
 	name = "石室",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/yaofang",
 		["north"] = "gumu/lgf",
@@ -11386,6 +13085,7 @@ Room {
 Room {
 	id = "gumu/shulin",
 	name = "树林",
+	outdoor = "终南山",
 	ways = {
 		["out"] = "gumu/shulin2",
 	},
@@ -11393,23 +13093,28 @@ Room {
 Room {
 	id = "gumu/shulin1",
 	name = "树林",
+	outdoor = "终南山",
 	ways = {
 		["east"] = "gumu/sln",
 		["west"] = "gumu/lyy",
 	},
+	room_relative="黑林｜老妪岩树林",
 }
 Room {
 	id = "gumu/shulin2",
 	name = "灌木丛",
+	outdoor = "终南山",
 	ways = {
 		["east"] = "gumu/shengou",
 		["west"] = "gumu/sln",
 	},
+	room_relative="深沟｜黑林灌木丛",
 }
 --[[
 Room {
 	id = "gumu/sln",
 	name = "黑林",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/sln",
 		["north"] = "gumu/sln",
@@ -11426,6 +13131,7 @@ Room {
 Room {
 	id = "gumu/sln",
 	name = "黑林",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/sl3",
 	},
@@ -11433,6 +13139,7 @@ Room {
 Room {
 	id = "gumu/sl3",
 	name = "黑林",
+	outdoor = "终南山",
 	ways = {
 		["north"] = "gumu/sl2",
 	},
@@ -11440,6 +13147,7 @@ Room {
 Room {
 	id = "gumu/sl2",
 	name = "黑林",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/sl4",
 	},
@@ -11450,6 +13158,7 @@ Room {
 Room {
 	id = "gumu/sl4",
 	name = "黑林",
+	outdoor = "终南山",
 	ways = {	
 		["e;e;e;e;e;e;e;e;e;e;e;e;w"] = "gumu/shulin2",
 		["w;w;w;w;w;w;w;w;w;w;w;w;e"] = "gumu/shulin1",
@@ -11458,6 +13167,7 @@ Room {
 Room {
         id = "gumu/ss0",
         name = "石室",
+		outdoor = "终南山",
         ways = {
                 ["out"] = "gumu/ss4",
         },
@@ -11465,6 +13175,7 @@ Room {
 Room {
         id = "gumu/ss1",
         name = "石室",
+		outdoor = "终南山",
         ways = {
                 ["out"] = "gumu/ss1",
         },
@@ -11472,6 +13183,7 @@ Room {
 Room {
         id = "gumu/ss4",
         name = "石室",
+		outdoor = "终南山",
         ways = {
                 ["w;w;w;w;w;s;s;s;s;s;s;n;n;n;n;n;e;e;e;e;e;#walkBusy;enter"] = "gumu/lingshi",
                 ["w;w;w;w;w;s;s;s;s;s;s;n;n;n;n;n;e;e;e;e;e"] = "gumu/ss5",
@@ -11481,6 +13193,7 @@ Room {
 Room {
 	id = "gumu/ss5",
 	name = "石室",
+	outdoor = "终南山",
 	ways = {
 		["enter"] = "gumu/lingshi",
 		["west"] = "gumu/ss4",
@@ -11489,6 +13202,7 @@ Room {
 Room {
         id = "gumu/sshi1",
         name = "石室",
+		outdoor = "终南山",
         ways = {
                 ["up"] = "gumu/shiguan",
                 ["l map;#walkBusy;walk down"] = "gumu/gmanhe1",
@@ -11497,32 +13211,39 @@ Room {
 Room {
 	id = "gumu/xiaolu1",
 	name = "田间小路",
+	outdoor = "终南山",
 	ways = {
 		["south"] = "gumu/xiaolu2",
 		["east"] = "gumu/fchuan",
 	},
+	room_relative="田间小路---樊川｜终南小道田间小路",
 }
 Room {
 	id = "gumu/xiaolu2",
 	name = "终南小道",
+	outdoor = "终南山",
 	ways = {
 		["southeast"] = "group/entry/gmchang",
 		["south"] = "gumu/xiaolu3",
-		["north"] = "gumu/xiaolu1",
+		["north"] = "gumu/xiaolu1",  
 	},
+	room_relative="田间小路｜终南小道｜↘乡间小道终南广场终南小道",
 }
 Room {
 	id = "gumu/xiaolu3",
 	name = "乡间小道",
+	outdoor = "终南山",
 	ways = {
 		["southup"] = "gumu/shanlu1",
 		["southeast"] = "gumu/shanxia",
 		["north"] = "gumu/xiaolu2",
 	},
+	room_relative="终南小道｜乡间小道↓↘山麓终南山下乡间小道",
 }
 Room {
 	id = "gumu/xuantie/dongkou",
 	name = "洞口",
+	outdoor = "襄阳郊外",
 	ways = {
 		["southeast"] = "gumu/xuantie/xiaolu3",
 		["enter"] = "gumu/xuantie/shandong",
@@ -11531,21 +13252,28 @@ Room {
 		["enter"] = {
 			{id = "shen diao", exp = 100000},
 		},
+	precmds = {
+              ["enter"] = "kill shen diao",
+	},
 	},
 	objs = {
           ["神雕"] = "shen diao",
      },
+	 
 }
 Room {
 	id = "gumu/xuantie/pubu",
 	name = "瀑布",
+	outdoor = "襄阳郊外",
 	ways = {
 		["west"] = "gumu/xuantie/xiaolu3",
 	},
+	room_relative="山路｜瀑布",
 }
 Room {
 	id = "gumu/xuantie/qiaobi",
 	name = "峭壁",
+	outdoor = "襄阳郊外",
 	ways = {
 		["southdown"] = "gumu/xuantie/shanlu8",
 		["l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;mo qingtai;cuan up"] = "gumu/xuantie/pingtai",
@@ -11553,10 +13281,12 @@ Room {
 	nolooks = {
 		["l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;l shibi;mo qingtai;cuan up"] = true,
 	},
+	room_relative="深谷｜峭壁-平台",
 }
 Room {
 	id = "gumu/xuantie/pingtai",
 	name = "平台",
+	outdoor = "襄阳郊外",
 	ways = {
 		["enter"] = "gumu/xuantie/jianzhong",
 		["tiao down"] = "gumu/xuantie/qiaobi",
@@ -11568,10 +13298,12 @@ Room {
 	precmds = {
 		["enter"] = "move stone",
 	},
+	
 }
 Room {
 	id = "gumu/xuantie/jianzhong",
 	name = "剑冢",
+	outdoor = "襄阳郊外",
 	ways = {
 		["out"] = "gumu/xuantie/pingtai",
 	},
@@ -11581,10 +13313,12 @@ Room {
 	precmds = {
 		["out"] = "tui shi",
 	},
+	
 }
 Room {
 	id = "gumu/xuantie/shandong",
 	name = "大山洞",
+	outdoor = "襄阳郊外",
 	ways = {
 		["out"] = "gumu/xuantie/dongkou",
 	},
@@ -11592,22 +13326,27 @@ Room {
 Room {
 	id = "gumu/xuantie/shanlu7",
 	name = "深谷",
+	outdoor = "襄阳郊外",
 	ways = {
 		["south"] = "gumu/xuantie/shandong",
 		["northwest"] = "gumu/xuantie/shanlu8",
 	},
+	room_relative="大山洞｜山路｜深谷",
 }
 Room {
 	id = "gumu/xuantie/shanlu8",
 	name = "深谷",
+	outdoor = "襄阳郊外",
 	ways = {
 		["northup"] = "gumu/xuantie/qiaobi",
 		["southeast"] = "gumu/xuantie/shanlu7",
 	},
+	room_relative="峭壁｜深谷｜深谷",
 }
 Room {
 	id = "gumu/xuantie/shushang",
 	name = "树上",
+	outdoor = "襄阳郊外",
 	ways = {
 		["down"] = "gumu/xuantie/shanlu7",
 	},
@@ -11615,24 +13354,26 @@ Room {
 Room {
 	id = "gumu/xuantie/xiaolu1",
 	name = "山路",
+	outdoor = "襄阳郊外",
 	ways = {
 		["northup"] = "gumu/xuantie/xiaolu2",
-		--["south"] = "gumu/xuantie/xiaolu4",
-		["south"] = "gumu/xuantie/linhain",
+		["south"] = "gumu/xuantie/xiaolu4",
+		["s"] = "gumu/xuantie/linhain",
 	},
 	nolooks = {
 		["south"] = true,
-		--["s"] = true,
+		["s"] = true,
 	},
 	lengths = {
-		--["south"] = "if score.party and score.party=='古墓派' then return 1 else return false end",
-		--["s"] = "if score.party and score.party=='古墓派' then return false else return 30 end",
+		["south"] = "if score.party and score.party=='古墓派' then return 1 else return false end",
+		["s"] = "if score.party and score.party=='古墓派' then return false else return 30 end",
 	},
 	room_relative="山路↑山路｜山路山路",
 }
 Room {
 	id = "gumu/xuantie/xiaolu2",
 	name = "山路",
+	outdoor = "襄阳郊外",
 	ways = {
 		["northup"] = "gumu/xuantie/xiaolu3",
 		["southdown"] = "gumu/xuantie/xiaolu1",
@@ -11642,6 +13383,7 @@ Room {
 Room {
 	id = "gumu/xuantie/xiaolu3",
 	name = "山路",
+	outdoor = "襄阳郊外",
 	ways = {
 		["northwest"] = "gumu/xuantie/dongkou",
 		["east"] = "gumu/xuantie/pubu",
@@ -11652,8 +13394,9 @@ Room {
 Room {
 	id = "gumu/xuantie/linhain",
 	name = "树林",
+	outdoor = "襄阳郊外",
 	ways = {
-		["#goXtj"] = "gumu/xuantie/dongkou",
+		["#goXtj"] = "gumu/xuantie/xiaolu1",
 		["#outXtj"] = "gumu/xuantie/xiaolu4",
 	},
 	nolooks = {
@@ -11663,103 +13406,58 @@ Room {
 		["north"] = true,
 	},
 }
-Room {
-	id = "gumu/xuantie/linhain1",
-	name = "树林",
-	ways = {
-		["south"] = "gumu/xuantie/linhain1",
-		["north"] = "gumu/xuantie/linhain2",
-		["east"] = "gumu/xuantie/linhain1",
-		["west"] = "gumu/xuantie/linhain1",
-		["#outXtj"] = "gumu/xuantie/xiaolu4",
-	},
-	nolooks = {
-		["east"] = true,
-		["west"] = true,
-		["south"] = true,
-		["north"] = true,
-	},
-}
-Room {
-	id = "gumu/xuantie/linhain2",
-	name = "树林",
-	ways = {
-		["south"] = "gumu/xuantie/linhain2",
-		["north"] = "gumu/xuantie/linhain2",
-		["east"] = "gumu/xuantie/linhain3",
-		["west"] = "gumu/xuantie/linhain2",
-		["#outXtj"] = "gumu/xuantie/xiaolu4",
-	},
-	nolooks = {
-		["east"] = true,
-		["west"] = true,
-		["south"] = true,
-		["north"] = true,
-	},
-}
-Room {
-	id = "gumu/xuantie/linhain3",
-	name = "树林",
-	ways = {
-		["south"] = "gumu/xuantie/linhain3",
-		["north"] = "gumu/xuantie/linhain3",
-		["east"] = "gumu/xuantie/linhain3",
-		["west"] = "gumu/xuantie/linhain3",
-		["#outXtj"] = "gumu/xuantie/xiaolu4",
-		["#goXtj"] = "gumu/xuantie/dongkou",
-	},
-	nolooks = {
-		["east"] = true,
-		["west"] = true,
-		["south"] = true,
-		["north"] = true,
-	},
-}
-
 Room {
 	id = "gumu/xuantie/xiaolu4",
 	name = "山路",
+	outdoor = "襄阳郊外",
 	ways = {
 		["southeast"] = "xiangyang/conglin4",
-		--["north"]     = "gumu/xuantie/xiaolu1",
-		["north"]     = "gumu/xuantie/linhain1",
+		["north"]     = "gumu/xuantie/xiaolu1",
+		["n"]     = "gumu/xuantie/linhain",
 		},
         nolooks = {
                 ["north"] = true,
-                --["n"] = true,
+                ["n"] = true,
         },
         lengths = {
-                --["north"] = "if score.party and score.party=='古墓派' then return 1 else return false end",
-		        --["n"] = "if score.party and score.party=='古墓派' then return false else return 1 end",
+                ["north"] = "if score.party and score.party=='古墓派' then return 1 else return false end",
+		        ["n"] = "if score.party and score.party=='古墓派' then return false else return 30 end",
 		},
 		room_relative='山路｜山路↘山间空地山路',
 }
 Room {
 	id = "gumu/xuanya",
 	name = "悬崖",
+	outdoor = "终南山",
 	ways = {
 		["north"] = "gumu/rukou",
 	},
+	room_relative='古墓｜悬崖',
 }
 Room {
 	id = "gumu/yaofang",
 	name = "药房",
+	outdoor = "终南山",
 	ways = {
-		["north"] = "gumu/shitou",
+		["north"] = "gumu/shitou",   
 		["west"] = "gumu/fang",
 	},
+	room_relative='石室｜石室药房',
 }
 Room {
 	id = "gumu/ztm",
 	name = "中天门",
+	outdoor = "终南山",
 	ways = {
 		["westdown"] = "gumu/shanlu3",
 		["southdown"] = "gumu/jlg",
 	},
+	room_relative='山路→中天门↑金莲阁中天门',
 }
 Room {
 	id = "hengshan/baiyunan",
 	name = "白云庵",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/square",
 	},
@@ -11768,20 +13466,24 @@ Room {
           ["郑萼"] = "zheng e",
           ["秦绢"] = "qin juan",
            },
+	room_relative="白云庵｜见性峰广场白云庵",
 }
 Room {
 	id = "hengshan/beiyuedian",
 	name = "北岳殿",
+	outdoor = "恒山",
 	ways = {
 		["northup"] = "hengshan/shandao1",
 		["eastup"] = "hengshan/yuyang",
 		["westup"] = "hengshan/huixiantai",
 		["southdown"] = "hengshan/beiyuemiao",
 	},
+	room_relative="见性峰山道↑会仙台←北岳殿→玉羊游云↑北岳庙北岳殿",
 }
 Room {
 	id = "hengshan/beiyuemiao",
 	name = "北岳庙",
+	outdoor = "恒山",
 	ways = {
 		["northup"] = "hengshan/beiyuedian",
 		["east"] = "hengshan/kutianjing",
@@ -11791,86 +13493,106 @@ Room {
 	objs = {
           ["仪和"] = "yi he",
           ["仪琳"] = "yi lin",
+	room_relative="北岳殿↑鸡叫石----北岳庙----苦甜井↑果老岭北岳庙",
            },
 }
 Room {
 	id = "hengshan/cuiping1",
 	name = "翠屏山道",
+	outdoor = "恒山",
 	ways = {
 		["westup"] = "hengshan/cuiping2",
 		["down"] = "hengshan/cuipinggu2",
 	},
+	room_relative="翠屏山道←翠屏山道〓翠屏谷翠屏山道",
 }
 Room {
 	id = "hengshan/cuiping2",
 	name = "翠屏山道",
+	outdoor = "恒山",
 	ways = {
 		["eastdown"] = "hengshan/cuiping1",
 		["eastup"] = "hengshan/xuankong1",
 	},
+	room_relative="翠屏山道←翠屏山道翠屏山道",
 }
 Room {
 	id = "hengshan/cuipinggu1",
 	name = "翠屏谷",
+	outdoor = "恒山",
 	ways = {
 		["southeast"] = "hengshan/cuipinggu2",
 		["northeast"] = "hengshan/jinlongxia",
 	},
 	objs = {
           ["仪文"] = "yi wen",
+	room_relative="金龙峡↗翠屏谷↘翠屏谷翠屏谷",
            },
 }
 Room {
 	id = "hengshan/cuipinggu2",
 	name = "翠屏谷",
+	outdoor = "恒山",
 	ways = {
 		["northwest"] = "hengshan/cuipinggu1",
 		["up"] = "hengshan/cuiping1",
 	},
+	room_relative="翠屏谷翠屏山道↖〓翠屏谷翠屏谷",
 }
 Room {
 	id = "hengshan/daziling",
 	name = "大字岭",
+	outdoor = "恒山",
 	ways = {
 		["northeast"] = "hengshan/hufengkou",
 		["west"] = "hengshan/yunge",
 	},
+	room_relative="虎风口↗云阁虹桥----大字岭大字岭",
 }
 Room {
 	id = "hengshan/guolaoling",
 	name = "果老岭",
+	outdoor = "恒山",
 	ways = {
 		["northup"] = "hengshan/beiyuemiao",
 		["westdown"] = "hengshan/tongyuangu",
 		["southwest"] = "hengshan/hufengkou",
 	},
+	room_relative="北岳庙↑通元谷→果老岭↙虎风口果老岭",
 }
 Room {
 	id = "hengshan/hufengkou",
 	name = "虎风口",
+	outdoor = "恒山",
 	ways = {
 		["southwest"] = "hengshan/daziling",
 		["northeast"] = "hengshan/guolaoling",
 		["west"] = "hengshan/xgsong",
 	},
+ room_relative="果老岭↗悬根松----虎风口↙大字岭虎风口",
 }
 Room {
 	id = "hengshan/huixiantai",
 	name = "会仙台",
+	outdoor = "恒山",
 	ways = {
 		["eastdown"] = "hengshan/beiyuedian",
 	},
+	room_relative="会仙台←北岳殿会仙台",
 }
 Room {
 	id = "hengshan/jijiaoshi",
 	name = "鸡叫石",
+	outdoor = "恒山",
 	ways = {
 		["east"] = "hengshan/beiyuemiao",
 	},
+	room_relative="鸡叫石----北岳庙鸡叫石",
 }
 Room {
 	id = "hengshan/jinlongxia",
 	name = "金龙峡",
+	outdoor = "恒山",
 	ways = {
 		["southwest"] = "hengshan/cuipinggu1",
 		["southdown"] = "changan/northroad10",
@@ -11878,41 +13600,51 @@ Room {
 	},
 	objs = {
           ["定静师太"] = "dingjing shitai",
+	room_relative="树林----金龙峡↙↑翠屏谷大道金龙峡",
            },
 }
 Room {
 	id = "hengshan/kutianjing",
 	name = "苦甜井",
+	outdoor = "恒山",
 	ways = {
 		["west"] = "hengshan/beiyuemiao",
 	},
+	room_relative="北岳庙----苦甜井苦甜井",
 }
 Room {
 	id = "hengshan/shandao1",
 	name = "见性峰山道",
+	outdoor = "恒山",
 	ways = {
 		["northup"] = "hengshan/shandao2",
 		["southdown"] = "hengshan/beiyuedian",
 	},
+room_relative="见性峰山道↑见性峰山道↑北岳殿见性峰山道",
 }
 Room {
 	id = "hengshan/shandao2",
 	name = "见性峰山道",
+	outdoor = "恒山",
 	ways = {
 		["eastup"] = "hengshan/square",
 		["southdown"] = "hengshan/shandao1",
 	},
+	room_relative="见性峰山道→见性峰广场↑见性峰山道见性峰山道",
 }
 Room {
 	id = "hengshan/sjdian",
 	name = "三教殿",
+	outdoor = "恒山",
 	ways = {
 		["down"] = "hengshan/xuankong1",
 	},
+	room_relative="三教殿〓悬空寺北楼三教殿",
 }
 Room {
 	id = "hengshan/square",
 	name = "见性峰广场",
+	outdoor = "恒山",
 	ways = {
 		["westdown"] = "hengshan/shandao2",
 		["north"] = "hengshan/baiyunan",
@@ -11920,77 +13652,96 @@ Room {
 	objs = {
           ["定逸师太"] = "dingyi shitai",
           ["仪清"] = "yi qing",
+  
            },
+  room_relative="白云庵｜见性峰山道→见性峰广场见性峰广场",
 }
 Room {
 	id = "hengshan/tongyuangu",
 	name = "通元谷",
+	outdoor = "恒山",
 	ways = {
 		["eastup"] = "hengshan/guolaoling",
 	},
+	room_relative="通元谷→果老岭通元谷",
 }
 Room {
 	id = "hengshan/xgsong",
 	name = "悬根松",
+	outdoor = "恒山",
 	ways = {
 		["east"] = "hengshan/hufengkou",
 	},
+	room_relative="悬根松----虎风口悬根松",
 }
 Room {
 	id = "hengshan/xuankong1",
 	name = "悬空寺北楼",
+	outdoor = "恒山",
 	ways = {
 		["westdown"] = "hengshan/cuiping2",
 		["south"] = "hengshan/zhanqiao",
 		["up"] = "hengshan/sjdian",
 	},
+room_relative="三教殿〓翠屏山道→悬空寺北楼｜悬空栈桥悬空寺北楼",
 }
 Room {
 	id = "hengshan/xuankong2",
 	name = "悬空寺南楼",
+	outdoor = "恒山",
 	ways = {
 		["southup"] = "hengshan/zhandao",
 		["north"] = "hengshan/zhanqiao",
 	},
+room_relative="悬空栈桥｜悬空寺南楼↓梯式栈道悬空寺南楼",
 }
 Room {
 	id = "hengshan/yunge",
 	name = "云阁虹桥",
+	outdoor = "恒山",
 	ways = {
 		["east"] = "hengshan/daziling",
 		["northdown"] = "hengshan/zhandao",
 	},
 	objs = {
           ["仪质"] = "yi zhi",
+	room_relative="梯式栈道↓云阁虹桥---大字岭云阁虹桥",
            },
 }
 Room {
 	id = "hengshan/yuyang",
 	name = "玉羊游云",
+	outdoor = "恒山",
 	ways = {
 		["westdown"] = "hengshan/beiyuedian",
 	},
+	room_relative="北岳殿→玉羊游云玉羊游云",
 }
 Room {
 	id = "hengshan/zhandao",
 	name = "梯式栈道",
+	outdoor = "恒山",
 	ways = {
 		["southup"] = "hengshan/yunge",
 		["northdown"] = "hengshan/xuankong2",
 	},
+	room_relative="悬空寺南楼↓梯式栈道↓云阁虹桥梯式栈道",
 }
 Room {
 	id = "hengshan/zhanqiao",
 	name = "悬空栈桥",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/xuankong2",
-		["north"] = "hengshan/xuankong1",
+		["north"] = "hengshan/xuankong1",   
 	},
+	room_relative="悬空寺北楼｜悬空栈桥｜悬空寺南楼悬空栈桥",
 }
 --add by xieky@sj 20170809
 Room {
 	id = "hengshan/mtroad",
 	name = "山路",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/mtyadi",
 		["east"] = "hengshan/mtroad1",
@@ -11998,10 +13749,12 @@ Room {
 	objs = {
           ["丁当"] = "ding dang",
            },
+		   room_relative="山路-----树林｜崖底山路",
 }
 Room {
 	id = "hengshan/mtyadi",
 	name = "崖底",
+	outdoor = "恒山",
 	ways = {
 		["north"] = "hengshan/mtroad",
 --		["climb lian"] = "???",
@@ -12010,16 +13763,19 @@ Room {
 Room {
 	id = "hengshan/mtroad1",
 	name = "树林",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/mtroad2",
 		["north"] = "hengshan/mtroad1",
 		["west"] = "hengshan/mtroad",
 		["east"] = "hengshan/jinlongxia",
 	},
+	room_relative="树林｜山路-----树林-----金龙峡｜树林树林",
 }
 Room {
 	id = "hengshan/mtroad2",
 	name = "树林",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/mtroad2",
 		["north"] = "hengshan/mtroad3",
@@ -12030,10 +13786,12 @@ Room {
         ["李四"] = "Li si",
         ["张三"] = "Zhang san",
     },
+	room_relative="树林｜树林-----树林-----树林｜树林树林",
 }
 Room {
 	id = "hengshan/mtroad3",
 	name = "树林",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/mtroad4",
 		["north"] = "hengshan/mtroad3",
@@ -12047,6 +13805,7 @@ Room {
 Room {
 	id = "hengshan/mtroad4",
 	name = "树林",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/mtroad4",
 		["north"] = "hengshan/mtroad6",
@@ -12057,6 +13816,7 @@ Room {
 Room {
 	id = "hengshan/mtroad5",
 	name = "树林",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/mtroad5",
 		["north"] = "hengshan/mtroad5",
@@ -12067,6 +13827,7 @@ Room {
 Room {
 	id = "hengshan/mtroad6",
 	name = "树林",
+	outdoor = "恒山",
 	ways = {
 		["south"] = "hengshan/mtroad4",
 		["north"] = "hengshan/mtroad4",
@@ -12081,15 +13842,18 @@ Room {
 Room {
 	id = "hj/caochang",
 	name = "草场",
+	outdoor = "回疆",
 	ways = {
 		["westdown"] = "hj/shuijing",
 		["east"] = "hj/caoyuan1",
 		["northdown"] = "hj/pmchang",
 	},
+	room_relative="跑马场↓坎儿井→草场-----大草原草场",
 }
 Room {
 	id = "hj/caoyuan",
 	name = "草原边缘",
+	outdoor = "回疆",
 	ways = {
 		["westup"] = "hj/caoyuan2",
 		["southwest"] = "hj/caoyuan1",
@@ -12114,6 +13878,7 @@ Room {
 Room {
 	id = "hj/caoyuan1",
 	name = "大草原",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/majiu",
 		["north"] = "hj/caoyuan2",
@@ -12131,6 +13896,7 @@ Room {
 Room {
 	id = "hj/caoyuan10",
 	name = "大草原",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/caoyuan",
 		["north"] = "hj/caoyuan9",
@@ -12142,6 +13908,7 @@ Room {
 Room {
 	id = "hj/caoyuan2",
 	name = "草原",
+	outdoor = "回疆",
 	ways = {
 		["northup"] = "hj/road1",
 		["eastdown"] = "hj/caoyuan",
@@ -12155,6 +13922,7 @@ Room {
 Room {
 	id = "hj/caoyuan4",
 	name = "大草原",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/caoyuan5",
 		["north"] = "hj/caoyuan5",
@@ -12166,6 +13934,7 @@ Room {
 Room {
 	id = "hj/caoyuan5",
 	name = "大草原",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/caoyuan4",
 		["north"] = "hj/caoyuan4",
@@ -12181,6 +13950,7 @@ Room {
 Room {
 	id = "hj/caoyuan6",
 	name = "大草原",
+	outdoor = "回疆",
 	ways = {
 		["southwest"] = "hj/road2",
 		["south"] = "hj/caoyuan",
@@ -12192,6 +13962,7 @@ Room {
 Room {
 	id = "hj/caoyuan7",
 	name = "大草原",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/caoyuan8",
 		["north"] = "hj/room-su",
@@ -12203,6 +13974,7 @@ Room {
 Room {
 	id = "hj/caoyuan8",
 	name = "大草原",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/caoyuan9",
 		["north"] = "hj/room-che",
@@ -12214,6 +13986,7 @@ Room {
 Room {
 	id = "hj/caoyuan9",
 	name = "大草原",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/caoyuan",
 		["east"] = "hj/caoyuan8",
@@ -12228,6 +14001,7 @@ Room {
 Room {
 	id = "hj/gebin",
 	name = "大戈壁",
+	outdoor = "回疆",
 	ways = {
 		["#outGb"] = "hj/room-ji",
 	},
@@ -12242,6 +14016,7 @@ Room {
 Room {
 	id = "hj/hsk",
 	name = "哈萨克帐篷",
+	outdoor = "回疆",
 	ways = {
 		["southwest"] = "hj/room-che",
 		["east"] = "hj/caoyuan",
@@ -12252,10 +14027,12 @@ Room {
           ["乳酪"] = "ru lao",
           ["哈萨克妇女"] = "hasake",
            },
+		   room_relative="车尔库的家｜草原边缘｜马棚哈萨克帐篷",
 }
 Room {
 	id = "hj/hswz",
 	name = "黑石围子",
+	outdoor = "回疆",
 	ways = {
 		["southeast"] = "xingxiu/shamo13",
 		["southwest"] = "hj/caoyuan10",
@@ -12263,12 +14040,14 @@ Room {
 		["north"] = "hj/gebin",
 	},
 	lengths={
-	    ["north"] = "if tmp.find then return 1 else return 10 end",
+	    ["north"] = 10 ,
 	},
+	room_relative="大沙漠｜大草原--大沙漠｜大戈壁黑石围子",
 }
 Room {
 	id = "hj/luzhou",
 	name = "回疆绿洲",
+	outdoor = "回疆",
 	ways = {
 		["southeast"] = "hj/gebin",
 		["southwest"] = "hj/gebin",
@@ -12279,22 +14058,27 @@ Room {
 Room {
 	id = "hj/majiu",
 	name = "马棚",
+	outdoor = "回疆",
 	ways = {
 		["east"] = "hj/hsk",
 		["north"] = "hj/caoyuan1",
 		["west"] = "hj/caoyuan7",
 	},
+	room_relative="哈萨克帐篷｜大草原--大草原｜马棚",
 }
 Room {
 	id = "hj/mg-door",
 	name = "高昌迷宫",
+	outdoor = "回疆",
 	ways = {
 		["eastdown"] = "hj/shulin1",
 	},
+	
 }
 Room {
 	id = "hj/mg-indoor",
 	name = "高昌迷宫",
+	outdoor = "回疆",
 	ways = {
 		["east"] = "hj/mg3",
 		["west"] = "hj/mg4",
@@ -12303,6 +14087,7 @@ Room {
 Room {
 	id = "hj/mg-room1",
 	name = "迷宫房舍",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/tianjin",
 		["northwest"] = "hj/mg-room3",
@@ -12313,6 +14098,7 @@ Room {
 Room {
 	id = "hj/mg-room2",
 	name = "迷宫房舍",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/mg-room1",
 	},
@@ -12320,6 +14106,7 @@ Room {
 Room {
 	id = "hj/mg-room3",
 	name = "迷宫房舍",
+	outdoor = "回疆",
 	ways = {
 		["southeast"] = "hj/mg-room1",
 		["northeast"] = "hj/mg-room5",
@@ -12328,6 +14115,7 @@ Room {
 Room {
 	id = "hj/mg-room4",
 	name = "迷宫房舍",
+	outdoor = "回疆",
 	ways = {
 		["southwest"] = "hj/mg-room1",
 		["northwest"] = "hj/mg-room5",
@@ -12336,6 +14124,7 @@ Room {
 Room {
 	id = "hj/mg-room5",
 	name = "迷宫房舍",
+	outdoor = "回疆",
 	ways = {
 		["southeast"] = "hj/mg-room4",
 		["southwest"] = "hj/mg-room3",
@@ -12344,6 +14133,7 @@ Room {
 Room {
 	id = "hj/mg1",
 	name = "高昌迷宫",
+	outdoor = "回疆",
 	ways = {
 		["north"] = "hj/mg2",
 	},
@@ -12351,6 +14141,7 @@ Room {
 Room {
 	id = "hj/mg2",
 	name = "高昌迷宫",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/mg1",
 		["north"] = "hj/mg4",
@@ -12359,6 +14150,7 @@ Room {
 Room {
 	id = "hj/mg3",
 	name = "高昌迷宫",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/mg4",
 		["east"] = "hj/mg4",
@@ -12369,6 +14161,7 @@ Room {
 Room {
 	id = "hj/mg4",
 	name = "高昌迷宫",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/mg3",
 		["north"] = "hj/mg3",
@@ -12379,6 +14172,7 @@ Room {
 Room {
 	id = "hj/pmchang",
 	name = "跑马场",
+	outdoor = "回疆",
 	ways = {
 		["southup"] = "hj/caochang",
 		["southwest"] = "hj/shuijing",
@@ -12390,10 +14184,12 @@ Room {
           ["陈达海"] = "chen dahai",
           ["绵羊"] = "mian yang",
            },
+		room_relative="哈萨克小店｜小路----跑马场----草原↙↓坎儿井草场跑马场",
 }
 Room {
 	id = "hj/road1",
 	name = "小路",
+	outdoor = "回疆",
 	ways = {
 		["east"] = "hj/caoyuan4",
 		["northeast"] = "hj/road2",
@@ -12405,6 +14201,7 @@ Room {
 Room {
 	id = "hj/road2",
 	name = "小路",
+	outdoor = "回疆",
 	ways = {
 		["southwest"] = "hj/road1",
 		["north"] = "hj/room-ji",
@@ -12415,29 +14212,31 @@ Room {
 Room {
 	id = "hj/room-che",
 	name = "车尔库的家",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/caoyuan8",
 		["east"] = "hj/caoyuan8",
 		["northeast"] = "hj/hsk",
 		["west"] = "hj/caoyuan8",
 	},
+	room_relative="大草原｜大草原--哈萨克帐篷｜大草原--车尔库的家",
 }
 Room {
 	id = "hj/room-ji",
 	name = "草棚",
+	outdoor = "回疆",
 	ways = {
 		["southeast"] = "hj/caoyuan6",
 		["south"] = "hj/road2",
 		["enter"] = "hj/room-ji1",
-		["northwest"] = "hj/gebin",
+		--["northwest"] = "hj/gebin",
 	},
-	lengths={
-	    ["northwest"] = 10 ,
-	},
+	room_relative="大戈壁小屋↖∧草棚｜↘小路大草原草棚",
 }
 Room {
 	id = "hj/room-ji1",
 	name = "小屋",
+	outdoor = "回疆",
 	ways = {
 		["out"] = "hj/room-ji",
 	},
@@ -12445,10 +14244,12 @@ Room {
           ["计老人"] = "ji laoren",
           ["李文秀"] = "li wenxiu",
            },
+	room_relative="小屋∨草棚小屋",
 }
 Room {
 	id = "hj/room-su",
 	name = "苏鲁克的家",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/caoyuan7",
 		["east"] = "hj/caoyuan7",
@@ -12458,10 +14259,12 @@ Room {
 	objs = {
           ["苏鲁克"] = "su luke",
            },
+		 room_relative="坎儿井↗大草原--苏鲁克的家--大草原｜大草原苏鲁克的家",
 }
 Room {
 	id = "hj/senlin",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["southeast"] = "hj/shanqiu",
 		["northwest"] = "xingxiu/tianshan",
@@ -12491,6 +14294,7 @@ Room {
 Room {
 	id = "hj/senlinn",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["east"] = "hj/senlin2",
 	},
@@ -12498,6 +14302,7 @@ Room {
 Room {
 	id = "hj/senlin2",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/senlin3",
 	},
@@ -12505,6 +14310,7 @@ Room {
 Room {
 	id = "hj/senlin3",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["west"] = "hj/senlin4",
 	},
@@ -12512,6 +14318,7 @@ Room {
 Room {
 	id = "hj/senlin4",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["north"] = "hj/senlin5",
 	},
@@ -12519,6 +14326,7 @@ Room {
 Room {
 	id = "hj/senlin5",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["east"] = "hj/senlin6",
 	},
@@ -12526,6 +14334,7 @@ Room {
 Room {
 	id = "hj/senlin6",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/senlin7",
 	},
@@ -12533,6 +14342,7 @@ Room {
 Room {
 	id = "hj/senlin7",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["west"] = "hj/senlin8",
 	},
@@ -12540,6 +14350,7 @@ Room {
 Room {
 	id = "hj/senlin8",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["north"] = "hj/senlin9",
 	},
@@ -12548,6 +14359,7 @@ Room {
 Room {
 	id = "hj/senlin9",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["north"] = "hj/senlin10",
 	},
@@ -12555,6 +14367,7 @@ Room {
 Room {
 	id = "hj/senlin10",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["east"] = "hj/senlin11",
 	},
@@ -12562,6 +14375,7 @@ Room {
 Room {
 	id = "hj/senlin11",
 	name = "针叶林",
+	outdoor = "回疆",
 	ways = {
 		["#outZyl"] = "hj/senlin",
 	},
@@ -12579,6 +14393,7 @@ Room {
 Room {
 	id = "hj/shanqiu",
 	name = "小山丘",
+	outdoor = "回疆",
 	ways = {
 		["eastdown"] = "group/entry/hjroad",
 		["westdown"] = "hj/senlinn",
@@ -12587,29 +14402,35 @@ Room {
 	objs = {
           ["苏普"] = "su pu",
            },
+	room_relative="针叶林→小山丘←小路｜大草原小山丘",
 }
 Room {
 	id = "hj/shop",
 	name = "哈萨克小店",
+	outdoor = "回疆",
 	ways = {
 		["southeast"] = "hj/caoyuan2",
 		["south"] = "hj/pmchang",
 		["northwest"] = "hj/sroom",
 		["east"] = "hj/road1",
 	},
+	room_relative="哈萨克帐篷↖哈萨克小店--小路｜↘跑马场草原哈萨克小店",
 }
 Room {
 	id = "hj/shuijing",
 	name = "坎儿井",
+	outdoor = "回疆",
 	ways = {
 		["eastup"] = "hj/caochang",
 		["southwest"] = "hj/room-su",
 		["northeast"] = "hj/pmchang",
 	},
+	room_relative="跑马场↗坎儿井→草场↙苏鲁克的家坎儿井",
 }
 Room {
 	id = "hj/shulin",
 	name = "山陵",
+	outdoor = "回疆",
 	ways = {
 		["south"] = "hj/gebin",
 		["northwest"] = "hj/shulin1",
@@ -12620,6 +14441,7 @@ Room {
 Room {
 	id = "hj/shulin1",
 	name = "山谷",
+	outdoor = "回疆",
 	ways = {
 		["southeast"] = "hj/shulin",
 		["westup"] = "hj/mg-door",
@@ -12628,14 +14450,17 @@ Room {
 Room {
 	id = "hj/sroom",
 	name = "哈萨克帐篷",
+	outdoor = "回疆",
 	no_fight = true,
 	ways = {
 		["southeast"] = "hj/shop",
 	},
+	room_relative="哈萨克帐篷↘哈萨克小店哈萨克帐篷",
 }
 Room {
 	id = "hj/tianjin",
 	name = "天井",
+	outdoor = "回疆",
 	ways = {
 		["north"] = "hj/mg-room1",
 	},
@@ -12643,6 +14468,7 @@ Room {
 Room {
 	id = "hmy/andao1",
 	name = "暗道",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/andao2",
 		["west"] = "hmy/houdian",
@@ -12651,6 +14477,7 @@ Room {
 Room {
 	id = "hmy/andao2",
 	name = "暗道",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/andao1",
 		["east"] = "hmy/andao3",
@@ -12659,6 +14486,7 @@ Room {
 Room {
 	id = "hmy/andao3",
 	name = "暗道",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/andao4",
 		["west"] = "hmy/andao2",
@@ -12667,6 +14495,7 @@ Room {
 Room {
 	id = "hmy/andao4",
 	name = "暗道",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/andao3",
 		["west"] = "hmy/andao5",
@@ -12675,6 +14504,7 @@ Room {
 Room {
 	id = "hmy/andao5",
 	name = "暗道",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/andao4",
 		["northeast"] = "hmy/andao6",
@@ -12683,6 +14513,7 @@ Room {
 Room {
 	id = "hmy/andao6",
 	name = "暗道",
+	outdoor = "黑木崖",
 	ways = {
 		["southwest"] = "hmy/andao5",
 		["northwest"] = "hmy/andao7",
@@ -12691,6 +14522,7 @@ Room {
 Room {
 	id = "hmy/andao7",
 	name = "暗道",
+	outdoor = "黑木崖",
 	ways = {
 		["southeast"] = "hmy/andao6",
 		["north"] = "hmy/andao8",
@@ -12699,6 +14531,7 @@ Room {
 Room {
 	id = "hmy/andao8",
 	name = "暗道",
+	outdoor = "黑木崖",
 	ways = {
 		["southeast"] = "hmy/andao7",
 		["enter"] = "hmy/jail_gate",
@@ -12707,16 +14540,19 @@ Room {
 Room {
 	id = "hmy/baichi",
 	name = "三岔口",
+	outdoor = "黑木崖",
 	ways = {
 		["eastup"] = "hmy/suo",
 		["westup"] = "hmy/shijie",
 		["south"] = "hmy/meimao",
 		["eastdown"] = "hmy/shandao2",
 	},
+	room_relative="索道｜石阶--眉毛崖｜山道三岔口",
 }
 Room {
 	id = "hmy/baihutang",
 	name = "白虎堂",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/changlang",
 		["east"] = "hmy/zhuquetang",
@@ -12724,27 +14560,33 @@ Room {
 	objs = {
           ["桑三娘"] = "sang sanniang",
            },
+	room_relative="白虎堂----朱雀堂｜长廊白虎堂",
 }
 Room {
 	id = "hmy/baizhang",
 	name = "百丈泉",
+	outdoor = "黑木崖",
 	ways = {
 		["eastup"] = "hmy/yupingpu",
 		["south"] = "hmy/qiangu",
 	},
+	room_relative="百丈泉→玉屏瀑｜千古石百丈泉",
 }
 Room {
 	id = "hmy/cddian",
 	name = "成德殿",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/dadian",
 		["north"] = "hmy/changlang2",
 		["west"] = "hmy/zhuquetang",
 	},
+	room_relative="长廊｜朱雀堂----成德殿｜大殿成德殿",
 }
 Room {
 	id = "hmy/changlang",
 	name = "长廊",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/fleitang",
 		["east"] = "hmy/dadian",
@@ -12754,29 +14596,35 @@ Room {
 	objs = {
           ["仇松年"] = "chou songnian",
            },
+	room_relative="白虎堂｜前殿-----长廊-----大殿｜风雷堂长廊",
 }
 Room {
 	id = "hmy/changlang2",
 	name = "长廊",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/cddian",
 		["east"] = "hmy/qqiudian",
 		["west"] = "hmy/qlongtang",
 	},
+	room_relative="青龙堂-----长廊-----千秋殿｜成德殿长廊",
 }
 Room {
 	id = "hmy/changlang3",
 	name = "长廊",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/shufang",
 		["north"] = "hmy/lgfang",
 		["east"] = "hmy/changlang4",
 		["west"] = "hmy/qqiudian",
 	},
+	room_relative="练功房｜千秋殿-----长廊-----长廊｜书房长廊",
 }
 Room {
 	id = "hmy/changlang4",
 	name = "长廊",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/changlang6",
 		["north"] = "hmy/xiuxishi",
@@ -12785,90 +14633,100 @@ Room {
 	},
 	lengths = {
 		["north"] = "if score.gender and score.gender=='女' then return 1 else return false end",
-	}
+	},
+	room_relative="休息室｜长廊-----长廊-----膳食房｜长廊长廊",
 }
 Room {
 	id = "hmy/changlang5",
 	name = "长廊",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/houhuayen",
 		["east"] = "hmy/houdian",
 		["north"] = "hmy/dadian",
 		["west"] = "hmy/fleitang",
 	},
+	room_relative="大殿｜风雷堂-----长廊-----后殿｜后花园长廊",
 }
 Room {
 	id = "hmy/changlang6",
 	name = "长廊",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/houdian",
 		["east"] = "hmy/yiting",
 		["north"] = "hmy/changlang4",
 		["west"] = "hmy/dadian",
 	},
+	room_relative="长廊｜大殿-----长廊-----议事厅｜后殿长廊",
 }
 Room {
 	id = "hmy/changtan",
 	name = "长滩",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/shandao",
 		["dutan"] = "hmy/xxtan",
 	},
+	room_relative="长滩-----山道长滩",
 }
 Room {
 	id = "hmy/chengdedian",
 	name = "成德殿",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/dadian",
 		["north"] = "hmy/changlang2",
 		["west"] = "hmy/zhuquetang",
 	},
+	room_relative="长廊｜朱雀堂--大殿｜成德殿",
 }
 Room {
 	id = "hmy/dadian",
 	name = "大殿",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/changlang5",
 		["east"] = "hmy/changlang6",
 		["north"] = "hmy/cddian",
 		["west"] = "hmy/changlang",
 	},
+	room_relative="成德殿｜长廊-----大殿-----长廊｜长廊大殿",
 }
 Room {
 	id = "hmy/dedao",
 	name = "地道",
+	outdoor = "黑木崖",
 	ways = {
 		["down"] = "hmy/xhuayuan",
 		["up"] = "hmy/shiwu",
 	},
 }
-Room {
-	id = "hmy/fengleitang",
-	name = "风雷堂",
-	ways = {
-		["east"] = "hmy/changlang5",
-		["north"] = "hmy/changlang",
-	},
-}
+
 Room {
 	id = "hmy/fleitang",
 	name = "风雷堂",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/changlang5",
 		["north"] = "hmy/changlang",
 	},
+	room_relative="长廊｜风雷堂----长廊风雷堂",
 }
 Room {
 	id = "hmy/guanpu",
 	name = "观瀑亭",
+	outdoor = "黑木崖",
 	ways = {
 		["northup"] = "hmy/moyun",
 		["south"] = "hmy/yupingpu",
 	},
+	room_relative="卧云崖↑观瀑亭｜玉屏瀑观瀑亭",
 }
 Room {
 	id = "hmy/houdian",
 	name = "后殿",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/changlang6",
 		["west"] = "hmy/changlang5",
@@ -12877,18 +14735,22 @@ Room {
           ["周孤桐"] = "zhou gutong",
           ["吴柏英"] = "wu baiying",
            },
+	room_relative="长廊｜长廊-----后殿后殿",
 }
 Room {
 	id = "hmy/houhuayen",
 	name = "后花园",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/changlang5",
 		["west"] = "hmy/shiwu",
 	},
+	room_relative="长廊｜小石屋----后花园后花园",
 }
 Room {
 	id = "hmy/jail_gate",
 	name = "监狱大门",
+	outdoor = "黑木崖",
 	ways = {
 		["out"] = "hmy/andao8",
 	},
@@ -12896,23 +14758,28 @@ Room {
 Room {
 	id = "hmy/lgfang",
 	name = "练功房",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/changlang3",
 	},
+	room_relative="练功房｜长廊练功房",
 }
 Room {
 	id = "hmy/liangting",
 	name = "凉亭",
+	outdoor = "黑木崖",
 	ways = {
 		["west"] = "hmy/shidao2",
 	},
 	objs = {
           ["向问天"] = "xiang wentian",
            },
+	room_relative="石道-----凉亭凉亭",
 }
 Room {
 	id = "hmy/lianhua",
 	name = "碧血崖",
+	outdoor = "黑木崖",
 	ways = {
 		["eastdown"] = "hmy/xianren",
 		["east"] = "hmy/wulao",
@@ -12922,10 +14789,12 @@ Room {
           ["野狼"] = "ye lang",
           ["蜜蜂"] = "mi feng",
            },
+	room_relative="玉屏瀑----碧血崖----五老峰碧血崖",
 }
 Room {
 	id = "hmy/meimao",
 	name = "眉毛崖",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/baichi",
 		["southdown"] = "hmy/taohua",
@@ -12933,10 +14802,12 @@ Room {
 	objs = {
           ["小猴"] = "xiao hou",
            },
+	room_relative="三岔口｜眉毛崖↑桃花川眉毛崖",
 }
 Room {
 	id = "hmy/midao6",
 	name = "地道",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/suo",
 		["west"] = "hmy/suo",
@@ -12945,22 +14816,27 @@ Room {
 Room {
 	id = "hmy/moyun",
 	name = "卧云崖",
+	outdoor = "黑木崖",
 	ways = {
 		["southdown"] = "hmy/guanpu",
 	},
+	room_relative="卧云崖↑观瀑亭卧云崖",
 }
 Room {
 	id = "hmy/pailou",
 	name = "牌楼",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/xiangfang",
 		["north"] = "hmy/shibanlu",
 		["west"] = "hmy/yading",
 	},
+	room_relative="石板路｜崖顶-----牌楼-----厢房牌楼",
 }
 Room {
 	id = "hmy/pingding/cj1",
 	name = "长街",
+	outdoor = "平定州",
 	ways = {
 		["east"] = "hmy/pingding/cj2",
 		["west"] = "hmy/pingding/gate1",
@@ -12970,6 +14846,7 @@ Room {
 Room {
 	id = "hmy/pingding/cj2",
 	name = "长街",
+	outdoor = "平定州",
 	ways = {
 		["northeast"] = "hmy/pingding/cj3",
 		["west"] = "hmy/pingding/cj1",
@@ -12980,6 +14857,7 @@ Room {
 Room {
 	id = "hmy/pingding/cj3",
 	name = "长街",
+	outdoor = "平定州",
 	ways = {
 		["east"] = "hmy/pingding/cj5",
 		["southeast"] = "hmy/pingding/kedian",
@@ -12992,6 +14870,7 @@ Room {
 Room {
 	id = "hmy/pingding/cj4",
 	name = "长街",
+	outdoor = "平定州",
 	ways = {
 		["south"] = "hmy/pingding/cj3",
 		["north"] = "hmy/pingding/gate2",
@@ -13001,6 +14880,7 @@ Room {
 Room {
 	id = "hmy/pingding/cj5",
 	name = "长街",
+	outdoor = "平定州",
 	ways = {
 		["east"] = "hmy/pingding/dongmen",
 		["west"] = "hmy/pingding/cj3",
@@ -13010,26 +14890,32 @@ Room {
 Room {
 	id = "hmy/pingding/dongmen",
 	name = "东门",
+	outdoor = "平定州",
 	ways = {
 		["east"] = "hmy/pingding/road6",
 		["west"] = "hmy/pingding/cj5",
 	},
+	room_relative="长街-----东门-----土路东门",
 }
 Room {
 	id = "hmy/pingding/gate1",
 	name = "西门",
+	outdoor = "平定州",
 	ways = {
 		["east"] = "hmy/pingding/cj1",
 		["west"] = "hmy/pingding/road3",
 	},
+	room_relative="土路-----西门-----长街西门",
 }
 Room {
 	id = "hmy/pingding/gate2",
 	name = "北门",
+	outdoor = "平定州",
 	ways = {
 		["south"] = "hmy/pingding/cj4",
 		["north"] = "hmy/pingding/road4",
 	},
+	room_relative="土路｜北门｜长街北门",
 }
 Room {
 	id = "hmy/pingding/kedian",
@@ -13042,10 +14928,12 @@ Room {
 	nolooks = {
 		["up"] = true,
 	},
+	room_relative="长街客房↖｜平定客店平定客店",
 }
 Room {
 	id = "hmy/pingding/kedian2",
 	name = "客店二楼",
+	outdoor = "平定州",
 	ways = {
 		["enter"] = "hmy/pingding/kedian3",
 		["down"] = "hmy/pingding/kedian",
@@ -13054,6 +14942,7 @@ Room {
 Room {
 	id = "hmy/pingding/kedian3",
 	name = "客店二楼",
+	outdoor = "平定州",
 	no_fight = true,
 	ways = {
 		["out"] = "hmy/pingding/kedian2",
@@ -13062,6 +14951,7 @@ Room {
 Room {
 	id = "hmy/pingding/kefang",
 	name = "客房",
+	outdoor = "平定州",
 	no_fight = true,
 	ways = {
 		["south"] = "hmy/pingding/kedian",
@@ -13070,6 +14960,7 @@ Room {
 Room {
 	id = "hmy/pingding/road1",
 	name = "土路",
+	outdoor = "平定州",
 	ways = {
 		["northeast"] = "group/entry/hmyroad2",
 		["west"] = "changan/northroad10",
@@ -13079,6 +14970,7 @@ Room {
 Room {
 	id = "hmy/pingding/road3",
 	name = "土路",
+	outdoor = "平定州",
 	ways = {
 		["westdown"] = "group/entry/hmyroad2",
 		["east"] = "hmy/pingding/gate1",
@@ -13088,6 +14980,7 @@ Room {
 Room {
 	id = "hmy/pingding/road4",
 	name = "土路",
+	outdoor = "平定州",
 	ways = {
 		["south"] = "hmy/pingding/gate2",
 		["northwest"] = "hmy/pingding/road5",
@@ -13097,6 +14990,7 @@ Room {
 Room {
 	id = "hmy/pingding/road5",
 	name = "土路",
+	outdoor = "平定州",
 	ways = {
 		["northwest"] = "hmy/shidao",
 		["southeast"] = "hmy/pingding/road4",
@@ -13106,6 +15000,7 @@ Room {
 Room {
 	id = "hmy/pingding/road6",
 	name = "土路",
+	outdoor = "平定州",
 	ways = {
 		["eastup"] = "hmy/pingding/road7",
 		["west"] = "hmy/pingding/dongmen",
@@ -13115,6 +15010,7 @@ Room {
 Room {
 	id = "hmy/pingding/road7",
 	name = "土路",
+	outdoor = "平定州",
 	ways = {
 		["westdown"] = "hmy/pingding/road6",
 		["east"] = "group/entry/hmyroad8",
@@ -13124,6 +15020,7 @@ Room {
 Room {
 	id = "hmy/pingding/road9",
 	name = "土路",
+	outdoor = "平定州",
 	ways = {
 		["northwest"] = "group/entry/hmyroad8",
 		["east"] = "cangzhou/sancakou",
@@ -13133,20 +15030,25 @@ Room {
 Room {
 	id = "hmy/pingding/xchidian",
 	name = "小吃店",
+	outdoor = "平定州",
 	ways = {
 		["north"] = "hmy/pingding/cj2",
 	},
+	room_relative="长街｜小吃店小吃店",
 }
 Room {
 	id = "hmy/pingding/yaopu",
 	name = "药铺",
+	outdoor = "平定州",
 	ways = {
 		["east"] = "hmy/pingding/cj3",
 	},
+	room_relative="药铺-----长街药铺",
 }
 Room {
 	id = "hmy/qiandian",
 	name = "前殿",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/changlang",
 		["west"] = "hmy/shibanlu",
@@ -13154,32 +15056,41 @@ Room {
 	blocks = {
 		["east"] = {
 			{id = "shi zhe", exp = 1500000},
-		}
+		},
+	precmds = {
+              ["east"] = "kill shi zhe",
 	},
+	},
+	
 }
 Room {
 	id = "hmy/qiangu",
 	name = "千古石",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/baizhang",
 	},
 	objs = {
           ["野狼"] = "ye lang",
            },
+	room_relative="百丈泉｜千古石千古石",
 }
 Room {
 	id = "hmy/qlongtang",
 	name = "青龙堂",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/changlang2",
 	},
 	objs = {
           ["上官云"] = "shangguan yun",
            },
+	room_relative="青龙堂----长廊青龙堂",
 }
 Room {
 	id = "hmy/qqiudian",
 	name = "千秋殿",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/changlang3",
 		["west"] = "hmy/changlang2",
@@ -13187,20 +15098,24 @@ Room {
 	objs = {
           ["曲洋"] = "qu yang",
            },
+	room_relative="长廊----千秋殿----长廊千秋殿",
 }
 Room {
 	id = "hmy/rusheng",
 	name = "入胜亭",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/wulao",
 	},
 	objs = {
           ["小猴"] = "xiao hou",
            },
+	room_relative="五老峰｜入胜亭入胜亭",
 }
 Room {
 	id = "hmy/ryping",
 	name = "日月坪",
+	outdoor = "黑木崖",
 	ways = {
 		["eastdown"] = "hmy/shimen",
 		["#hmyUp"] = "hmy/yading",
@@ -13212,22 +15127,27 @@ Room {
 Room {
 	id = "hmy/shandao",
 	name = "山道",
+	outdoor = "黑木崖",
 	ways = {
 		["westup"] = "hmy/shandao2",
 		["west"] = "hmy/changtan",
 	},
+	room_relative="山道--长滩山道",
 }
 Room {
 	id = "hmy/shandao2",
 	name = "山道",
+	outdoor = "黑木崖",
 	ways = {
 		["eastdown"] = "hmy/shandao",
 		["westup"] = "hmy/baichi",
 	},
+	room_relative="三岔口←山道←山道山道",
 }
 Room {
 	id = "hmy/shibanlu",
 	name = "石板路",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/pailou",
 		["east"] = "hmy/qiandian",
@@ -13239,14 +15159,17 @@ Room {
 Room {
 	id = "hmy/shidao",
 	name = "石道",
+	outdoor = "黑木崖",
 	ways = {
 		["southeast"] = "hmy/pingding/road5",
 		["north"] = "hmy/shidao2",
 	},
+	room_relative="石道｜石道↘土路石道",
 }
 Room {
 	id = "hmy/shidao2",
 	name = "石道",
+	outdoor = "黑木崖",
 	ways = {
 		["westdown"] = "hmy/xxtan",
 		["south"] = "hmy/shidao",
@@ -13255,10 +15178,12 @@ Room {
 	objs = {
           ["王城"] = "wang cheng",
            },
+	room_relative="猩猩滩→石道-----凉亭｜石道石道",
 }
 Room {
 	id = "hmy/shifang",
 	name = "膳食房",
+	outdoor = "黑木崖",
 	no_fight = true,
 	ways = {
 		["west"] = "hmy/changlang4",
@@ -13268,26 +15193,32 @@ Room {
           ["粽子"] = "zong zi",
           ["厨师"] = "chu zi",
            },
+	room_relative="长廊----膳食房膳食房",
 }
 Room {
 	id = "hmy/shijie",
 	name = "石阶",
+	outdoor = "黑木崖",
 	ways = {
 		["eastdown"] = "hmy/baichi",
 		["westup"] = "hmy/shijie2",
 	},
+	room_relative="石阶←石阶←三岔口石阶",
 }
 Room {
 	id = "hmy/shijie2",
 	name = "石阶",
+	outdoor = "黑木崖",
 	ways = {
 		["eastdown"] = "hmy/shijie",
 		["westup"] = "hmy/shimen",
 	},
+	room_relative="石门←石阶←石阶石阶",
 }
 Room {
 	id = "hmy/shimen",
 	name = "石门",
+	outdoor = "黑木崖",
 	ways = {
 		["eastdown"] = "hmy/shijie2",
 		["#toRyp"] = "hmy/ryping",
@@ -13306,27 +15237,34 @@ Room {
 Room {
 	id = "hmy/shiwu",
 	name = "小石屋",
+	outdoor = "黑木崖",
 	ways = {
-		["east"] = "hmy/houhuayen",
+		["east"] = "hmy/houhuayen", 
 	},
+	room_relative="小石屋----后花园小石屋",
 }
 Room {
 	id = "hmy/shufang",
 	name = "书房",
+	outdoor = "黑木崖",
 	ways = {
 		["north"] = "hmy/changlang3",
 	},
+	room_relative="长廊｜书房书房",
 }
 Room {
 	id = "hmy/suo",
 	name = "索道",
+	outdoor = "黑木崖",
 	ways = {
 		["westdown"] = "hmy/baichi",
 	},
+	room_relative="三岔口→索道索道",
 }
 Room {
 	id = "hmy/taohua",
 	name = "桃花川",
+	outdoor = "黑木崖",
 	ways = {
 		["northup"] = "hmy/meimao",
 		["westup"] = "hmy/zisi",
@@ -13335,10 +15273,12 @@ Room {
 	objs = {
           ["猴子"] = "hou zi",
            },
+	room_relative="眉毛崖↑紫云崖----桃花川桃花川",
 }
 Room {
 	id = "hmy/wulao",
 	name = "五老峰",
+	outdoor = "黑木崖",
 	ways = {
 		["south"] = "hmy/rusheng",
 		["east"] = "hmy/ziyun",
@@ -13349,33 +15289,41 @@ Room {
           ["野狼"] = "ye lang",
           ["小猴"] = "xiao hou",
            },
+	room_relative="一品崖｜碧血崖----五老峰----紫云崖｜入胜亭五老峰",
 }
 Room {
 	id = "hmy/xhuayuan",
 	name = "小花园",
+	outdoor = "黑木崖",
 	ways = {
 		["west"] = "hmy/xiaoshe",
 		["up"] = "hmy/dedao",
 	},
+	
 }
 Room {
 	id = "hmy/xian",
 	name = "仙人洞",
+	outdoor = "黑木崖",
 	ways = {
 		["westdown"] = "hmy/xianren",
 	},
+	room_relative="仙人指路→仙人洞仙人洞",
 }
 Room {
 	id = "hmy/xiangfang",
 	name = "厢房",
+	outdoor = "黑木崖",
 	no_fight = true,
 	ways = {
 		["west"] = "hmy/pailou",
 	},
+	room_relative="牌楼-----厢房厢房",
 }
 Room {
 	id = "hmy/xianren",
 	name = "仙人指路",
+	outdoor = "黑木崖",
 	ways = {
 		["eastup"] = "hmy/xian",
 		["westup"] = "hmy/lianhua",
@@ -13383,38 +15331,41 @@ Room {
 	objs = {
           ["蝴蝶"] = "hu die",
            },
+	room_relative="碧血崖←仙人指路→仙人洞仙人指路",
 }
 Room {
 	id = "hmy/xiaoshe",
 	name = "小舍",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/xhuayuan",
 	},
+	room_relative="小花园--小舍",
 }
 Room {
 	id = "hmy/xiuxishi",
 	name = "休息室",
+	outdoor = "黑木崖",
 	no_fight = true,
 	ways = {
 		["south"] = "hmy/changlang4",
 	},
+	room_relative="长廊--休息室",
 }
 Room {
 	id = "hmy/xxtan",
 	name = "猩猩滩",
+	outdoor = "黑木崖",
 	ways = {
 		["eastup"] = "hmy/shidao2",
-		["dutan"] = "hmy/changtan",
-		["#dutan"] = "hmy/changtan",
+		["dutan"] = "hmy/changtan"
 	},
-	lengths = {
-	    ["dutan"] = "if job.name=='huashan' then return false else return 1 end",
-		["#dutan"] = "if job.name=='huashan' then return 1 else return false end",
-	},
+	room_relative="猩猩滩→石道猩猩滩",
 }
 Room {
 	id = "hmy/yading",
 	name = "崖顶",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/pailou",
 		["#hmyDown"] = "hmy/ryping",
@@ -13429,29 +15380,36 @@ Room {
 Room {
 	id = "hmy/yiping",
 	name = "一品崖",
+	outdoor = "黑木崖",
 	ways = {
-		["south"] = "hmy/wulao",
+		["south"] = "hmy/wulao", 
 	},
+	room_relative="一品崖｜五老峰一品崖",
 }
 Room {
 	id = "hmy/yiting",
 	name = "议事厅",
+	outdoor = "黑木崖",
 	ways = {
 		["west"] = "hmy/changlang6",
 	},
+	room_relative="长廊----议事厅议事厅",
 }
 Room {
 	id = "hmy/yupingpu",
 	name = "玉屏瀑",
+	outdoor = "黑木崖",
 	ways = {
 		["westdown"] = "hmy/baizhang",
 		["east"] = "hmy/lianhua",
-		["north"] = "hmy/guanpu",
+		["north"] = "hmy/guanpu", 
 	},
+	room_relative="观瀑亭｜百丈泉→玉屏瀑----碧血崖玉屏瀑",
 }
 Room {
 	id = "hmy/zhuquetang",
 	name = "朱雀堂",
+	outdoor = "黑木崖",
 	ways = {
 		["east"] = "hmy/cddian",
 		["west"] = "hmy/baihutang",
@@ -13459,55 +15417,67 @@ Room {
 	objs = {
           ["鲍大楚"] = "bao dachu",
            },
+	room_relative="白虎堂----朱雀堂----成德殿朱雀堂",
 }
 Room {
 	id = "hmy/zisi",
 	name = "紫石崖",
+	outdoor = "黑木崖",
 	ways = {
-		["eastdown"] = "hmy/taohua",
+		["eastdown"] = "hmy/taohua",  
 	},
 	objs = {
           ["蜜蜂"] = "mi feng",
            },
+	room_relative="紫石崖←桃花川紫石崖",
 }
 Room {
 	id = "hmy/ziyun",
 	name = "紫云崖",
+	outdoor = "黑木崖",
 	ways = {
-		["east"] = "hmy/taohua",
-		["west"] = "hmy/wulao",
+		["east"] = "hmy/taohua",  
+		["west"] = "hmy/wulao",  
 	},
+	room_relative="五老峰----紫云崖----桃花川紫云崖",
 }
 Room {
 	id = "huanghe/bingcao",
 	name = "冰草湾",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "huanghe/shixiazi",
 		["northeast"] = "huanghe/yinpanshui",
 	},
+	room_relative="石峡子｜营盘水冰草湾",
 }
 Room {
 	id = "huanghe/caodi1",
 	name = "草地",
+	outdoor = "黄河流域",
 	ways = {
 		["south"] = "city/hsroad1",
 		["west"] = "huanghe/caodi2",
 	},
+	room_relative="草地-----草地｜北门外草地",
 }
 Room {
 	id = "huanghe/caodi2",
 	name = "草地",
+	outdoor = "黄河流域",
 	ways = {
 		["east"] = "huanghe/caodi1",
 		["west"] = "huanghe/shulin1",
 	},
 	objs = {
           ["石块"] = "shi kuai",
+   room_relative="树林-----草地-----草地草地",
            },
 }
 Room {
 	id = "huanghe/cschang",
 	name = "采石场",
+	outdoor = "黄河流域",
 	no_fight = true,
 	ways = {
 		["northup"] = "huanghe/hhgate",
@@ -13515,26 +15485,32 @@ Room {
 	objs = {
           ["李公公"] = "li gonggong",
            },
+    room_relative="黄河帮寨门--采石场",
 }
 Room {
 	id = "huanghe/daba",
 	name = "黄河大堤",
+	outdoor = "黄河流域",
 	no_fight = true,
 	ways = {
 		["southdown"] = "huanghe/huanghe7",
 	},
+	room_relative="黄河大堤↑黄河岸边黄河大堤",
 }
 Room {
 	id = "huanghe/dacaigou",
 	name = "打柴沟",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "huanghe/gulang",
 		["north"] = "huanghe/wuqiao",
 	},
+	room_relative="古浪｜乌鞘岭打柴沟",
 }
 Room {
 	id = "huanghe/fendi",
 	name = "墓地",
+	outdoor = "黄河流域",
 	no_fight = true,
 	ways = {
 		["south"] = "huanghe/shulin6",
@@ -13542,10 +15518,12 @@ Room {
 	objs = {
           ["胡斐"] = "hu fei",
            },
+  room_relative="墓地｜树林墓地",
 }
 Room {
 	id = "huanghe/gchang",
 	name = "广场",
+	outdoor = "黄河流域",
 	ways = {
 		["east"] = "huanghe/hhgate",
 		["west"] = "huanghe/xyting",
@@ -13554,35 +15532,23 @@ Room {
           ["钱青健"] = "qian qingjian",
           ["吴青烈"] = "wu qinglie",
            },
+  room_relative="侠义厅-----广场-----黄河帮寨门广场",
 }
-Room {
-	id = "huanghe/guchangcheng",
-	name = "古长城",
-	ways = {
-		["southeast"] = "huanghe/shimen",
-		["southwest"] = "huanghe/yinpanshui",
-	},
-}
-Room {
-	id = "huanghe/gulang",
-	name = "古浪",
-	ways = {
-		["east"] = "huanghe/yaocaidian",
-		["northeast"] = "huanghe/dacaigou",
-		["west"] = "huanghe/xiaojiaqiao",
-	},
-}
+
 Room {
 	id = "huanghe/hetao",
 	name = "河套",
+	outdoor = "黄河流域",
 	ways = {
 		["south"] = "huanghe/weifen",
 		["northwest"] = "huanghe/huanghe_1",
 	},
+	room_relative="黄河↖河套｜渭汾流域河套",
 }
 Room {
 	id = "huanghe/hhgate",
 	name = "黄河帮寨门",
+	outdoor = "黄河流域",
 	ways = {
 		["east"] = "huanghe/huanghe1",
 		["southdown"] = "huanghe/cschang",
@@ -13591,19 +15557,15 @@ Room {
 	objs = {
           ["沈青刚"] = "shen qinggang",
           ["马青雄"] = "ma qingxiong",
+  
            },
+		   room_relative="广场--黄河帮寨门--黄河岸边↑采石场黄河帮寨门",
 }
-Room {
-	id = "huanghe/hongshanxia",
-	name = "红山峡",
-	ways = {
-		["south"] = "huanghe/jingyuan",
-		["north"] = "huanghe/shimen",
-	},
-}
+
 Room {
 	id = "huanghe/huanghe1",
 	name = "黄河岸边",
+	outdoor = "黄河流域",
 	ways = {
 		["south"] = "huanghe/tiandi4",
 		["north"] = "huanghe/weifen",
@@ -13612,12 +15574,13 @@ Room {
 	},
 	objs = {
           ["侯通海"] = "hou tonghai",
+  room_relative="渭汾流域｜黄河帮寨门---黄河岸边---黄河岸边｜田地黄河岸边",
            },
-	room_relative="渭汾流域｜黄河帮寨门---黄河岸边---黄河岸边｜田地黄河岸边",
 }
 Room {
 	id = "huanghe/huanghe2",
 	name = "黄河岸边",
+	outdoor = "黄河流域",
 	ways = {
 		["east"] = "huanghe/huanghe3",
 		["west"] = "huanghe/huanghe1",
@@ -13627,18 +15590,17 @@ Room {
 Room {
 	id = "huanghe/huanghe3",
 	name = "黄河岸边",
+	outdoor = "黄河流域",
 	ways = {
 		["east"] = "huanghe/huanghe4",
 		["west"] = "huanghe/huanghe2",
 	},
-    objs = {
-          ["大汉"] = "da han",
-           },
 	room_relative="黄河岸边---黄河岸边---黄河岸边黄河岸边",
 }
 Room {
 	id = "huanghe/huanghe4",
 	name = "黄河岸边",
+	outdoor = "黄河流域",
 	ways = {
 		["northeast"] = "huanghe/huanghe5",
 		["west"] = "huanghe/huanghe3",
@@ -13648,16 +15610,18 @@ Room {
 Room {
 	id = "huanghe/huanghe5",
 	name = "黄河岸边",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "huanghe/huanghe4",
 		["east"] = "taishan/daizong",
 		["northeast"] = "huanghe/huanghe6",
 	},
-	room_relative="黄河岸边↗黄河岸边---岱宗坊↙黄河岸边黄河岸边",
+ room_relative="黄河岸边↗黄河岸边---岱宗坊↙黄河岸边黄河岸边",
 }
 Room {
 	id = "huanghe/huanghe6",
 	name = "黄河岸边",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "huanghe/huanghe5",
 		["northeast"] = "huanghe/huanghe7",
@@ -13671,64 +15635,69 @@ Room {
 Room {
 	id = "huanghe/huanghe7",
 	name = "黄河岸边",
+	outdoor = "黄河流域",
 	ways = {
 		["northup"] = "huanghe/daba",
 		["southwest"] = "huanghe/huanghe6",
 		["northwest"] = "huanghe/yyd/damen",
 		["northeast"] = "huanghe/huanghe8",
 	},
-	room_relative="萧府大门黄河大堤黄河入海口↖↑↗黄河岸边↙黄河岸边黄河岸边",
+room_relative="萧府大门黄河大堤黄河入海口↖↑↗黄河岸边↙黄河岸边黄河岸边",
 }
 Room {
 	id = "huanghe/huanghe8",
 	name = "黄河入海口",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "huanghe/huanghe7",
 		["north"] = "huanghe/road2",
 	},
+	room_relative="大渡口｜黄河入海口↙黄河岸边黄河入海口",
 }
 Room {
 	id = "huanghe/huanghe_1",
 	name = "黄河",
+	outdoor = "黄河流域",
 	ways = {
 		["southeast"] = "huanghe/hetao",
 		["northwest"] = "huanghe/huangtu",
 	},
+	room_relative="黄土高原↖黄河↘河套黄河",
 }
 Room {
 	id = "huanghe/huanghe_2",
 	name = "黄河",
+	outdoor = "黄河流域",
 	ways = {
 		["northeast"] = "huanghe/huangtu",
 		["west"] = "huanghe/huanghe_3",
 	},
+	room_relative="黄土高原｜黄河黄河",
 }
 Room {
 	id = "huanghe/huanghe_3",
 	name = "黄河",
+	outdoor = "黄河流域",
 	ways = {
 		["east"] = "huanghe/huanghe_2",
 	},
+	room_relative="黄河--黄河",
 }
 Room {
 	id = "huanghe/huangtu",
 	name = "黄土高原",
+	outdoor = "黄河流域",
 	ways = {
 		["southeast"] = "huanghe/huanghe_1",
 		["northwest"] = "changan/road2",
 	},
+room_relative="陕晋渡口↖黄土高原↘黄河黄土高原",
 }
-Room {
-	id = "huanghe/jingyuan",
-	name = "靖远",
-	ways = {
-		["south"] = "huanghe/shamo",
-		["north"] = "huanghe/hongshanxia",
-	},
-}
+
 Room {
 	id = "huanghe/kedian",
 	name = "客店",
+	outdoor = "黄河流域",
 	no_fight = true,
 	ways = {
 		["up"] = "huanghe/kedian2",
@@ -13737,6 +15706,7 @@ Room {
 Room {
 	id = "huanghe/kedian2",
 	name = "客店二楼",
+	outdoor = "黄河流域",
 	ways = {
 		["enter"] = "huanghe/kedian3",
 		["down"] = "huanghe/kedian",
@@ -13745,47 +15715,51 @@ Room {
 Room {
 	id = "huanghe/kedian3",
 	name = "客店二楼",
+	outdoor = "黄河流域",
 	no_fight = true,
 	ways = {
 		["out"] = "huanghe/kedian2",
 	},
 }
 Room {
-	id = "huanghe/road2",
-	name = "大渡口",
-	ways = {
-		["south"] = "huanghe/huanghe8",
-		["#duHhe"] = "huanghe/road3",
-		["#ptoSld"] = "sld/dukou",
-	},
-	nolooks = {
-		["enter"] = true,
-		["#duHhe"] = true,
-		["#ptoSld"] = true,
-	},
-	lengths = {
-		["#duHhe"] = 10000,
-		["#ptoSld"] = "if score.party and score.party=='神龙教' then return 10 else return false end",
+	 id = "huanghe/road2",
+        name = "大渡口",
+        ways = {
+                ["south"] = "huanghe/huanghe8",
+                ["#duHhe"] = "huanghe/road3",
+                ["#ptoSld"] = "sld/dukou",
+        },
+        nolooks = {
+                ["enter"] = true,
+                ["#duHhe"] = true,
+                ["#ptoSld"] = true,
+        },
+        lengths = {
+                ["#duHhe"] = "if not road.huanghe2 then return 10000 else return false end",
+                ["#ptoSld"] = "if score.party and score.party=='神龙教' then return 10 else return false end",
      },
+	 room_relative="大渡口｜黄河入海口大渡口",
 }
 Room {
 	id = "huanghe/road3",
-	name = "大渡口",
-	ways = {
-		["north"] = "cangzhou/sroad4",
-		["#duHhe"] = "huanghe/road2",
-	},
-	lengths = {
-		["#duHhe"] = 10000,
-	},
-	nolooks = {
-		["enter"] = true,
-		["#duHhe"] = true,
-	},
+        name = "大渡口",
+        ways = {
+                ["north"] = "cangzhou/sroad4",
+                ["#duHhe"] = "huanghe/road2",
+        },
+        lengths = {
+                ["#duHhe"] = "if not road.huanghe2 then return 10000 else return false end",
+        },
+        nolooks = {
+                ["enter"] = true,
+                ["#duHhe"] = true,
+        },
+		room_relative="官道｜大渡口大渡口",
 }
 Room {
 	id = "huanghe/shamo",
 	name = "沙漠",
+	outdoor = "黄河流域",
 	ways = {
 		["south"] = "huanghe/shamo1",
 		["east"] = "huanghe/shamo",
@@ -13796,6 +15770,7 @@ Room {
 Room {
 	id = "lanzhou/shamo1",
 	name = "沙漠",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/shamo",
 		["enter"] = "lanzhou/shidong",
@@ -13808,6 +15783,7 @@ Room {
 Room {
 	id = "huanghe/shidong",
 	name = "石洞",
+	outdoor = "黄河流域",
 	ways = {
 		["out"] = "huanghe/shamo1",
 	},
@@ -13815,23 +15791,28 @@ Room {
 Room {
 	id = "huanghe/shimen",
 	name = "石门",
+	outdoor = "黄河流域",
 	ways = {
 		["south"] = "huanghe/hongshanxia",
 		["northwest"] = "huanghe/yinpanshui",
 		["north"] = "huanghe/wufosi",
 	},
+	room_relative="红山峡｜营盘水-----五佛寺石门",
 }
 Room {
 	id = "huanghe/shixiazi",
 	name = "石峡子",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "huanghe/tumenzi",
 		["northeast"] = "huanghe/bingcao",
 	},
+	room_relative="土门子｜冰草湾石峡子",
 }
 Room {
 	id = "huanghe/shulin1",
 	name = "树林",
+	outdoor = "黄河流域",
 	ways = {
 		["north"] = "huanghe/shulin3",
 		["east"] = "huanghe/caodi2",
@@ -13839,11 +15820,13 @@ Room {
 	},
 	objs = {
           ["石块"] = "shi kuai",
+	room_relative="树林｜树林-----树林-----草地树林",
            },
 }
 Room {
 	id = "huanghe/shulin2",
 	name = "树林",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "zhiye/caikuang-chang0",
 		["north"] = "huanghe/shulin4",
@@ -13851,20 +15834,24 @@ Room {
 	},
 	objs = {
           ["灰狼"] = "hui lang",
+	room_relative="树林｜树林-----树林↙采矿场入口树林",
            },
 }
 Room {
 	id = "huanghe/shulin3",
 	name = "树林",
+	outdoor = "黄河流域",
 	ways = {
 		["south"] = "huanghe/shulin1",
 		["north"] = "huanghe/tiandi1",
 		["west"] = "huanghe/shulin4",
 	},
+	room_relative="田地｜树林-----树林｜树林树林",
 }
 Room {
 	id = "huanghe/shulin4",
 	name = "树林",
+	outdoor = "黄河流域",
 	ways = {
 		["south"] = "huanghe/shulin2",
 		["northwest"] = "group/entry/hhshulin5",
@@ -13873,27 +15860,33 @@ Room {
 	objs = {
           ["狐狸"] = "hu li",
            },
+   room_relative="树林↖树林-----树林｜树林树林",
 }
 Room {
 	id = "huanghe/shulin6",
 	name = "树林",
+	outdoor = "黄河流域",
 	ways = {
-		--["north"] = "huanghe/fendi",
+		["north"] = "huanghe/fendi",
 		["east"] = "group/entry/hhshulin5",
 	},
+	room_relative="墓地｜树林-----树林树林",
 }
 Room {
 	id = "huanghe/tiandi1",
 	name = "田地",
+	outdoor = "黄河流域",
 	ways = {
 		["south"] = "huanghe/shulin3",
 		["east"] = "huanghe/tiandi3",
 		["west"] = "huanghe/tiandi2",
 	},
+	room_relative="田地-----田地-----田地｜树林田地",
 }
 Room {
 	id = "huanghe/tiandi2",
 	name = "田地",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "group/entry/hhshulin5",
 		["east"] = "huanghe/tiandi1",
@@ -13901,18 +15894,22 @@ Room {
 	objs = {
           ["大黄牛"] = "da huangniu",
            },
+	room_relative="树林｜田地田地",
 }
 Room {
 	id = "huanghe/tiandi3",
 	name = "田地",
+	outdoor = "黄河流域",
 	ways = {
 		["northeast"] = "huanghe/tiandi4",
 		["west"] = "huanghe/tiandi1",
 	},
+ room_relative="田地↗田地-----田地田地",
 }
 Room {
 	id = "huanghe/tiandi4",
 	name = "田地",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "huanghe/tiandi3",
 		["east"] = "taishan/hsroad2",
@@ -13920,60 +15917,25 @@ Room {
 	},
 	objs = {
           ["野狗"] = "ye gou",
+	room_relative="黄河岸边｜田地-----青石大道↙田地田地",
            },
-}
-Room {
-	id = "huanghe/tumenzi",
-	name = "土门子",
-	ways = {
-		["south"] = "huanghe/wuwei",
-		["northwest"] = "hengshan/jinlongxia",
-		["east"] = "hmy/pingding/road1",
-		["northeast"] = "huanghe/shixiazi",
-	},
 }
 Room {
 	id = "huanghe/weifen",
 	name = "渭汾流域",
+	outdoor = "黄河流域",
 	ways = {
 		["southwest"] = "nanyang/yidao4",
 		["south"] = "huanghe/huanghe1",
 		["north"] = "huanghe/hetao",
 	},
+	room_relative="河套｜渭汾流域↙｜密林黄河岸边渭汾流域",
 }
-Room {
-	id = "huanghe/wufosi",
-	name = "五佛寺",
-	ways = {
-		["south"] = "huanghe/shimen",
-	},
-}
-Room {
-	id = "huanghe/wuqiao",
-	name = "乌鞘岭",
-	ways = {
-		["south"] = "huanghe/dacaigou",
-		["northwest"] = "huanghe/wuwei",
-	},
-}
-Room {
-	id = "huanghe/wuwei",
-	name = "武威",
-	ways = {
-		["southeast"] = "huanghe/wuqiao",
-		["north"] = "huanghe/tumenzi",
-	},
-}
-Room {
-	id = "huanghe/xiaojiaqiao",
-	name = "萧家桥",
-	ways = {
-		["east"] = "huanghe/gulang",
-	},
-}
+
 Room {
 	id = "huanghe/xyting",
 	name = "侠义厅",
+	outdoor = "黄河流域",
 	ways = {
 		["east"] = "huanghe/gchang",
 	},
@@ -13982,25 +15944,12 @@ Room {
           ["梁子翁"] = "liang ziweng",
           ["沙通天"] = "sha tongtian",
            },
-}
-Room {
-	id = "huanghe/yaocaidian",
-	name = "皮货药材店",
-	ways = {
-		["west"] = "huanghe/gulang",
-	},
-}
-Room {
-	id = "huanghe/yinpanshui",
-	name = "营盘水",
-	ways = {
-		["southwest"] = "huanghe/bingcao",
-		["northeast"] = "huanghe/guchangcheng",
-	},
+	room_relative="侠义厅----广场侠义厅",
 }
 Room {
 	id = "huanghe/yyd/chufang",
 	name = "厨房",
+	outdoor = "萧府",
 	ways = {
 		["east"] = "huanghe/yyd/dating",
 	},
@@ -14008,6 +15957,7 @@ Room {
 Room {
 	id = "huanghe/yyd/damen",
 	name = "萧府大门",
+	outdoor = "萧府",
 	no_fight = true,
 	ways = {
 		["southeast"] = "huanghe/huanghe7",
@@ -14023,6 +15973,7 @@ Room {
 Room {
 	id = "huanghe/yyd/dating",
 	name = "萧府大厅",
+	outdoor = "萧府",
 	ways = {
 		["south"] = "huanghe/yyd/damen",
 		["north"] = "huanghe/yyd/houyuan",
@@ -14033,6 +15984,7 @@ Room {
 Room {
 	id = "huanghe/yyd/houshan",
 	name = "后山",
+	outdoor = "萧府",
 	ways = {
 		["south"] = "huanghe/yyd/houyuan",
 	},
@@ -14040,28 +15992,34 @@ Room {
 Room {
 	id = "huanghe/yyd/houyuan",
 	name = "后院",
+	outdoor = "萧府",
 	ways = {
 		["south"] = "huanghe/yyd/dating",
 	},
-}
+}  
 Room {
 	id = "huanghe/yyd/shufang",
 	name = "书房",
+	outdoor = "萧府",
 	ways = {
 		["west"] = "huanghe/yyd/dating",
 	},
+	room_relative="萧府大厅-----书房书房",
 }
 Room {
 	id = "huashan/baichi",
 	name = "百尺峡",
+	outdoor = "华山",
 	ways = {
 		["eastup"] = "huashan/laojun",
 		["northdown"] = "huashan/qianchi",
 	},
+room_relative="千尺幢↓百尺峡→老君沟百尺峡",
 }
 Room {
 	id = "huashan/canglong",
 	name = "苍龙岭",
+	outdoor = "华山",
 	ways = {
 		["westup"] = "huashan/sheshen",
 		["northdown"] = "huashan/husun",
@@ -14069,11 +16027,13 @@ Room {
 	},
 	objs = {
           ["猴子"] = "hou zi",
+	 room_relative="猢狲愁↓舍身崖←苍龙岭↑镇岳宫苍龙岭",
            },
 }
 Room {
 	id = "huashan/cave",
 	name = "密洞",
+	outdoor = "华山",
 	ways = {
 		["right"] = "huashan/rukou",
 	},
@@ -14081,6 +16041,7 @@ Room {
 Room {
 	id = "huashan/celang1",
 	name = "侧廊",
+	outdoor = "华山",
 	ways = {
 		["east"] = "huashan/qianting",
 		["west"] = "huashan/lianwu1",
@@ -14090,6 +16051,7 @@ Room {
 Room {
 	id = "huashan/celang2",
 	name = "侧廊",
+	outdoor = "华山",
 	ways = {
 		["east"] = "huashan/lianwu2",
 		["west"] = "huashan/qianting",
@@ -14099,6 +16061,7 @@ Room {
 Room {
 	id = "huashan/celang3",
 	name = "侧廊",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/xiuxi1",
 		["east"] = "huashan/houtang",
@@ -14107,12 +16070,13 @@ Room {
 	room_relative="饭厅-----侧廊-----后堂｜女休息室侧廊",
 	lengths = {
 		["south"] = "if score.gender and score.gender=='女' then return 1 else return false end",
-		["west"] = "if job.room=='饭厅' or job.room=='药房' then return 1 elseif flag.times and flag.times<3 then return 6 else return 1 end",
+         ["west"] = "if job.room=='饭厅' or job.room=='药房' then return 1 elseif flag.times and flag.times<3 then return 6 else return 1 end",
 	},
 }
 Room {
 	id = "huashan/celang4",
 	name = "侧廊",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/xiuxi2",
 		["east"] = "huashan/shuyuan",
@@ -14126,31 +16090,42 @@ Room {
 Room {
 	id = "huashan/chaoyang",
 	name = "朝阳峰",
+	outdoor = "华山",
 	ways = {
 		["westdown"] = "huashan/zhenyue",
 	},
+	room_relative="镇岳宫→朝阳峰朝阳峰",
 }
 Room {
-        id = "huashan/fanting",
-        name = "饭厅",
-        ways = {
-                ["eat rice;drop rice;drop bao zi;drop douhua;drop jitui;drop doufu;drop kousansi;drop cuishan;drop liji;drop huasheng;drop niurou;drop liyu;drop yaoliu;drop rou pian;north"] = "huashan/yaofang",
-                ["eat rice;drop rice;drop douhua;drop bao zi;drop jitui;drop doufu;drop kousansi;drop cuishan;drop liji;drop huasheng;drop niurou;drop liyu;drop yaoliu;drop rou pian;east"] = "huashan/celang3",
-        },
-        objs = {
+	id = "huashan/fanting",
+	name = "饭厅",
+	outdoor = "华山",
+	ways = {
+		["north"] = "huashan/yaofang",
+		["east"] = "huashan/celang3",
+	},
+	precmds = {
+    ["north"] = "drop hulu;drop rice;drop jitui;drop rou pian;drop huasheng;drop tangcu liyu",
+	["east"] = "drop hulu;drop rice;drop jitui;drop rou pian;drop huasheng;drop tangcu liyu",
+	},
+	objs = {
           ["清水葫芦"] = "qingshui hulu",
            },
+  room_relative="药房｜饭厅-----侧廊饭厅",
 }
 Room {
 	id = "huashan/hole",
 	name = "思过崖洞口",
+	outdoor = "华山",
 	ways = {
 		["out"] = "huashan/siguoya",
 	},
+	room_relative="思过崖洞口∨思过崖思过崖洞口",
 }
 Room {
 	id = "huashan/hole2",
 	name = "石洞",
+	outdoor = "华山",
 	ways = {
 		["out"] = "huashan/song",
 	},
@@ -14158,6 +16133,7 @@ Room {
 Room {
 	id = "huashan/houshan",
 	name = "后山",
+	outdoor = "华山",
 	ways = {
 		["northdown"] = "huashan/midong",
 	},
@@ -14165,6 +16141,7 @@ Room {
 Room {
 	id = "huashan/houtang",
 	name = "后堂",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/qinshi",
 		["north"] = "huashan/zhengqi",
@@ -14173,30 +16150,36 @@ Room {
 	},
 	objs = {
           ["陆大有"] = "lu dayou",
+	room_relative="正气堂｜侧廊-----后堂-----侧廊｜寝室后堂",
            },
 }
 Room {
 	id = "huashan/husun",
 	name = "猢狲愁",
+	outdoor = "华山",
 	ways = {
 		["southup"] = "huashan/canglong",
 		["northdown"] = "huashan/laojun",
 	},
 	objs = {
           ["猴子"] = "hou zi",
+	room_relative="老君沟↓猢狲愁↓苍龙岭猢狲愁",
            },
 }
 Room {
 	id = "huashan/jiabi",
 	name = "夹山壁",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shiwu1",
 		["out"] = "huashan/siguoya",
 	},
+	
 }
 Room {
 	id = "huashan/jinshe/biding",
 	name = "壁顶",
+	outdoor = "华山",
 	ways = {
 		["down"] = "huashan/husun",
 	},
@@ -14204,25 +16187,29 @@ Room {
 Room {
 	id = "huashan/jitan",
 	name = "祭坛",
+	outdoor = "华山",
 	ways = {
 		["out"] = "huashan/yunuci",
 	},
 	objs = {
           ["岳灵珊"] = "yue lingshan",
-           },
+	 },
+	 room_relative="祭坛∨玉女祠祭坛",
 }
 Room {
 	id = "huashan/kongdi",
 	name = "空地",
+	outdoor = "华山",
 	ways = {
 		["north"] = "huashan/shulin1",
 		["southdown"] = "huashan/v-road-1",
 	},
-	room_relative='松树林｜空地↑山涧空地',
+	room_relative="松树林｜空地↑空地",
 }
 Room {
 	id = "huashan/laojun",
 	name = "老君沟",
+	outdoor = "华山",
 	ways = {
 		["southup"] = "huashan/husun",
 		["westdown"] = "huashan/baichi",
@@ -14230,10 +16217,12 @@ Room {
 	objs = {
           ["猴子"] = "hou zi",
            },
+	room_relative="百尺峡→老君沟↓猢狲愁老君沟",
 }
 Room {
 	id = "huashan/lianwu1",
 	name = "练武场",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/yaofang",
 		["east"] = "huashan/celang1",
@@ -14246,18 +16235,21 @@ Room {
 Room {
 	id = "huashan/lianwu2",
 	name = "练武场",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/wuqiku",
 		["west"] = "huashan/celang2",
 	},
-	room_relative="侧廊----练武场｜剑房练武场",
+	
 	objs = {
           ["施戴子"] = "shi daizi",
            },
+	room_relative="侧廊----练武场｜剑房练武场",
 }
 Room {
 	id = "huashan/maowu",
 	name = "茅屋",
+	outdoor = "华山",
 	ways = {
 		["southeast"] = "huashan/v-road-1",
 	},
@@ -14265,6 +16257,7 @@ Room {
 Room {
 	id = "huashan/midao",
 	name = "密道",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/midong",
 		["left"] = "huashan/rukou",
@@ -14273,6 +16266,7 @@ Room {
 Room {
 	id = "huashan/midong",
 	name = "秘洞",
+	outdoor = "华山",
 	ways = {
 		["southeast"] = "huashan/midong",
 		["southwest"] = "huashan/midong",
@@ -14287,16 +16281,24 @@ Room {
 Room {
 	id = "huashan/path1",
 	name = "山脚下",
+	outdoor = "华山",
 	ways = {
 		["southeast"] = "huashan/shaluo",
 		["south"] = "huashan/shulin",
 		["north"] = "huashan/yuquan",
 		["west"] = "village/eexit",
 	},
+	
+	lengths = {
+		["south"] = 7,
+	},	
+	room_relative="玉泉院｜东村口----山脚下｜↘树林莎萝坪山脚下",
+	
 }
 Room {
 	id = "huashan/pubu",
 	name = "瀑布",
+	outdoor = "华山",
 	ways = {
 		["east"] = "huashan/yunu",
 		["tiao tan;#walkBusy"] = "huashan/shuitan",
@@ -14310,10 +16312,12 @@ Room {
 	objs = {
           ["青蛙"] = "qing wa",
            },
+	room_relative="瀑布-----玉女峰瀑布",
 }
 Room {
 	id = "huashan/shuitan",
 	name = "瀑布底",
+	outdoor = "华山",
 	ways = {
 		["qian up"] = "huashan/pubu",
 	},
@@ -14327,76 +16331,96 @@ Room {
 Room {
 	id = "huashan/qianchi",
 	name = "千尺幢",
+	outdoor = "华山",
 	ways = {
 		["southup"] = "huashan/baichi",
 		["westdown"] = "huashan/qingke",
 	},
+	room_relative="青柯坪→千尺幢↓百尺峡千尺幢",
 }
 Room {
 	id = "huashan/qianting",
 	name = "前厅",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/zhengqi",
 		["east"] = "huashan/celang2",
 		["northdown"] = "huashan/taijie",
 		["west"] = "huashan/celang1",
+	
+	},
+	precmds = {
+              ["south"] = "#walkBusy",
 	},
 	objs = {
           ["华山正气碑"] = "board",
+	room_relative="台阶↓侧廊-----前厅-----侧廊｜正气堂前厅",
            },
 }
 Room {
 	id = "huashan/qingke",
 	name = "青柯坪",
+	outdoor = "华山",
 	ways = {
 		["eastup"] = "huashan/qianchi",
 		["northdown"] = "huashan/shaluo",
 	},
+  room_relative="莎萝坪↓青柯坪→千尺幢青柯坪",
 }
 Room {
 	id = "huashan/qinshi",
 	name = "寝室",
+	outdoor = "华山",
 	ways = {
 		["north"] = "huashan/houtang",
 	},
 	objs = {
           ["绳子"] = "sheng zi",
            },
+	room_relative="后堂｜寝室寝室",
 }
 Room {
 	id = "huashan/rukou",
 	name = "山洞",
+	outdoor = "华山",
 }
 Room {
 	id = "huashan/shaluo",
 	name = "莎萝坪",
+	outdoor = "华山",
 	ways = {
 		["southup"] = "huashan/qingke",
 		["northwest"] = "huashan/path1",
 		["northeast"] = "huashan/shanhong",
 	},
+	room_relative="山脚下山洪瀑布↖↗莎萝坪↓青柯坪莎萝坪",
 }
 Room {
 	id = "huashan/shanhong",
 	name = "山洪瀑布",
+	outdoor = "华山",
 	ways = {
 		["southwest"] = "huashan/shaluo",
 	},
+	room_relative="山洪瀑布↙莎萝坪山洪瀑布",
 }
 Room {
 	id = "huashan/shanlu1",
 	name = "山路",
+	outdoor = "华山",
 	ways = {
 		["southeast"] = "huashan/shanlu2",
 		["north"] = "huashan/yunu",
 	},
 	objs = {
           ["猴子"] = "hou zi",
+	room_relative="玉女峰｜山路↘山路山路",
            },
 }
 Room {
 	id = "huashan/shanlu2",
 	name = "山路",
+	outdoor = "华山",
 	ways = {
 		["southup"] = "huashan/taijie",
 		["southwest"] = "huashan/xiaoxi",
@@ -14404,44 +16428,54 @@ Room {
 	},
 	objs = {
           ["猴子"] = "hou zi",
+	room_relative="山路↖山路↙↓小溪台阶山路",
            },
 }
 Room {
 	id = "huashan/sheshen",
 	name = "舍身崖",
+	outdoor = "华山",
 	ways = {
 		["eastdown"] = "huashan/canglong",
 	},
+	room_relative="舍身崖←苍龙岭舍身崖",
 }
 Room {
 	id = "huashan/shiwu",
 	name = "石屋",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulin4",
 	},
 	objs = {
           ["穆人清"] = "mu renqing",
            },
+   room_relative="松树林-----石屋石屋",
 }
 Room {
 	id = "huashan/shiwu1",
 	name = "石屋",
+	outdoor = "华山",
 	ways = {
 		["east"] = "huashan/jiabi",
 	},
+	
 }
 Room {
 	id = "huashan/shulin",
 	name = "树林",
+	outdoor = "华山",
 	ways = {
 		["north"] = "huashan/shulinn",
 		["east"] = "huashan/shulin1",
 		["west"] = "huashan/shulinn",
 	},
+	room_relative="松树林｜松树林-----树林-----松树林树林",
 }
 Room {
 	id = "huashan/shulin1",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/kongdi",
 		["north"] = "huashan/shulinn",
@@ -14473,6 +16507,7 @@ Room {
 Room {
 	id = "huashan/shulinn",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn1",
 	},
@@ -14480,6 +16515,7 @@ Room {
 Room {
 	id = "huashan/shulinn1",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn2",
 	},
@@ -14487,6 +16523,7 @@ Room {
 Room {
 	id = "huashan/shulinn2",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn3",
 	},
@@ -14494,6 +16531,7 @@ Room {
 Room {
 	id = "huashan/shulinn3",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn4",
 	},
@@ -14501,6 +16539,7 @@ Room {
 Room {
 	id = "huashan/shulinn4",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn5",
 	},
@@ -14508,6 +16547,7 @@ Room {
 Room {
 	id = "huashan/shulinn5",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn6",
 	},
@@ -14515,6 +16555,7 @@ Room {
 Room {
 	id = "huashan/shulinn6",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn7",
 	},
@@ -14522,6 +16563,7 @@ Room {
 Room {
 	id = "huashan/shulinn7",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn8",
 	},
@@ -14529,6 +16571,7 @@ Room {
 Room {
 	id = "huashan/shulinn8",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinn9",
 	},
@@ -14536,6 +16579,7 @@ Room {
 Room {
 	id = "huashan/shulinn9",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["west"] = "huashan/shulinnn",
 	},
@@ -14543,6 +16587,7 @@ Room {
 Room {
 	id = "huashan/shulinnn",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["#hsssl"] = "huashan/shiwu",
 	},
@@ -14563,46 +16608,53 @@ Room {
 Room {
 	id = "huashan/shulin4",
 	name = "松树林",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/path1",
 		["east"] = "huashan/shiwu",
 		["north"] = "huashan/kongdi",
 		["west"] = "huashan/shulin4",
 	},
+	room_relative="山脚下｜石屋-----空地｜松树林松树林",
 }
 Room {
 	id = "huashan/shuyuan",
 	name = "书院",
+	outdoor = "华山",
 	ways = {
 		["north"] = "huashan/wuqiku",
 		["west"] = "huashan/celang4",
 	},
 	objs = {
           ["正气诀要"] = "shu",
+	room_relative="剑房｜侧廊-----书院书院",
            },
 }
 Room {
-        id = "huashan/siguoya",
-        name = "思过崖",
-        ways = {
-                ["eastdown"] = "huashan/xiaolu2",
-                ["enter"] = "huashan/hole",
-                ["#Fqy"] = "huashan/fengqingyang",
-        },
-        nolooks = {
-                ["#Fqy"] = true,
-                ["enter"] = true,
-        },
-        objs = {
+	id = "huashan/siguoya",
+	name = "思过崖",
+	outdoor = "华山",
+	ways = {
+		["eastdown"] = "huashan/xiaolu2",
+		["enter"] = "huashan/hole",
+		["#Fqy"] = "huashan/fengqingyang",
+	},
+	nolooks = {
+		["#Fqy"] = true,
+		["enter"] = true,
+	},
+	objs = {
           ["令狐冲"] = "linghu chong",
            },
-        lengths = {
-                ["#Fqy"] = "if MidHsDay[locl.time] and score.master=='风清扬' then return 1 else return false end",
-        },
+	lengths = {
+		["#Fqy"] = "if MidHsDay[locl.time] and score.master=='风清扬' then return false else return 1 end",
+	},
+	room_relative="思过崖洞口∧思过崖←小山路思过崖",
 }
 Room {
 	id = "huashan/fengqingyang",
 	name = "夹山壁",
+	outdoor = "华山",
 	ways = {
 		["out"] = "huashan/siguoya",
 	},
@@ -14612,21 +16664,21 @@ Room {
 }
 Room {
 	id = "huashan/taijie",
-	name = "台阶",
-	ways = {
-		["southup"] = "huashan/qianting",
-		["northdown"] = "huashan/shanlu2",
-	},
-	objs = {
+        name = "台阶",
+		outdoor = "华山",
+        ways = {
+                ["southup"] = "huashan/qianting",
+                ["northdown"] = "huashan/shanlu2",
+        },
+        objs = {
           ["梁发"] = "liang fa",
            },
-	--[[lengths = {
-		["southup"] = "if score.party=='华山派' and hp.shen<0 then return false else return 10 end",
-	},]]
+        room_relative="山路↓台阶↓前厅台阶",
 }
 Room {
 	id = "huashan/shentan",
 	name = "山涧",
+	outdoor = "华山",
 	ways = {
 		["northeast"] = "huashan/v-road-1",
 	},
@@ -14635,6 +16687,7 @@ Room {
 Room {
 	id = "huashan/v-road-1",
 	name = "山涧",
+	outdoor = "华山",
 	ways = {
 		["southeast"] = "huashan/v-road-5",
 		["southwest"] = "huashan/shentan",
@@ -14658,15 +16711,17 @@ Room {
 Room {
 	id = "huashan/v-road-3",
 	name = "山涧",
+	outdoor = "华山",
 	ways = {
 		["westdown"] = "huashan/v-road-2",
 		["southeast"] = "huashan/shulinn",
 	},
-	room_relative="山涧→山涧↘松树林山涧",
+	room_relative="山涧→山涧↘山涧",
 }
 Room {
 	id = "huashan/v-road-5",
 	name = "山涧",
+	outdoor = "华山",
 	ways = {
 		["northwest"] = "huashan/v-road-1",
 		["bang shengzi;pa up"] = "huashan/song",
@@ -14682,6 +16737,7 @@ Room {
 Room {
 	id = "huashan/song",
 	name = "万年松",
+	outdoor = "华山",
 	ways = {
 		["enter"] = "huashan/hole2",
 		["down"] = "huashan/v-road-5",
@@ -14690,14 +16746,17 @@ Room {
 Room {
 	id = "huashan/wuqiku",
 	name = "剑房",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/shuyuan",
 		["north"] = "huashan/lianwu2",
 	},
+room_relative="练武场｜剑房｜书院剑房",
 }
 Room {
 	id = "huashan/xiaolu1",
 	name = "小山路",
+	outdoor = "华山",
 	ways = {
 		["southeast"] = "huashan/yunu",
 		["northwest"] = "huashan/xiaolu2",
@@ -14707,6 +16766,7 @@ Room {
 Room {
 	id = "huashan/xiaolu2",
 	name = "小山路",
+	outdoor = "华山",
 	ways = {
 		["southeast"] = "huashan/xiaolu1",
 		["westup"] = "huashan/siguoya",
@@ -14716,40 +16776,49 @@ Room {
 Room {
 	id = "huashan/xiaoxi",
 	name = "小溪",
+	outdoor = "华山",
 	ways = {
 		["northeast"] = "huashan/shanlu2",
 	},
+	room_relative="山路↗小溪小溪",
 }
 Room {
 	id = "huashan/xiuxi1",
 	name = "女休息室",
+	outdoor = "华山",
 	no_fight = true,
 	ways = {
 		["north"] = "huashan/celang3",
 	},
+	room_relative="侧廊--女休息室",
 }
 Room {
 	id = "huashan/xiuxi2",
 	name = "男休息室",
+	outdoor = "华山",
 	no_fight = true,
 	ways = {
 		["north"] = "huashan/celang4",
 	},
+	room_relative="侧廊--男休息室",
 }
 Room {
 	id = "huashan/yaofang",
 	name = "药房",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/fanting",
 		["north"] = "huashan/lianwu1",
 	},
-	lengths = {
-		["south"] = "if job.room=='饭厅' or job.room=='药房' then return 1 elseif flag.times and flag.times<3 then return 6 else return 1 end",
-	},
+    lengths = {
+                ["south"] = "if job.room=='饭厅' or job.room=='药房' then return 1 elseif flag.times and flag.times<3 then return 6 else return 1 end",
+        },
+	room_relative="练武场｜药房｜饭厅药房",
 }
 Room {
 	id = "huashan/yunu",
 	name = "玉女峰",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/shanlu1",
 		["northwest"] = "huashan/xiaolu1",
@@ -14757,49 +16826,61 @@ Room {
 		["northdown"] = "huashan/zhenyue",
 		["west"] = "huashan/pubu",
 	},
+	room_relative="小山路镇岳宫↖↓瀑布----玉女峰----玉女祠｜山路玉女峰",
 }
 Room {
 	id = "huashan/yunuci",
 	name = "玉女祠",
+	outdoor = "华山",
 	ways = {
 		["enter"] = "huashan/jitan",
 		["west"] = "huashan/yunu",
 	},
+	room_relative="祭坛∧玉女峰----玉女祠玉女祠",
 }
 Room {
 	id = "huashan/yuquan",
 	name = "玉泉院",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/path1",
 	},
 	objs = {
           ["李铁嘴"] = "li tiezui",
            },
+   room_relative="玉泉院｜山脚下玉泉院",
 }
 Room {
 	id = "huashan/zhengqi",
 	name = "正气堂",
+	outdoor = "华山",
 	ways = {
 		["south"] = "huashan/houtang",
 		["north"] = "huashan/qianting",
 	},
+	
+	
 	objs = {
           ["岳不群"] = "yue buqun",
           ["宁中则"] = "ning zhongze",
+	room_relative="前厅｜正气堂｜后堂正气堂",
            },
 }
 Room {
 	id = "huashan/zhenyue",
 	name = "镇岳宫",
+	outdoor = "华山",
 	ways = {
 		["northup"] = "huashan/canglong",
 		["southup"] = "huashan/yunu",
 		["eastup"] = "huashan/chaoyang",
 	},
+	 room_relative="苍龙岭↑镇岳宫→朝阳峰↓玉女峰镇岳宫",
 }
 Room {
 	id = "hz/baidi",
 	name = "白堤",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/yuemiao",
 		["southwest"] = "hz/gushan",
@@ -14808,26 +16889,32 @@ Room {
 		["northeast"] = "hz/hubian",
 		["west"] = "hz/pinghu",
 	},
+	 room_relative="断桥残雪青石大道西湖边↖｜↗平湖秋月-----白堤↙↘孤山岳王庙白堤",
 }
 Room {
 	id = "hz/baoshuta",
 	name = "宝淑塔",
+	outdoor = "杭州城",
 	ways = {
 		["northdown"] = "hz/shanlu",
 		["southdown"] = "hz/qsddao1",
 	},
+	room_relative="山路｜青石大道宝淑塔",
 }
 Room {
 	id = "hz/beimen",
 	name = "北门",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/qsddao6",
 		["north"] = "group/entry/hzqsd7",
 	},
+	room_relative="青石大道｜北门｜青石大道北门",
 }
 Room {
 	id = "hz/changlang1",
 	name = "长廊",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/changlang1",
 		["north"] = "hz/changlang2",
@@ -14838,6 +16925,7 @@ Room {
 Room {
 	id = "hz/changlang2",
 	name = "长廊",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/changlang3",
 		["north"] = "hz/changlang2",
@@ -14848,6 +16936,7 @@ Room {
 Room {
 	id = "hz/changlang3",
 	name = "长廊",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/changlang3",
 		["east"] = "hz/changlang4",
@@ -14858,16 +16947,19 @@ Room {
 Room {
 	id = "hz/changlang4",
 	name = "长廊",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/changlang4",
 		["north"] = "hz/changlang4",
 		["east"] = "hz/changlang4",
 		["west"] = "hz/huanglong",
 	},
+	room_relative="长廊｜长廊---长廊｜黄龙洞长廊",
 }
 Room {
 	id = "hz/cuihezhai",
 	name = "翠合斋",
+	outdoor = "杭州城",
 	no_fight = true,
 	ways = {
 		["west"] = "hz/qsddao4",
@@ -14875,31 +16967,39 @@ Room {
 	objs = {
           ["张算盘"] = "zhang suanpan",
            },
+	room_relative="青石大道--翠合斋",
 }
 Room {
 	id = "hz/duanqiao",
 	name = "断桥残雪",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/baidi",
 	},
+	room_relative="断桥残雪↘白堤断桥残雪",
 }
 Room {
 	id = "hz/dxbdian",
 	name = "大雄宝殿",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/tianwang",
 	},
+	room_relative="大雄宝殿｜天王殿大雄宝殿",
 }
 Room {
 	id = "hz/fangheting",
 	name = "放鹤亭",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/gushan",
 	},
+	room_relative="放鹤亭｜孤山放鹤亭",
 }
 Room {
 	id = "hz/feilaifeng",
 	name = "飞来峰",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/yxsdong",
 		["west"] = "hz/qsddao3",
@@ -14908,10 +17008,12 @@ Room {
           ["归辛树"] = "gui xinshu",
           ["归二娘"] = "gui erniang",
            },
+   room_relative="青石大道----飞来峰↘石屋洞飞来峰",
 }
 Room {
 	id = "hz/gushan",
 	name = "孤山",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/wenlange",
 		["east"] = "meizhuang/hubian",
@@ -14919,10 +17021,12 @@ Room {
 		["northeast"] = "hz/baidi",
 		["west"] = "hz/xilengqiao",
 	},
+	room_relative="放鹤亭白堤｜↗西冷桥-----孤山-----西湖边｜文澜阁孤山",
 }
 Room {
 	id = "hz/hggyu",
 	name = "花港观鱼",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/hubian1",
 		["south"] = "hz/hubian2",
@@ -14930,55 +17034,74 @@ Room {
 		["east"] = "hz/hongyuchi",
 		["west"] = "hz/mudanyuan",
 	},
+room_relative="苏堤｜红鱼池-----牡丹园----西湖边↘｜西湖边花港观鱼",
 }
 Room {
 	id = "hz/hongyuchi",
 	name = "红鱼池",
+	outdoor = "杭州城",
 	ways = {
 		["west"] = "hz/hggyu",
 	},
+	room_relative="花港观鱼--红鱼池",
 }
 Room {
 	id = "hz/huanglong",
 	name = "黄龙洞",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/shuichi",
 		["southdown"] = "hz/shanlu",
 	},
+	room_relative="黄龙洞↑↘山路水池黄龙洞",
 }
 Room {
 	id = "hz/hubian",
 	name = "西湖边",
+	outdoor = "杭州城",
 	ways = {
 		["southwest"] = "hz/baidi",
 		["south"] = "hz/llwying",
+},
+		objs = {
+		["二位游客"] = "you ke",
+		["刀客"] = "dao ke",
 	},
 	room_relative="西湖边↙｜白堤柳浪闻莺西湖边",
 }
 Room {
 	id = "hz/hubian1",
 	name = "西湖边",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/jingcisi",
 		["northwest"] = "hz/hggyu",
 		["north"] = "hz/llwying",
 		["west"] = "hz/hubian2",
+},
+		objs = {
+		["游客"] = "you ke",
 	},
-	room_relative="花港观鱼柳浪闻莺↖｜西湖边----西湖边↘净慈寺西湖边",
+	room_relative="花港观鱼↖柳浪闻莺｜西湖边----西湖边↘净慈寺西湖边",
 }
 Room {
 	id = "hz/hubian2",
 	name = "西湖边",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/hupao",
 		["east"] = "hz/hubian1",
 		["north"] = "hz/hggyu",
+},
+		objs = {
+		["游客"] = "you ke",
 	},
 	room_relative="花港观鱼｜西湖边----西湖边｜虎跑西湖边",
 }
 Room {
 	id = "hz/hubian3",
 	name = "西湖边",
+	outdoor = "杭州城",
 	ways = {
 		["northwest"] = "hz/baidi",
 		["east"] = "hz/yuemiao",
@@ -14992,64 +17115,79 @@ Room {
 Room {
 	id = "hz/hupao",
 	name = "虎跑",
+	outdoor = "杭州城",
 	ways = {
 		["northwest"] = "hz/longjing",
 		["north"] = "hz/hubian2",
 		["northeast"] = "hz/yuhuang",
 	},
+ room_relative="龙井西湖边玉皇山↖｜↗虎跑虎跑",
 }
 Room {
 	id = "hz/huxinting",
 	name = "湖心亭",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/santan",
 		["west"] = "hz/ruangong",
 	},
+	room_relative="三潭映月｜阮公墩湖心亭",
 }
 Room {
 	id = "hz/jingcisi",
 	name = "净慈寺",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/yuhuang",
 		["northwest"] = "hz/hubian1",
 	},
+	room_relative="西湖边↖净慈寺↘玉皇山净慈寺",
 }
 Room {
 	id = "hz/jingzhong",
 	name = "精忠柏",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/mu",
 		["west"] = "hz/yuanmen",
 	},
+	room_relative="岳飞墓｜园门精忠柏",
 }
 Room {
 	id = "hz/jinhuazhai",
 	name = "金华斋",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/qsddao4",
 	},
 	objs = {
           ["崔算盘"] = "cui suanpan",
            },
+	room_relative="青石大道--金华斋",
 }
 Room {
 	id = "hz/jiulou",
 	name = "天香楼",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/qsddao6",
 	},
+	room_relative="天香楼----青石大道天香楼",
 }
 Room {
 	id = "hz/juquqiao",
 	name = "九曲桥",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/santan",
 		["north"] = "hz/xiaoying",
 	},
+	room_relative="三潭映月｜小赢洲九曲桥",
 }
 Room {
 	id = "hz/kedian2",
 	name = "客店二楼",
+	outdoor = "杭州城",
 	ways = {
 		["enter"] = "hz/kedian3",
 		["down"] = "hz/tianxiang",
@@ -15058,6 +17196,7 @@ Room {
 Room {
 	id = "hz/kedian3",
 	name = "客店二楼",
+	outdoor = "杭州城",
 	no_fight = true,
 	ways = {
 		["out"] = "hz/kedian2",
@@ -15066,78 +17205,96 @@ Room {
 Room {
 	id = "hz/kuahong",
 	name = "跨虹桥",
+	outdoor = "杭州城",
 	ways = {
 		["northwest"] = "hz/quyuan",
 		["north"] = "hz/yingboqiao",
 		["west"] = "hz/sudi",
 	},
+	room_relative="曲园风荷映波桥↖｜苏堤----跨虹桥跨虹桥",
 }
 Room {
 	id = "hz/leifengta",
 	name = "雷峰塔",
+	outdoor = "杭州城",
 	ways = {
 		["westdown"] = "hz/shanlu",
 	},
+	room_relative="山路--雷峰塔",
 }
 Room {
 	id = "hz/lingyinsi",
 	name = "灵隐寺",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/qsddao3",
 		["west"] = "hz/tianwang",
 	},
+	room_relative="天王殿----灵隐寺----青石大道灵隐寺",
 }
 Room {
 	id = "hz/liulin",
 	name = "柳林",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/liulin",
 		["north"] = "hz/liulin1",
 		["east"] = "hz/liulin",
 		["west"] = "hz/liulin",
 	},
+	room_relative="柳林｜柳林-----柳林-----柳林｜柳林柳林",
 }
 Room {
 	id = "hz/liulin1",
 	name = "柳林",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/liulin1",
 		["north"] = "hz/liulin2",
 		["east"] = "hz/liulin1",
 		["west"] = "hz/liulin1",
 	},
+	room_relative="柳林｜柳林-----柳林-----柳林｜柳林柳林",
 }
 Room {
 	id = "hz/liulin2",
 	name = "柳林",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/liulin2",
 		["north"] = "hz/shanlu1",
 		["east"] = "hz/liulin2",
 	},
+	room_relative="山路｜柳林-----柳林｜柳林柳林",
 }
 Room {
 	id = "hz/llwying",
 	name = "柳浪闻莺",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/hubian1",
 		["north"] = "hz/hubian",
 	},
+	room_relative="西湖边｜柳浪闻莺｜西湖边柳浪闻莺",
 }
 Room {
 	id = "hz/longjing",
 	name = "龙井",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/hupao",
 		["northwest"] = "hz/yxsdong2",
 	},
+	room_relative="烟霞洞↖｜虎跑↘龙井",
 }
 Room {
 	id = "hz/majiu",
 	name = "马厩",
+	outdoor = "杭州城",
 	ways = {
 		["west"] = "hz/tianxiang",
 	},
+	room_relative="天香楼--马厩",
 }
 Room {
 	id = "hz/maoshe",
@@ -15149,27 +17306,34 @@ Room {
 Room {
 	id = "hz/mu",
 	name = "岳飞墓",
+	outdoor = "杭州城",
 	ways = {
 		["north"] = "hz/jingzhong",
 	},
+	room_relative="精忠柏--岳飞墓",
 }
 Room {
 	id = "hz/mudanyuan",
 	name = "牡丹园",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/hggyu",
 	},
+	room_relative="花港观鱼--牡丹园",
 }
 Room {
 	id = "hz/pinghu",
 	name = "平湖秋月",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/baidi",
 	},
+	room_relative="平湖秋月---白堤平湖秋月",
 }
 Room {
 	id = "hz/qsddao1",
 	name = "青石大道",
+	outdoor = "杭州城",
 	ways = {
 		["northup"] = "hz/baoshuta",
 		["south"] = "hz/baidi",
@@ -15179,6 +17343,7 @@ Room {
 Room {
 	id = "hz/qsddao2",
 	name = "青石大道",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/qsddao3",
 		["south"] = "hz/sudi",
@@ -15190,6 +17355,7 @@ Room {
 Room {
 	id = "hz/qsddao3",
 	name = "青石大道",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "thd/niujia/road",
 		["northwest"] = "hz/qsddao2",
@@ -15201,6 +17367,7 @@ Room {
 Room {
 	id = "hz/qsddao4",
 	name = "青石大道",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/tianxiang",
 		["north"] = "hz/qsddao5",
@@ -15212,6 +17379,7 @@ Room {
 Room {
 	id = "hz/qsddao5",
 	name = "青石大道",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/qsddao4",
 		["east"] = "hz/yaopu",
@@ -15223,6 +17391,7 @@ Room {
 Room {
 	id = "hz/qsddao6",
 	name = "青石大道",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/qsddao5",
 		["east"] = "hz/shuyuan",
@@ -15234,36 +17403,45 @@ Room {
 Room {
 	id = "hz/quanwu",
 	name = "泉屋",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/yuquan",
 	},
+	room_relative="泉屋｜玉泉泉屋",
 }
 Room {
 	id = "hz/quyuan",
 	name = "曲园风荷",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/kuahong",
 		["east"] = "hz/yingxunge",
 	},
+	room_relative="曲园风荷---迎熏阁↘跨虹桥曲园风荷",
 }
 Room {
 	id = "hz/ruangong",
 	name = "阮公墩",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/huxinting",
 	},
+	room_relative="湖心亭--阮公墩",
 }
 Room {
 	id = "hz/santan",
 	name = "三潭映月",
+	outdoor = "杭州城",
 	ways = {
 		["north"] = "hz/juquqiao",
 		["west"] = "hz/huxinting",
 	},
+	room_relative="九曲桥｜湖心亭三潭映月",
 }
 Room {
 	id = "hz/shanlu",
 	name = "山路",
+	outdoor = "杭州城",
 	ways = {
 		["northup"] = "hz/huanglong",
 		["southup"] = "hz/baoshuta",
@@ -15274,6 +17452,7 @@ Room {
 Room {
 	id = "hz/shanlu1",
 	name = "山路",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/shanlu3",
 		["east"] = "hz/liulin",
@@ -15285,6 +17464,7 @@ Room {
 Room {
 	id = "hz/shanlu2",
 	name = "山路",
+	outdoor = "杭州城",
 	ways = {
 		["eastdown"] = "ningbo/qsddao1",
 		["northdown"] = "hz/zilaidong",
@@ -15294,6 +17474,7 @@ Room {
 Room {
 	id = "hz/shanlu3",
 	name = "山路",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "group/entry/hzqsd7",
 		["north"] = "hz/shanlu1",
@@ -15305,44 +17486,54 @@ Room {
 Room {
 	id = "hz/shanquan",
 	name = "山泉",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/shanlu1",
 		["enter"] = "hz/maoshe",
 		["east"] = "hz/shanquan",
 	},
+
 }
 Room {
 	id = "hz/shuichi",
 	name = "水池",
+	outdoor = "杭州城",
 	ways = {
 		["northwest"] = "hz/huanglong",
 		["west"] = "hz/xiaozhu",
 	},
+	room_relative="黄龙洞｜小筑水池",
 }
 Room {
 	id = "hz/shuyuan",
 	name = "书院",
+	outdoor = "杭州城",
 	ways = {
 		["west"] = "hz/qsddao6",
 	},
+	room_relative="青石大道--书院",
 }
 Room {
 	id = "hz/sudi",
 	name = "苏堤",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/hggyu",
 		["north"] = "hz/qsddao2",
 		["east"] = "hz/kuahong",
 		["west"] = "hz/yingboqiao",
 	},
+room_relative="青石大道｜映波桥-----苏堤-----跨虹桥｜花港观鱼苏堤",
 }
 Room {
 	id = "hz/tianwang",
 	name = "天王殿",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/lingyinsi",
 		["north"] = "hz/dxbdian",
 	},
+	room_relative="大雄宝殿｜天王殿----灵隐寺天王殿",
 }
 Room {
 	id = "hz/tianxiang",
@@ -15352,74 +17543,95 @@ Room {
 		["north"] = "hz/qsddao4",
 		["east"] = "hz/majiu",
 		["west"] = "hz/yuemiao",
-		-- ["up"] = "hz/kedian2",
+	    ["#hckz"] = "hz/kedian2",
+	},
+	lengths = {
+		["#hckz"] = 5,
 	},
 	nolooks = {
 		["up"] = true,
 	},
+	room_relative="青石大道｜岳王庙---鸿昌客栈---马厩鸿昌客栈",
 }
 Room {
 	id = "hz/wenlange",
 	name = "文澜阁",
+	outdoor = "杭州城",
 	ways = {
 		["north"] = "hz/gushan",
 	},
+	room_relative="孤山｜文澜阁文澜阁",
 }
 Room {
 	id = "hz/xiaoying",
 	name = "小赢洲",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/juquqiao",
 	},
+	room_relative="九曲桥--小赢洲",
 }
 Room {
 	id = "hz/xiaozhu",
 	name = "小筑",
+	outdoor = "杭州城",
 	ways = {
 		["southwest"] = "hz/changlang1",
 		["east"] = "hz/shuichi",
 	},
+	room_relative="水池｜长廊小筑",
 }
 Room {
 	id = "hz/xilengqiao",
 	name = "西冷桥",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/gushan",
 	},
+	room_relative="西冷桥----孤山西冷桥",
 }
 Room {
 	id = "hz/yaopu",
 	name = "万年春",
+	outdoor = "杭州城",
 	ways = {
 		["west"] = "hz/qsddao5",
 	},
+	room_relative="青石大道--万年春",
 }
 Room {
 	id = "hz/yingboqiao",
 	name = "映波桥",
+	outdoor = "杭州城",
 	ways = {
 		["south"] = "hz/kuahong",
 		["east"] = "hz/sudi",
 	},
+	room_relative="映波桥----苏堤｜跨虹桥映波桥",
 }
 Room {
 	id = "hz/yingxunge",
 	name = "迎熏阁",
+	outdoor = "杭州城",
 	ways = {
 		["west"] = "hz/quyuan",
 	},
+	room_relative="曲园风荷----迎熏阁迎熏阁",
 }
 Room {
 	id = "hz/yuanmen",
 	name = "园门",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/jingzhong",
 		["out"] = "hz/yuemiao",
 	},
+	room_relative="精忠柏｜岳王庙园门",
 }
 Room {
 	id = "hz/yuemiao",
 	name = "岳王庙",
+	outdoor = "杭州城",
 	no_fight = true,
 	ways = {
 		["southeast"] = "hz/qsddao2",
@@ -15428,78 +17640,96 @@ Room {
 		["east"] = "hz/tianxiang",
 		["west"] = "hz/hubian3",
 	},
+room_relative="白堤↖｜鸿昌客栈---西湖边----园门｜青石大道↘岳王庙",
 }
 Room {
 	id = "hz/yuhuang",
 	name = "玉皇山",
+	outdoor = "杭州城",
 	ways = {
 		["southwest"] = "hz/hupao",
 		["south"] = "hz/zilaidong",
 		["northwest"] = "hz/jingcisi",
 	},
+	room_relative="净慈寺↖玉皇山↙｜虎跑紫来洞玉皇山",
 }
 Room {
 	id = "hz/yuquan",
 	name = "玉泉",
+	outdoor = "杭州城",
 	ways = {
 		["north"] = "hz/quanwu",
 		["east"] = "hz/qsddao2",
 	},
+	room_relative="泉屋｜玉泉-----青石大道玉泉",
 }
 Room {
 	id = "hz/yxsdong",
 	name = "石屋洞",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/yxsdong1",
 		["northwest"] = "hz/feilaifeng",
 	},
+	room_relative="飞来峰↖石屋洞↘水乐洞石屋洞",
 }
 Room {
 	id = "hz/yxsdong1",
 	name = "水乐洞",
+	outdoor = "杭州城",
 	ways = {
 		["northwest"] = "hz/yxsdong",
 		["west"] = "hz/yxsdong2",
 	},
+	room_relative="石屋洞↖烟霞洞----水乐洞水乐洞",
 }
 Room {
 	id = "hz/yxsdong2",
 	name = "烟霞洞",
+	outdoor = "杭州城",
 	ways = {
 		["southeast"] = "hz/longjing",
 		["east"] = "hz/yxsdong1",
 	},
+	room_relative="烟霞洞----水乐洞↘龙井烟霞洞",
 }
 Room {
 	id = "hz/zahuopu",
 	name = "杂货铺",
+	outdoor = "杭州城",
 	ways = {
 		["east"] = "hz/qsddao5",
 	},
 	objs = {
           ["李老板"] = "li laoban",
            },
+	room_relative="青石大道--杂货铺",
 }
 Room {
 	id = "hz/zilaidong",
 	name = "紫来洞",
+	outdoor = "杭州城",
 	ways = {
 		["southup"] = "hz/shanlu2",
 		["north"] = "hz/yuhuang",
 	},
+	room_relative="玉皇山｜紫来洞↓山路紫来洞",
 }
 
 Room {
 	id = "jiaxing/road2",
 	name = "青石官道",
+	outdoor = "嘉兴城",
 	ways = {
 		["southeast"] = "jiaxing/road1",
 		["northwest"] = "suzhou/qsgdao2",
 	},
+	room_relative="青石官道↖青石官道↘青石官道青石官道",
 }
 Room {
 	id = "jiaxing/road1",
 	name = "青石官道",
+	outdoor = "嘉兴城",
 	ways = {
 		["southeast"] = "jiaxing/beimen",
 		["northwest"] = "jiaxing/road2",
@@ -15509,68 +17739,84 @@ Room {
 Room {
 	id = "jiaxing/beimen",
 	name = "北门",
+	outdoor = "嘉兴城",
 	ways = {
 		["south"] = "jiaxing/jiaxing",
 		["northwest"] = "jiaxing/road1",
 	},
+	room_relative="青石官道↖北门｜市集北门",
 }
 Room {
 	id = "jiaxing/beijie",
 	name = "北街",
+	outdoor = "嘉兴城",
 	ways = {
 		["north"] = "jiaxing/beimen",
 		["south"] = "jiaxing/jiaxing",
 	},
+	room_relative="北门｜市集北街",
 }
 Room {
 	id = "jiaxing/jiaxing",
 	name = "市集",
+	outdoor = "嘉兴城",
 	ways = {
 		["south"] = "jiaxing/jxnanmen",
 		["east"] = "jiaxing/dbianmen",
 		["north"] = "jiaxing/beimen",
 	},
+	room_relative="北门｜市集-----东边门｜南门市集",
 }
 Room {
 	id = "jiaxing/dongjie",
 	name = "东街",
+	outdoor = "嘉兴城",
 	ways = {
 		["west"] = "jiaxing/jiaxing",
 		["east"] = "jiaxing/dbianmen",
 	},
+	room_relative="市集｜东边门东街",
 }
 Room {
 	id = "jiaxing/dbianmen",
 	name = "东边门",
+	outdoor = "嘉兴城",
 	ways = {
 		["south"] = "jiaxing/tieqiang",
 		["east"] = "jiaxing/nanhu",
 		["west"] = "jiaxing/jiaxing",
 	},
+	room_relative="市集----东边门----南湖｜铁枪庙东边门",
 }
 Room {
 	id = "jiaxing/nanhu",
 	name = "南湖",
+	outdoor = "嘉兴城",
 	ways = {
 		["southeast"] = "jiaxing/nanhu1",
 		["east"] = "jiaxing/hubian",
 		["west"] = "jiaxing/dbianmen",
 	},
+	room_relative="东边门-----南湖-----湖边↘南湖南湖",
 }
 Room {
 	id = "jiaxing/nanhu1",
 	name = "南湖",
+	outdoor = "嘉兴城",
 	ways = {
 		["south"] = "jiaxing/jxyanyu",
 		["northwest"] = "jiaxing/nanhu",
 	},
+	room_relative="南湖↖南湖｜烟雨楼南湖",
 }
 Room {
 	id = "jiaxing/yanyu",
 	name = "烟雨楼",
+	outdoor = "嘉兴城",
 	ways = {
 		["down"] = "jiaxing/jxyanyu",
 	},
+	room_relative="不知道哪里烟雨楼 不知道哪里 烟雨楼",
 }
 Room {
 	id = "jiaxing/jxyanyu",
@@ -15582,38 +17828,47 @@ Room {
 	objs = {
           ["杨康"] = "yang kang",
            },
+	room_relative="南湖--烟雨楼",
 }
 Room {
 	id = "jiaxing/hubian",
 	name = "湖边",
+	outdoor = "嘉兴城",
 	ways = {
 		["west"] = "jiaxing/nanhu",
 	},
+	room_relative="南湖-----湖边湖边",
 }
 Room {
 	id = "jiaxing/zahuopu",
 	name = "杂货铺",
+	outdoor = "嘉兴城",
 	ways = {
 		["south"] = "jiaxing/dbianmen",
 	},
+	room_relative="东边门--杂货铺",
 }
 Room {
 	id = "jiaxing/xijie1",
 	name = "西街",
+	outdoor = "嘉兴城",
 	ways = {
 		["east"] = "jiaxing/jiaxing",
 		["west"] = "jiaxing/xijie2",
 	},
+	room_relative="市集｜西街西街",
 }
 Room {
 	id = "jiaxing/xijie2",
 	name = "西街",
+	outdoor = "嘉兴城",
 	ways = {
 		["east"] = "jiaxing/xijie1",
 		["west"] = "jiaxing/ximen",
 		["south"] = "jiaxing/xiaoxiang1",
 		["north"] = "jiaxing/kedian",
 	},
+	room_relative="西街｜西门----小巷｜有间客栈西街",
 }
 Room {
 	id = "jiaxing/kedian",
@@ -15629,6 +17884,7 @@ Room {
 Room {
 	id = "jiaxing/kedian2",
 	name = "客店二楼",
+	outdoor = "嘉兴城",
 	ways = {
 		["down"] = "jiaxing/kedian",
 		["enter"] = "jiaxing/kefang",
@@ -15637,6 +17893,7 @@ Room {
 Room {
 	id = "jiaxing/kefang",
 	name = "客房",
+	outdoor = "嘉兴城",
 	ways = {
 		["out"] = "jiaxing/xijie2",
 	},
@@ -15644,56 +17901,69 @@ Room {
 Room {
 	id = "jiaxing/ximen",
 	name = "西门",
+	outdoor = "嘉兴城",
 	ways = {
 		["east"] = "jiaxing/xijie2",
 	},
+	room_relative="西街--西门",
 }
 Room {
 	id = "jiaxing/xiaoxiang1",
 	name = "小巷",
+	outdoor = "嘉兴城",
 	ways = {
 		["north"] = "jiaxing/xijie2",
 		["east"] = "jiaxing/xiaoxiang2",
 		["south"] = "jiaxing/jiuyuan",
 	},
+	room_relative="西街｜小巷｜旧园小巷",
 }
 Room {
 	id = "jiaxing/xiaoxiang2",
 	name = "小巷",
+	outdoor = "嘉兴城",
 	ways = {
 		["west"] = "jiaxing/xiaoxiang1",
 		["east"] = "jiaxing/nanjie",
 	},
+	room_relative="小巷｜南街小巷",
 }
 Room {
 	id = "jiaxing/jiuyuan",
 	name = "旧园",
+	outdoor = "嘉兴城",
 	ways = {
 		["north"] = "jiaxing/xiaoxiang1",
 	},
+	room_relative="小巷--旧园",
 }
 Room {
 	id = "jiaxing/nanjie",
 	name = "南街",
+	outdoor = "嘉兴城",
 	ways = {
 		["west"] = "jiaxing/xiaoxiang2",
 		["north"] = "jiaxing/jiaxing",
 		["south"] = "jiaxing/jxnanmen",
 	},
+	room_relative="小巷｜市集---南门南街",
 }
 Room {
 	id = "jiaxing/jxnanmen",
 	name = "南门",
+	outdoor = "嘉兴城",
 	ways = {
 		["south"] = "jiaxing/xiaojing2",
 		["north"] = "jiaxing/jiaxing",
 		["east"] = "jiaxing/tieqiang",
 	},
+  room_relative="市集｜南门-----铁枪庙｜乡间小径南门",
 }
 
 Room {
 	id = "jiaxing/tieqiang",
 	name = "铁枪庙",
+	outdoor = "嘉兴城",
 	ways = {
 		["west"] = "jiaxing/jxnanmen",
 		["north"] = "jiaxing/dbianmen",
@@ -15701,65 +17971,79 @@ Room {
 	objs = {
           ["李莫愁"] = "li mochou",
           ["乌鸦"] = "wu ya",
+	room_relative="东边门｜南门----铁枪庙铁枪庙",
            },
 }
 Room {
 	id = "jiaxing/xiaojing2",
 	name = "乡间小径",
+	outdoor = "嘉兴城",
 	ways = {
 		["north"] = "jiaxing/jxnanmen",
 		["east"] = "jiaxing/river",
 		["southeast"] = "jiaxing/shulin1",
 	},
+	room_relative="南门｜乡间小径---河岸↘树林乡间小径",
 }
 Room {
 	id = "jiaxing/river",
 	name = "河岸",
+	outdoor = "嘉兴城",
 	ways = {
 		["west"] = "jiaxing/xiaojing2",
 	},
+	room_relative="乡间小径--河岸",
 }
 Room {
 	id = "jiaxing/shulin1",
 	name = "树林",
+	outdoor = "嘉兴城",
 	ways = {
 		["south"] = "jiaxing/luzhuang",
 		["northwest"] = "jiaxing/xiaojing2",
 		["east"] = "jiaxing/lumu",
 	},
+	room_relative="乡间小径↖树林-----坟墓｜陆家庄树林",
 }
 Room {
 	id = "jiaxing/lumu",
 	name = "坟墓",
+	outdoor = "嘉兴城",
 	ways = {
 		["west"] = "jiaxing/shulin1",
 	},
 	objs = {
           ["武三通"] = "wu santong",
            },
+	room_relative="树林-----坟墓坟墓",
 }
 Room {
 	id = "jiaxing/luzhuang",
 	name = "陆家庄",
+	outdoor = "嘉兴城",
 	ways = {
 		["north"] = "jiaxing/shulin1",
 		["west"] = "jiaxing/tianjing",
 	},
+	room_relative="树林｜天井----陆家庄陆家庄",
 }
 Room {
 	id = "jiaxing/tianjing",
 	name = "天井",
+	outdoor = "嘉兴城",
 	ways = {
 		["east"] = "jiaxing/luzhuang",
 		["west"] = "jiaxing/dating",
 	},
 	objs = {
           ["阿根"] = "pu ren",
+	room_relative="大厅-----天井-----陆家庄天井",	  
            },
 }
 Room {
 	id = "jiaxing/dating",
 	name = "大厅",
+	outdoor = "嘉兴城",
 	ways = {
 		["south"] = "jiaxing/houyuan",
 		["east"] = "jiaxing/tianjing",
@@ -15767,25 +18051,31 @@ Room {
 	objs = {
           ["陆立鼎"] = "lu liding",
            },
+	room_relative="大厅-----天井｜後院大厅",
 }
 Room {
 	id = "jiaxing/houyuan",
 	name = "後院",
+	outdoor = "嘉兴城",
 	ways = {
 		["north"] = "jiaxing/dating",
 	},
+	room_relative="大厅｜後院後院",
 }
 
 Room {
 	id = "kunlun/bainiushan",
 	name = "白牛山",
+	outdoor = "昆仑山",
 	ways = {
 		["southwest"] = "kunlun/fufengshan",
 	},
+	room_relative="扶峰山--白牛山",
 }
 Room {
 	id = "kunlun/bayankala",
 	name = "巴颜喀拉山",
+	outdoor = "昆仑山",
 	ways = {
 		["northdown"] = "kunlun/shanlu2",
 		["west"] = "kunlun/kekexili",
@@ -15793,18 +18083,22 @@ Room {
 	objs = {
           ["大石头"] = "da shitou",
      },
+	 room_relative="西域山路↓可可西里山--巴颜喀拉山巴颜喀拉山",
 }
 Room {
 	id = "kunlun/chufang",
 	name = "厨房",
+	outdoor = "昆仑山",
 	no_fight = true,
 	ways = {
 		["west"] = "kunlun/shilu2",
 	},
+	room_relative="石路--厨房",
 }
 Room {
 	id = "kunlun/conglinggu",
 	name = "葱岭谷",
+	outdoor = "昆仑山",
 	ways = {
 		["out"] = "kunlun/shanlinn5",
 	},
@@ -15812,42 +18106,49 @@ Room {
           ["冬虫草"] = "dongchong cao",
           ["黄芪"] = "huang qi",
      },
+	 room_relative="云杉林--葱岭谷",
 }
 Room {
 	id = "kunlun/elang01",
 	name = "东走廊",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "kunlun/keting1",
 		["west"] = "kunlun/qianting",
 	},
+	room_relative="前厅----东走廊----客厅东走廊",
 }
 Room {
 	id = "kunlun/fufengshan",
 	name = "扶峰山",
+	outdoor = "昆仑山",
 	ways = {
 		["enter"] = "kunlun/houyuan",
 		["northeast"] = "kunlun/bainiushan",
 		["climb"] = "kunlun/sanshengao",
-		--["#fufengstop"] = "kunlun/sanshengao",
 	},
 	precmds = {
 		["enter"] = "open door",
 	},
+	
 }
 Room {
 	id = "kunlun/gate",
 	name = "后院门",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "kunlun/shilu2",
 		["west"] = "kunlun/lang",
 	},
 	lengths = {
-		["east"] = "if score.party and score.party=='昆仑派' then return 1 else return false end",
+		["east"] = "if score.party and score.party=='昆仑山' then return 1 else return false end",
 	},
+	
 }
 Room {
 	id = "kunlun/guangchang",
 	name = "广场",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/pingfeng",
 		["north"] = "kunlun/shanlu04",
@@ -15856,11 +18157,13 @@ Room {
 	},
 	objs = {
           ["高则成"] = "gao zecheng",
+   room_relative="山路｜广场西-----广场-----广场东｜石屏风广场",
      },
 }
 Room {
 	id = "kunlun/guangchange",
 	name = "广场东",
+	outdoor = "昆仑山",
 	ways = {
 		["northwest"] = "kunlun/shanlu04",
 		["west"] = "kunlun/guangchang",
@@ -15868,18 +18171,22 @@ Room {
 	objs = {
           ["玉灵子"] = "yuling zi",
      },
+	 room_relative="山路↖广场----广场东广场东",
 }
 Room {
 	id = "kunlun/guangchangw",
 	name = "广场西",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "kunlun/guangchang",
 		["northeast"] = "kunlun/shanlu04",
 	},
+	room_relative="山路↗广场西----广场广场西",
 }
 Room {
-        id = "kunlun/houyuan",
+	id = "kunlun/houyuan",
         name = "后院",
+		outdoor = "昆仑山",
         ways = {
                 ["south"] = "kunlun/shanlinn3",
                 ["open door;out"] = "kunlun/fufengshan",
@@ -15896,82 +18203,101 @@ Room {
 Room {
 	id = "kunlun/huayuan1",
 	name = "花园",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/lang1",
 		["north"] = "kunlun/shilu1",
 		["east"] = "kunlun/lang",
 		["west"] = "kunlun/shiqiao",
 	},
+	room_relative="石路｜小石桥-----花园-----走廊｜走廊花园",
 }
 Room {
 	id = "kunlun/jingshenfeng",
 	name = "惊神峰",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/sanshengao",
 	},
 	objs = {
           ["何足道"] = "he zudao",
      },
+	 room_relative="三圣坳--惊神峰",
 }
 Room {
 	id = "kunlun/jingxiushi",
 	name = "静修室",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/shiqiao",
 		["east"] = "kunlun/shilu1",
 	},
+	room_relative="静修室----石路｜小石桥静修室",
 }
 Room {
 	id = "kunlun/jiuqulang1",
 	name = "九曲廊",
+	outdoor = "昆仑山",
 	ways = {
 		["southwest"] = "kunlun/tieqinju",
 		["east"] = "kunlun/shiqiao",
 	},
+	room_relative="九曲廊----小石桥↙铁琴居九曲廊",
 }
 Room {
 	id = "kunlun/jiuqulang2",
 	name = "九曲廊",
+	outdoor = "昆仑山",
 	ways = {
 		["southwest"] = "kunlun/shanlinn",
 		["northeast"] = "kunlun/sanshengtang",
 	},
+	room_relative="三圣堂↗九曲廊↙云杉林九曲廊",
 }
 Room {
 	id = "kunlun/kekexili",
 	name = "可可西里山",
+	outdoor = "昆仑山",
 	ways = {
 		["northwest"] = "kunlun/shankou",
 		["east"] = "kunlun/bayankala",
 	},
+	room_relative="昆仑山垭口↖可可西里山--巴颜喀拉山可可西里山",
 }
 Room {
 	id = "kunlun/keting1",
 	name = "客厅",
+	outdoor = "昆仑山",
 	ways = {
 		["west"] = "kunlun/elang01",
 	},
+	room_relative="东走廊-----客厅客厅",
 }
 Room {
 	id = "kunlun/keting2",
 	name = "客厅",
+	outdoor = "昆仑山",
 	no_fight = true,
 	ways = {
 		["east"] = "kunlun/wlang01",
 	},
+	room_relative="客厅-----西走廊客厅",
 }
 Room {
 	id = "kunlun/klshanlu",
 	name = "昆仑山麓",
+	outdoor = "昆仑山",
 	ways = {
 		["northup"] = "kunlun/shanmen",
 		["east"] = "kunlun/shankou",
 		["west"] = "fairyland/shanlu1",
 	},
+	room_relative="昆仑派山门↑山路---昆仑山麓---昆仑山垭口昆仑山麓",
 }
 Room {
 	id = "kunlun/kuhanlou1",
 	name = "苦寒楼一层",
+	outdoor = "昆仑山",
 	ways = {
 		["out"] = "kunlun/shanlinn",
 		["up"] = "kunlun/kuhanlou2",
@@ -15980,6 +18306,7 @@ Room {
 Room {
 	id = "kunlun/kuhanlou2",
 	name = "苦寒楼二层",
+	outdoor = "昆仑山",
 	ways = {
 		["down"] = "kunlun/kuhanlou1",
 		["up"] = "kunlun/kuhanlou3",
@@ -15988,6 +18315,7 @@ Room {
 Room {
 	id = "kunlun/kuhanlou3",
 	name = "苦寒楼三层",
+	outdoor = "昆仑山",
 	ways = {
 		["down"] = "kunlun/kuhanlou2",
 	},
@@ -15995,49 +18323,60 @@ Room {
 Room {
 	id = "kunlun/lang",
 	name = "走廊",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/lang2",
 		["north"] = "kunlun/shufang",
 		["east"] = "kunlun/gate",
 		["west"] = "kunlun/huayuan1",
 	},
+	room_relative="书房｜花园-----走廊-----后院门｜走廊走廊",
 }
 Room {
 	id = "kunlun/lang1",
 	name = "走廊",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/sanshengtang",
 		["east"] = "kunlun/lang2",
 		["north"] = "kunlun/huayuan1",
 	},
+	room_relative="花园｜走廊-----走廊｜三圣堂走廊",
 }
 Room {
 	id = "kunlun/lang2",
 	name = "走廊",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "kunlun/liangong",
 		["north"] = "kunlun/lang",
 		["west"] = "kunlun/lang1",
 	},
+	room_relative="走廊｜走廊-----走廊-----练功房走廊",
 }
 Room {
 	id = "kunlun/liangong",
 	name = "练功房",
+	outdoor = "昆仑山",
 	ways = {
 		["west"] = "kunlun/lang2",
 	},
+	room_relative="走廊----练功房练功房",
 }
 Room {
 	id = "kunlun/pingfeng",
 	name = "石屏风",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/qianting",
 		["north"] = "kunlun/guangchang",
 	},
+	room_relative="广场｜石屏风｜前厅石屏风",
 }
 Room {
 	id = "kunlun/qianting",
 	name = "前厅",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/shilu1",
 		["north"] = "kunlun/pingfeng",
@@ -16046,19 +18385,23 @@ Room {
 	},
 	objs = {
           ["西华子"] = "xi huazi",
+   room_relative="石屏风｜西走廊-----前厅-----东走廊｜石路前厅",
      },
 }
 Room {
 	id = "kunlun/sanshengao",
 	name = "三圣坳",
+	outdoor = "昆仑山",
 	ways = {
 		["north"] = "kunlun/jingshenfeng",
 		["down"] = "kunlun/fufengshan",
 	},
+	room_relative="惊神峰｜扶峰山三圣坳",
 }
 Room {
 	id = "kunlun/sanshengtang",
 	name = "三圣堂",
+	outdoor = "昆仑山",
 	ways = {
 		["southwest"] = "kunlun/jiuqulang2",
 		["north"] = "kunlun/lang1",
@@ -16066,15 +18409,18 @@ Room {
 	objs = {
           ["班淑娴"] = "ban shuxian",
           ["杏芳"] = "xing fang",
+   room_relative="走廊｜三圣堂↙九曲廊三圣堂",
      },
 }
 Room {
 	id = "kunlun/shankou",
 	name = "昆仑山垭口",
+	outdoor = "昆仑山",
 	ways = {
 		["southeast"] = "kunlun/kekexili",
 		["west"] = "kunlun/klshanlu",
 	},
+	room_relative="昆仑山麓--昆仑山垭口↘可可西里山昆仑山垭口",
 }
 --[[Room {
 	id = "kunlun/shanlinn",
@@ -16110,6 +18456,7 @@ Room {
 Room {
   id = "kunlun/shanlinn",
   name = "云杉林",
+  outdoor = "昆仑山",
   ways = {
     ["northeast"] = "kunlun/jiuqulang2",
     ["southeast"] = "kunlun/shanlinn2",
@@ -16120,6 +18467,7 @@ room_relative="九曲廊↗云杉林----云杉林↘云杉林云杉林",
 Room {
   id = "kunlun/shanlinn3",
   name = "云杉林",
+  outdoor = "昆仑山",
   ways = {
     ["east"] = "kunlun/shanlinn",
     ["north"] = "kunlun/houyuan",
@@ -16129,6 +18477,7 @@ room_relative="后院｜云杉林----云杉林----云杉林｜云杉林云杉林",
 Room {
   id = "kunlun/shanlinn2",
   name = "云杉林",
+  outdoor = "昆仑山",
   ways = {
     ["east"] = "kunlun/shanlinn4",
   },
@@ -16136,6 +18485,7 @@ Room {
 Room {
   id = "kunlun/shanlinn4",
   name = "云杉林",
+  outdoor = "昆仑山",
   ways = {
     ["south"] = "kunlun/shanlinn5",
   },
@@ -16143,6 +18493,7 @@ Room {
 Room {
   id = "kunlun/shanlinn5",
   name = "云杉林",
+  outdoor = "昆仑山",
   ways = {
     ["west"] = "kunlun/shanlinn6",
     ["south"] = "kunlun/conglinggu",
@@ -16152,6 +18503,7 @@ room_relative="云杉林｜云杉林----云杉林----云杉林｜葱岭谷云杉林",
 Room {
   id = "kunlun/shanlinn6",
   name = "云杉林",
+  outdoor = "昆仑山",
   ways = {
     ["east"] = "kunlun/kuhanlou1",
   },
@@ -16160,64 +18512,79 @@ room_relative="云杉林｜云杉林----云杉林----苦寒楼一层｜云杉林云杉林",
 Room {
 	id = "kunlun/shanlu",
 	name = "西域山路",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "kunlun/zhenyuanqiao",
 		["west"] = "kunlun/shanlu1",
 	},
+	room_relative="西域山路---西域山路---镇远桥西域山路",
 }
 Room {
 	id = "kunlun/shanlu01",
 	name = "山路",
+	outdoor = "昆仑山",
 	ways = {
 		["southup"] = "kunlun/shanlu02",
 		["westdown"] = "kunlun/shanmen",
 	},
+	room_relative="昆仑派山门→山路↓山路山路",
 }
 Room {
 	id = "kunlun/shanlu02",
 	name = "山路",
+	outdoor = "昆仑山",
 	ways = {
 		["southup"] = "kunlun/shanlu03",
 		["northdown"] = "kunlun/shanlu01",
 	},
+	room_relative="山路↓山路↓山路山路",
 }
 Room {
 	id = "kunlun/shanlu03",
 	name = "山路",
+	outdoor = "昆仑山",
 	ways = {
 		["southup"] = "kunlun/shanlu04",
 		["northdown"] = "kunlun/shanlu02",
 	},
+	room_relative="山路↓山路↓山路山路",
 }
 Room {
 	id = "kunlun/shanlu04",
 	name = "山路",
+	outdoor = "昆仑山",
 	ways = {
 		["southeast"] = "kunlun/guangchange",
 		["southwest"] = "kunlun/guangchangw",
 		["south"] = "kunlun/guangchang",
 		["northdown"] = "kunlun/shanlu03",
 	},
+	room_relative="山路↓山路↙｜↘广场西广场广场东山路",
 }
 Room {
 	id = "kunlun/shanlu1",
 	name = "西域山路",
+	outdoor = "昆仑山",
 	ways = {
 		["westup"] = "kunlun/shanlu2",
 		["east"] = "kunlun/shanlu",
 	},
+	room_relative="西域山路←西域山路---西域山路西域山路",
 }
 Room {
 	id = "kunlun/shanlu2",
 	name = "西域山路",
+	outdoor = "昆仑山",
 	ways = {
 		["southup"] = "kunlun/bayankala",
 		["eastdown"] = "kunlun/shanlu1",
 	},
+	room_relative="西域山路←西域山路↓巴颜喀拉山西域山路",
 }
 Room {
 	id = "kunlun/shanmen",
 	name = "昆仑派山门",
+	outdoor = "昆仑山",
 	ways = {
 		["eastup"] = "kunlun/shanlu01",
 		["southdown"] = "kunlun/klshanlu",
@@ -16225,29 +18592,35 @@ Room {
 	objs = {
           ["蒋涛"] = "jiang tao",
      },
+	 room_relative="昆仑派山门→山路↑昆仑山麓昆仑派山门",
 }
 Room {
 	id = "kunlun/shilu1",
 	name = "石路",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/huayuan1",
 		["east"] = "kunlun/shufang",
 		["north"] = "kunlun/qianting",
 		["west"] = "kunlun/jingxiushi",
 	},
+	room_relative="前厅｜静修室-----石路-----书房｜花园石路",
 }
 Room {
 	id = "kunlun/shilu2",
 	name = "石路",
+	outdoor = "昆仑山",
 	ways = {
 		["north"] = "kunlun/xiuxishi",
 		["east"] = "kunlun/chufang",
 		["west"] = "kunlun/gate",
 	},
+	room_relative="休息室｜厨房-----后院门石路",
 }
 Room {
 	id = "kunlun/shiqiao",
 	name = "小石桥",
+	outdoor = "昆仑山",
 	ways = {
 		["north"] = "kunlun/jingxiushi",
 		["east"] = "kunlun/huayuan1",
@@ -16256,10 +18629,12 @@ Room {
 	objs = {
           ["苏习之"] = "su xizhi",
      },
+	 room_relative="静修室｜九曲廊----小石桥----花园小石桥",
 }
 Room {
 	id = "kunlun/shufang",
 	name = "书房",
+	outdoor = "昆仑山",
 	ways = {
 		["south"] = "kunlun/lang",
 		["west"] = "kunlun/shilu1",
@@ -16267,10 +18642,12 @@ Room {
 	objs = {
           ["『琴技入门』"] = "art's book",
      },
+	 room_relative="石路-----书房｜走廊书房",
 }
 Room {
 	id = "kunlun/sleeproom",
 	name = "卧室",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "kunlun/tieqinju",
 	},
@@ -16283,10 +18660,12 @@ Room {
 	objs = {
           ["詹春"] = "zhan chun",
      },
+	 room_relative="铁琴居--卧室",
 }
 Room {
 	id = "kunlun/tieqinju",
 	name = "铁琴居",
+	outdoor = "昆仑山",
 	ways = {
 		["west"] = "kunlun/sleeproom",
 		["northeast"] = "kunlun/jiuqulang1",
@@ -16298,41 +18677,51 @@ Room {
 	objs = {
           ["何太冲"] = "he taichong",
      },
+	 
 }
 Room {
 	id = "kunlun/tieqinju2",
 	name = "铁琴居二楼",
+	outdoor = "昆仑山",
 	ways = {
 		["down"] = "kunlun/tieqinju",
 	},
+	room_relative="铁琴居二楼--铁琴居",
 }
 Room {
 	id = "kunlun/wlang01",
 	name = "西走廊",
+	outdoor = "昆仑山",
 	ways = {
 		["east"] = "kunlun/qianting",
 		["west"] = "kunlun/keting2",
 	},
+	room_relative="客厅----西走廊----前厅西走廊",
 }
 Room {
 	id = "kunlun/xiuxishi",
 	name = "休息室",
+	outdoor = "昆仑山",
 	no_fight = true,
 	ways = {
 		["south"] = "kunlun/shilu2",
 	},
+	room_relative="石路--休息室",
 }
 Room {
 	id = "kunlun/zhenyuanqiao",
 	name = "镇远桥",
+	outdoor = "昆仑山",
 	ways = {
 		["eastdown"] = "mingjiao/shanjiao",
 		["west"] = "kunlun/shanlu",
 	},
+	room_relative="西域山路----镇远桥←山脚下镇远桥",
 }
 Room {
 	id = "lanzhou/bingcao",
 	name = "冰草湾",
+	outdoor = "兰州城",
 	ways = {
 		["southwest"] = "group/entry/lzshixia",
 		["northeast"] = "lanzhou/yinpanshui",
@@ -16340,10 +18729,12 @@ Room {
 	objs = {
           ["蜈蚣"] = "wu gong",
            },
+	room_relative="营盘水↗冰草湾↙石峡子冰草湾",
 }
 Room {
 	id = "lanzhou/dacaigou",
 	name = "打柴沟",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/gulang",
 		["north"] = "lanzhou/wuqiao",
@@ -16351,40 +18742,44 @@ Room {
 	objs = {
           ["樵夫"] = "qiao fu",
            },
+	room_relative="乌鞘岭｜打柴沟↘古浪打柴沟",
 }
 Room {
 	id = "lanzhou/dukou2",
-	name = "西夏渡口",
-	ways = {
-		["southeast"] = "lanzhou/shanlu1",
-		["#duHhe"] = "lanzhou/dukou3",
-	},
-	nolooks = {
-		["#duHhe"] = true,
-		["enter"] = true,
-	},
-	lengths = {
-		["#duHhe"] = 10000,
-	},
+        name = "西夏渡口",
+        ways = {
+                ["southeast"] = "lanzhou/shanlu1",
+                ["#duHhe"] = "lanzhou/dukou3",
+        },
+        nolooks = {
+                ["#duHhe"] = true,
+                ["enter"] = true,
+        },
+        lengths = {
+                ["#duHhe"] = "if not road.huanghe1 then return 10000 else return false end",
+        },
+		room_relative="西夏渡口↘山脚下西夏渡口",
 }
 Room {
 	id = "lanzhou/dukou3",
-	name = "西夏渡口",
-	ways = {
-		["northwest"] = "lanzhou/huanghe_3",
-		["#duHhe"] = "lanzhou/dukou2",
-	},
-	nolooks = {
-		["#duHhe"] = true,
-		["enter"] = true,
-	},
-	lengths = {
-		["#duHhe"] = 10000,
-	},
+        name = "西夏渡口",
+        ways = {
+                ["northwest"] = "lanzhou/huanghe_3",
+                ["#duHhe"] = "lanzhou/dukou2",
+        },
+        nolooks = {
+                ["#duHhe"] = true,
+                ["enter"] = true,
+        },
+        lengths = {
+                ["#duHhe"] = "if not road.huanghe1 then return 10000 else return false end",
+        },
+		room_relative="黄河↖西夏渡口西夏渡口",
 }
 Room {
 	id = "lanzhou/gccheng",
 	name = "古长城",
+	outdoor = "兰州城",
 	ways = {
 		["east"] = "lanzhou/shimen",
 		["west"] = "lanzhou/yinpanshui",
@@ -16392,70 +18787,86 @@ Room {
 	nolooks = {
 		["down"] = true,
 	},
+	room_relative="营盘水----古长城----石门古长城",
 }
 Room {
 	id = "lanzhou/gulang",
 	name = "古浪",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/xjqiao",
 		["northwest"] = "lanzhou/dacaigou",
 		["east"] = "lanzhou/yaocaidian",
 	},
+	room_relative="打柴沟↖古浪-----皮货药材店↘萧家桥古浪",
 }
 Room {
 	id = "lanzhou/hongsx",
 	name = "红山峡",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/jintai",
 		["north"] = "lanzhou/shimen",
 	},
+	room_relative="石门｜红山峡↘景泰红山峡",
 }
 Room {
 	id = "lanzhou/houyuan",
 	name = "后院",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/zhenting",
 	},
 	postcmds = {
 		["south"] = "#walkBusy",
 	},
+	room_relative="正厅--后院",
 }
 Room {
 	id = "lanzhou/huanghe_2",
 	name = "黄河",
+	outdoor = "兰州城",
 	ways = {
 		["northwest"] = "lanzhou/jintai",
 		["east"] = "lanzhou/huanghe_3",
 	},
+	room_relative="景泰↖黄河-----黄河黄河",
 }
 Room {
 	id = "lanzhou/huanghe_3",
 	name = "黄河",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/dukou3",
 		["west"] = "lanzhou/huanghe_2",
 	},
+	room_relative="黄河-----黄河↘西夏渡口黄河",
 }
 Room {
 	id = "lanzhou/jingyuan",
 	name = "靖远",
+	outdoor = "兰州城",
 	ways = {
 		["eastup"] = "lanzhou/lpshan",
 		["southwest"] = "group/entry/lzroad1",
 		["northeast"] = "lanzhou/kongdong",
 	},
+	room_relative="崆峒山↗靖远→六盘山↙大道靖远",
 }
 Room {
 	id = "lanzhou/jintai",
 	name = "景泰",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/huanghe_2",
 		["northwest"] = "lanzhou/hongsx",
 	},
+	room_relative="红山峡↖景泰↘黄河景泰",
 }
 Room {
 	id = "lanzhou/kedian",
 	name = "客店",
+	outdoor = "兰州城",
 	ways = {
 		["#lzkedianoutgosleep"] = "lanzhou/yongdeng",
 		["#lanzhoukedian"] = "lanzhou/kedian2",
@@ -16463,77 +18874,91 @@ Room {
 	lengths = {
 		["#lanzhoukedian"] = 5,	
 	},
+	room_relative="客店二楼〓客店-----永登客店",
 }
 Room {
 	id = "lanzhou/kedian2",
 	name = "客店二楼",
+	outdoor = "兰州城",
 	ways = {
 		["enter"] = "lanzhou/kedian3",
 		["down"] = "lanzhou/kedian",
 	},
-	room_relative="客店二楼∧客店二楼〓客店客店二楼",
 }
 Room {
 	id = "lanzhou/kedian3",
 	name = "客店二楼",
+	outdoor = "兰州城",
 	no_fight = true,
 	ways = {
 		["out"] = "lanzhou/kedian2",
 	},
-	room_relative="客店二楼∨客店二楼客店二楼",
 }
 Room {
 	id = "lanzhou/kongdong",
 	name = "崆峒山",
+	outdoor = "兰州城",
 	ways = {
 		["southwest"] = "lanzhou/jingyuan",
 		["northdown"] = "lanzhou/shanlu1",
 	},
+	room_relative="山脚下↓崆峒山↙靖远崆峒山",
 }
 Room {
 	id = "lanzhou/lanzhou",
 	name = "城中心",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/lanzhous",
 		["east"] = "lanzhou/lanzhoue",
 		["west"] = "lanzhou/lanzhouw",
 	},
+	room_relative="西城门----城中心----东城门｜南城门城中心",
 }
 Room {
 	id = "lanzhou/lanzhoue",
 	name = "东城门",
+	outdoor = "兰州城",
 	ways = {
 		["east"] = "lanzhou/road5",
 		["west"] = "lanzhou/lanzhou",
 	},
+	room_relative="城中心----东城门----大道东城门",
 }
 Room {
 	id = "lanzhou/lanzhous",
 	name = "南城门",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/sroad1",
 		["north"] = "lanzhou/lanzhou",
 	},
+	room_relative="城中心｜南城门｜大道南城门",
 }
 Room {
 	id = "lanzhou/lanzhouw",
 	name = "西城门",
+	outdoor = "兰州城",
 	ways = {
 		["northwest"] = "lanzhou/road6",
 		["east"] = "lanzhou/lanzhou",
 	},
+	room_relative="大道↖西城门----城中心西城门",
 }
 Room {
 	id = "lanzhou/lpshan",
 	name = "六盘山",
+	outdoor = "兰州城",
 	ways = {
 		["westdown"] = "lanzhou/jingyuan",
 		["southeast"] = "changan/westroad2",
 	},
+	room_relative="靖远→六盘山↘官道六盘山",
 }
 Room {
 	id = "lanzhou/qianting",
 	name = "前厅",
+	outdoor = "兰州城",
 	ways = {
 		["north"] = "lanzhou/zhenting",
 		["east"] = "lanzhou/zhengmen",
@@ -16541,52 +18966,68 @@ Room {
 	postcmds = {
 		["north"] = "#walkBusy",
 	},
+	room_relative="正厅｜苗家庄门口前厅",
 }
 Room {
 	id = "lanzhou/qingcheng",
 	name = "青城",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "chengdu/road1",
 		["northwest"] = "group/entry/lzsroad3",
-		["northeast"] = "lanzhou/shamo",
 	},
-		lengths = {
-		["northeast"] = 1,
-	},
+	room_relative="大道↖↗青城｜大道青城",
 }
 Room {
-	id = "lanzhou/road2",
-	name = "大渡口",
-	ways = {
-		["#duHhe"] = "lanzhou/road3",
-		["east"] = "lanzhou/road6",
-	},
-	lengths = {
-		["#duHhe"] = 10000,
-	},
-	nolooks = {
-		["enter"] = true,
-		["#duHhe"] = true,
-	},
+	 id = "lanzhou/road2",
+        name = "大渡口",
+        ways = {
+                ["#duHhe"] = "lanzhou/road3",
+                ["east"] = "lanzhou/road6",
+        },
+        lengths = {
+                ["#duHhe"] = "if road.huanghe1 then return 10000 else return false end",
+        },
+        nolooks = {
+                ["enter"] = true,
+                ["#duHhe"] = true,
+        },
+  room_relative="大渡口----大道大渡口",
 }
 Room {
 	id = "lanzhou/road3",
-	name = "大渡口",
+        name = "大渡口",
+        ways = {
+                ["#duHhe"] = "lanzhou/road2",
+                ["northwest"] = "lanzhou/road4",
+        },
+        lengths = {
+                ["#duHhe"] = "if road.huanghe1 then return 10000 else return false end",
+        },
+        nolooks = {
+                ["#duHhe"] = true,
+                ["enter"] = true,
+        },
+		room_relative="大道↖大渡口大渡口",
+}
+Room {
+	id = "lanzhou/duchuan1",
+	name = "黄河渡船",
 	ways = {
-		["#duHhe"] = "lanzhou/road2",
-		["northwest"] = "lanzhou/road4",
+		["out"] = "lanzhou/road3",
 	},
-	lengths = {
-		["#duHhe"] = 10000,
-	},
-	nolooks = {
-		["#duHhe"] = true,
-		["enter"] = true,
+}
+Room {
+	id = "lanzhou/duchuan2",
+	name = "黄河渡船",
+	ways = {
+		["out"] = "lanzhou/road2",
 	},
 }
 Room {
 	id = "lanzhou/road4",
 	name = "大道",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/road3",
 		["west"] = "lanzhou/yongdeng",
@@ -16596,6 +19037,7 @@ Room {
 Room {
 	id = "lanzhou/road5",
 	name = "大道",
+	outdoor = "兰州城",
 	ways = {
 		["northeast"] = "group/entry/lzroad1",
 		["west"] = "lanzhou/lanzhoue",
@@ -16605,6 +19047,7 @@ Room {
 Room {
 	id = "lanzhou/road6",
 	name = "大道",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/lanzhouw",
 		["west"] = "lanzhou/road2",
@@ -16614,6 +19057,7 @@ Room {
 Room {
 	id = "lanzhou/shamo",
 	name = "沙漠",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/shamo1",
 		["east"] = "lanzhou/shamo",
@@ -16628,28 +19072,31 @@ Room {
 		["#toQc"] = 50,
 	},
 }
-Room {
-	id = "lanzhou/shamo1",
-	name = "沙漠",
-	ways = {
-		["south"] = "lanzhou/shamo",
-		["enter"] = "lanzhou/shidong",
-		["east"] = "lanzhou/shamo",
-		["north"] = "lanzhou/shamo",
-		["west"] = "lanzhou/shamo",
-	},
-}
+--Room {
+--	id = "lanzhou/shamo1",
+--	name = "沙漠",
+--	ways = {
+--		["south"] = "lanzhou/shamo",
+--		["enter"] = "lanzhou/shidong",
+--		["east"] = "lanzhou/shamo",
+--		["north"] = "lanzhou/shamo",
+--		["west"] = "lanzhou/shamo",
+--	},
+--}
 Room {
 	id = "lanzhou/shanlu1",
 	name = "山脚下",
+	outdoor = "兰州城",
 	ways = {
 		["southup"] = "lanzhou/kongdong",
 		["northwest"] = "lanzhou/dukou2",
 	},
+	room_relative="西夏渡口↖山脚下↓崆峒山山脚下",
 }
 Room {
 	id = "lanzhou/shidong",
 	name = "石洞",
+	outdoor = "兰州城",
 	ways = {
 		["out"] = "lanzhou/shamo1",
 	},
@@ -16661,6 +19108,7 @@ Room {
 Room {
 	id = "lanzhou/shimen",
 	name = "石门",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/hongsx",
 		["north"] = "lanzhou/wufosi",
@@ -16669,10 +19117,12 @@ Room {
 	objs = {
           ["采石人"] = "caishi ren",
            },
+	room_relative="五佛寺｜古长城-----石门｜红山峡石门",
 }
 Room {
 	id = "lanzhou/sroad1",
 	name = "大道",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/sroad2",
 		["north"] = "lanzhou/lanzhous",
@@ -16683,15 +19133,20 @@ Room {
 Room {
 	id = "lanzhou/sroad2",
 	name = "大道",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "group/entry/lzsroad3",
 		["north"] = "lanzhou/sroad1",
+},
+	objs = {
+          ["西域客商"] = "xiyu keshang",
 	},
 	room_relative="大道｜大道↘大道大道",
 }
 Room {
 	id = "lanzhou/tumenzi",
 	name = "土门子",
+	outdoor = "兰州城",
 	ways = {
 		["northeast"] = "group/entry/lzshixia",
 		["west"] = "lanzhou/wuwei",
@@ -16699,69 +19154,85 @@ Room {
 	nolooks = {
 		["down"] = true,
 	},
+	room_relative="石峡子↗武威----土门子土门子",
 }
 Room {
 	id = "lanzhou/wufosi",
 	name = "五佛寺",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/shimen",
 	},
 	nolooks = {
 		["down"] = true,
 	},
+	room_relative="五佛寺｜石门五佛寺",
 }
 Room {
 	id = "lanzhou/wuqiao",
 	name = "乌鞘岭",
+	outdoor = "兰州城",
 	ways = {
 		["south"] = "lanzhou/dacaigou",
 		["northwest"] = "lanzhou/wuwei",
 	},
+	room_relative="武威↖乌鞘岭｜打柴沟乌鞘岭",
 }
 Room {
 	id = "lanzhou/wuwei",
 	name = "武威",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/wuqiao",
 		["northwest"] = "xingxiu/road4",
 		["east"] = "lanzhou/tumenzi",
 	},
+	room_relative="万里长城↖武威-----土门子↘乌鞘岭武威",
 }
 Room {
 	id = "lanzhou/xjqiao",
 	name = "萧家桥",
+	outdoor = "兰州城",
 	ways = {
 		["southeast"] = "lanzhou/yongdeng",
 		["northwest"] = "lanzhou/gulang",
 	},
+	room_relative="古浪↖萧家桥↘永登萧家桥",
 }
 Room {
 	id = "lanzhou/yaocaidian",
 	name = "皮货药材店",
+	outdoor = "兰州城",
 	ways = {
 		["west"] = "lanzhou/gulang",
 	},
+	room_relative="古浪--皮货药材店皮货药材店",
 }
 Room {
 	id = "lanzhou/yinpanshui",
 	name = "营盘水",
+	outdoor = "兰州城",
 	ways = {
 		["southwest"] = "lanzhou/bingcao",
 		["east"] = "lanzhou/gccheng",
 	},
+	room_relative="营盘水----古长城↙冰草湾营盘水",
 }
 Room {
 	id = "lanzhou/yongdeng",
 	name = "永登",
+	outdoor = "兰州城",
 	ways = {
 		["northwest"] = "lanzhou/xjqiao",
 		["east"] = "lanzhou/road4",
 		["west"] = "lanzhou/kedian",
 	},
+	room_relative="萧家桥↖客店-----永登-----大道永登",
 }
 Room {
 	id = "lanzhou/zhengmen",
 	name = "苗家庄门口",
+	outdoor = "兰州城",
 	no_fight = true,
 	ways = {
 		["east"] = "lanzhou/sroad1",
@@ -16771,10 +19242,12 @@ Room {
 		["east"] = "#walkBusy",
 		["west"] = "#walkBusy",
 	},
+	
 }
 Room {
 	id = "lanzhou/zhenting",
 	name = "正厅",
+	outdoor = "兰州城",
 	no_fight = true,
 	ways = {
 		["south"] = "lanzhou/qianting",
@@ -16783,10 +19256,12 @@ Room {
 	objs = {
           ["苗人凤"] = "miao renfeng",
            },
+	room_relative="前厅｜后院正厅",
 }
 Room {
 	id = "meizhuang/ceting2",
 	name = "侧厅",
+	outdoor = "梅庄",
 	ways = {
 		["west"] = "meizhuang/huilang20",
 	},
@@ -16794,6 +19269,7 @@ Room {
 Room {
 	id = "meizhuang/ceting3",
 	name = "侧厅",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang21",
 	},
@@ -16801,6 +19277,7 @@ Room {
 Room {
 	id = "meizhuang/door",
 	name = "庄院大门",
+	outdoor = "梅庄",
 	ways = {
 		["north"] = "meizhuang/road3",
 		["mzDoor"] = "meizhuang/tianjing",
@@ -16812,6 +19289,7 @@ Room {
 Room {
 	id = "meizhuang/gushan",
 	name = "孤山",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/hubian",
 	},
@@ -16819,6 +19297,7 @@ Room {
 Room {
 	id = "meizhuang/hall",
 	name = "大厅",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang",
 		["north"] = "meizhuang/tianjing",
@@ -16827,6 +19306,7 @@ Room {
 Room {
 	id = "meizhuang/houtang2",
 	name = "后堂",
+	outdoor = "梅庄",
 	ways = {
 		["north"] = "meizhuang/huilang12",
 	},
@@ -16834,6 +19314,7 @@ Room {
 Room {
 	id = "meizhuang/houtang3",
 	name = "后堂",
+	outdoor = "梅庄",
 	ways = {
 		["north"] = "meizhuang/huilang13",
 	},
@@ -16841,6 +19322,7 @@ Room {
 Room {
 	id = "meizhuang/huashi",
 	name = "画室",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang6",
 	},
@@ -16848,6 +19330,7 @@ Room {
 Room {
 	id = "meizhuang/hubian",
 	name = "西湖边",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/shiji",
 		["west"] = "hz/gushan",
@@ -16857,6 +19340,7 @@ Room {
 Room {
 	id = "meizhuang/huilang",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang3",
 		["north"] = "meizhuang/hall",
@@ -16866,6 +19350,7 @@ Room {
 Room {
 	id = "meizhuang/huilang10",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang12",
 		["east"] = "meizhuang/huilang8",
@@ -16874,6 +19359,7 @@ Room {
 Room {
 	id = "meizhuang/huilang11",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang13",
 		["west"] = "meizhuang/huilang9",
@@ -16882,6 +19368,7 @@ Room {
 Room {
 	id = "meizhuang/huilang12",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/houtang2",
 		["east"] = "meizhuang/huilang14",
@@ -16891,6 +19378,7 @@ Room {
 Room {
 	id = "meizhuang/huilang13",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/houtang3",
 		["north"] = "meizhuang/huilang11",
@@ -16900,6 +19388,7 @@ Room {
 Room {
 	id = "meizhuang/huilang14",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang16",
 		["west"] = "meizhuang/huilang12",
@@ -16908,6 +19397,7 @@ Room {
 Room {
 	id = "meizhuang/huilang15",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang13",
 		["west"] = "meizhuang/huilang17",
@@ -16916,6 +19406,7 @@ Room {
 Room {
 	id = "meizhuang/huilang16",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang19",
 		["west"] = "meizhuang/huilang14",
@@ -16924,6 +19415,7 @@ Room {
 Room {
 	id = "meizhuang/huilang17",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang15",
 		["west"] = "meizhuang/huilang19",
@@ -16932,6 +19424,7 @@ Room {
 Room {
 	id = "meizhuang/huilang19",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["north"] = "meizhuang/qinshi",
 		["east"] = "meizhuang/huilang17",
@@ -16941,6 +19434,7 @@ Room {
 Room {
 	id = "meizhuang/huilang2",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang",
 		["west"] = "meizhuang/huilang4",
@@ -16949,6 +19443,7 @@ Room {
 Room {
 	id = "meizhuang/huilang20",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang4",
 		["north"] = "meizhuang/huilang22",
@@ -16958,6 +19453,7 @@ Room {
 Room {
 	id = "meizhuang/huilang21",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang5",
 		["north"] = "meizhuang/huilang23",
@@ -16967,6 +19463,7 @@ Room {
 Room {
 	id = "meizhuang/huilang22",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang20",
 		["east"] = "meizhuang/huilang24",
@@ -16976,6 +19473,7 @@ Room {
 Room {
 	id = "meizhuang/huilang23",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang21",
 		["east"] = "meizhuang/xiangfang3",
@@ -16985,6 +19483,7 @@ Room {
 Room {
 	id = "meizhuang/huilang24",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/tianjing",
 		["west"] = "meizhuang/huilang22",
@@ -16993,6 +19492,7 @@ Room {
 Room {
 	id = "meizhuang/huilang25",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang23",
 		["west"] = "meizhuang/tianjing",
@@ -17001,6 +19501,7 @@ Room {
 Room {
 	id = "meizhuang/huilang3",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang5",
 		["west"] = "meizhuang/huilang",
@@ -17009,6 +19510,7 @@ Room {
 Room {
 	id = "meizhuang/huilang4",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang6",
 		["north"] = "meizhuang/huilang20",
@@ -17019,6 +19521,7 @@ Room {
 Room {
 	id = "meizhuang/huilang5",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang7",
 		["east"] = "meizhuang/qishi",
@@ -17029,6 +19532,7 @@ Room {
 Room {
 	id = "meizhuang/huilang6",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang8",
 		["north"] = "meizhuang/huilang4",
@@ -17038,6 +19542,7 @@ Room {
 Room {
 	id = "meizhuang/huilang7",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang9",
 		["east"] = "meizhuang/shufang",
@@ -17047,6 +19552,7 @@ Room {
 Room {
 	id = "meizhuang/huilang8",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["north"] = "meizhuang/huilang6",
 		["west"] = "meizhuang/huilang10",
@@ -17055,6 +19561,7 @@ Room {
 Room {
 	id = "meizhuang/huilang9",
 	name = "回廊",
+	outdoor = "梅庄",
 	ways = {
 		["north"] = "meizhuang/huilang7",
 		["east"] = "meizhuang/huilang11",
@@ -17063,6 +19570,7 @@ Room {
 Room {
 	id = "meizhuang/jiushi",
 	name = "酒室",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang4",
 	},
@@ -17070,6 +19578,7 @@ Room {
 Room {
 	id = "meizhuang/neishi",
 	name = "内室",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/qinshi",
 	},
@@ -17077,19 +19586,15 @@ Room {
 Room {
 	id = "meizhuang/plum_maze",
 	name = "梅林",
-	--nofind = true,
 	ways = {
-		--["#mlIn"] = "meizhuang/road3",
-		["north"] = "meizhuang/road2",
+		["#mlOutt"] = "meizhuang/road2",
+		["#inmz"] = "meizhuang/road3",
 	},
-	--[[lengths = {
-		["#mlIn"] = 3,
-		["#mlOut"] = 3,
-	},]]
 }
 Room {
 	id = "meizhuang/qinshi",
 	name = "琴室",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/huilang19",
 		["north"] = "meizhuang/neishi",
@@ -17098,6 +19603,7 @@ Room {
 Room {
 	id = "meizhuang/qishi",
 	name = "棋室",
+	outdoor = "梅庄",
 	ways = {
 		["west"] = "meizhuang/huilang5",
 	},
@@ -17105,6 +19611,7 @@ Room {
 Room {
 	id = "meizhuang/road1",
 	name = "小路",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/road2",
 		["west"] = "meizhuang/shiji",
@@ -17114,18 +19621,19 @@ Room {
 Room {
 	id = "meizhuang/road2",
 	name = "小路",
+	outdoor = "梅庄",
 	ways = {
-		["#inmz"] = "meizhuang/plum_maze",
+		--["south"] = "meizhuang/plum_maze",
 		["north"] = "meizhuang/road1",
 	},
-	room_relative="小路｜小路｜梅林小路",
 	lengths = {
-		["#inmz"] = 3,
+		["south"] = 10000,
 	},
 }
 Room {
 	id = "meizhuang/road3",
 	name = "青石板大路",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/door",
 		["north"] = "meizhuang/plum_maze",
@@ -17134,14 +19642,17 @@ Room {
 Room {
 	id = "meizhuang/shiji",
 	name = "石级",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/road1",
 		["west"] = "meizhuang/hubian",
 	},
+	room_relative="西湖边-----石级-----小路石级",
 }
 Room {
 	id = "meizhuang/shufang",
 	name = "书房",
+	outdoor = "梅庄",
 	ways = {
 		["west"] = "meizhuang/huilang7",
 	},
@@ -17149,6 +19660,7 @@ Room {
 Room {
 	id = "meizhuang/tianjing",
 	name = "天井",
+	outdoor = "梅庄",
 	ways = {
 		["south"] = "meizhuang/hall",
 		["east"] = "meizhuang/huilang25",
@@ -17159,6 +19671,7 @@ Room {
 Room {
 	id = "meizhuang/xiangfang2",
 	name = "厢房",
+	outdoor = "梅庄",
 	ways = {
 		["east"] = "meizhuang/huilang22",
 	},
@@ -17166,6 +19679,7 @@ Room {
 Room {
 	id = "meizhuang/xiangfang3",
 	name = "厢房",
+	outdoor = "梅庄",
 	ways = {
 		["west"] = "meizhuang/huilang23",
 	},
@@ -17173,37 +19687,46 @@ Room {
 Room {
 	id = "miaojiang/bingqif",
 	name = "兵器房",
+	outdoor = "苗疆",
 	ways = {
 		["west"] = "miaojiang/qiant",
 	},
+	room_relative="前厅----兵器房兵器房",
 }
 Room {
 	id = "miaojiang/chufang",
 	name = "厨房",
+	outdoor = "苗疆",
 	ways = {
 		["east"] = "miaojiang/qiant",
 	},
+	room_relative="厨房-----前厅厨房",
 }
 Room {
 	id = "miaojiang/guoyuan",
 	name = "果园",
+	outdoor = "苗疆",
 	ways = {
 		["west"] = "miaojiang/jiedao5",
 	},
+	room_relative="小镇-----果园果园",
 }
 Room {
 	id = "miaojiang/haozhai",
 	name = "苗居",
+	outdoor = "苗疆",
 	ways = {
 		["north"] = "miaojiang/jiedao3",
 	},
 	objs = {
           ["陈清"] = "chen qing",
            },
+	room_relative="小镇｜苗居苗居",
 }
 Room {
 	id = "miaojiang/houshan",
 	name = "后山",
+	outdoor = "苗疆",
 	ways = {
 		["southeast"] = "miaojiang/shanlu",
 	},
@@ -17214,6 +19737,7 @@ Room {
 Room {
 	id = "miaojiang/jiedao1",
 	name = "小镇",
+	outdoor = "苗疆",
 	ways = {
 		["south"] = "miaojiang/jiedao2",
 		["east"] = "miaojiang/zhd",
@@ -17227,6 +19751,7 @@ Room {
 Room {
 	id = "miaojiang/jiedao2",
 	name = "小镇",
+	outdoor = "苗疆",
 	ways = {
 		["southeast"] = "miaojiang/ywj",
 		["south"] = "miaojiang/jiedao3",
@@ -17238,6 +19763,7 @@ Room {
 Room {
 	id = "miaojiang/jiedao3",
 	name = "小镇",
+	outdoor = "苗疆",
 	ways = {
 		["south"] = "miaojiang/haozhai",
 		["east"] = "miaojiang/jiedao5",
@@ -17249,6 +19775,7 @@ Room {
 Room {
 	id = "miaojiang/jiedao4",
 	name = "小镇",
+	outdoor = "苗疆",
 	ways = {
 		["north"] = "miaojiang/mzhai",
 		["east"] = "miaojiang/jiedao3",
@@ -17259,6 +19786,7 @@ Room {
 Room {
 	id = "miaojiang/jiedao5",
 	name = "小镇",
+	outdoor = "苗疆",
 	ways = {
 		["southeast"] = "miaojiang/lianwuc",
 		["east"] = "miaojiang/guoyuan",
@@ -17269,24 +19797,29 @@ Room {
 Room {
 	id = "miaojiang/lianwuc",
 	name = "练武场",
+	outdoor = "苗疆",
 	ways = {
-		["northwest"] = "miaojiang/jiedao5",
+		["northwest"] = "miaojiang/jiedao5",  
 	},
 	objs = {
           ["苗族青年"] = "miaozu qingnian",
            },
+	room_relative="小镇↖练武场练武场",
 }
 Room {
 	id = "miaojiang/myp",
 	name = "明月屏",
+	outdoor = "苗疆",
 	ways = {
 		["south"] = "miaojiang/xiaolu1",
 		["northeast"] = "miaojiang/shandao1",
 	},
+	room_relative="山道↗明月屏｜小路明月屏",
 }
 Room {
 	id = "miaojiang/myt",
 	name = "明月厅",
+	outdoor = "苗疆",
 	ways = {
 		["south"] = "miaojiang/qiant",
 		["northwest"] = "miaojiang/shef",
@@ -17294,30 +19827,36 @@ Room {
 	objs = {
           ["何红药"] = "he hongyao",
            },
+	room_relative="蛇房↖明月厅｜前厅明月厅",
 }
 Room {
 	id = "miaojiang/mzhai",
 	name = "苗屋",
+	outdoor = "苗疆",
 	ways = {
 		["south"] = "miaojiang/jiedao4",
 	},
 	objs = {
           ["苗族老汉"] = "miaozu laohan",
            },
+		room_relative="苗屋｜小镇苗屋",
 }
 Room {
 	id = "miaojiang/qiant",
 	name = "前厅",
+	outdoor = "苗疆",
 	ways = {
 		["south"] = "miaojiang/wddamen",
 		["north"] = "miaojiang/myt",
 		["east"] = "miaojiang/bingqif",
 		["west"] = "miaojiang/chufang",
 	},
+	room_relative="明月厅｜厨房-----前厅-----兵器房｜大门前厅",
 }
 Room {
 	id = "miaojiang/shandao1",
 	name = "山道",
+	outdoor = "苗疆",
 	ways = {
 		["southwest"] = "miaojiang/myp",
 		["west"] = "miaojiang/shandao2",
@@ -17327,6 +19866,7 @@ Room {
 Room {
 	id = "miaojiang/shandao2",
 	name = "山道",
+	outdoor = "苗疆",
 	ways = {
 		["east"] = "miaojiang/shandao1",
 		["north"] = "group/entry/mjshan2",
@@ -17336,6 +19876,7 @@ Room {
 Room {
 	id = "miaojiang/shandong",
 	name = "山洞",
+	outdoor = "苗疆",
 	ways = {
 		["out"] = "miaojiang/slu9",
 	},
@@ -17343,6 +19884,7 @@ Room {
 Room {
 	id = "miaojiang/shanlu",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["southeast"] = "miaojiang/slu1",
 		["northwest"] = "miaojiang/houshan",
@@ -17358,21 +19900,25 @@ Room {
 Room {
 	id = "miaojiang/shanlu1",
 	name = "小路",
+	outdoor = "苗疆",
 	ways = {
 		["southeast"] = "miaojiang/xiaolu1",
 	},
-	room_relative="山路山路↖↑山脚-----小镇山脚",
+	room_relative="小路↘小路小路",
 }
 Room {
 	id = "miaojiang/shanya2",
 	name = "山坡",
+	outdoor = "苗疆",
 	ways = {
 		["west"] = "miaojiang/wddamen",
 	},
+	room_relative="大门-----山坡山坡",
 }
 Room {
 	id = "miaojiang/shef",
 	name = "蛇房",
+	outdoor = "苗疆",
 	ways = {
 		["southeast"] = "miaojiang/myt",
 		["south"] = "miaojiang/woshi",
@@ -17380,10 +19926,12 @@ Room {
 	objs = {
           ["黑色毒蛇"] = "heise dushe",
            },
+	room_relative="蛇房｜↘卧室明月厅蛇房",
 }
 Room {
 	id = "miaojiang/slu1",
 	name = "山脚",
+	outdoor = "苗疆",
 	ways = {
 		["northwest"] = "miaojiang/shanlu",
 		["east"] = "miaojiang/jiedao4",
@@ -17397,10 +19945,12 @@ Room {
 	lengths = {
 		["#Inwdj"] = "if inwdj==0 then return false else return 1 end",
 	},
+	
 }
 Room {
 	id = "miaojiang/slu2",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["northup"] = "miaojiang/slu4",
 		["eastup"] = "miaojiang/slu3",
@@ -17414,6 +19964,7 @@ Room {
 Room {
 	id = "miaojiang/slu3",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["northup"] = "miaojiang/slu6",
 		["eastdown"] = "miaojiang/slu5",
@@ -17424,6 +19975,7 @@ Room {
 Room {
 	id = "miaojiang/slu4",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["northup"] = "miaojiang/wddamen",
 		["southdown"] = "miaojiang/slu2",
@@ -17433,6 +19985,7 @@ Room {
 Room {
 	id = "miaojiang/slu5",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["northup"] = "miaojiang/slu7",
 		["westup"] = "miaojiang/slu3",
@@ -17445,6 +19998,7 @@ Room {
 Room {
 	id = "miaojiang/slu6",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["southdown"] = "miaojiang/slu3",
 	},
@@ -17453,6 +20007,7 @@ Room {
 Room {
 	id = "miaojiang/slu7",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["northwest"] = "miaojiang/slu8",
 		["southdown"] = "miaojiang/slu5",
@@ -17462,6 +20017,7 @@ Room {
 Room {
 	id = "miaojiang/slu8",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["southeast"] = "miaojiang/slu7",
 		["east"] = "miaojiang/slu9",
@@ -17471,6 +20027,7 @@ Room {
 Room {
 	id = "miaojiang/slu9",
 	name = "山路",
+	outdoor = "苗疆",
 	ways = {
 		["enter"] = "miaojiang/shandong",
 		["west"] = "miaojiang/slu8",
@@ -17480,28 +20037,33 @@ Room {
 Room {
 	id = "miaojiang/wddamen",
 	name = "大门",
+	outdoor = "苗疆",
 	ways = {
 		["east"] = "miaojiang/shanya2",
-		["north"] = "miaojiang/qiant",
+		["north"] = "miaojiang/qiant",  
 		["southdown"] = "miaojiang/slu4",
 	},
 	objs = {
           ["五毒教弟子"] = "wudujiao dizi",
            },
+	room_relative="前厅｜大门-----山坡↑山路大门",
 }
 Room {
 	id = "miaojiang/woshi",
 	name = "卧室",
+	outdoor = "苗疆",
 	ways = {
-		["north"] = "miaojiang/shef",
+		["north"] = "miaojiang/shef", 
 	},
 	objs = {
           ["何铁手"] = "he tieshou",
            },
+	room_relative="蛇房｜卧室卧室",
 }
 Room {
 	id = "miaojiang/xiaolu1",
 	name = "小路",
+	outdoor = "苗疆",
 	ways = {
 		["northwest"] = "miaojiang/shanlu1",
 		["east"] = "miaojiang/xiaolu2",
@@ -17512,6 +20074,7 @@ Room {
 Room {
 	id = "miaojiang/xiaolu2",
 	name = "小路",
+	outdoor = "苗疆",
 	ways = {
 		["south"] = "miaojiang/jiedao1",
 		["west"] = "miaojiang/xiaolu1",
@@ -17521,16 +20084,19 @@ Room {
 Room {
 	id = "miaojiang/xiaotan",
 	name = "小摊",
+	outdoor = "苗疆",
 	ways = {
 		["west"] = "miaojiang/jiedao2",
 	},
 	objs = {
           ["苗家女子"] = "miaojia nuzi",
            },
+	room_relative="小镇-----小摊小摊",
 }
 Room {
 	id = "miaojiang/yaofang1",
 	name = "药王局",
+	outdoor = "苗疆",
 	no_fight = true,
 	ways = {
 		["south"] = "miaojiang/ywj",
@@ -17538,10 +20104,12 @@ Room {
 	objs = {
           ["丹炉"] = "dan lu",
            },
+	room_relative="药王局｜药王居药王局",
 }
 Room {
 	id = "miaojiang/ywj",
 	name = "药王居",
+	outdoor = "苗疆",
 	no_fight = true,
 	ways = {
 		["northwest"] = "miaojiang/jiedao2",
@@ -17550,35 +20118,43 @@ Room {
 	objs = {
           ["程灵素"] = "cheng lingsu",
            },
+	room_relative="小镇药王局↖｜药王居药王居",
 }
 Room {
 	id = "miaojiang/zhd",
 	name = "杂货店",
+	outdoor = "苗疆",
 	ways = {
 		["west"] = "miaojiang/jiedao1",
 	},
+	room_relative="小镇----杂货店杂货店",
 }
 Room {
 	id = "mingjiao/bank",
 	name = "勒马斋",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/shejing",
 	},
 	objs = {
           ["龙卷风"] = "long juanfeng",
            },
+  room_relative="勒马斋----沙漠绿洲勒马斋",
 }
 Room {
 	id = "mingjiao/baota",
 	name = "光明宝塔",
+	outdoor = "明教",
 	ways = {
 		["enter"] = "mingjiao/baota0",
 		["southdown"] = "mingjiao/sht",
 	},
+	room_relative="宝塔一楼∧光明宝塔↑圣火堂光明宝塔",
 }
 Room {
 	id = "mingjiao/baota0",
 	name = "宝塔一楼",
+	outdoor = "明教",
 	ways = {
 		["out"] = "mingjiao/baota",
 	},
@@ -17730,6 +20306,7 @@ Room {
 Room {
 	id = "mingjiao/bingqi",
 	name = "兵器库",
+	outdoor = "明教",
 	ways = {
 		["north"] = "mingjiao/huoqi",
 	},
@@ -17743,6 +20320,7 @@ Room {
 Room {
 	id = "mingjiao/bishui",
 	name = "碧水寒潭",
+	outdoor = "明教",
 	ways = {
 		["west"] = "mingjiao/shanlu2",
 		["jump down"] = "mingjiao/tandi",
@@ -17758,30 +20336,37 @@ Room {
 Room {
 	id = "mingjiao/cl1",
 	name = "长廊",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/wu3",
 		["west"] = "mingjiao/huoqi",
 	},
+	room_relative="烈火旗-----长廊-----练武场长廊",
 }
 Room {
 	id = "mingjiao/cl2",
 	name = "长廊",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/shuiqi",
 		["west"] = "mingjiao/wu3",
 	},
+	room_relative="练武场-----长廊-----洪水旗长廊",
 }
 Room {
 	id = "mingjiao/dashaqiu",
 	name = "大沙丘",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/htping",
 		["west"] = "mingjiao/shejing",
 	},
+	room_relative="沙漠绿洲----大沙丘----黄土坪大沙丘",
 }
 Room {
 	id = "mingjiao/didao/bidao1",
 	name = "秘道入口",
+	outdoor = "明教",
 	ways = {
 		["north"] = "mingjiao/didao/bidao2",
 		["out"] = "mingjiao/wxiang",
@@ -17790,6 +20375,7 @@ Room {
 Room {
 	id = "mingjiao/didao/bidao10",
 	name = "秘道",
+	outdoor = "明教",
 	ways = {
 		["eastdown"] = "mingjiao/didao/bidao11",
 		["westup"] = "mingjiao/didao/bidao9",
@@ -17798,6 +20384,7 @@ Room {
 Room {
 	id = "mingjiao/didao/bidao11",
 	name = "秘道",
+	outdoor = "明教",
 	ways = {
 		["eastdown"] = "mingjiao/didao/bidao12",
 		["westup"] = "mingjiao/didao/bidao10",
@@ -18002,6 +20589,7 @@ Room {
 Room {
 	id = "mingjiao/didao/men-di",
 	name = "地字门",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/didao/senlin",
 		["northeast"] = "mingjiao/didao/senlin",
@@ -18015,6 +20603,7 @@ Room {
 Room {
 	id = "mingjiao/didao/men-feng",
 	name = "风字门",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/didao/senlin",
 		["northeast"] = "mingjiao/didao/senlin",
@@ -18028,6 +20617,7 @@ Room {
 Room {
 	id = "mingjiao/didao/men-lei",
 	name = "雷字门",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/didao/senlin",
 		["northeast"] = "mingjiao/didao/senlin",
@@ -18041,6 +20631,7 @@ Room {
 Room {
 	id = "mingjiao/didao/men-tian",
 	name = "天字门",
+	outdoor = "明教",
 	ways = {
 		["southwest"] = "mingjiao/didao/senlin",
 		["northeast"] = "mingjiao/didao/senlin",
@@ -18054,6 +20645,7 @@ Room {
 Room {
 	id = "mingjiao/didao/senlin",
 	name = "紫杉林",
+	outdoor = "明教",
 	ways = {
 		["#outzsl"] = "mingjiao/shuiqi",
 		["#tianMen"] = "mingjiao/didao/men-tian",
@@ -18072,6 +20664,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shenchu1",
 	name = "树林深处",
+	outdoor = "明教",
 	ways = {
 		["northwest"] = "mingjiao/didao/shenchu2",
 		["north"] = "mingjiao/didao/shuling2",
@@ -18084,6 +20677,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shenchu2",
 	name = "树林深处",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/didao/shenchu4",
 		["north"] = "mingjiao/didao/shenchu5",
@@ -18099,6 +20693,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shenchu3",
 	name = "树林深处",
+	outdoor = "明教",
 	ways = {
 		["southwest"] = "mingjiao/didao/shenchu2",
 		["south"] = "mingjiao/didao/shenchu5",
@@ -18113,6 +20708,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shenchu4",
 	name = "树林深处",
+	outdoor = "明教",
 	ways = {
 		["northwest"] = "mingjiao/didao/shuling6",
 		["west"] = "mingjiao/didao/shenchu3",
@@ -18126,6 +20722,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shenchu5",
 	name = "树林深处",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/didao/shenchu2",
 		["north"] = "mingjiao/didao/shenchu3",
@@ -18135,6 +20732,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shuling1",
 	name = "树林",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/didao/shuling3",
 		["east"] = "mingjiao/muqi",
@@ -18152,6 +20750,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shuling2",
 	name = "树林",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/didao/shenchu5",
 		["north"] = "mingjiao/didao/shuling6",
@@ -18166,6 +20765,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shuling3",
 	name = "树林",
+	outdoor = "明教",
 	ways = {
 		["#mjSlout1"] = "mingjiao/didao/shenchu1",
 	},
@@ -18173,16 +20773,19 @@ Room {
 Room {
 	id = "mingjiao/didao/shuling4",
 	name = "树林",
+	outdoor = "明教",
 	ways = {
 		["#mjSlout1"] = "mingjiao/didao/shenchu1",
 	},
 	objs = {
           ["徐达"] = "xu da",
     },
+	room_relative="树林深处｜树林-----树林-----树林｜树林树林",
 }
 Room {
 	id = "mingjiao/didao/shuling5",
 	name = "树林",
+	outdoor = "明教",
 	ways = {
 		["#mjSlout4"] = "mingjiao/didao/shenchu4",
 	},
@@ -18193,6 +20796,7 @@ Room {
 Room {
 	id = "mingjiao/didao/shuling6",
 	name = "树林",
+	outdoor = "明教",
 	ways = {
 		["#mjSlout4"] = "mingjiao/didao/shenchu4",
 		["east"] = "mingjiao/didao/shuling5",
@@ -18201,10 +20805,12 @@ Room {
 	objs = {
           ["常遇春"] = "chang yuchun",
     },
+	room_relative="树林｜树林-----树林-----树林｜树林深处树林",
 }
 Room {
 	id = "mingjiao/eatroom",
 	name = "厨房",
+	outdoor = "明教",
 	no_fight = true,
 	ways = {
 		["east"] = "mingjiao/xting",
@@ -18213,10 +20819,12 @@ Room {
           ["粽子"] = "zong zi",
           ["酸梅汤"] = "suanmei tang",
            },
+	room_relative="厨房-----小厅厨房",
 }
 Room {
 	id = "mingjiao/gmd",
 	name = "光明顶",
+	outdoor = "明教",
 	ways = {
 		["northup"] = "mingjiao/wu3",
 		["southdown"] = "mingjiao/muqi",
@@ -18224,11 +20832,16 @@ Room {
 	objs = {
           ["光明圣火碑"] = "board",
           ["殷无禄"] = "yin wulu",
+		  ["刘国彦"] = "nan jiaozhong",
+		  ["吴安"] = "nan jiaozhong",
+		  ["殷天正"] = "yin tianzheng",
+	room_relative="练武场↑光明顶↑巨木旗光明顶",
            },
 }
 Room {
 	id = "mingjiao/guangc",
 	name = "广场",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/wu3",
 		["east"] = "mingjiao/zl2",
@@ -18237,21 +20850,27 @@ Room {
 	},
 	objs = {
           ["韦一笑"] = "wei yixiao",
+		  ["周金"] = "nan jiaozhong",
+		  ["刘云"] = "nv jiaozhong",
+	room_relative="练武场｜长廊-----广场-----长廊｜练武场广场",
            },
 }
 Room {
 	id = "mingjiao/hdg/caojing",
 	name = "草径",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/niupeng",
 		["east"] = "mingjiao/hdg/xfang1",
 		["north"] = "mingjiao/hdg/maowu",
 		["west"] = "mingjiao/hdg/maopeng",
 	},
+	room_relative="茅屋｜茅棚-----草径-----厢房｜牛棚草径",
 }
 Room {
 	id = "mingjiao/hdg/caotang",
 	name = "草堂",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/maowu",
 		["enter"] = "mingjiao/hdg/xfang4",
@@ -18264,10 +20883,12 @@ Room {
 	precmds = {
 		["enter"] = "open door",
 	},
+	room_relative="厢房∧厨房-----草堂-----厢房｜茅屋草堂",
 }
 Room {
 	id = "mingjiao/hdg/chufang",
 	name = "厨房",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/xfang2",
 		["north"] = "mingjiao/hdg/huapu4",
@@ -18278,25 +20899,31 @@ Room {
 		["north"] = "drop rice;drop miantang;drop qingcai",
 		["east"] = "drop rice;drop miantang;drop qingcai",
 	},
+	room_relative="花圃｜厨房-----草堂｜厢房厨房",
 }
 Room {
 	id = "mingjiao/hdg/houshan",
 	name = "后山",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/huapu4",
 	},
+	
 }
 Room {
 	id = "mingjiao/hdg/huacong1",
 	name = "花丛中",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["north"] = "mingjiao/hdg/xiaojing",
 		["out"] = "mingjiao/hdg/shanbi",
 	},
+	room_relative="小径｜花丛中∨山壁花丛中",
 }
 Room {
 	id = "mingjiao/hdg/huapu1",
 	name = "花圃",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/huapu1",
 		["north"] = "mingjiao/hdg/huapu1",
@@ -18307,9 +20934,11 @@ Room {
 Room {
 	id = "mingjiao/hdg/huapu2",
 	name = "花圃",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["west"] = "mingjiao/hdg/xfang1",
 	},
+	room_relative="厢房--花圃",
 }
 Room {
 	id = "mingjiao/hdg/huapu3",
@@ -18317,140 +20946,165 @@ Room {
 	ways = {
 		["east"] = "mingjiao/hdg/maopeng",
 	},
+	room_relative="茅棚--花圃",
 }
 Room {
 	id = "mingjiao/hdg/huapu4",
 	name = "花圃",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/chufang",
 		["north"] = "mingjiao/hdg/houshan",
 	},
+	
 }
 Room {
 	id = "mingjiao/hdg/kongdi",
 	name = "空地",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["southwest"] = "mingjiao/hdg/xiaojing2",
 		["northwest"] = "mingjiao/hdg/shanlu2",
 		["north"] = "mingjiao/hdg/niupeng",
 		["northeast"] = "mingjiao/hdg/shanlu1",
 	},
+	room_relative="山路牛棚山路↖｜↗空地↙小径空地",
 }
 Room {
 	id = "mingjiao/hdg/maopeng",
 	name = "茅棚",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["north"] = "mingjiao/hdg/xfang2",
 		["east"] = "mingjiao/hdg/caojing",
 		["west"] = "mingjiao/hdg/huapu3",
 	},
+	
 }
 Room {
 	id = "mingjiao/hdg/maowu",
 	name = "茅屋",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/caojing",
 		["east"] = "mingjiao/hdg/yaofang",
 		["north"] = "mingjiao/hdg/caotang",
 		["west"] = "mingjiao/hdg/xfang2",
 	},
+	room_relative="草堂｜厢房-----茅屋-----药房｜草径茅屋",
 }
 Room {
 	id = "mingjiao/hdg/niupeng",
 	name = "牛棚",
-	ways = {
-		["south"] = "mingjiao/hdg/kongdi",
-		["northdown"] = "mingjiao/hdg/caojing",
-	},
+	outdoor = "蝴蝶谷",
+	
+		 ways = {
+                ["south"] = "mingjiao/hdg/kongdi",
+                --["northdown"] = "mingjiao/hdg/caojing",
+                ["#hdgleavein"] = "mingjiao/hdg/caojing",          
+        },
+  
 }
 Room {
 	id = "mingjiao/hdg/shanbi",
 	name = "山壁",
-	ways = {
-		["south"] = "city/wroad3",
-		["right"] = "mingjiao/hdg/huacong1",
-		--["#go_hudiegu"] = "mingjiao/hdg/huacong1",
-	},
-	nolooks = {
-		["right"] = true,
-		--["#go_hudiegu"] = true,
-	},
-	--[[lengths = {
-		["right"] = "if score.party and score.party=='明教' then return 10 else return false end",
-	},
-	precmds = {
-		["right"] = "bo huacong",
-	},]]
+	outdoor = "蝴蝶谷",
+        ways = {
+                ["south"] = "city/wroad3",
+                --["right"] = "mingjiao/hdg/huacong1",
+                ["#bohuacong"] = "mingjiao/hdg/huacong1",
+        },
+        nolooks = {
+                ["#bohuacong"] = true,
+        },
+    
 }
 Room {
 	id = "mingjiao/hdg/shanlu1",
 	name = "山路",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["northup"] = "mingjiao/hdg/shanlu3",
 		["southwest"] = "mingjiao/hdg/kongdi",
 	},
+	room_relative="山路↑山路↙空地山路",
 }
 Room {
 	id = "mingjiao/hdg/shanlu2",
 	name = "山路",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["northup"] = "mingjiao/hdg/shanlu4",
 		["southeast"] = "mingjiao/hdg/kongdi",
 	},
+	room_relative="山路↑山路↘空地山路",
 }
 Room {
 	id = "mingjiao/hdg/shanlu3",
 	name = "山路",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["eastdown"] = "mingjiao/hdg/huapu1",
 		["southdown"] = "mingjiao/hdg/shanlu1",
 	},
+	room_relative="山路←花圃↑山路山路",
 }
 Room {
 	id = "mingjiao/hdg/shanlu4",
 	name = "山路",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["westdown"] = "mingjiao/hdg/huapu1",
 		["southdown"] = "mingjiao/hdg/shanlu2",
 	},
+	room_relative="花圃→山路↑山路山路",
 }
 Room {
 	id = "mingjiao/hdg/shufang",
 	name = "书房",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["west"] = "mingjiao/hdg/xfang3",
 	},
+	room_relative="厢房-----书房书房",
 }
 Room {
 	id = "mingjiao/hdg/xfang1",
 	name = "厢房",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["north"] = "mingjiao/hdg/yaofang",
 		["east"] = "mingjiao/hdg/huapu2",
 		["west"] = "mingjiao/hdg/caojing",
 	},
+	room_relative="药房｜草径-----厢房-----花圃厢房",
 }
 Room {
 	id = "mingjiao/hdg/xfang2",
 	name = "厢房",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/maopeng",
 		["east"] = "mingjiao/hdg/maowu",
 		["north"] = "mingjiao/hdg/chufang",
 	},
+	room_relative="厨房｜厢房-----茅屋｜茅棚厢房",
 }
 Room {
 	id = "mingjiao/hdg/xfang3",
 	name = "厢房",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/yaofang",
 		["east"] = "mingjiao/hdg/shufang",
 		["west"] = "mingjiao/hdg/caotang",
 	},
+	room_relative="草堂-----厢房-----书房｜药房厢房",
 }
 Room {
 	id = "mingjiao/hdg/xfang4",
 	name = "厢房",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["out"] = "mingjiao/hdg/caotang",
 	},
@@ -18460,43 +21114,53 @@ Room {
 	precmds = {
 		["out"] = "open door",
 	},
+	
 }
 Room {
 	id = "mingjiao/hdg/xiaojing",
 	name = "小径",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/huacong1",
 		["north"] = "mingjiao/hdg/xiaojing1",
 	},
+	room_relative="小径｜小径｜花丛中小径",
 }
 Room {
 	id = "mingjiao/hdg/xiaojing1",
 	name = "小径",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/xiaojing",
 		["north"] = "mingjiao/hdg/xiaojing2",
 	},
+	room_relative="小径｜小径｜小径小径",
 }
 Room {
 	id = "mingjiao/hdg/xiaojing2",
 	name = "小径",
+	outdoor = "蝴蝶谷",
 	ways = {
 		["south"] = "mingjiao/hdg/xiaojing1",
 		["northeast"] = "mingjiao/hdg/kongdi",
 	},
+	room_relative="空地↗小径｜小径小径",
 }
 Room {
 	id = "mingjiao/hdg/yaofang",
 	name = "药房",
-	ways = {
+	outdoor = "蝴蝶谷",
+		ways = {
 		["south"] = "mingjiao/hdg/xfang1",
 		["north"] = "mingjiao/hdg/xfang3",
 		["west"] = "mingjiao/hdg/maowu",
 	},
+	room_relative="厢房｜茅屋-----药房｜厢房药房",
 }
 Room {
 	id = "mingjiao/htping",
 	name = "黄土坪",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/shaqiu4",
 		["west"] = "mingjiao/dashaqiu",
@@ -18507,12 +21171,14 @@ Room {
 	},
 	objs = {
           ["殷无福"] = "yin wufu",
+		  ["周雄"] = "nan jiaozhong",
            },
-	
+	room_relative="大沙丘----黄土坪----小沙丘｜↘小沙丘小沙丘黄土坪",
 }
 Room {
 	id = "mingjiao/huoqi",
 	name = "烈火旗",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/bingqi",
 		["north"] = "mingjiao/wu2",
@@ -18523,16 +21189,18 @@ Room {
 		["south"] = "#walkBusy",
 	},
 	lengths={
-	     --["west"] = 3,
-           ["west"] = "if tmp.find and flag.times<3 then return false else return 3 end",
+	     ["west"] = 3,
 	},
 	objs = {
           ["辛然"] = "xin ran",
+	
            },
+room_relative="长廊｜练武场-----兵器库｜紫杉林烈火旗",
 }
 Room {
 	id = "mingjiao/jinqi",
 	name = "锐金旗",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/rukou",
 		["south"] = "mingjiao/zl7",
@@ -18540,16 +21208,17 @@ Room {
 		["east"] = "mingjiao/didao/senlin",
 	},
 	lengths={
-	     --["east"] = 3,
-		["east"] = "if tmp.find and flag.times<3 then return false else return 3 end",
+	     ["east"] = 3,
 	},
 	objs = {
           ["庄铮"] = "zhuang zheng",
+	room_relative="狮王殿｜长廊-----紫杉林｜监狱入口锐金旗",
            },
 }
 Room {
 	id = "mingjiao/jyt",
 	name = "聚议厅",
+	outdoor = "明教",
 	ways = {
 		["northup"] = "mingjiao/sht",
 		["south"] = "mingjiao/xting",
@@ -18558,11 +21227,15 @@ Room {
 	},
 	objs = {
           ["范遥"] = "fan yao",
+		  ["刘凝可"] = "nv jiaozhong",
+		  ["何玉"] = "nv jiaozhong",
+  room_relative="圣火堂↑龙王殿----聚议厅----狮王殿｜小厅聚议厅",
            },
 }
 Room {
 	id = "mingjiao/ljroad1",
 	name = "林间小路",
+	outdoor = "明教",
 	ways = {
 		["westdown"] = "mingjiao/shanyao",
 		["northwest"] = "mingjiao/ljroad2",
@@ -18573,6 +21246,7 @@ Room {
 Room {
 	id = "mingjiao/ljroad2",
 	name = "林间小路",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/ljroad1",
 		["northwest"] = "mingjiao/ljroad3",
@@ -18582,6 +21256,7 @@ Room {
 Room {
 	id = "mingjiao/ljroad2a",
 	name = "林间小路",
+	outdoor = "明教",
 	ways = {
 		["southwest"] = "mingjiao/ljroad1",
 		["northeast"] = "mingjiao/ljroad3",
@@ -18591,6 +21266,7 @@ Room {
 Room {
 	id = "mingjiao/ljroad3",
 	name = "林间小路",
+	outdoor = "明教",
 	ways = {
 		["northup"] = "mingjiao/qianting",
 		["southeast"] = "mingjiao/ljroad2",
@@ -18601,6 +21277,7 @@ Room {
 Room {
 	id = "mingjiao/longwang",
 	name = "龙王殿",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/jyt",
 		["west"] = "mingjiao/tuqi",
@@ -18609,6 +21286,7 @@ Room {
 	objs = {
           ["杨逍"] = "yang xiao",
            },
+	room_relative="小院子↖厚土旗----龙王殿----聚议厅龙王殿",
 }
 Room {
 	id = "mingjiao/lsd/anbian",
@@ -18628,7 +21306,7 @@ Room {
 Room {
 	id = "mingjiao/lsd/sfjiao",
 	name = "山峰脚下",
-	ways = {
+		ways = {
 		["northup"] = "mingjiao/lsd/shanfeng",
 		["south"] = "mingjiao/lsd/lsgu",
 	},
@@ -18636,6 +21314,7 @@ Room {
 Room {
 	id = "mingjiao/lsd/shanfeng",
 	name = "山峰",
+	
 	ways = {
 		["southdown"] = "mingjiao/lsd/sfjiao",
 	},
@@ -18643,6 +21322,7 @@ Room {
 Room {
 	id = "mingjiao/lsd/shanguang",
 	name = "山岗",
+	
 	ways = {
 		["westdown"] = "mingjiao/lsd/anbian",
 		["northdown"] = "mingjiao/lsd/lsgu",
@@ -18651,6 +21331,7 @@ Room {
 Room {
 	id = "mingjiao/muqi",
 	name = "巨木旗",
+	outdoor = "明教",
 	ways = {
 		["northup"] = "mingjiao/gmd",
 		["south"] = "mingjiao/tingtang",
@@ -18674,21 +21355,27 @@ Room {
 			{id = "jiao zhong", exp = 100000, party = "明教"},
 		},
 	},
+	
 }
 Room {
 	id = "mingjiao/qianting",
 	name = "总坛前厅",
+	outdoor = "明教",
 	ways = {
 		["north"] = "mingjiao/tingtang",
 		["southdown"] = "mingjiao/ljroad3",
 	},
 	objs = {
           ["殷野王"] = "yin yewang",
+		  ["林俊彦"] = "nan jiaozhong",
+		  ["刘安"] = "nan jiaozhong",
            },
+	room_relative="厅堂｜总坛前厅↑林间小路总坛前厅",
 }
 Room {
 	id = "mingjiao/rukou",
 	name = "监狱入口",
+	outdoor = "明教",
 	ways = {
 		["southwest"] = "mingjiao/zl7",
 		["northwest"] = "mingjiao/jinqi",
@@ -18696,27 +21383,33 @@ Room {
 	objs = {
           ["冷谦"] = "leng qian",
            },
+	room_relative="锐金旗↖监狱入口↙长廊监狱入口",
 }
 Room {
 	id = "mingjiao/shanjiao",
 	name = "山脚下",
+	outdoor = "明教",
 	ways = {
 		["eastup"] = "mingjiao/sshanlu1",
 		["westup"] = "kunlun/zhenyuanqiao",
 		["south"] = "mingjiao/shejing",
 	},
+	room_relative="镇远桥←山脚下→山路｜沙漠绿洲山脚下",
 }
 Room {
 	id = "mingjiao/shanlu1",
 	name = "山间小路",
+	outdoor = "明教",
 	ways = {
 		["eastdown"] = "mingjiao/shanlu2",
 		["westup"] = "mingjiao/shuiqi",
 	},
+	room_relative="长廊｜锐金旗监狱入口",
 }
 Room {
 	id = "mingjiao/shanlu2",
 	name = "山间小路",
+	outdoor = "明教",
 	ways = {
 		["westup"] = "mingjiao/shanlu1",
 		["east"] = "mingjiao/bishui",
@@ -18727,26 +21420,32 @@ Room {
 		},
 
 	},
+	
 }
 Room {
 	id = "mingjiao/shanting",
 	name = "山亭",
+	outdoor = "明教",
 	ways = {
 		["westup"] = "mingjiao/sshanlu6",
 		["northdown"] = "mingjiao/sshanlu5",
 	},
+	room_relative="山路↓山路←山亭山亭",
 }
 Room {
 	id = "mingjiao/shanyao",
 	name = "半山腰",
+	outdoor = "明教",
 	ways = {
 		["eastup"] = "mingjiao/ljroad1",
 		["northdown"] = "mingjiao/sshanlu6",
 	},
+	room_relative="山路↓半山腰→林间小路半山腰",
 }
 Room {
 	id = "mingjiao/shaqiu1",
 	name = "小沙丘",
+	outdoor = "明教",
 	ways = {
 		["east"] = "group/entry/mjshamo1",
 		["west"] = "mingjiao/shaqiu2",
@@ -18760,6 +21459,7 @@ Room {
 Room {
 	id = "mingjiao/shaqiu2",
 	name = "小沙丘",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/shaqiu1",
 		["west"] = "mingjiao/shaqiu3",
@@ -18768,10 +21468,12 @@ Room {
 		["south"] = true,
 		["north"] = true,
 	},
+	room_relative="小沙丘｜小沙丘小沙丘",
 }
 Room {
 	id = "mingjiao/shaqiu3",
 	name = "小沙丘",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/shaqiu2",
 		["west"] = "mingjiao/shaqiu4",
@@ -18780,10 +21482,12 @@ Room {
 		["south"] = true,
 		["north"] = true,
 	},
+	room_relative="小沙丘｜小沙丘小沙丘",
 }
 Room {
 	id = "mingjiao/shaqiu4",
 	name = "小沙丘",
+	outdoor = "明教",
 	ways = {
 		["northwest"] = "mingjiao/htping",
 		["east"] = "mingjiao/shaqiu3",
@@ -18797,34 +21501,46 @@ Room {
 Room {
 	id = "mingjiao/shejing",
 	name = "沙漠绿洲",
+	outdoor = "明教",
 	ways = {
 		["north"] = "mingjiao/shanjiao",
 		["east"] = "mingjiao/dashaqiu",
 		["west"] = "mingjiao/bank",
 	},
+	room_relative="山脚下｜勒马斋---沙漠绿洲---大沙丘沙漠绿洲",
 }
 Room {
 	id = "mingjiao/shiwang",
 	name = "狮王殿",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/jinqi",
 		["west"] = "mingjiao/jyt",
+},
+	objs = {
+          ["李翠燕"] = "nv jiaozhong",
+		  ["赵忠"] = "nan jiaozhong",
 	},
+	room_relative="聚议厅----狮王殿----锐金旗狮王殿",
 }
 Room {
 	id = "mingjiao/sht",
 	name = "圣火堂",
+	outdoor = "明教",
 	ways = {
 		["northup"] = "mingjiao/baota",
 		["southdown"] = "mingjiao/jyt",
 	},
 	objs = {
           ["张无忌"] = "zhang wuji",
+		  ["赵兰花"] = "nv jiaozhong",
+	room_relative="光明宝塔↑圣火堂↑聚议厅圣火堂",
            },
 }
 Room {
 	id = "mingjiao/shuiqi",
 	name = "洪水旗",
+	outdoor = "明教",
 	ways = {
 		["eastdown"] = "mingjiao/shanlu1",
 		["north"] = "mingjiao/wu4",
@@ -18832,16 +21548,17 @@ Room {
 		["east"] = "mingjiao/didao/senlin",
 	},
 	lengths={
-	     --["east"] = 3,
-		["east"] = "if tmp.find and flag.times<3 then return false else return 3 end",
+	     ["east"] = 3,
 	},
 	objs = {
           ["唐洋"] = "tang yang",
+	room_relative="紫杉林｜山间小路-----练武场｜长廊洪水旗",
            },
 }
 Room {
 	id = "mingjiao/shuyuan",
 	name = "书院",
+	outdoor = "明教",
 	no_fight = true,
 	ways = {
 		["east"] = "mingjiao/wu1",
@@ -18853,66 +21570,82 @@ Room {
           ["本草纲目"] = "bencao gangmu",
           ["药理经"] = "yaoli jing",
            },
+	room_relative="书院-----练武场书院",
 }
 Room {
 	id = "mingjiao/sleeproom",
 	name = "休息室",
+	outdoor = "明教",
 	no_fight = true,
 	ways = {
 		["west"] = "mingjiao/xting",
 	},
+	room_relative="小厅----休息室休息室",
 }
 Room {
 	id = "mingjiao/sshanlu1",
 	name = "山路",
+	outdoor = "明教",
 	ways = {
 		["southup"] = "mingjiao/sshanlu2",
 		["westdown"] = "mingjiao/shanjiao",
 	},
+	room_relative="山脚下→山路↓山路山路",
 }
 Room {
 	id = "mingjiao/sshanlu2",
 	name = "山路",
+	outdoor = "明教",
 	ways = {
 		["westup"] = "mingjiao/sshanlu3",
 		["northdown"] = "mingjiao/sshanlu1",
 	},
+	room_relative="山路↓山路←山路山路",
 }
 Room {
 	id = "mingjiao/sshanlu3",
 	name = "山路",
+	outdoor = "明教",
 	ways = {
 		["northup"] = "mingjiao/sshanlu4",
 		["eastdown"] = "mingjiao/sshanlu2",
 	},
+	room_relative="山路↑山路←山路山路",
 }
 Room {
 	id = "mingjiao/sshanlu4",
 	name = "山路",
+	outdoor = "明教",
 	ways = {
 		["north"] = "mingjiao/xuanya1",
 		["southdown"] = "mingjiao/sshanlu3",
 	},
+	room_relative="栈道｜山路↑山路山路",
 }
 Room {
 	id = "mingjiao/sshanlu5",
 	name = "山路",
+	outdoor = "明教",
 	ways = {
 		["southup"] = "mingjiao/shanting",
 		["westdown"] = "mingjiao/xuanya3",
 	},
+	room_relative="栈道→山路↓山亭山路",
 }
 Room {
 	id = "mingjiao/sshanlu6",
 	name = "山路",
+	outdoor = "明教",
 	ways = {
 		["southup"] = "mingjiao/shanyao",
 		["eastdown"] = "mingjiao/shanting",
 	},
+	room_relative="山路←山亭↓半山腰山路",
 }
 Room {
 	id = "mingjiao/tandi",
 	name = "潭底",
+	outdoor = "明教",
 	ways = {
 		["up"] = "mingjiao/bishui",
 	},
@@ -18920,6 +21653,7 @@ Room {
 Room {
 	id = "mingjiao/tearoom",
 	name = "茶室",
+	outdoor = "明教",
 	no_fight = true,
 	ways = {
 		["east"] = "mingjiao/tingtang",
@@ -18928,20 +21662,28 @@ Room {
           ["酸梅汤"] = "suanmei tang",
           ["侍茶小僮"] = "xiao tong",
            },
+	room_relative="茶室-----厅堂茶室",
 }
 Room {
 	id = "mingjiao/tingtang",
 	name = "厅堂",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/qianting",
 		["east"] = "mingjiao/xiangfang",
 		["north"] = "mingjiao/muqi",
 		["west"] = "mingjiao/tearoom",
+},
+        objs = {
+          ["小丫鬟"] = "xiao yahuan",
+		  ["小侍童"] = "xiao shitong",
+	room_relative="巨木旗｜茶室-----厅堂-----厢房｜总坛前厅厅堂",
 	},
 }
 Room {
 	id = "mingjiao/tuqi",
 	name = "厚土旗",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/zl6",
 		["east"] = "mingjiao/longwang",
@@ -18949,16 +21691,17 @@ Room {
 	},
 	lengths = {
 		["east"] = "if hp.exp < 1600000 then return false else return 1 end",
-		--["west"] = 3;
-		["west"] = "if tmp.find and flag.times<3 then return false else return 3 end",
+		["west"] = 3;
 	},
 	objs = {
           ["颜垣"] = "yan tan",
+	room_relative="长廊｜龙王殿-----紫杉林厚土旗",
            },
 }
 Room {
 	id = "mingjiao/wu1",
 	name = "练武场",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/guangc",
 		["east"] = "mingjiao/yaofang",
@@ -18967,54 +21710,78 @@ Room {
 	},
 	objs = {
           ["张中"] = "zhang zhong",
+		  ["吴花"] = "nv jiaozhong",
+		  ["张福"] = "nan jiaozhong",
+	room_relative="小厅｜书院----练武场----药房｜广场练武场",
+		  
            },
 }
 Room {
 	id = "mingjiao/wu2",
 	name = "练武场",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/huoqi",
 		["east"] = "mingjiao/zl1",
 		["north"] = "mingjiao/zl6",
 	},
+	objs = {
+          ["赵亿彦"] = "nan jiaozhong",
+		  ["郑丽丽"] = "nv jiaozhong",
+	},
+	room_relative="长廊｜练武场----长廊｜烈火旗练武场",
 }
 Room {
 	id = "mingjiao/wu3",
 	name = "练武场",
+	outdoor = "明教",
 	ways = {
 		["north"] = "mingjiao/guangc",
 		["east"] = "mingjiao/cl2",
 		["southdown"] = "mingjiao/gmd",
 		["west"] = "mingjiao/cl1",
+},
+	objs = {
+          ["殷无寿"] = "yin wushou",
+		  ["郑孝胜"] = "nan jiaozhong",
+		  ["郑若馨"] = "nv jiaozhong",
+	room_relative="广场｜长廊----练武场----长廊↑光明顶练武场",
 	},
 }
 Room {
 	id = "mingjiao/wu4",
 	name = "练武场",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/shuiqi",
 		["north"] = "mingjiao/zl7",
 		["west"] = "mingjiao/zl2",
 	},
+room_relative="长廊｜长廊----练武场｜洪水旗练武场",
 }
 Room {
 	id = "mingjiao/wxiang",
 	name = "西厢房",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/yuanzi",
 	},
+	room_relative="小院子--西厢房",
 }
 Room {
 	id = "mingjiao/xiangfang",
 	name = "厢房",
+	outdoor = "明教",
 	no_fight = true,
 	ways = {
 		["#walkBusy;west"] = "mingjiao/tingtang",
 	},
+	room_relative="厅堂-----厢房厢房",
 }
 Room {
 	id = "mingjiao/xting",
 	name = "小厅",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/wu1",
 		["east"] = "mingjiao/sleeproom",
@@ -19023,11 +21790,15 @@ Room {
 	},
 	objs = {
           ["周颠"] = "zhou dian",
+		  ["谢香可"] = "nv jiaozhong",
+		  ["张栋添"] = "nan jiaozhong",
            },
+	room_relative="聚议厅｜厨房-----小厅-----休息室｜练武场小厅",
 }
 Room {
 	id = "mingjiao/xuanya1",
 	name = "栈道",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/sshanlu4",
 		["northwest"] = "mingjiao/xuanya2a",
@@ -19038,6 +21809,7 @@ Room {
 Room {
 	id = "mingjiao/xuanya2",
 	name = "栈道",
+	outdoor = "明教",
 	ways = {
 		["southwest"] = "mingjiao/xuanya1",
 		["northeast"] = "mingjiao/xuanya3",
@@ -19047,6 +21819,7 @@ Room {
 Room {
 	id = "mingjiao/xuanya2a",
 	name = "栈道",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/xuanya1",
 		["northwest"] = "mingjiao/xuanya3",
@@ -19056,6 +21829,7 @@ Room {
 Room {
 	id = "mingjiao/xuanya3",
 	name = "栈道",
+	outdoor = "明教",
 	ways = {
 		["eastup"] = "mingjiao/sshanlu5",
 		["southeast"] = "mingjiao/xuanya2a",
@@ -19066,51 +21840,62 @@ Room {
 Room {
 	id = "mingjiao/yaofang",
 	name = "药房",
+	outdoor = "明教",
 	ways = {
 		["west"] = "mingjiao/wu1",
 	},
 	objs = {
           ["药师"] = "yao shi",
            },
+	room_relative="练武场-----药房药房",
 }
 Room {
 	id = "mingjiao/yuanzi",
 	name = "小院子",
+	outdoor = "明教",
 	ways = {
 		["southeast"] = "mingjiao/longwang",
 		["west"] = "mingjiao/wxiang",
 	},
+	room_relative="龙王殿｜西厢房小院子",
 }
 Room {
 	id = "mingjiao/zl1",
 	name = "长廊",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/guangc",
 		["west"] = "mingjiao/wu2",
 	},
+	room_relative="练武场-----长廊-----广场长廊",
 }
 Room {
 	id = "mingjiao/zl2",
 	name = "长廊",
+	outdoor = "明教",
 	ways = {
 		["east"] = "mingjiao/wu4",
 		["west"] = "mingjiao/guangc",
 	},
+	room_relative="广场-----长廊-----练武场长廊",
 }
 Room {
 	id = "mingjiao/zl6",
 	name = "长廊",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/wu2",
 		["north"] = "mingjiao/tuqi",
 	},
 	objs = {
           ["说不得"] = "shuo bude",
+	room_relative="厚土旗｜长廊｜练武场长廊",
            },
 }
 Room {
 	id = "mingjiao/zl7",
 	name = "长廊",
+	outdoor = "明教",
 	ways = {
 		["south"] = "mingjiao/wu4",
 		["north"] = "mingjiao/jinqi",
@@ -19118,19 +21903,23 @@ Room {
 	},
 	objs = {
           ["彭莹玉"] = "peng yingyu",
+	room_relative="锐金旗监狱入口｜↗长廊｜练武场长廊",
            },
 }
 Room {
 	id = "mr/cangshuge",
 	name = "藏书阁",
+	outdoor = "姑苏慕容",
 	no_fight = true,
 	ways = {
 		["down"] = "mr/yunjinlou",
 	},
+	room_relative="云锦楼--藏书阁",
 }
 Room {
 	id = "mr/chufang",
 	name = "厨房",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/xiaoting",
 	},
@@ -19139,6 +21928,7 @@ Room {
           ["菱白虾仁"] = "lingbai xiaren",
           ["樱桃火腿"] = "yingtao huotui",
            },
+	room_relative="小厅--厨房",
 }
 --Room {
 --	id = "mr/cl",
@@ -19151,13 +21941,16 @@ Room {
 Room {
 	id = "mr/cufang",
 	name = "厨房",
+	outdoor = "姑苏慕容",
 	ways = {
 		["east"] = "mr/didao1",
 	},
+	
 }
 Room {
 	id = "mr/didao",
 	name = "地道",
+	outdoor = "姑苏慕容",
 	ways = {
 		["xiaodao"] = "mr/houtang",
 		["north"] = "mr/didao1",
@@ -19169,6 +21962,7 @@ Room {
 Room {
 	id = "mr/didao1",
 	name = "地道",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/didao",
 		["east"] = "mr/sleeproom",
@@ -19178,6 +21972,7 @@ Room {
 Room {
 	id = "mr/didao2",
 	name = "地道",
+	outdoor = "姑苏慕容",
 	ways = {
 		["north"] = "mr/migong1",
 	},
@@ -19185,6 +21980,7 @@ Room {
 Room {
 	id = "mr/duchuan3",
 	name = "渡船",
+	outdoor = "姑苏慕容",
 	ways = {
 		["out"] = "mr/xiaodao",
 	},
@@ -19192,6 +21988,7 @@ Room {
 Room {
 	id = "mr/houtang",
 	name = "后堂",
+	outdoor = "姑苏慕容",
 	ways = {
 		["north"] = "mr/xiaoting",
 		["zuan didao"] = "mr/didao",
@@ -19202,34 +21999,42 @@ Room {
 	lengths = {
 		["zuan didao"] = "if score.party and score.party=='姑苏慕容' then return 1 else return false end",
 	},
+	room_relative="小厅｜后堂后堂",
 }
 Room {
 	id = "mr/hubian",
 	name = "湖边",
+	outdoor = "姑苏慕容",
 	ways = {
 		["east"] = "mr/hubian1",
 		["west"] = "suzhou/qingshidadao",
 	},
+	room_relative="青石大道-----湖边-----湖边湖边",
 }
 Room {
 	id = "mr/hubian1",
 	name = "湖边",
+	outdoor = "姑苏慕容",
 	ways = {
 		["east"] = "mr/hubian2",
 		["west"] = "mr/hubian",
 	},
+	room_relative="湖边｜湖边湖边",
 }
 Room {
 	id = "mr/hubian2",
 	name = "湖边",
+	outdoor = "姑苏慕容",
 	ways = {
 		["southeast"] = "mr/shiqiao",
 		["west"] = "mr/hubian1",
 	},
+	
 }
 Room {
 	id = "mr/kongfang",
 	name = "空房间",
+	outdoor = "姑苏慕容",
 	ways = {
 		["west"] = "mr/migong2",
 	},
@@ -19237,6 +22042,7 @@ Room {
 Room {
 	id = "mr/migong1",
 	name = "迷宫",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/migong1",
 		["north"] = "mr/migong4",
@@ -19247,6 +22053,7 @@ Room {
 Room {
 	id = "mr/migong2",
 	name = "迷宫",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/migong3",
 		["east"] = "mr/migong4",
@@ -19257,6 +22064,7 @@ Room {
 Room {
 	id = "mr/migong3",
 	name = "迷宫",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/migong1",
 		["north"] = "mr/migong3",
@@ -19267,6 +22075,7 @@ Room {
 Room {
 	id = "mr/migong4",
 	name = "迷宫",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/migong3",
 		["east"] = "mr/migong4",
@@ -19277,6 +22086,7 @@ Room {
 Room {
 	id = "mr/mishi",
 	name = "密室",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/fenmu",
 	},
@@ -19284,6 +22094,7 @@ Room {
 Room {
 	id = "mr/mishi1",
 	name = "密室",
+	outdoor = "姑苏慕容",
 	ways = {
 		["up"] = "mr/mishi",
 	},
@@ -19291,6 +22102,7 @@ Room {
 Room {
 	id = "mtl/anbian",
 	name = "岸边",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mtl/hc",
 		["east"] = "mtl/hc1",
@@ -19301,6 +22113,7 @@ Room {
 Room {
 	id = "mtl/anbian1",
 	name = "岸边",
+	outdoor = "姑苏慕容",
 	ways = {
 		["north"] = "mtl/xiaojing11",
 		["qu xiaozhu;#CboatWait"] = "mr/xiaodao",
@@ -19314,18 +22127,21 @@ Room {
 		["qu xiaozhu;#CboatWait"] = "if score.party and score.party=='姑苏慕容' then return false else return 1 end",
 		["qu yanziwu;#CboatWait"] = "if score.party and score.party=='姑苏慕容' then return false else return 1 end",
 		},
-	room_relative="小径｜岸边岸边",
+		
 }
 Room {
 	id = "mtl/cangshuge",
 	name = "藏书阁",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["down"] = "mtl/yunjinlou",
 	},
+	room_relative="云锦楼--藏书阁",
 }
 Room {
 	id = "mtl/cl",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["north"] = "mtl/qianyuan",
 		["east"] = "mtl/cl1",
@@ -19335,6 +22151,7 @@ Room {
 Room {
 	id = "mtl/cl1",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/cl2",
 		["west"] = "mtl/cl",
@@ -19344,6 +22161,7 @@ Room {
 Room {
 	id = "mtl/cl2",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl3",
 		["north"] = "mtl/xiaojing5",
@@ -19354,6 +22172,7 @@ Room {
 Room {
 	id = "mtl/cl3",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/xiangfang1",
 		["east"] = "mtl/houyuan",
@@ -19365,6 +22184,7 @@ Room {
 Room {
 	id = "mtl/cl3-1",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl3-2",
 		["east"] = "mtl/cl3",
@@ -19374,6 +22194,7 @@ Room {
 Room {
 	id = "mtl/cl3-2",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl3-3",
 		["east"] = "mtl/xiangfang1",
@@ -19384,6 +22205,7 @@ Room {
 Room {
 	id = "mtl/cl3-3",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/hffang",
 		["north"] = "mtl/cl3-2",
@@ -19393,6 +22215,7 @@ Room {
 Room {
 	id = "mtl/cl4",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl4-2",
 		["north"] = "mtl/xiaojing7",
@@ -19403,6 +22226,7 @@ Room {
 Room {
 	id = "mtl/cl4-1",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["eastup"] = "mtl/tingzi",
 		["west"] = "mtl/cl4",
@@ -19412,17 +22236,19 @@ Room {
 Room {
 	id = "mtl/cl4-2",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/keting",
 		["north"] = "mtl/cl4",
 		["east"] = "mtl/cl4-3",
 		["west"] = "mtl/houyuan",
 	},
-	room_relative="长廊｜后院-----长廊-----长廊｜客厅长廊",
+	room_relative="长廊｜后院-----长廊-----客厅长廊",
 }
 Room {
 	id = "mtl/cl4-3",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl4-4",
 		["east"] = "mtl/fanting",
@@ -19433,11 +22259,15 @@ Room {
 		["east"] = {
 			{id = "jia ding", exp = 30000, party = "姑苏慕容"}
 		},
+	precmds = {
+              ["east"] = "kill jia ding",
+	},
 	},
 }
 Room {
 	id = "mtl/cl4-4",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl4-5",
 		["east"] = "mtl/guifang",
@@ -19454,6 +22284,7 @@ Room {
 Room {
 	id = "mtl/cl4-5",
 	name = "长廊",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["north"] = "mtl/cl4-4",
 		["west"] = "mtl/zahuoshi",
@@ -19463,6 +22294,7 @@ Room {
 Room {
 	id = "mtl/fanting",
 	name = "厨房",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["west"] = "mtl/cl4-3",
 	},
@@ -19471,10 +22303,12 @@ Room {
           ["翡翠鱼圆"] = "feicui yuyuan",
           ["梅花糟鸭"] = "meihua zaoya",
            },
+	room_relative="长廊--厨房",
 }
 Room {
 	id = "mtl/guifang",
 	name = "闺房",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["west"] = "mtl/cl4-4",
 		["jump window"] = "mtl/ytyuan1"
@@ -19486,36 +22320,44 @@ Room {
 Room {
 	id = "mtl/hc",
 	name = "花丛中",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/zhuangmen",
 		["north"] = "mtl/anbian",
 		["west"] = "mtl/hc3",
 	},
+	room_relative="花丛中｜庄门-----岸边花丛中",
 }
 Room {
 	id = "mtl/hc1",
 	name = "花丛中",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/zhuangmen",
 		["east"] = "mtl/hc4",
 		["west"] = "mtl/anbian",
 	},
+	room_relative="岸边----花丛中----花丛中｜庄门花丛中",
 }
 Room {
 	id = "mtl/hc2",
 	name = "花丛中",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/hc3",
 		["east"] = "mtl/anbian",
 	},
+	room_relative="花丛中----岸边｜花丛中花丛中",
 }
 Room {
 	id = "mtl/hc3",
 	name = "花丛中",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["north"] = "mtl/hc2",
 		["east"] = "mtl/hc",
 	},
+room_relative="花丛中｜花丛中----花丛中花丛中",
 }
 Room {
 	id = "mtl/hc4",
@@ -19524,10 +22366,12 @@ Room {
 		["south"] = "mtl/qianyuan",
 		["west"] = "mtl/hc1",
 	},
+  room_relative="花丛中----花丛中｜前院花丛中",
 }
 Room {
 	id = "mtl/hffang",
 	name = "花肥房",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/hhyuan",
 		["west"] = "mtl/cl3-3",
@@ -19536,29 +22380,35 @@ Room {
           ["唐光雄"] = "tang guangxiong",
           ["严妈妈"] = "yan mama",
            },
+   room_relative="长廊----花肥房----后花园花肥房",
 }
 Room {
 	id = "mtl/hhyuan",
 	name = "后花园",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/zahuoshi",
 		["north"] = "mtl/yunjinlou",
 		["west"] = "mtl/hffang",
 	},
+	room_relative="云锦楼｜花肥房----后花园----杂货室后花园",
 }
 Room {
 	id = "mtl/houyuan",
 	name = "后院",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/yunjinlou",
 		["north"] = "mtl/xiaojing8",
 		["east"] = "mtl/cl4-2",
 		["west"] = "mtl/cl3",
 	},
+	room_relative="云锦楼｜小径----长廊｜长廊后院",
 }
 Room {
 	id = "mtl/huandong",
 	name = "娘缳玉洞",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["north"] = "mtl/ytyuan",
 		["combat"] = "mtl/ytyuansz",
@@ -19569,10 +22419,12 @@ Room {
 	objs = {
           ["王语嫣"] = "wang yuyan",
            },
+	room_relative="樱桃园｜娘缳玉洞娘缳玉洞",
 }
 Room {
 	id = "mtl/ytyuansz",
 	name = "娘缳玉洞-实战部",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["out"] = "mtl/huandong",
 	},
@@ -19580,6 +22432,7 @@ Room {
 Room {
 	id = "mtl/ytyuantf",
 	name = "娘缳玉洞-天赋部",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["out"] = "mtl/huandong",
 	},
@@ -19587,6 +22440,7 @@ Room {
 Room {
 	id = "mtl/ytyuanzx",
 	name = "娘缳玉洞-杂项部",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["out"] = "mtl/huandong",
 	},
@@ -19601,6 +22455,7 @@ Room {
 Room {
 	id = "mtl/keting",
 	name = "客厅",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/cl4-4",
 		["north"] = "mtl/cl4-2",
@@ -19610,40 +22465,48 @@ Room {
           ["香茶"] = "xiang cha",
           ["桂圆"] = "gui yuan",
           ["葡萄"] = "pu tao",
+	room_relative="长廊｜云锦楼-----客厅-----长廊客厅",
            },
 }
 Room {
 	id = "mtl/liulin",
 	name = "柳树林",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/xiaojing5",
 		["east"] = "mtl/liulin1",
 	},
 	objs = {
           ["柳条"] = "liu tiao",
+  room_relative="柳树林----柳树林｜小径柳树林",
            },
 }
 Room {
 	id = "mtl/liulin1",
 	name = "柳树林",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/xiaojing6",
 		["north"] = "mtl/liulin3",
 		["east"] = "mtl/liulin2",
 		["west"] = "mtl/liulin",
 	},
+room_relative="柳树林｜柳树林----柳树林----柳树林｜小径柳树林",
 }
 Room {
 	id = "mtl/liulin2",
 	name = "柳树林",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/xiaojing7",
 		["west"] = "mtl/liulin1",
 	},
+room_relative="柳树林----柳树林｜小径柳树林",
 }
 Room {
 	id = "mtl/liulin3",
 	name = "柳树林",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/liulin1",
 		["yue tree"] = "mtl/shushang",
@@ -19651,17 +22514,21 @@ Room {
 	objs = {
           ["小树枝"] = "xiao shuzhi",
            },
+  
 }
 Room {
 	id = "mtl/shushang",
 	name = "树上",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["jump down"] = "mtl/liulin3",
 	},
+	room_relative="柳树林--树上",
 }
 Room {
 	id = "mtl/midao",
 	name = "秘道",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/ytyuan",
 		["north"] = "mtl/hhyuan",
@@ -19670,16 +22537,19 @@ Room {
 Room {
 	id = "mtl/qianyuan",
 	name = "前院",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl",
 		["east"] = "mtl/shiqiao1",
 		["north"] = "mtl/hc4",
 		["west"] = "mtl/zhuangmen",
 	},
+room_relative="花丛中｜庄门-----前院-----小石桥｜长廊前院",
 }
 Room {
 	id = "mtl/shiqiao1",
 	name = "小石桥",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/xiaojing5",
 		["west"] = "mtl/qianyuan",
@@ -19691,117 +22561,143 @@ Room {
 	lengths = {
 		["zuan didao"] = "if score.party and score.party=='姑苏慕容' then return 1 else return false end",
 	},
+	room_relative="前院----小石桥----小径小石桥",
 }
 Room {
 	id = "mtl/shuichi",
 	name = "水池",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["west"] = "mtl/xiaojing7",
 	},
+	room_relative="小径-----水池水池",
 }
 Room {
 	id = "mtl/tingzi",
 	name = "亭子",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["westdown"] = "mtl/cl4-1",
 	},
+	room_relative="长廊→亭子亭子",
 }
 Room {
 	id = "mtl/xiangfang1",
 	name = "厢房",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/yunjinlou",
 		["north"] = "mtl/cl3",
 		["west"] = "mtl/cl3-2",
 	},
+	room_relative="长廊｜长廊-----厢房-----云锦楼厢房",
 }
 Room {
 	id = "mtl/xiaojing10",
 	name = "小径",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/xiaojing11",
 		["north"] = "mtl/zhuangmen",
 	},
+	room_relative="庄门｜小径｜小径小径",
 }
 Room {
 	id = "mtl/xiaojing11",
 	name = "小径",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/anbian1",
 		["north"] = "mtl/xiaojing10",
 	},
+	room_relative="小径｜小径｜岸边小径",
 }
 Room {
 	id = "mtl/xiaojing5",
 	name = "小径",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl2",
 		["east"] = "mtl/xiaojing6",
 		["north"] = "mtl/liulin",
 		["west"] = "mtl/shiqiao1",
 	},
+	room_relative="柳树林｜小石桥-----小径-----小径｜长廊小径",
 }
 Room {
 	id = "mtl/xiaojing6",
 	name = "小径",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/xiaojing8",
 		["east"] = "mtl/xiaojing7",
 		["north"] = "mtl/liulin1",
 		["west"] = "mtl/xiaojing5",
 	},
+	room_relative="柳树林｜小径-----小径-----小径｜小径小径",
 }
 Room {
 	id = "mtl/xiaojing7",
 	name = "小径",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/cl4",
 		["east"] = "mtl/shuichi",
 		["north"] = "mtl/liulin2",
 		["west"] = "mtl/xiaojing6",
 	},
+room_relative="柳树林｜小径-----小径-----水池｜长廊小径",
 }
 Room {
 	id = "mtl/xiaojing8",
 	name = "小径",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/houyuan",
 		["north"] = "mtl/xiaojing6",
 	},
+	room_relative="后院｜小径小径",
 }
 Room {
 	id = "mtl/ytyuan",
 	name = "樱桃园",
+	outdoor = "曼佗罗山庄",
 	no_fight = true,
 	ways = {
 		["south"] = "mtl/huandong",
 		["north"] = "mtl/midao",
 		["west"] = "mtl/ytyuan2",
 	},
+	room_relative="秘道｜樱桃园----樱桃园｜娘缳玉洞樱桃园",
 }
 Room {
 	id = "mtl/ytyuan1",
 	name = "樱桃园",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/huandong",
 		["east"] = "mtl/ytyuan2",
 		["north"] = "mtl/ytyuan1",
 		["west"] = "mtl/ytyuan1",
 	},
+	room_relative="娘缳玉洞｜樱桃园-----樱桃园｜樱桃园樱桃园",
 }
 Room {
 	id = "mtl/ytyuan2",
 	name = "樱桃园",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/huandong",
 		["north"] = "mtl/ytyuan2",
 		["east"] = "mtl/ytyuan",
 		["west"] = "mtl/ytyuan2",
 	},
+	room_relative="娘缳玉洞｜樱桃园-----樱桃园｜樱桃园樱桃园",
 }
 Room {
 	id = "mtl/yunjinlou",
 	name = "云锦楼",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/hhyuan",
 		["east"] = "mtl/keting",
@@ -19810,11 +22706,13 @@ Room {
 	},
 	objs = {
           ["王夫人"] = "Wang furen",
+   room_relative="后院｜厢房----云锦楼----客厅｜后花园云锦楼",
            },
 }
 Room {
 	id = "mtl/zahuoshi",
 	name = "杂货室",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["east"] = "mtl/cl4-5",
 		["west"] = "mtl/hhyuan",
@@ -19822,20 +22720,24 @@ Room {
 	objs = {
           ["兵器架"] = "bingqi jia",
            },
+   room_relative="后花园----杂货室----长廊杂货室",
 }
 Room {
 	id = "mtl/zhuangmen",
 	name = "庄门",
+	outdoor = "曼佗罗山庄",
 	ways = {
 		["south"] = "mtl/xiaojing10",
 		["east"] = "mtl/qianyuan",
 		["north"] = "mtl/hc1",
 		["west"] = "mtl/hc",
 	},
+room_relative="花丛中｜花丛中-----庄门-----前院｜小径庄门",
 }
 Room {
 	id = "mr/shiqiao",
 	name = "小石桥",
+	outdoor = "姑苏慕容",
 	ways = {
 		["push 桥栏;d"] = "mr/didao",
 		["south"] = "mr/testmatou1",
@@ -19851,14 +22753,17 @@ Room {
 Room {
 	id = "mr/sleeproom",
 	name = "休息室",
+	outdoor = "姑苏慕容",
 	no_fight = true,
 	ways = {
 		["west"] = "mr/didao1",
 	},
+	
 }
 Room {
 	id = "mr/testmatou1",
 	name = "码头",
+	outdoor = "姑苏慕容",
 	ways = {
 		["north"] = "mr/shiqiao",
 		["qu mr;#boatWait"] = "mr/xiaodao",
@@ -19872,10 +22777,12 @@ Room {
 		["qu mr;#boatWait"] = "if score.party and score.party=='姑苏慕容' then return false else return 1 end",
 		["qu yanziwu;#boatWait"] = "if score.party and score.party=='姑苏慕容' then return false else return 1 end",
 	},
+	room_relative="小石桥｜小岛边码头",
 }
 Room {
 	id = "mr/tingyuju",
 	name = "听雨居",
+	outdoor = "姑苏慕容",
 	ways = {
 		["southeast"] = "mr/xiaojing2",
 		["tan qin;#boatWait"] = "mtl/anbian",
@@ -19886,25 +22793,31 @@ Room {
 	lengths = {
 		["tan qin;#boatWait"] = "if score.party and score.party=='姑苏慕容' then return false else return 1 end",
 	},
+	room_relative="听雨居↘小径听雨居",
 }
 Room {
 	id = "mr/tingzi",
 	name = "亭子",
+	outdoor = "姑苏慕容",
 	ways = {
 		["westdown"] = "mr/cl4-1",
 	},
+	
 }
 Room {
 	id = "mr/xiangfang",
 	name = "厢房",
+	outdoor = "姑苏慕容",
 	no_fight = true,
 	ways = {
 		["west"] = "mr/xiaoting",
 	},
+	room_relative="小厅-----厢房厢房",
 }
 Room {
 	id = "mr/xiaodao",
 	name = "小岛边",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/xiaoshe",
 		["#boatYell"] = "mr/testmatou1",
@@ -19916,42 +22829,52 @@ Room {
 	lengths = {
 		["#boatYell"] = "if score.party and score.party=='姑苏慕容' then return false else return 1 end",
 	},
+	room_relative="小岛边｜小舍小岛边",
 }
 Room {
 	id = "mr/xiaojing1",
 	name = "小径",
+	outdoor = "姑苏慕容",
 	ways = {
 		["east"] = "mr/xiaoshe",
 		["west"] = "mr/xiaojing2",
 	},
+	room_relative="小径-----小径-----小舍小径",
 }
 Room {
 	id = "mr/xiaojing2",
 	name = "小径",
+	outdoor = "姑苏慕容",
 	ways = {
 		["northwest"] = "mr/tingyuju",
 		["east"] = "mr/xiaojing1",
 	},
+	room_relative="听雨居↖小径-----小径小径",
 }
 Room {
 	id = "mr/xiaojing3",
 	name = "小径",
+	outdoor = "姑苏慕容",
 	ways = {
 		["northeast"] = "mr/xiaojing4",
 		["west"] = "mr/xiaoshe",
 	},
+	room_relative="小径↗小舍-----小径小径",
 }
 Room {
 	id = "mr/xiaojing4",
 	name = "小径",
+	outdoor = "姑苏慕容",
 	ways = {
 		["southwest"] = "mr/xiaojing3",
 		["east"] = "mr/xiaoting",
 	},
+	room_relative="小径-----小厅↙小径小径",
 }
 Room {
 	id = "mr/xiaoshe",
 	name = "小舍",
+	outdoor = "姑苏慕容",
 	ways = {
 		["east"] = "mr/xiaojing3",
 		["north"] = "mr/xiaodao",
@@ -19960,10 +22883,12 @@ Room {
 	objs = {
           ["包不同"] = "bao butong",
            },
+	room_relative="小岛边｜小径-----小舍-----小径小舍",
 }
 Room {
 	id = "mr/xiaoting",
 	name = "小厅",
+	outdoor = "姑苏慕容",
 	ways = {
 		["south"] = "mr/houtang",
 		["east"] = "mr/xiangfang",
@@ -19974,15 +22899,20 @@ Room {
 		["north"] = {
 			{id = "a bi", exp = 50000, party = "姑苏慕容"},
 		},
+	precmds = {
+              ["north"] = "kill a bi",
+	},
 	},
 	objs = {
           ["香茶"] = "xiang cha",
           ["阿碧"] = "a bi",
            },
+	
 }
 Room {
 	id = "mr/xiaozhou3",
 	name = "渡船",
+	outdoor = "姑苏慕容",
 	ways = {
 		["out"] = "mtl/anbian",
 	},
@@ -19990,14 +22920,16 @@ Room {
 Room {
 	id = "yanziwu/anbian2",
 	name = "岸边",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/shuixie",
 	},
-	room_relative="岸边｜听香水榭岸边",
+	room_relative="听香水榭--岸边",
 }
 Room {
 	id = "yanziwu/anbian3",
 	name = "岸边",
+	outdoor = "燕子坞",
 	ways = {
 		["north"] = "yanziwu/houyuan1",
 		["#boatYell"] = "mr/hubian2",
@@ -20009,10 +22941,12 @@ Room {
 	lengths = {
  		["#boatYell"] = "if score.party and score.party=='姑苏慕容' then return false else return 1 end",
 	},
+	
 }
 Room {
 	id = "yanziwu/anbian4",
 	name = "岸边",
+	outdoor = "燕子坞",
 	ways = {
 		["east"] = "yanziwu/shuixie",
 		["#boatYell"] = "mtl/anbian1",
@@ -20024,70 +22958,97 @@ Room {
 	lengths = {
 		["#boatYell"] = "if score.party and score.party=='姑苏慕容' then return false else return 1 end",
 	},
-	room_relative="岸边-----听香水榭岸边",
+	
 }
 Room {
-        id = "yanziwu/bishuiting",
-        name = "碧水亭",
-        ways = {
-                ["east"] = "yanziwu/muqiao",
-                ["jump liang"] = "yanziwu/lianshang",
-        },
+	id = "yanziwu/bishuiting",
+	name = "碧水亭",
+	outdoor = "燕子坞",
+	ways = {
+		["east"] = "yanziwu/muqiao",
+		["jump liang"] = "yanziwu/lianshang",
+	},
 }
 Room {
-        id = "yanziwu/lianshang",
-        name = "梁上",
-        ways = {
-                ["jump down"] = "yanziwu/bishuiting",
-        },
+	id = "yanziwu/lianshang",
+	name = "梁上",
+	outdoor = "燕子坞",
+	ways = {
+		["jump down"] = "yanziwu/bishuiting",
+	},
 }
 Room {
 	id = "yanziwu/cl5-0",
-	name = "长廊",
-	ways = {
-		["south"] = "yanziwu/cl5-1",
-		["east"] = "yanziwu/fanting1",
-		["west"] = "yanziwu/shufang",
+        name = "长廊",
+		outdoor = "燕子坞",
+        ways = {
+                ["south"] = "yanziwu/cl5-1",
+                ["east"] = "yanziwu/fanting1",
+                ["west"] = "yanziwu/shufang",
+                ["#yzwchanglang2shufang"] = "yanziwu/shufang",
+        },
+        nolooks = {
+                ["#yzwchanglang2shufang"] = true,
+        },
+        lengths = {
+                ["west"] = "if job.name=='huashan' or job.name=='wudang' then return false else return 1 end",
+                ["#yzwchanglang2shufang"] = "if job.name=='huashan' or job.name=='wudang' then return 1 else return false end",
+        },
+        
+        blocks = {
+                ["east"] = {
+                        {id = "guan jia", exp = 50000},
+                },
+		precmds = {
+              ["east"] = "kill guan jia",
 	},
-	room_relative="书房-----长廊-----厨房｜长廊长廊",
-	blocks = {
-		["east"] = {
-			{id = "guan jia", exp = 50000},
-		},
-	},
+        },
 }
 Room {
 	id = "yanziwu/cl5-1",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/cl5-2",
 		["east"] = "yanziwu/cl5-3",
 		["north"] = "yanziwu/cl5-0",
 		["west"] = "yanziwu/xiangfang2",
 	},
+        objs = {
+          ["丫鬟"] = "ya huan",
+	},
 	room_relative="长廊｜厢房-----长廊-----长廊｜长廊长廊",
 }
 Room {
 	id = "yanziwu/cl5-2",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["north"] = "yanziwu/cl5-1",
 		["west"] = "yanziwu/shangyue",
+	},
+        objs = {
+          ["管家"] = "guan jia",
 	},
 	room_relative="长廊｜赏月斋-----长廊长廊",
 }
 Room {
 	id = "yanziwu/cl5-3",
 	name = "长廊",
-	ways = {
+	outdoor = "燕子坞",
+		ways = {
 		["south"] = "yanziwu/xiaomen",
 		["west"] = "yanziwu/cl5-1",
+},
+        objs = {
+          ["二位家丁"] = "jia ding",
 	},
 	room_relative="长廊-----长廊｜小门长廊",
 }
 Room {
 	id = "yanziwu/cl5-4",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["north"] = "yanziwu/xiaomen",
 		["east"] = "yanziwu/xiaojing3",
@@ -20098,6 +23059,7 @@ Room {
 Room {
 	id = "yanziwu/cl5-5",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["north"] = "yanziwu/shangyue",
 		["east"] = "yanziwu/cl5-4",
@@ -20108,6 +23070,7 @@ Room {
 Room {
 	id = "yanziwu/cl5-6",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["east"] = "yanziwu/cl5-5",
 		["west"] = "yanziwu/cl6-5",
@@ -20117,44 +23080,61 @@ Room {
 Room {
 	id = "yanziwu/cl6-0",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/cl6-1",
 		["east"] = "yanziwu/jushi",
+},
+        objs = {
+          ["丫鬟"] = "ya huan",
 	},
 	room_relative="长廊-----局室｜长廊长廊",
 }
 Room {
 	id = "yanziwu/cl6-1",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/cl6-2",
 		["east"] = "yanziwu/xiangfang3",
 		["north"] = "yanziwu/cl6-0",
 		["west"] = "yanziwu/cl6-3",
+},
+        objs = {
+          ["二位仆人"] = "pu ren",
 	},
 	room_relative="长廊｜长廊-----长廊-----厢房｜长廊长廊",
 }
 Room {
 	id = "yanziwu/cl6-2",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["east"] = "yanziwu/jingyinge",
 		["north"] = "yanziwu/cl6-1",
 	},
-	room_relative="长廊｜长廊-----静音阁长廊",
+        objs = {
+          ["管家"] = "guan jia",
+	},
+	room_relative="长廊-----静音阁长廊",
 }
 Room {
 	id = "yanziwu/cl6-3",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/xiaomen1",
 		["east"] = "yanziwu/cl6-1",
+},
+        objs = {
+          ["二位家丁"] = "jia ding"
 	},
 	room_relative="长廊-----长廊｜小门长廊",
 }
 Room {
 	id = "yanziwu/cl6-4",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["north"] = "yanziwu/xiaomen1",
 		["east"] = "yanziwu/cl6-5",
@@ -20164,6 +23144,7 @@ Room {
 Room {
 	id = "yanziwu/cl6-5",
 	name = "长廊",
+	outdoor = "燕子坞",
 	ways = {
 		["north"] = "yanziwu/jingyinge",
 		["east"] = "yanziwu/cl5-6",
@@ -20173,69 +23154,92 @@ Room {
 }
 Room {
 	id = "yanziwu/dating",
-	name = "大厅",
-	ways = {
-		["south"] = "yanziwu/houting",
-		["north"] = "yanziwu/xiaojing2",
-		["east"] = "yanziwu/shufang",
-		["west"] = "yanziwu/jushi",
-	},
-	objs = {
-          ["香茶"] = "xiang cha",
-          ["公冶乾"] = "gongye gan",
-           },
+        name = "大厅",
+		outdoor = "燕子坞",
+        ways = {
+                ["south"] = "yanziwu/houting",
+                ["north"] = "yanziwu/xiaojing2",
+                ["east"] = "yanziwu/shufang",
+                ["west"] = "yanziwu/jushi",
+                ["#yzwdating2shufang"] = "yanziwu/shufang",
+        },
+        nolooks = {
+                ["#yzwdating2shufang"] = true,
+        },
+        lengths = {
+                ["east"] = "if job.name=='huashan' or job.name=='wudang' then return false else return 1 end",
+                ["#yzwdating2shufang"] = "if job.name=='huashan' or job.name=='wudang' then return 1 else return false end",
+        },        
+        objs = {
+                ["香茶"] = "xiang cha",
+                ["公冶乾"] = "gongye gan",
+        },
+		room_relative="小径｜局室-----大厅-----书房｜后厅大厅",
 }
 Room {
 	id = "yanziwu/fanting1",
 	name = "厨房",
+	outdoor = "燕子坞",
 	ways = {
 		["west"] = "yanziwu/cl5-0",
 	},
+	room_relative="长廊-----厨房厨房",
 }
 Room {
 	id = "yanziwu/fenmu",
 	name = "墓地",
+	outdoor = "燕子坞",
 	ways = {
 		["west"] = "yanziwu/xiaojing4",
 	},
+	room_relative="小径-----墓地墓地",
 }
 Room {
 	id = "yanziwu/guanxing",
 	name = "观星台",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/xiaojing4",
 	},
+	room_relative="观星台｜小径观星台",
 }
 Room {
 	id = "yanziwu/houting",
 	name = "后厅",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/neitang",
 		["east"] = "yanziwu/xiangfang2",
 		["north"] = "yanziwu/dating",
 		["west"] = "yanziwu/xiangfang3",
 	},
+	room_relative="大厅｜厢房-----后厅-----厢房｜内堂后厅",
 }
 Room {
 	id = "yanziwu/houyuan1",
 	name = "后院",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/anbian3",
 		["east"] = "yanziwu/yanziwu",
 		["north"] = "yanziwu/shuixie",
 		["west"] = "yanziwu/muqiao",
 	},
+	room_relative="听香水榭｜木桥-----后院-----院门｜岸边后院",
 }
---[[Room {
-	--id = "yanziwu/hssg",
-	--name = "还施水阁",
-	--ways = {
-	--	["south"] = "yanziwu/jiabi",
-	--},
---}
+Room {
+	id = "yanziwu/hssg",
+	name = "还施水阁",
+	outdoor = "燕子坞",
+	ways = {
+		["south"] = "yanziwu/jiabi",
+	},
+	
+}
 Room {
 	id = "yanziwu/jiabi",
 	name = "夹壁",
+	outdoor = "燕子坞",
 	ways = {
 		["north"] = "yanziwu/hssg",
 		["push shujia"] = "yanziwu/shufang",
@@ -20246,28 +23250,34 @@ Room {
 	lengths = {
 		["north"] = "if score.party and score.party=='姑苏慕容' then return 1 else return false end",
 	},
-}]]
+	room_relative="还施水阁｜书房夹壁",
+}
 Room {
 	id = "yanziwu/jingyinge",
 	name = "静音阁",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/cl6-5",
 		["east"] = "yanziwu/neitang",
 		["west"] = "yanziwu/cl6-2",
 	},
+	room_relative="长廊----静音阁----内堂｜长廊静音阁",
 }
 Room {
 	id = "yanziwu/jushi",
 	name = "局室",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/xiangfang3",
 		["east"] = "yanziwu/dating",
 		["west"] = "yanziwu/cl6-0",
 	},
+	room_relative="长廊-----局室-----大厅｜厢房局室",
 }
 Room {
 	id = "yanziwu/mishi",
 	name = "密室",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/fenmu",
 	},
@@ -20275,6 +23285,7 @@ Room {
 Room {
 	id = "yanziwu/mishi1",
 	name = "密室",
+	outdoor = "燕子坞",
 	ways = {
 		["up"] = "yanziwu/mishi",
 	},
@@ -20282,61 +23293,80 @@ Room {
 Room {
 	id = "yanziwu/muqiao",
 	name = "木桥",
+	outdoor = "燕子坞",
 	ways = {
 		["east"] = "yanziwu/houyuan1",
 		["west"] = "yanziwu/bishuiting",
 	},
+	room_relative="碧水亭-----木桥-----后院木桥",
 }
 Room {
 	id = "yanziwu/neitang",
 	name = "内堂",
+	outdoor = "燕子坞",
 	ways = {
 		["east"] = "yanziwu/shangyue",
 		["north"] = "yanziwu/houting",
 		["west"] = "yanziwu/jingyinge",
 	},
+	room_relative="后厅｜静音阁-----内堂-----赏月斋内堂",
 }
 Room {
 	id = "yanziwu/shangyue",
 	name = "赏月斋",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/cl5-5",
 		["east"] = "yanziwu/cl5-2",
 		["west"] = "yanziwu/neitang",
 	},
+	room_relative="内堂----赏月斋----长廊｜长廊赏月斋",
 }
 Room {
         id = "yanziwu/shufang",
         name = "书房",
+		outdoor = "燕子坞",
         ways = {
                 ["south"] = "yanziwu/xiangfang2",
-                ["north"] = "yanziwu/zishu",
+                ["north"] = "yanziwu/sishu",
                 ["east"] = "yanziwu/cl5-0",
                 ["west"] = "yanziwu/dating",
                 ["sit chair;zhuan"] = "yanziwu/jiabi",
+                ["#yzwshufang2jiabi"] = "yanziwu/jiabi",
+        },
+        nolooks = {
+                ["sit chair;zhuan"] = true,
+                ["#yzwshufang2jiabi"] = true,
+        },
+        lengths = {
+                ["sit chair;zhuan"] = "if job.name=='huashan' or job.name=='wudang' then return false else return 1 end",
+                ["#yzwshufang2jiabi"] = "if job.name=='huashan' or job.name=='wudang' then return 1 else return false end",
         },
         objs = {
-          ["风波恶"] = "feng boe",
-           },
-}
-Room {
-        id = "yanziwu/hssg",
-        name = "还施水阁",
-        ways = {
-                ["south"] = "yanziwu/jiabi",
+                ["风波恶"] = "feng boe",
         },
+		room_relative="私塾｜大厅-----书房-----长廊｜厢房书房",
 }
 Room {
-        id = "yanziwu/jiabi",
-        name = "夹壁",
+        id = "yanziwu/sishu",
+        name = "私塾",
+		outdoor = "燕子坞",
         ways = {
-                ["north"] = "yanziwu/hssg",
-                ["push shujia"] = "yanziwu/shufang",
+                ["south"] = "yanziwu/shufang",
+                ["#yzwsishu2shufang"] = "yanziwu/shufang",
+        },
+        nolooks = {
+                ["#yzwsishu2shufang"] = true,
+        },
+        lengths = {
+                ["north"] = "if job.name=='huashan' or job.name=='wudang' then return false else return 1 end",
+                ["#yzwsishu2shufang"] = "if job.name=='huashan' or job.name=='wudang' then return 1 else return false end",
         },
 }
 Room {
 	id = "yanziwu/shuixie",
 	name = "听香水榭",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/houyuan1",
 		["north"] = "yanziwu/anbian2",
@@ -20352,56 +23382,77 @@ Room {
 	objs = {
           ["阿朱"] = "a zhu",
            },
+	room_relative="岸边｜岸边---听香水榭｜后院听香水榭",
 }
 Room {
 	id = "yanziwu/wuchang",
 	name = "练武场",
+	outdoor = "燕子坞",
 	ways = {
 		["west"] = "yanziwu/yanziwu",
 	},
 	objs = {
           ["兵器架"] = "bingqi jia",
+		  ["二位家丁"] = "jia ding",
            },
+	room_relative="院门----练武场练武场",
 }
 Room {
 	id = "yanziwu/xiangfang2",
-	name = "厢房",
-	no_fight = true,
-	ways = {
-		["north"] = "yanziwu/shufang",
-		["east"] = "yanziwu/cl5-1",
-		["west"] = "yanziwu/houting",
-	},
+        name = "厢房",
+		outdoor = "燕子坞",
+        no_fight = true,
+        ways = {
+                ["north"] = "yanziwu/shufang",
+                ["east"] = "yanziwu/cl5-1",
+                ["west"] = "yanziwu/houting",
+                ["#yzwxiangfang2shufang"] = "yanziwu/shufang",
+        },
+        nolooks = {
+                ["#yzwxiangfang2shufang"] = true,
+        },
+        lengths = {
+                ["north"] = "if job.name=='huashan' or job.name=='wudang' then return false else return 1 end",
+                ["#yzwxiangfang2shufang"] = "if job.name=='huashan' or job.name=='wudang' then return 1 else return false end",
+        },
+		room_relative="书房｜后厅-----厢房-----长廊厢房",
 }
 Room {
 	id = "yanziwu/xiangfang3",
 	name = "厢房",
+	outdoor = "燕子坞",
 	no_fight = true,
 	ways = {
 		["north"] = "yanziwu/jushi",
 		["east"] = "yanziwu/houting",
 		["west"] = "yanziwu/cl6-1",
 	},
+	room_relative="局室｜长廊-----厢房-----后厅厢房",
 }
 Room {
 	id = "yanziwu/xiaojing2",
 	name = "小径",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/dating",
 		["north"] = "yanziwu/yanziwu",
 	},
+	room_relative="院门｜小径｜大厅小径",
 }
 Room {
 	id = "yanziwu/xiaojing3",
 	name = "小径",
+	outdoor = "燕子坞",
 	ways = {
 		["east"] = "yanziwu/xiaojing4",
 		["west"] = "yanziwu/cl5-4",
 	},
+	room_relative="长廊-----小径-----小径小径",
 }
 Room {
 	id = "yanziwu/xiaojing4",
 	name = "小径",
+	outdoor = "燕子坞",
 	ways = {
 		["north"] = "yanziwu/guanxing",
 		["east"] = "yanziwu/fenmu",
@@ -20410,26 +23461,32 @@ Room {
 	objs = {
           ["邓百川"] = "deng baichuan",
            },
+	room_relative="观星台｜小径-----小径-----墓地小径",
 }
 Room {
 	id = "yanziwu/xiaomen",
 	name = "小门",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/cl5-4",
 		["north"] = "yanziwu/cl5-3",
 	},
+	room_relative="长廊｜小门｜长廊小门",
 }
 Room {
 	id = "yanziwu/xiaomen1",
 	name = "小门",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/cl6-4",
 		["north"] = "yanziwu/cl6-3",
 	},
+	room_relative="长廊｜小门｜长廊小门",
 }
 Room {
 	id = "yanziwu/yanziwu",
 	name = "院门",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/xiaojing2",
 		["east"] = "yanziwu/wuchang",
@@ -20439,17 +23496,21 @@ Room {
           ["慕容复"] = "murong fu",
           ["慕容世袭图谱"] = "board",
            },
+	room_relative="后院-----院门-----练武场｜小径院门",
 }
 Room {
 	id = "yanziwu/zishu",
 	name = "私塾",
+	outdoor = "燕子坞",
 	ways = {
 		["south"] = "yanziwu/shufang",
 	},
+	room_relative="书房--私塾",
 }
 Room {
 	id = "mr/zhou3",
 	name = "小舟",
+	outdoor = "燕子坞",
 	ways = {
 		["out"] = "yanziwu/anbian2",
 	},
@@ -20457,6 +23518,7 @@ Room {
 Room {
 	id = "mr/zhou9",
 	name = "小舟",
+	outdoor = "燕子坞",
 	ways = {
 		["out"] = "mr/xiaodao",
 	},
@@ -20464,6 +23526,7 @@ Room {
 Room {
 	id = "nanyang/dating",
 	name = "聚贤庄大厅",
+	outdoor = "南阳城",
 	no_fight = true,
 	ways = {
 		["south"] = "nanyang/jxzhuang",
@@ -20473,58 +23536,74 @@ Room {
           ["游驹"] = "you ju",
           ["游骥"] = "you ji",
            },
+ room_relative="聚贤庄大厅--聚贤庄后院｜聚贤庄大门聚贤庄大厅",
 }
 Room {
 	id = "nanyang/duanya",
 	name = "断崖",
+	outdoor = "南阳城",
 	ways = {
 		["north"] = "nanyang/yidao4",
 	},
+	room_relative="密林｜断崖断崖",
 }
 Room {
 	id = "nanyang/houyuan",
 	name = "聚贤庄后院",
+	outdoor = "南阳城",
 	ways = {
 		["west"] = "nanyang/dating",
 	},
+	room_relative="聚贤庄大厅--聚贤庄后院聚贤庄后院",
 }
 Room {
 	id = "nanyang/jiulou1",
 	name = "迎宾楼",
+	outdoor = "南阳城",
 	ways = {
 		["east"] = "nanyang/nanyang",
 		["up"] = "nanyang/jiulou2",
 	},
+	room_relative="迎宾楼二楼〓迎宾楼----城中心迎宾楼",
 }
 Room {
 	id = "nanyang/jiulou2",
 	name = "迎宾楼二楼",
+	outdoor = "南阳城",
 	ways = {
 		["down"] = "nanyang/jiulou1",
 	},
+	room_relative="迎宾楼二楼〓迎宾楼迎宾楼二楼",
 }
 Room {
 	id = "nanyang/jxzhuang",
 	name = "聚贤庄大门",
+	outdoor = "南阳城",
 	ways = {
 		["southwest"] = "nanyang/xiaolu3",
 		["north"] = "nanyang/dating",
 	},
+	room_relative="聚贤庄大厅｜聚贤庄大门↙小路聚贤庄大门",
 }
 Room {
 	id = "nanyang/kedian1",
 	name = "客栈",
 	ways = {
-		["west"] = "nanyang/xujiaji",
-		-- ["up"] = "nanyang/kedian2",
+		["#nykzout"] = "nanyang/xujiaji",
+		["#nykz"] = "nanyang/kedian2",
+		},
+	lengths = {
+		["#nykz"] = 5,
 	},
 	nolooks = {
 		["up"] = true,
 	},
+	room_relative="客店二楼〓许家集-----客栈客栈",
 }
 Room {
 	id = "nanyang/kedian2",
 	name = "客店二楼",
+	outdoor = "南阳城",
 	no_fight = true,
 	ways = {
 		["down"] = "nanyang/kedian1",
@@ -20533,48 +23612,59 @@ Room {
 Room {
 	id = "nanyang/nanyang",
 	name = "城中心",
+	outdoor = "南阳城",
 	no_fight = true,
 	ways = {
 		["south"] = "nanyang/yidao2",
 		["north"] = "nanyang/yidao3",
 		["west"] = "nanyang/jiulou1",
 	},
+	room_relative="大驿道｜迎宾楼----城中心｜石板路城中心",
 }
 Room {
 	id = "nanyang/qslu",
 	name = "青石路",
+	outdoor = "南阳城",
 	ways = {
 		["south"] = "nanyang/xujiaji",
 		["east"] = "nanyang/xiaolu3",
 		["west"] = "nanyang/xiaolu",
 	},
+	room_relative="小路----青石路----小路｜许家集青石路",
 }
 Room {
 	id = "nanyang/qslu2",
 	name = "青石路",
+	outdoor = "南阳城",
 	ways = {
 		["north"] = "nanyang/xujiaji",
 	},
+	room_relative="许家集｜青石路青石路",
 }
 Room {
 	id = "nanyang/xiaolu",
 	name = "小路",
+	outdoor = "南阳城",
 	ways = {
 		["east"] = "nanyang/qslu",
 		["west"] = "nanyang/yidao2",
 	},
+	room_relative="石板路-----小路-----青石路小路",
 }
 Room {
 	id = "nanyang/xiaolu2",
 	name = "岔路",
+	outdoor = "南阳城",
 	ways = {
 		["northeast"] = "nanyang/xujiaji",
 		["west"] = "nanyang/yidao",
 	},
+	room_relative="许家集↗驿道-----岔路岔路",
 }
 Room {
 	id = "nanyang/xiaolu3",
 	name = "小路",
+	outdoor = "南阳城",
 	ways = {
 		["northeast"] = "nanyang/jxzhuang",
 		["west"] = "nanyang/qslu",
@@ -20582,46 +23672,56 @@ Room {
 	objs = {
           ["萧峰"] = "xiao feng",
            },
+   room_relative="聚贤庄大门↗青石路-----小路小路",
 }
 Room {
 	id = "nanyang/xujiaji",
 	name = "许家集",
+	outdoor = "南阳城",
 	ways = {
 		["southwest"] = "nanyang/xiaolu2",
 		["south"] = "nanyang/qslu2",
 		["north"] = "nanyang/qslu",
 		["east"] = "nanyang/kedian1",
 	},
+	room_relative="青石路｜许家集----客栈↙｜岔路青石路许家集",
 }
 Room {
 	id = "nanyang/yidao",
 	name = "驿道",
+	outdoor = "南阳城",
 	ways = {
 		["south"] = "xiangyang/henanroad2",
 		["north"] = "nanyang/yidao1",
 		["east"] = "nanyang/xiaolu2",
 	},
+	room_relative="南门｜驿道-----岔路｜土路驿道",
 }
 Room {
 	id = "nanyang/yidao1",
 	name = "南门",
+	outdoor = "南阳城",
 	ways = {
-		["south"] = "nanyang/yidao",
+		["south"] = "nanyang/yidao",  
 		["north"] = "nanyang/yidao2",
 	},
+	room_relative="石板路｜南门｜驿道南门",
 }
 Room {
 	id = "nanyang/yidao2",
 	name = "石板路",
+	outdoor = "南阳城",
 	ways = {
 		["south"] = "nanyang/yidao1",
 		["east"] = "nanyang/xiaolu",
 		["north"] = "nanyang/nanyang",
 	},
+	room_relative="城中心｜石板路----小路｜南门石板路",
 }
 Room {
 	id = "nanyang/yidao3",
 	name = "大驿道",
+	outdoor = "南阳城",
 	ways = {
 		["south"] = "nanyang/nanyang",
 		["north"] = "shaolin/ruzhou",
@@ -20630,59 +23730,74 @@ Room {
 	lengths = {
 	    ["east"] = "if job.name and job.name=='husong' then return false else return 1 end",
 	},
+	room_relative="汝州城｜大驿道----密林｜城中心大驿道",
 }
 Room {
 	id = "nanyang/yidao4",
 	name = "密林",
+	outdoor = "南阳城",
 	ways = {
 		["south"] = "nanyang/duanya",
 		["northeast"] = "huanghe/weifen",
 		["west"] = "nanyang/yidao3",
 	},
+	room_relative="渭汾流域↗大驿道-----密林｜断崖密林",
 }
 Room {
 	id = "ningbo/aywsi",
 	name = "阿育王寺",
+	outdoor = "宁波城",
 	ways = {
 		["southeast"] = "ningbo/ningbo",
 		["northwest"] = "ningbo/tianyige",
 		["east"] = "ningbo/xikou",
 		["west"] = "ningbo/tianfengta",
 	},
+	room_relative="天一阁↖天封塔---阿育王寺---溪口↘城中心阿育王寺",
 }
 Room {
 	id = "ningbo/baoguosi",
 	name = "报国寺",
+	outdoor = "宁波城",
 	ways = {
 		["northdown"] = "ningbo/shilu",
 	},
+	room_relative="石路↓报国寺报国寺",
 }
 Room {
 	id = "ningbo/dongqianhu",
 	name = "东钱湖",
+	outdoor = "宁波城",
 	ways = {
 		["southwest"] = "ningbo/kedian",
 		["south"] = "ningbo/xuedoushan",
 		["north"] = "ningbo/xikou",
 		["west"] = "ningbo/ningbo",
 	},
+	room_relative="溪口｜城中心----东钱湖↙｜客店雪窦山东钱湖",
 }
 Room {
 	id = "ningbo/kedian",
 	name = "客店",
+	outdoor = "宁波城",
 	ways = {
 		["north"] = "ningbo/ningbo",
 		["northeast"] = "ningbo/dongqianhu",
 		["west"] = "ningbo/majiu",
-		-- ["up"] = "ningbo/kedian2",
+		["#nbkz"] = "ningbo/kedian2",
+		},
+	lengths = {
+		["#nbkz"] = 5,
 	},
 	nolooks = {
 		["up"] = true,
 	},
+	room_relative="城中心东钱湖｜↗马厩-----客店客店",
 }
 Room {
 	id = "ningbo/kedian2",
 	name = "客店二楼",
+	outdoor = "宁波城",
 	ways = {
 		["enter"] = "ningbo/kedian3",
 		["down"] = "ningbo/kedian",
@@ -20691,6 +23806,7 @@ Room {
 Room {
 	id = "ningbo/kedian3",
 	name = "客店二楼",
+	outdoor = "宁波城",
 	ways = {
 		["out"] = "ningbo/kedian2",
 	},
@@ -20698,68 +23814,83 @@ Room {
 Room {
 	id = "ningbo/majiu",
 	name = "马厩",
+	outdoor = "宁波城",
 	ways = {
 		["east"] = "ningbo/kedian",
 		["northeast"] = "ningbo/ningbo",
 	},
+	room_relative="城中心↗马厩-----客店马厩",
 }
 Room {
 	id = "ningbo/ningbo",
 	name = "城中心",
+	outdoor = "宁波城",
 	ways = {
 		["south"] = "ningbo/kedian",
 		["northwest"] = "ningbo/aywsi",
 		["east"] = "ningbo/dongqianhu",
 		["west"] = "ningbo/ttcsi",
 	},
+	room_relative="阿育王寺↖天童禅寺----城中心----东钱湖｜客店城中心",
 }
 Room {
 	id = "ningbo/qsddao1",
 	name = "青石官道",
+	outdoor = "宁波城",
 	ways = {
 		["southeast"] = "group/entry/nbqsddao",
 		["westup"] = "hz/shanlu2",
 	},
+	room_relative="山路←青石官道↘青石官道青石官道",
 }
 Room {
 	id = "ningbo/shilu",
 	name = "石路",
+	outdoor = "宁波城",
 	ways = {
 		["southup"] = "ningbo/baoguosi",
-		["south"] = "ningbo/tianfengta",
+		["south"] = "ningbo/tianfengta",  
 		["northwest"] = "group/entry/nbqsddao",
-		["east"] = "ningbo/tianyige",
+		["east"] = "ningbo/tianyige",  
 	},
+	room_relative="青石官道↖石路-----天一阁｜天封塔石路",
 }
 Room {
 	id = "ningbo/tianfengta",
 	name = "天封塔",
+	outdoor = "宁波城",
 	ways = {
 		["south"] = "ningbo/ttcsi",
-		["north"] = "ningbo/shilu",
+		["north"] = "ningbo/shilu",  
 		["east"] = "ningbo/aywsi",
 	},
+	room_relative="石路｜天封塔----阿育王寺｜天童禅寺天封塔",
 }
 Room {
 	id = "ningbo/tianyige",
 	name = "天一阁",
+	outdoor = "宁波城",
 	ways = {
 		["southeast"] = "ningbo/aywsi",
-		["west"] = "ningbo/shilu",
+		["west"] = "ningbo/shilu",  
 	},
+	room_relative="石路----天一阁↘阿育王寺天一阁",
 }
 Room {
 	id = "ningbo/ttcsi",
 	name = "天童禅寺",
+	outdoor = "宁波城",
 	ways = {
-		["southwest"] = "fuzhou/road1",
-		["north"] = "ningbo/tianfengta",
+		["southwest"] = "fuzhou/road2",
+		["north"] = "ningbo/tianfengta",  
 		["east"] = "ningbo/ningbo",
 	},
+	room_relative="天封塔｜天童禅寺---城中心↙山路天童禅寺",
 }
 Room {
 	id = "ningbo/xikou",
 	name = "溪口",
+	outdoor = "宁波城",
 	ways = {
 		["south"] = "ningbo/dongqianhu",
 		["west"] = "ningbo/aywsi",
@@ -20767,17 +23898,21 @@ Room {
 	objs = {
           ["艄公"] = "shao gong",
            },
+	room_relative="阿育王寺-----溪口｜东钱湖溪口",
 }
 Room {
 	id = "ningbo/xuedoushan",
 	name = "雪窦山",
+	outdoor = "宁波城",
 	ways = {
 		["north"] = "ningbo/dongqianhu",
 	},
+	room_relative="东钱湖｜雪窦山雪窦山",
 }
 Room {
 	id = "putian/cb-dian",
 	name = "慈悲殿",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/guangchang",
 		["north"] = "putian/qianyuan",
@@ -20785,67 +23920,83 @@ Room {
 	objs = {
           ["元决尊者"] = "yuanjue zunzhe",
       },
+	  room_relative="前院｜慈悲殿｜广场慈悲殿",
 }
 Room {
 	id = "putian/celang2",
 	name = "侧廊",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/xiaoyuan4",
 		["north"] = "putian/xiaoyuan2",
 	},
+	room_relative="小院｜侧廊｜小院侧廊",
 }
 Room {
 	id = "putian/celang3",
 	name = "侧廊",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/xiaoyuan5",
 		["north"] = "putian/xiaoyuan3",
 	},
+	room_relative="小院｜侧廊｜小院侧廊",
 }
 Room {
 	id = "putian/celang4",
 	name = "侧廊",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/xj4",
 		["north"] = "putian/sengshe",
 		["west"] = "putian/xiaoyuan4",
 	},
+	room_relative="僧舍｜小院-----侧廊｜小径侧廊",
 }
 Room {
 	id = "putian/celang5",
 	name = "侧廊",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/xj3",
 		["east"] = "putian/xiaoyuan5",
 		["north"] = "putian/chufang",
 	},
+	room_relative="饭厅｜侧廊-----小院｜小径侧廊",
 }
 Room {
 	id = "putian/changlang2",
 	name = "长廊",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/jcyuan",
 		["west"] = "putian/fzshi",
 	},
+	room_relative="方丈室-----长廊-----戒持院长廊",
 }
 Room {
 	id = "putian/changlang3",
 	name = "长廊",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/nuange",
 		["west"] = "putian/jcyuan",
 	},
+	room_relative="戒持院-----长廊-----暖阁长廊",
 }
 Room {
 	id = "putian/chufang",
 	name = "饭厅",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/celang5",
 	},
+	room_relative="饭厅｜侧廊饭厅",
 }
 Room {
 	id = "putian/cjg",
 	name = "藏经阁",
+	outdoor = "莆田少林",
 	ways = {
 		["northdown"] = "putian/mf-dian",
 	},
@@ -20858,25 +24009,30 @@ Room {
 Room {
 	id = "putian/dc-dian",
 	name = "大乘殿",
+	outdoor = "莆田少林",
 	ways = {
 		["southup"] = "putian/wgg",
 		["north"] = "putian/xj4",
 		["west"] = "putian/lhtang",
 	},
+	room_relative="小径｜罗汉堂----大乘殿↓武功阁大乘殿",
 }
 Room {
 	id = "putian/dmyuan",
 	name = "达摩院",
+	outdoor = "莆田少林",
 	ways = {
 		["west"] = "putian/mf-dian",
 	},
 	objs = {
           ["天镜禅师"] = "tianjing chanshi",
       },
+	 room_relative="妙法殿----达摩院达摩院",
 }
 Room {
 	id = "putian/dxb-dian",
 	name = "大雄宝殿",
+	outdoor = "莆田少林",
 	ways = {
 		["northdown"] = "putian/guangchang",
 		["southdown"] = "putian/qiandian",
@@ -20884,41 +24040,51 @@ Room {
 	objs = {
           ["大苦大师"] = "daku dashi",
       },
+	  room_relative="广场↓大雄宝殿↑前殿大雄宝殿",
 }
 Room {
 	id = "putian/fatang2",
 	name = "法堂",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/houdian",
 	},
+	room_relative="法堂-----后殿法堂",
 }
 Room {
 	id = "putian/fatang3",
 	name = "法堂",
+	outdoor = "莆田少林",
 	ways = {
 		["west"] = "putian/houdian",
 	},
+	room_relative="后殿-----法堂法堂",
 }
 Room {
 	id = "putian/fzshi",
 	name = "方丈室",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/changlang2",
 	},
+	room_relative="方丈室----长廊方丈室",
 }
 Room {
 	id = "putian/guangchang",
 	name = "广场",
+	outdoor = "莆田少林",
 	ways = {
 		["southup"] = "putian/dxb-dian",
 		["east"] = "putian/xiaoyuan4",
 		["north"] = "putian/cb-dian",
 		["west"] = "putian/xiaoyuan5",
 	},
+	room_relative="慈悲殿｜小院-----广场-----小院↓大雄宝殿广场",
 }
 Room {
 	id = "putian/houdian",
 	name = "后殿",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/xm-dian",
 		["north"] = "putian/zhongdian",
@@ -20928,10 +24094,12 @@ Room {
 	objs = {
           ["元伤尊者"] = "yuanshang zunzhe",
       },
+	 room_relative="中殿｜法堂-----后殿-----法堂｜须弥殿后殿",
 }
 Room {
 	id = "putian/jcyuan",
 	name = "戒持院",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/jingshi",
 		["north"] = "putian/xm-dian",
@@ -20941,7 +24109,10 @@ Room {
 	blocks = {
 		["south"] = {
 			{id = "dadian dashi", exp = 2200000},
-		}
+		},
+	precmds = {
+              ["south"] = "kill dadian dashi",
+	},
 	},
 	objs = {
           ["大颠大师"] = "dadian dashi",
@@ -20950,54 +24121,65 @@ Room {
 Room {
 	id = "putian/jingshi",
 	name = "静室",
+	outdoor = "莆田少林",
 	ways = {
 		["north"] = "putian/jcyuan",
 	},
 	objs = {
           ["天虹禅师"] = "tianhong chanshi",
       },
+	  room_relative="戒持院｜静室静室",
 }
 Room {
 	id = "putian/jnlw-dian",
 	name = "紧那罗王殿",
+	outdoor = "莆田少林",
 	ways = {
 		["north"] = "putian/xiaoyuan5",
 	},
 	objs = {
           ["元怒尊者"] = "yuannu zunzhe",
       },
+	  room_relative="小院｜紧那罗王殿紧那罗王殿",
 }
 Room {
 	id = "putian/lhtang",
 	name = "罗汉堂",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/dc-dian",
 	},
 	objs = {
           ["元痛尊者"] = "yuantong zunzhe",
       },
+	  room_relative="罗汉堂----大乘殿罗汉堂",
 }
 Room {
 	id = "putian/liangt",
 	name = "凉亭",
+	outdoor = "莆田少林",
 	no_fight = true,
 	ways = {
 		["stand;out"] = "putian/road07",
 	},
+	room_relative="凉亭｜山路",
 }
 Room {
 	id = "putian/lz-dian",
 	name = "六祖殿",
+	outdoor = "莆田少林",
 	ways = {
 		["north"] = "putian/xiaoyuan4",
 	},
 	objs = {
           ["元哀尊者"] = "yuanai zunzhe",
       },
+	  room_relative="小院｜六祖殿六祖殿",
 }
 Room {
 	id = "putian/mf-dian",
 	name = "妙法殿",
+	outdoor = "莆田少林",
 	ways = {
 		["southup"] = "putian/cjg",
 		["north"] = "putian/xj3",
@@ -21007,11 +24189,15 @@ Room {
 		["southup"] = {
 			{id = "wu seng", exp = 200000},
 		},
+	precmds = {
+              ["southup"] = "kill wu seng",
+	},
 	},
 }
 Room {
 	id = "putian/mtd1",
 	name = "麻田地",
+	outdoor = "莆田少林",
 	ways = {
 		["northup"] = "putian/mtd2",
 	},
@@ -21023,29 +24209,36 @@ Room {
 Room {
 	id = "putian/mtd2",
 	name = "麻田地",
+	outdoor = "莆田少林",
 	ways = {
 		["north"] = "putian/xl8",
 		["southdown"] = "putian/mtd1",
 	},
+	room_relative="小路｜麻田地↑麻田地麻田地",
 }
 Room {
 	id = "putian/nuange",
 	name = "暖阁",
+	outdoor = "莆田少林",
 	ways = {
 		["west"] = "putian/changlang3",
 	},
+	room_relative="长廊｜暖阁",
 }
 Room {
 	id = "putian/qiandian",
 	name = "前殿",
+	outdoor = "莆田少林",
 	ways = {
 		["northup"] = "putian/dxb-dian",
 		["south"] = "putian/zhongdian",
 	},
+	room_relative="大雄宝殿｜中殿前殿",
 }
 Room {
 	id = "putian/qianyuan",
 	name = "前院",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/cb-dian",
 		["east"] = "putian/xiaoyuan2",
@@ -21062,52 +24255,61 @@ Room {
 Room {
 	id = "putian/road01",
 	name = "山路",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/road02",
-		["northwest"] = "fuzhou/road2",
+		["northwest"] = "fuzhou/road3",
 	},
-	room_relative="山路↖山路｜山路山路",
+	room_relative="山路↖山路｜山路山路 ",
 }
 Room {
 	id = "putian/road02",
 	name = "山路",
+	outdoor = "莆田少林",
 	ways = {
 		["southeast"] = "putian/road03",
 		["northeast"] = "fuzhou/wroad4",
 		["north"] = "putian/road01",
 	},
-	room_relative="山路山路｜↗山路↘山路山路",
+	room_relative="山路山路｜↗山路↘山路山路 ",
 }
 Room {
 	id = "putian/road03",
 	name = "山路",
+	outdoor = "莆田少林",
 	ways = {
 		["northwest"] = "putian/road02",
 		["east"] = "putian/road04",
 	},
-	room_relative="山路↖山路-----山路山路",
+	room_relative="山路↖山路-----山路山路 ",
 }
 Room {
 	id = "putian/road04",
 	name = "山路",
+	outdoor = "莆田少林",
 	ways = {
 		["northeast"] = "putian/road05",
 		["west"] = "putian/road03",
 	},
-	room_relative="山路↗山路-----山路山路",
+	room_relative="山路↗山路-----山路山路 ",
 }
 Room {
 	id = "putian/road05",
 	name = "山路",
+	outdoor = "莆田少林",
 	ways = {
 		["eastup"] = "putian/road06",
 		["southwest"] = "putian/road04",
+},
+		objs = {
+		["挑夫"] = "tiao fu",
 	},
-	room_relative="山路→石阶↙山路山路",
+	room_relative="山路→石阶↙山路山路 ",
 }
 Room {
 	id = "putian/road06",
 	name = "石阶",
+	outdoor = "莆田少林",
 	ways = {
 		["southup"] = "putian/road07",
 		["westdown"] = "putian/road05",
@@ -21117,6 +24319,7 @@ Room {
 Room {
 	id = "putian/road07",
 	name = "山路",
+	outdoor = "莆田少林",
 	ways = {
 		["southup"] = "putian/road08",
 		["enter"] = "putian/liangt",
@@ -21127,6 +24330,7 @@ Room {
 Room {
 	id = "putian/road08",
 	name = "石阶",
+	outdoor = "莆田少林",
 	ways = {
 		["southup"] = "putian/shanmen",
 		["northdown"] = "putian/road07",
@@ -21136,19 +24340,22 @@ Room {
 Room {
 	id = "putian/sengshe",
 	name = "僧舍",
+	outdoor = "莆田少林",
 	no_fight = true,
 	ways = {
 		["south"] = "putian/celang4",
 	},
+	room_relative="侧廊----僧舍",
 }
 Room {
 	id = "putian/shanmen",
 	name = "山门",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/xl3",
 		["northdown"] = "putian/road08",
 		["west"] = "putian/xl2",
-		["south"] = "putian/qianyuan",
+		["south"] = "putian/qianyuan",  
 	},
 	nolooks = {
 		["south"] = true,
@@ -21160,108 +24367,133 @@ Room {
 Room {
 	id = "putian/wgg",
 	name = "武功阁",
+	outdoor = "莆田少林",
 	ways = {
 		["northdown"] = "putian/dc-dian",
 	},
 	objs = {
           ["元悲尊者"] = "yuanbei zunzhe",
       },
+	  room_relative="大乘殿↓武功阁武功阁",
 }
 Room {
 	id = "putian/xiaoyuan2",
 	name = "小院",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/celang2",
-		["west"] = "putian/qianyuan",
+		["west"] = "putian/qianyuan",  
 	},
+	room_relative="前院-----小院｜侧廊小院",
 }
 Room {
 	id = "putian/xiaoyuan3",
 	name = "小院",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/celang3",
-		["east"] = "putian/qianyuan",
+		["east"] = "putian/qianyuan",   
 	},
+	room_relative="小院-----前院｜侧廊小院",
 }
 Room {
 	id = "putian/xiaoyuan4",
 	name = "小院",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/lz-dian",
 		["east"] = "putian/celang4",
 		["north"] = "putian/celang2",
-		["west"] = "putian/guangchang",
+		["west"] = "putian/guangchang",  
 	},
+	room_relative="侧廊｜广场-----小院-----侧廊｜六祖殿小院",
 }
 Room {
 	id = "putian/xiaoyuan5",
 	name = "小院",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/jnlw-dian",
-		["east"] = "putian/guangchang",
+		["east"] = "putian/guangchang",  
 		["north"] = "putian/celang3",
 		["west"] = "putian/celang5",
 	},
+	room_relative="侧廊｜侧廊-----小院-----广场｜紧那罗王殿小院",
 }
 Room {
 	id = "putian/xj3",
 	name = "小径",
+	outdoor = "莆田少林",
 	ways = {
-		["south"] = "putian/mf-dian",
+		["south"] = "putian/mf-dian",  
 		["north"] = "putian/celang5",
 	},
+	room_relative="侧廊｜小径｜妙法殿小径",
 }
 Room {
 	id = "putian/xj4",
 	name = "小径",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/dc-dian",
 		["north"] = "putian/celang4",
 	},
+	room_relative="侧廊｜小径｜大乘殿小径",
 }
 Room {
 	id = "putian/xl2",
 	name = "小路",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/shanmen",
 		["west"] = "putian/xl4",
 	},
+	room_relative="小路-----小路-----山门小路",
 }
 Room {
 	id = "putian/xl3",
 	name = "小路",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/xl5",
 		["west"] = "putian/shanmen",
 	},
+	room_relative="山门-----小路-----小路小路",
 }
 Room {
 	id = "putian/xl4",
 	name = "小路",
+	outdoor = "莆田少林",
 	ways = {
 		["east"] = "putian/xl2",
 		["west"] = "putian/xl6",
 	},
+	room_relative="小路-----小路-----小路小路",
 }
 Room {
 	id = "putian/xl5",
 	name = "小路",
+	outdoor = "莆田少林",
 	ways = {
 		["eastdown"] = "putian/xl7",
 		["west"] = "putian/xl3",
 	},
+	room_relative="小路-----小路←小路小路",
 }
 Room {
 	id = "putian/xl6",
 	name = "小路",
+	outdoor = "莆田少林",
 	ways = {
 		["southwest"] = "putian/xl8",
 		["east"] = "putian/xl4",
 	},
+	room_relative="小路-----小路↙小路小路",
 }
 Room {
 	id = "putian/xl7",
 	name = "小路",
+	outdoor = "莆田少林",
 	ways = {
 		["westup"] = "putian/xl5",
 		["north"] = "putian/youcaidi",
@@ -21269,41 +24501,51 @@ Room {
 	objs = {
           ["金丝雀"] = "jinsi que",
       },
+	  room_relative="油菜地｜小路←小路小路",
 }
 Room {
 	id = "putian/xl8",
 	name = "小路",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/mtd2",
 		["northeast"] = "putian/xl6",
 	},
+	room_relative="小路↗小路｜麻田地小路",
 }
 Room {
 	id = "putian/xm-dian",
 	name = "须弥殿",
+	outdoor = "莆田少林",
 	ways = {
-		["south"] = "putian/jcyuan",
-		["north"] = "putian/houdian",
+		["south"] = "putian/jcyuan",   
+		["north"] = "putian/houdian",  
 	},
+	room_relative="戒持院｜后殿须弥殿",
 }
 Room {
 	id = "putian/youcaidi",
 	name = "油菜地",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/xl7",
 	},
+	room_relative="油菜地｜小路油菜地",
 }
 Room {
 	id = "putian/zhongdian",
 	name = "中殿",
+	outdoor = "莆田少林",
 	ways = {
 		["south"] = "putian/houdian",
 		["north"] = "putian/qiandian",
 	},
+	room_relative="后殿｜前殿中殿",
 }
 Room {
 	id = "shaolin/andao1",
 	name = "暗道",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/rukou",
 		["north"] = "shaolin/jianyu1",
@@ -21312,6 +24554,7 @@ Room {
 Room {
 	id = "shaolin/andao2",
 	name = "暗道",
+	outdoor = "嵩山少林",
 	ways = {
 		["up"] = "shaolin/gulou1",
 	},
@@ -21329,6 +24572,7 @@ Room {
 Room {
 	id = "shaolin/bamboo1",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["southwest"] = "shaolin/bamboo2",
 		["south"] = "shaolin/shanlu6",
@@ -21339,10 +24583,12 @@ Room {
 	--    ["southeast"] = "if 1=1 then return false else return false end",
 	--	["northwest"] = "if 1=1 then return false else return false end",
 	--},
+	room_relative="竹林｜山路----竹林｜竹林竹林",
 }
 Room {
 	id = "shaolin/bamboo2",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/bamboo3",
 		["southwest"] = "shaolin/bamboo2",
@@ -21354,6 +24600,7 @@ Room {
 Room {
 	id = "shaolin/bamboo3",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/bamboo4",
 	},
@@ -21361,6 +24608,7 @@ Room {
 Room {
 	id = "shaolin/bamboo4",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/bamboo5",
 	},
@@ -21368,6 +24616,7 @@ Room {
 Room {
 	id = "shaolin/bamboo5",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/bamboo6",
 	},
@@ -21375,6 +24624,7 @@ Room {
 Room {
 	id = "shaolin/bamboo6",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/bamboo7",
 	},
@@ -21382,6 +24632,7 @@ Room {
 Room {
 	id = "shaolin/bamboo7",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/bamboo8",
 	},
@@ -21389,6 +24640,7 @@ Room {
 Room {
 	id = "shaolin/bamboo8",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/bamboo9",
 	},
@@ -21396,6 +24648,7 @@ Room {
 Room {
 	id = "shaolin/bamboo9",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/bamboo10",
 	},
@@ -21403,6 +24656,7 @@ Room {
 Room {
 	id = "shaolin/bamboo10",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/bamboo11",
 	},
@@ -21410,6 +24664,7 @@ Room {
 Room {
 	id = "shaolin/bamboo11",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/bamboo12",
 	},
@@ -21417,6 +24672,7 @@ Room {
 Room {
 	id = "shaolin/bamboo12",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/bamboo13",
 	},
@@ -21424,30 +24680,37 @@ Room {
 Room {
 	id = "shaolin/bamboo13",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["northwest"] = "shaolin/bamboo14",
 	},
+	room_relative="竹林竹林",
 }
 Room {
 	id = "shaolin/bamboo14",
 	name = "竹林",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/damodong",
 	},
+	room_relative="达摩洞竹林",
 }
 Room {
 	id = "shaolin/banruo1",
 	name = "般若堂一部",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/banruo2",
 	},
 	objs = {
           ["澄心"] = "chengxin luohan",
            },
+	room_relative="般若堂二部｜般若堂一部般若堂一部",
 }
 Room {
 	id = "shaolin/banruo2",
 	name = "般若堂二部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/banruo1",
 		["north"] = "shaolin/banruo3",
@@ -21455,10 +24718,12 @@ Room {
 	objs = {
           ["澄意"] = "chengyi luohan",
            },
+	room_relative="般若堂三部｜般若堂二部｜般若堂一部般若堂二部",
 }
 Room {
 	id = "shaolin/banruo3",
 	name = "般若堂三部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/banruo2",
 		["north"] = "shaolin/banruo4",
@@ -21466,10 +24731,12 @@ Room {
 	objs = {
           ["澄思"] = "chengsi luohan",
            },
+	room_relative="般若堂四部｜般若堂三部｜般若堂二部般若堂三部",
 }
 Room {
 	id = "shaolin/banruo4",
 	name = "般若堂四部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/banruo3",
 		["north"] = "shaolin/banruo5",
@@ -21477,10 +24744,12 @@ Room {
 	objs = {
           ["澄识"] = "chengshi luohan",
            },
+	room_relative="般若堂五部｜般若堂四部｜般若堂三部般若堂四部",
 }
 Room {
 	id = "shaolin/banruo5",
 	name = "般若堂五部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/banruo4",
 		["north"] = "shaolin/banruo6",
@@ -21489,10 +24758,12 @@ Room {
 	objs = {
           ["澄志"] = "chengzhi luohan",
            },
+	room_relative="般若堂六部｜练武场--般若堂五部｜般若堂四部般若堂五部",
 }
 Room {
 	id = "shaolin/banruo6",
 	name = "般若堂六部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/banruo5",
 		["north"] = "shaolin/banruo7",
@@ -21500,10 +24771,12 @@ Room {
 	objs = {
           ["澄信"] = "chengxin luohan",
            },
+	room_relative="般若堂七部｜般若堂六部｜般若堂五部般若堂六部",
 }
 Room {
 	id = "shaolin/banruo7",
 	name = "般若堂七部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/banruo6",
 		["north"] = "shaolin/banruo8",
@@ -21511,10 +24784,12 @@ Room {
 	objs = {
           ["澄灵"] = "chengling luohan",
            },
+	room_relative="般若堂八部｜般若堂七部｜般若堂六部般若堂七部",
 }
 Room {
 	id = "shaolin/banruo8",
 	name = "般若堂八部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/banruo7",
 		["north"] = "shaolin/banruo9",
@@ -21522,20 +24797,24 @@ Room {
 	objs = {
           ["澄欲"] = "chengyu luohan",
            },
+	room_relative="般若堂九部｜般若堂八部｜般若堂七部般若堂八部",
 }
 Room {
 	id = "shaolin/banruo9",
 	name = "般若堂九部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/banruo8",
 	},
 	objs = {
           ["澄尚"] = "chengshang luohan",
            },
+	room_relative="般若堂九部｜般若堂八部般若堂九部",
 }
 Room {
 	id = "shaolin/brtang",
 	name = "般若堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/lwc16",
 		["west"] = "shaolin/stoneroad3",
@@ -21543,31 +24822,39 @@ Room {
 	objs = {
           ["玄难大师"] = "xuannan dashi",
            },
+	room_relative="石板路----般若堂----练武场般若堂",
 }
 Room {
 	id = "shaolin/bydian",
 	name = "白衣殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/kchang",
 	},
+	room_relative="空场----白衣殿白衣殿",
 }
 Room {
 	id = "shaolin/cdian-1",
 	name = "东侧殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/gchang-3",
 	},
+	room_relative="广场东侧----东侧殿东侧殿",
 }
 Room {
 	id = "shaolin/cdian-2",
 	name = "西侧殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/gchang-2",
 	},
+	room_relative="西侧殿----广场西侧西侧殿",
 }
 Room {
 	id = "shaolin/celang-1",
 	name = "西侧廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/gchang-2",
 		["north"] = "shaolin/celang-2",
@@ -21578,6 +24865,7 @@ Room {
 Room {
 	id = "shaolin/celang-2",
 	name = "西侧廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/celang-1",
 		["northeast"] = "shaolin/sblu-1",
@@ -21588,6 +24876,7 @@ Room {
 Room {
 	id = "shaolin/celang-3",
 	name = "东侧廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/gchang-3",
 		["east"] = "shaolin/zhonglou",
@@ -21598,6 +24887,7 @@ Room {
 Room {
 	id = "shaolin/celang-4",
 	name = "东侧廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/celang-3",
 		["northwest"] = "shaolin/sblu-1",
@@ -21608,6 +24898,7 @@ Room {
 Room {
 	id = "shaolin/celang1",
 	name = "侧廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/stoneroad4",
 		["northwest"] = "shaolin/huaishu2",
@@ -21618,6 +24909,7 @@ Room {
 Room {
 	id = "shaolin/celang2",
 	name = "侧廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/stoneroad3",
 		["east"] = "shaolin/sengshe1",
@@ -21628,6 +24920,7 @@ Room {
 Room {
 	id = "shaolin/chanfang-1",
 	name = "禅房",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
 		["south"] = "shaolin/chanfang-3",
@@ -21637,18 +24930,22 @@ Room {
 	objs = {
           ["玄澄大师"] = "xuancheng dashi",
            },
+		room_relative="禅房｜禅房-----证道院｜禅房禅房",
 }
 Room {
 	id = "shaolin/chanfang-2",
 	name = "禅房",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
 		["south"] = "shaolin/chanfang-1",
 	},
+	room_relative="禅房｜禅房禅房",
 }
 Room {
 	id = "shaolin/chanfang-3",
 	name = "禅房",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
 		["north"] = "shaolin/chanfang-1",
@@ -21656,10 +24953,12 @@ Room {
 	objs = {
           ["阿含经"] = "shu",
            },
+	room_relative="禅房｜禅房禅房",
 }
 Room {
 	id = "shaolin/chufang1",
 	name = "香积厨",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/chufang2",
 		["west"] = "shaolin/fanting1",
@@ -21669,6 +24968,7 @@ Room {
 Room {
 	id = "shaolin/chufang2",
 	name = "香积厨",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/xiaolu-1",
 		["north"] = "shaolin/chufang1",
@@ -21679,6 +24979,7 @@ Room {
 Room {
 	id = "shaolin/cjlou",
 	name = "藏经阁一楼",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/xiaoxi1",
 		["up"] = "shaolin/cjlou1",
@@ -21699,6 +25000,7 @@ Room {
 Room {
 	id = "shaolin/cjlou1",
 	name = "藏经阁二楼",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/cjlou",
 		["push chuang;jump chuang"] = "shaolin/xiaojin1",
@@ -21713,6 +25015,7 @@ Room {
 Room {
 	id = "shaolin/cyzi-1",
 	name = "菜园子",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/cyzi-2",
 		["north"] = "shaolin/xiaolu-3",
@@ -21726,6 +25029,7 @@ Room {
 Room {
 	id = "shaolin/cyzi-2",
 	name = "菜园子",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/cyzi-3",
 		["north"] = "shaolin/cyzi-1",
@@ -21735,6 +25039,7 @@ Room {
 Room {
 	id = "shaolin/cyzi-3",
 	name = "菜园子",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/cyzi-4",
 		["west"] = "shaolin/cyzi-2",
@@ -21744,6 +25049,7 @@ Room {
 Room {
 	id = "shaolin/cyzi-4",
 	name = "菜园子",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/cyzi-3",
 		["west"] = "shaolin/cyzi-1",
@@ -21753,14 +25059,17 @@ Room {
 Room {
 	id = "shaolin/czan",
 	name = "初祖庵",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shanlu4",
 		["north"] = "shaolin/shanlu5",
 	},
+	room_relative="山路｜初祖庵｜山路初祖庵"
 }
 Room {
 	id = "shaolin/dabeidia",
 	name = "大悲殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/stoneroad1",
 		["north"] = "shaolin/hguangz2",
@@ -21770,22 +25079,27 @@ Room {
           ["道正禅师"] = "daozheng chanshi",
           ["木鱼槌"] = "muyu chui",
            },
+		room_relative="后殿广场｜须弥殿----大悲殿｜石板路大悲殿",
 }
 Room {
 	id = "shaolin/damodong",
 	name = "达摩洞",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/bamboo1",
 	},
+	room_relative="竹林达摩洞",
 }
 Room {
 	id = "shaolin/daxiong",
 	name = "大雄宝殿",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
 		["south"] = "shaolin/pingtai",
 		["north"] = "shaolin/stoneroad1",
 	},
+	room_relative="石板路｜大雄宝殿｜平台大雄宝殿",
 }
 Room {
 	id = "shaolin/dmyuan",
@@ -21798,6 +25112,7 @@ Room {
 	objs = {
           ["玄悲大师"] = "xuanbei dashi",
            },
+	room_relative="达摩院后殿｜达摩院｜回廊达摩院",
 }
 Room {
 	id = "shaolin/dmyuan2",
@@ -21806,10 +25121,12 @@ Room {
 	ways = {
 		["south"] = "shaolin/dmyuan",
 	},
+	room_relative="达摩院后殿｜达摩院达摩院后殿",
 }
 Room {
 	id = "shaolin/duanya",
 	name = "断崖坪",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/xctang",
 	--	["#goYd"] = "shaolin/yading",
@@ -21824,38 +25141,47 @@ Room {
 Room {
 	id = "shaolin/dxshijie",
 	name = "台阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/pingtai",
 		["south"] = "shaolin/stoneroad2",
 	},
+	room_relative="平台↑台阶｜石板路台阶",
 }
 Room {
 	id = "shaolin/dzdian",
 	name = "地藏殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/kchang",
 	},
+	room_relative="地藏殿----空场地藏殿",
 }
 Room {
 	id = "shaolin/entrance",
 	name = "木人巷入口",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/murenxiang",
 	},
+	room_relative="木人巷--木人巷入口",
 }
 Room {
 	id = "shaolin/fangjuku",
 	name = "防具库",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/lshuyuan",
 	},
 	objs = {
           ["道相禅师"] = "daoxiang chanshi",
            },
+	room_relative="龙树院｜防具库防具库",
 }
 Room {
 	id = "shaolin/fanting1",
 	name = "饭厅",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/fanting3",
 		["north"] = "shaolin/fanting2",
@@ -21867,6 +25193,7 @@ Room {
 Room {
 	id = "shaolin/fanting2",
 	name = "饭厅",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/fanting1",
 	},
@@ -21875,6 +25202,7 @@ Room {
 Room {
 	id = "shaolin/fanting3",
 	name = "饭厅",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/fanting1",
 		["east"] = "shaolin/chufang2",
@@ -21884,6 +25212,7 @@ Room {
 Room {
 	id = "shaolin/fatang",
 	name = "法堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/jietan4",
 		["southwest"] = "shaolin/jietan3",
@@ -21891,10 +25220,12 @@ Room {
 		["north"] = "shaolin/kchang",
 		["west"] = "shaolin/huilang1",
 	},
+	room_relative="空场｜回廊-----法堂-----心禅坪↙↘戒坛戒坛法堂",
 }
 Room {
 	id = "shaolin/fota1",
 	name = "佛塔一层",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/fotaout",
 		["up"] = "shaolin/fota2",
@@ -21903,6 +25234,7 @@ Room {
 Room {
 	id = "shaolin/fota2",
 	name = "圣僧塔",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/fota1",
 		["up"] = "shaolin/fota3",
@@ -21911,6 +25243,7 @@ Room {
 Room {
 	id = "shaolin/fota3",
 	name = "佛塔三层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/fota2",
 	},
@@ -21918,6 +25251,7 @@ Room {
 Room {
 	id = "shaolin/fotaout",
 	name = "古佛舍利塔",
+	outdoor = "嵩山少林",
 	ways = {
 		["enter"] = "shaolin/fota1",
 		["s;ne;se;n;e;sw;e;ne;se;s;se;open door;e"] = "shaolin/slyuan",
@@ -21926,6 +25260,7 @@ Room {
 Room {
 	id = "shaolin/fumoquan",
 	name = "金刚伏魔圈",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/qyping",
 	},
@@ -21938,21 +25273,26 @@ Room {
 Room {
 	id = "shaolin/fxjing",
 	name = "佛心井",
+	outdoor = "嵩山少林",
 	ways = {
 		["westdown"] = "shaolin/shijie9",
 	},
+	room_relative="石阶→佛心井佛心井",
 }
 Room {
 	id = "shaolin/fzjs",
 	name = "方丈精舍",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/xiaolu7",
 		["up"] = "shaolin/fzjs1",
 	},
+	room_relative="茶室〓方丈精舍---林中小路方丈精舍",
 }
 Room {
 	id = "shaolin/fzjs1",
 	name = "茶室",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/fzjs2",
 		["down"] = "shaolin/fzjs",
@@ -21960,68 +25300,82 @@ Room {
 	objs = {
           ["清乐比丘"] = "qingle biqiu",
            },
+	room_relative="方丈室｜茶室〓方丈精舍茶室",
 }
 Room {
 	id = "shaolin/fzjs2",
 	name = "方丈室",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/fzjs1",
 	},
 	objs = {
           ["玄慈大师"] = "xuanci dashi",
            },
+	room_relative="方丈室｜茶室方丈室",
 }
 Room {
 	id = "shaolin/gchang-1",
 	name = "广场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/smdian",
 		["north"] = "shaolin/qdian",
 		["east"] = "shaolin/gchang-3",
 		["west"] = "shaolin/gchang-2",
 	},
+	room_relative="前殿｜广场西侧-----广场-----广场东侧｜山门殿广场",
 }
 Room {
 	id = "shaolin/gchang-2",
 	name = "广场西侧",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/gchang-1",
 		["north"] = "shaolin/celang-1",
 		["west"] = "shaolin/cdian-2",
 	},
+	room_relative="西侧廊｜西侧殿---广场西侧---广场广场西侧",
 }
 Room {
 	id = "shaolin/gchang-3",
 	name = "广场东侧",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/celang-3",
 		["east"] = "shaolin/cdian-1",
 		["west"] = "shaolin/gchang-1",
 	},
+	room_relative="东侧廊｜广场---广场东侧---东侧殿广场东侧",
 }
 Room {
 	id = "shaolin/gchange",
 	name = "寺前广场",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/guangchang",
 	},
 	objs = {
           ["清无比丘"] = "qingwu biqiu",
            },
+	room_relative="广场---寺前广场寺前广场",
 }
 Room {
 	id = "shaolin/gchangw",
 	name = "寺前广场",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/guangchang",
 	},
 	objs = {
           ["清为比丘"] = "qingwei biqiu",
            },
+	room_relative="寺前广场---广场寺前广场",
 }
 Room {
 	id = "shaolin/guangchang",
 	name = "广场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shifang",
 		["east"] = "shaolin/gchange",
@@ -22038,18 +25392,22 @@ Room {
           ["清法比丘"] = "qingfa biqiu",
           ["无上正等正觉碑"] = "board",
            },
+	
 }
 Room {
 	id = "shaolin/gulou",
 	name = "鼓楼小院",
+	outdoor = "嵩山少林",
 	ways = {
 		["enter"] = "shaolin/gulou1",
 		["east"] = "shaolin/celang-1",
 	},
+	room_relative="鼓楼一层｜侧廊鼓楼小院",
 }
 Room {
 	id = "shaolin/gulou1",
 	name = "鼓楼一层",
+	outdoor = "嵩山少林",
 	ways = {
 		["up"] = "shaolin/gulou2",
 		["out"] = "shaolin/gulou",
@@ -22058,6 +25416,7 @@ Room {
 Room {
 	id = "shaolin/gulou2",
 	name = "鼓楼二层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/gulou1",
 		["up"] = "shaolin/gulou3",
@@ -22066,6 +25425,7 @@ Room {
 Room {
 	id = "shaolin/gulou3",
 	name = "鼓楼三层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/gulou2",
 		["up"] = "shaolin/gulou4",
@@ -22074,6 +25434,7 @@ Room {
 Room {
 	id = "shaolin/gulou4",
 	name = "鼓楼四层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/gulou3",
 		["up"] = "shaolin/gulou5",
@@ -22082,6 +25443,7 @@ Room {
 Room {
 	id = "shaolin/gulou5",
 	name = "鼓楼五层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/gulou4",
 		["up"] = "shaolin/gulou6",
@@ -22090,6 +25452,7 @@ Room {
 Room {
 	id = "shaolin/gulou6",
 	name = "鼓楼六层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/gulou5",
 		["up"] = "shaolin/gulou7",
@@ -22098,6 +25461,7 @@ Room {
 Room {
 	id = "shaolin/gulou7",
 	name = "鼓楼七层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/gulou6",
 	},
@@ -22108,14 +25472,17 @@ Room {
 Room {
 	id = "shaolin/gygu",
 	name = "归元谷",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/xclang",
 		["northwest"] = "shaolin/gygu",
 	},
+	room_relative="石廊｜归元谷归元谷",
 }
 Room {
 	id = "shaolin/hguangz1",
 	name = "后殿广场",
+	outdoor = "嵩山少林",
 	ways = {
 		["southwest"] = "shaolin/huaishu5",
 		["north"] = "shaolin/hguangz4",
@@ -22126,6 +25493,7 @@ Room {
 Room {
 	id = "shaolin/hguangz2",
 	name = "后殿广场",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
 		["south"] = "shaolin/dabeidia",
@@ -22140,6 +25508,7 @@ Room {
 Room {
 	id = "shaolin/hguangz3",
 	name = "后殿广场",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/songshu1",
 		["north"] = "shaolin/hguangz5",
@@ -22150,6 +25519,7 @@ Room {
 Room {
 	id = "shaolin/hguangz4",
 	name = "后殿广场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/hguangz1",
 		["east"] = "shaolin/houdian",
@@ -22159,6 +25529,7 @@ Room {
 Room {
 	id = "shaolin/hguangz5",
 	name = "后殿广场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/hguangz3",
 		["west"] = "shaolin/houdian",
@@ -22168,6 +25539,7 @@ Room {
 Room {
 	id = "shaolin/houdian",
 	name = "后殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/taijie",
 		["east"] = "shaolin/hguangz5",
@@ -22176,19 +25548,23 @@ Room {
 	objs = {
           ["慧空尊者"] = "huikong zunzhe",
            },
+	room_relative="台阶｜后殿广场-----后殿-----后殿广场后殿",
 }
 Room {
 	id = "shaolin/houshan",
 	name = "小院",
+	outdoor = "嵩山少林",
 	ways = {
 		["northwest"] = "shaolin/zhushe",
 		["north"] = "shaolin/xiaowu",
 		["east"] = "shaolin/xiaojing2",
 	},
+	room_relative="猪舍小土屋↖｜小院-----田埂边小院",
 }
 Room {
 	id = "shaolin/houshand",
 	name = "山洞",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/yading",
 	},
@@ -22196,6 +25572,7 @@ Room {
 Room {
 	id = "shaolin/houyuan",
 	name = "小屋",
+	outdoor = "嵩山少林",
 	ways = {
 		["enter"] = "shaolin/liwu",
 		["north"] = "shaolin/xiaojin1",
@@ -22203,10 +25580,12 @@ Room {
 	objs = {
           ["慕容博"] = "murong bo",
            },
+	
 }
 Room {
 	id = "shaolin/huaishu1",
 	name = "槐树林",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/huaishu2",
 		["west"] = "shaolin/putiyuan",
@@ -22216,6 +25595,7 @@ Room {
 Room {
 	id = "shaolin/huaishu2",
 	name = "槐树林",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/celang1",
 		["north"] = "shaolin/huaishu4",
@@ -22226,6 +25606,7 @@ Room {
 Room {
 	id = "shaolin/huaishu4",
 	name = "槐树林",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/huaishu2",
 		["east"] = "shaolin/stoneroad1",
@@ -22237,6 +25618,7 @@ Room {
 Room {
 	id = "shaolin/huaishu5",
 	name = "槐树林",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/huaishu4",
 		["northeast"] = "shaolin/hguangz1",
@@ -22247,49 +25629,60 @@ Room {
 Room {
 	id = "shaolin/huilang1",
 	name = "回廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/huilang1",
 		["north"] = "shaolin/huilang2",
 		["east"] = "shaolin/fatang",
 		["west"] = "shaolin/huilang1",
 	},
+	room_relative="回廊｜回廊----法堂｜回廊回廊",
 }
 Room {
 	id = "shaolin/huilang2",
 	name = "回廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/huilang1",
 		["east"] = "shaolin/huilang2",
 		["north"] = "shaolin/huilang2",
 		["west"] = "shaolin/huilang3",
 	},
+	room_relative="回廊｜回廊----回廊｜回廊回廊",
 }
 Room {
 	id = "shaolin/huilang3",
 	name = "回廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/huilang3",
 		["north"] = "shaolin/huilang3",
 		["east"] = "shaolin/huilang2",
 		["west"] = "shaolin/huilang4",
 	},
+	room_relative="回廊｜回廊----回廊｜回廊回廊",
 }
 Room {
 	id = "shaolin/huilang4",
 	name = "回廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/huilang4",
 		["east"] = "shaolin/huilang3",
-		["north"] = "shaolin/dmyuan",
+		["#dmy1"] = "shaolin/dmyuan",
 		["west"] = "shaolin/huilang4",
-	},
+	
+		},
+	room_relative="回廊｜回廊----达摩院｜回廊回廊",
 }
 Room {
 	id = "shaolin/huizhizuo",
 	name = "晦智圣座",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/fota2",
 	},
+	room_relative="圣僧塔--晦智圣座",
 }
 Room {
 	id = "shaolin/jianyu",
@@ -22298,6 +25691,7 @@ Room {
 Room {
 	id = "shaolin/jianyu1",
 	name = "监狱",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/jianyu",
 	},
@@ -22305,6 +25699,7 @@ Room {
 Room {
 	id = "shaolin/jieluyua",
 	name = "戒律院",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
 		["west"] = "shaolin/songshu4",
@@ -22313,6 +25708,7 @@ Room {
 Room {
 	id = "shaolin/jietan1",
 	name = "戒坛",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/sblu-3",
 		["north"] = "shaolin/jietan3",
@@ -22323,6 +25719,7 @@ Room {
 Room {
 	id = "shaolin/jietan2",
 	name = "戒坛",
+	outdoor = "嵩山少林",
 	ways = {
 		["southwest"] = "shaolin/sblu-3",
 		["north"] = "shaolin/jietan4",
@@ -22333,6 +25730,7 @@ Room {
 Room {
 	id = "shaolin/jietan3",
 	name = "戒坛",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/jietan1",
 		["east"] = "shaolin/jietan4",
@@ -22343,6 +25741,7 @@ Room {
 Room {
 	id = "shaolin/jietan4",
 	name = "戒坛",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/jietan2",
 		["northwest"] = "shaolin/fatang",
@@ -22353,21 +25752,26 @@ Room {
 Room {
 	id = "shaolin/jiulou1",
 	name = "迎宾楼",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/nanyang",
 		["up"] = "shaolin/jiulou2",
 	},
+	room_relative="南阳城｜迎宾楼二楼迎宾楼",
 }
 Room {
 	id = "shaolin/jiulou2",
 	name = "迎宾楼二楼",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/jiulou1",
 	},
+	room_relative="迎宾楼--迎宾楼二楼",
 }
 Room {
 	id = "shaolin/jnlwang",
 	name = "紧那罗王殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/pingtai",
 	},
@@ -22375,35 +25779,42 @@ Room {
           ["木鱼槌"] = "muyu chui",
           ["道品禅师"] = "daopin chanshi",
            },
+	room_relative="平台--紧那罗王殿紧那罗王殿",
 }
 Room {
 	id = "shaolin/jxzhuang",
 	name = "聚贤庄",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/yidao2",
-	},
+	},	
 }
 Room {
 	id = "shaolin/kchang",
 	name = "空场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/fatang",
 		["north"] = "shaolin/qfdian",
 		["east"] = "shaolin/bydian",
 		["west"] = "shaolin/dzdian",
 	},
+	room_relative="千佛殿｜地藏殿-----空场-----白衣殿｜法堂空场",
 }
 Room {
 	id = "shaolin/kedian1",
 	name = "悦来客栈",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/nanyang",
 		["up"] = "shaolin/kedian2",
 	},
+	room_relative="南阳城｜客店二楼悦来客栈",
 }
 Room {
 	id = "shaolin/kedian2",
 	name = "客店二楼",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/kedian1",
 	},
@@ -22411,6 +25822,7 @@ Room {
 Room {
 	id = "shaolin/kuhuiping",
 	name = "苦慧坪",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/fota2",
 	},
@@ -22418,17 +25830,20 @@ Room {
 Room {
 	id = "shaolin/lhtang",
 	name = "罗汉堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/stoneroad4",
 		["west"] = "shaolin/lwc",
 	},
 	objs = {
           ["玄苦大师"] = "xuanku dashi",
+    room_relative="练武场----罗汉堂----石板路罗汉堂",
            },
 }
 Room {
 	id = "shaolin/liuzu",
 	name = "六祖殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/pingtai",
 	},
@@ -22436,39 +25851,47 @@ Room {
           ["木鱼槌"] = "muyu chui",
           ["道成禅师"] = "daocheng chanshi",
            },
+	room_relative="六祖殿----平台六祖殿",
 }
 Room {
 	id = "shaolin/liwu",
 	name = "里屋",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/houyuan",
 	},
 	objs = {
           ["无名老僧"] = "wuming laoseng",
            },
+	room_relative="小屋--里屋",
 }
 Room {
 	id = "shaolin/lshuyuan",
 	name = "龙树院",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/fangjuku",
 		["north"] = "shaolin/wuqiku",
 		["east"] = "shaolin/huaishu5",
 	},
+	room_relative="武器库｜龙树院----槐树林｜防具库龙树院",
 }
 Room {
 	id = "shaolin/luohan1",
 	name = "罗汉堂一部",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/luohan2",
 	},
 	objs = {
           ["澄观"] = "chengguan luohan",
            },
+	room_relative="罗汉堂二部｜罗汉堂一部罗汉堂一部",
 }
 Room {
 	id = "shaolin/luohan2",
 	name = "罗汉堂二部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/luohan1",
 		["north"] = "shaolin/luohan3",
@@ -22476,21 +25899,25 @@ Room {
 	objs = {
           ["澄知"] = "chengzhi luohan",
            },
+	room_relative="罗汉堂三部｜罗汉堂二部｜罗汉堂一部罗汉堂二部",
 }
 Room {
 	id = "shaolin/luohan3",
 	name = "罗汉堂三部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/luohan2",
 		["north"] = "shaolin/luohan4",
 	},
 	objs = {
           ["澄明"] = "chengming luohan",
+   room_relative="罗汉堂四部｜罗汉堂三部｜罗汉堂二部罗汉堂三部",
            },
 }
 Room {
 	id = "shaolin/luohan4",
 	name = "罗汉堂四部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/luohan3",
 		["north"] = "shaolin/luohan5",
@@ -22498,10 +25925,12 @@ Room {
 	objs = {
           ["澄净"] = "chengjing luohan",
            },
+	room_relative="罗汉堂五部｜罗汉堂四部｜罗汉堂三部罗汉堂四部",
 }
 Room {
 	id = "shaolin/luohan5",
 	name = "罗汉堂五部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/luohan4",
 		["east"] = "shaolin/lwc6",
@@ -22510,11 +25939,13 @@ Room {
 	},
 	objs = {
           ["澄坚"] = "chengjian luohan",
+	room_relative="罗汉堂六部｜演武堂--罗汉堂五部--练武场｜罗汉堂四部罗汉堂五部",
            },
 }
 Room {
 	id = "shaolin/luohan6",
 	name = "罗汉堂六部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/luohan5",
 		["north"] = "shaolin/luohan7",
@@ -22522,21 +25953,25 @@ Room {
 	objs = {
           ["澄行"] = "chengxing luohan",
            },
+	room_relative="罗汉堂七部｜罗汉堂六部｜罗汉堂五部罗汉堂六部",
 }
 Room {
 	id = "shaolin/luohan7",
 	name = "罗汉堂七部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/luohan6",
 		["north"] = "shaolin/luohan8",
 	},
 	objs = {
           ["澄寂"] = "chengji luohan",
+	room_relative="罗汉堂八部｜罗汉堂七部｜罗汉堂六部罗汉堂七部",
            },
 }
 Room {
 	id = "shaolin/luohan8",
 	name = "罗汉堂八部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/luohan7",
 		["north"] = "shaolin/luohan9",
@@ -22544,40 +25979,48 @@ Room {
 	objs = {
           ["澄灭"] = "chengmie luohan",
            },
+	room_relative="罗汉堂九部｜罗汉堂八部｜罗汉堂七部罗汉堂八部",
 }
 Room {
 	id = "shaolin/luohan9",
 	name = "罗汉堂九部",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/luohan8",
 	},
 	objs = {
           ["澄和"] = "chenghe luohan",
            },
+	room_relative="罗汉堂九部｜罗汉堂八部罗汉堂九部",
 }
 Room {
 	id = "shaolin/lwc",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc9",
 		["north"] = "shaolin/lwc2",
 		["east"] = "shaolin/lhtang",
 		["west"] = "shaolin/lwc5",
 	},
+	room_relative="练武场｜中心武场----练武场----罗汉堂｜练武场练武场",
 }
 Room {
 	id = "shaolin/lwc11",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc19",
 		["north"] = "shaolin/lwc12",
 		["east"] = "shaolin/banruo5",
 		["west"] = "shaolin/lwc15",
 	},
+	room_relative="练武场｜中心武场----练武场----般若堂五部｜练武场练武场",
 }
 Room {
 	id = "shaolin/lwc12",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc11",
 		["west"] = "shaolin/lwc13",
@@ -22585,10 +26028,12 @@ Room {
 	objs = {
           ["木人"] = "mu ren",
            },
+	room_relative="练武场----练武场｜练武场练武场",
 }
 Room {
 	id = "shaolin/lwc13",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc15",
 		["east"] = "shaolin/lwc12",
@@ -22597,10 +26042,12 @@ Room {
 	objs = {
           ["梅花桩"] = "meihua zhuang",
            },
+	room_relative="练武场----练武场----练武场｜中心武场练武场",
 }
 Room {
 	id = "shaolin/lwc14",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc16",
 		["east"] = "shaolin/lwc13",
@@ -22608,10 +26055,12 @@ Room {
 	objs = {
           ["铜人"] = "tong ren",
            },
+   room_relative="练武场----练武场｜练武场练武场",
 }
 Room {
 	id = "shaolin/lwc15",
 	name = "中心武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc18",
 		["north"] = "shaolin/lwc13",
@@ -22621,20 +26070,24 @@ Room {
 	objs = {
           ["金人"] = "jin ren",
            },
+	room_relative="练武场｜练武场---中心武场---练武场｜练武场中心武场",
 }
 Room {
 	id = "shaolin/lwc16",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc17",
 		["east"] = "shaolin/lwc15",
 		["north"] = "shaolin/lwc14",
 		["west"] = "shaolin/brtang",
 	},
+	room_relative="练武场｜般若堂----练武场----中心武场｜练武场练武场",
 }
 Room {
 	id = "shaolin/lwc17",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/lwc18",
 		["north"] = "shaolin/lwc16",
@@ -22642,10 +26095,12 @@ Room {
 	objs = {
           ["木人"] = "mu ren",
            },
+	room_relative="练武场｜练武场----练武场练武场",
 }
 Room {
 	id = "shaolin/lwc18",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/lwc19",
 		["north"] = "shaolin/lwc15",
@@ -22654,10 +26109,12 @@ Room {
 	objs = {
           ["梅花桩"] = "meihua zhuang",
            },
+	room_relative="中心武场｜练武场----练武场----练武场练武场",
 }
 Room {
 	id = "shaolin/lwc19",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/lwc11",
 		["west"] = "shaolin/lwc18",
@@ -22665,10 +26122,12 @@ Room {
 	objs = {
           ["铜人"] = "tong ren",
            },
+	room_relative="练武场｜练武场----练武场练武场",
 }
 Room {
 	id = "shaolin/lwc2",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc",
 		["west"] = "shaolin/lwc3",
@@ -22676,10 +26135,12 @@ Room {
 	objs = {
           ["木人"] = "mu ren",
            },
+	room_relative="练武场----练武场｜练武场练武场",
 }
 Room {
 	id = "shaolin/lwc3",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc5",
 		["east"] = "shaolin/lwc2",
@@ -22688,10 +26149,12 @@ Room {
 	objs = {
           ["梅花桩"] = "meihua zhuang",
            },
+	room_relative="练武场----练武场----练武场｜中心武场练武场",
 }
 Room {
 	id = "shaolin/lwc4",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc6",
 		["east"] = "shaolin/lwc3",
@@ -22699,10 +26162,12 @@ Room {
 	objs = {
           ["铜人"] = "tong ren",
            },
+	room_relative="练武场----练武场｜练武场练武场",
 }
 Room {
 	id = "shaolin/lwc5",
 	name = "中心武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc8",
 		["north"] = "shaolin/lwc3",
@@ -22711,21 +26176,25 @@ Room {
 	},
 	objs = {
           ["金人"] = "jin ren",
+	room_relative="练武场｜练武场---中心武场---练武场｜练武场中心武场",
            },
 }
 Room {
 	id = "shaolin/lwc6",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lwc7",
 		["east"] = "shaolin/lwc5",
 		["north"] = "shaolin/lwc4",
 		["west"] = "shaolin/luohan5",
 	},
+	room_relative="练武场｜罗汉堂五部----练武场----中心武场｜练武场练武场",
 }
 Room {
 	id = "shaolin/lwc7",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/lwc8",
 		["north"] = "shaolin/lwc6",
@@ -22733,10 +26202,12 @@ Room {
 	objs = {
           ["木人"] = "mu ren",
            },
+	room_relative="练武场｜练武场----练武场练武场",
 }
 Room {
 	id = "shaolin/lwc8",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/lwc9",
 		["north"] = "shaolin/lwc5",
@@ -22744,22 +26215,26 @@ Room {
 	},
 	objs = {
           ["梅花桩"] = "meihua zhuang",
+	room_relative="中心武场｜练武场----练武场----练武场练武场",
            },
 }
 Room {
 	id = "shaolin/lwc9",
 	name = "练武场",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/lwc",
 		["west"] = "shaolin/lwc8",
 	},
 	objs = {
           ["铜人"] = "tong ren",
+	room_relative="练武场｜练武场----练武场练武场",
            },
 }
 Room {
 	id = "shaolin/lxting",
 	name = "立雪亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/sblu-2",
 		["southdown"] = "shaolin/taijie",
@@ -22767,10 +26242,12 @@ Room {
 	objs = {
           ["慧光尊者"] = "huiguang zunzhe",
            },
+	room_relative="石板路｜立雪亭↑台阶立雪亭",
 }
 Room {
 	id = "shaolin/murenxiang",
 	name = "木人巷",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/murenxiang",
 	},
@@ -22778,16 +26255,19 @@ Room {
 Room {
 	id = "shaolin/nanyang",
 	name = "南阳城",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/yidao2",
 		["north"] = "shaolin/yidao3",
 		["east"] = "shaolin/kedian1",
 		["west"] = "shaolin/jiulou1",
 	},
+	
 }
 Room {
 	id = "shaolin/pingtai",
 	name = "平台",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/jnlwang",
 		["north"] = "shaolin/daxiong",
@@ -22798,20 +26278,24 @@ Room {
           ["少林弟子留言板"] = "board",
           ["慧修尊者"] = "huixiu zunzhe",
            },
+	room_relative="大雄宝殿｜六祖殿-----平台-----紧那罗王殿↑台阶平台",
 }
 Room {
 	id = "shaolin/putiyuan",
 	name = "菩提院",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/huaishu1",
 	},
 	objs = {
           ["玄渡大师"] = "xuandu dashi",
            },
+	room_relative="菩提院----槐树林菩提院",
 }
 Room {
 	id = "shaolin/qdian",
 	name = "前殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/gchang-1",
 		["north"] = "shaolin/twdian",
@@ -22819,10 +26303,12 @@ Room {
 	objs = {
           ["清善比丘"] = "qingshan biqiu",
            },
+	room_relative="天王殿｜前殿｜广场前殿",
 }
 Room {
 	id = "shaolin/qfdian",
 	name = "千佛殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/kchang",
 		["north"] = "shaolin/shanlu1",
@@ -22830,10 +26316,12 @@ Room {
 	objs = {
           ["清观比丘"] = "qingguan biqiu",
            },
+	room_relative="山路｜千佛殿｜空场千佛殿",
 }
 Room {
 	id = "shaolin/qyping",
 	name = "青云坪",
+	outdoor = "嵩山少林",
 	ways = {
 		["enter"] = "shaolin/fumoquan",
 		["sd;w;e;n;e;s;n;e;w;s"] = "shaolin/shanlu8",
@@ -22846,6 +26334,7 @@ Room {
 Room {
 	id = "shaolin/rukou",
 	name = "五行洞入口",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/andao1",
 	},
@@ -22853,14 +26342,17 @@ Room {
 Room {
 	id = "shaolin/ruzhou",
 	name = "汝州城",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "nanyang/yidao3",
 		["west"] = "shaolin/shijie1",
 	},
+	room_relative="石阶----汝州城｜大驿道汝州城",
 }
 Room {
 	id = "shaolin/sblu-1",
 	name = "石板路",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/celang-4",
 		["southwest"] = "shaolin/celang-2",
@@ -22875,6 +26367,7 @@ Room {
 Room {
 	id = "shaolin/sblu-2",
 	name = "石板路",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lxting",
 		["east"] = "shaolin/xiaolu1",
@@ -22886,6 +26379,7 @@ Room {
 Room {
 	id = "shaolin/sblu-3",
 	name = "石板路",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/sblu-2",
 		["northwest"] = "shaolin/jietan1",
@@ -22896,6 +26390,7 @@ Room {
 Room {
 	id = "shaolin/sengshe1",
 	name = "僧舍",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/sengshe3",
 		["north"] = "shaolin/sengshe2",
@@ -22904,28 +26399,32 @@ Room {
 	objs = {
           ["慧合尊者"] = "huihe zunzhe",
            },
-	room_relative="僧舍｜侧廊-----僧舍｜僧舍僧舍",
+ room_relative="僧舍｜侧廊-----僧舍｜僧舍僧舍",
 }
 Room {
 	id = "shaolin/sengshe2",
 	name = "僧舍",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
-		["south"] = "shaolin/sengshe1",
+		["#slss1"] = "shaolin/sengshe1",
 	},
-	room_relative="僧舍｜僧舍僧舍",
+	
 }
 Room {
 	id = "shaolin/sengshe3",
 	name = "僧舍",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
-		["north"] = "shaolin/sengshe1",
+		["#slss2"] = "shaolin/sengshe1",
 	},
+	
 }
 Room {
 	id = "shaolin/sengshe4",
 	name = "僧舍",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/sengshe6",
 		["north"] = "shaolin/sengshe5",
@@ -22934,85 +26433,104 @@ Room {
 	objs = {
           ["慧虚尊者"] = "huixu zunzhe",
            },
-	room_relative="僧舍｜僧舍-----侧廊｜僧舍僧舍",
+	 room_relative="僧舍｜僧舍-----侧廊｜僧舍僧舍",
 }
 Room {
 	id = "shaolin/sengshe5",
 	name = "僧舍",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
-		["south"] = "shaolin/sengshe4",
+		["#slss3"] = "shaolin/sengshe4",
 	},
+	
 }
 Room {
 	id = "shaolin/sengshe6",
 	name = "僧舍",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
-		["north"] = "shaolin/sengshe4",
+		["#slss4"] = "shaolin/sengshe4",
 	},
+	
 }
 Room {
 	id = "shaolin/shanlu1",
 	name = "山路",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/qfdian",
 		["north"] = "shaolin/shanlu2",
 	},
+	room_relative="山路｜山路｜千佛殿山路",
 }
 Room {
 	id = "shaolin/shanlu2",
 	name = "山路",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/shanlu3",
 		["south"] = "shaolin/shanlu1",
 	},
+	room_relative="山路↑山路｜山路山路",
 }
 Room {
 	id = "shaolin/shanlu3",
 	name = "山路",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/shanlu4",
 		["southdown"] = "shaolin/shanlu2",
 	},
+	room_relative="山路｜山路↑山路山路",
 }
 Room {
 	id = "shaolin/shanlu4",
 	name = "山路",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shanlu3",
 		["north"] = "shaolin/czan",
 	},
+	room_relative="初祖庵｜山路｜山路山路",
 }
 Room {
 	id = "shaolin/shanlu5",
 	name = "山路",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/shanlu6",
 		["south"] = "shaolin/czan",
 	},
+	room_relative="山路↑山路｜初祖庵山路",
 }
 Room {
 	id = "shaolin/shanlu6",
 	name = "山路",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/shanlu7",
 		["northwest"] = "shaolin/bamboo1",
 		["southdown"] = "shaolin/shanlu5",
 	--	["nw;sw;se;n;s;w;e;w;e;e;s;w;n;nw;n"] = "shaolin/damodong",
 	},
+	room_relative="竹林山路↖↑山路↑山路山路",
 }
 Room {
 	id = "shaolin/shanlu7",
 	name = "山路",
+	outdoor = "嵩山少林",
 	ways = {
 		["northeast"] = "shaolin/shanlu8",
 		["southdown"] = "shaolin/shanlu6",
 	},
+	room_relative="山路↗山路↑山路山路",
 }
 Room {
 	id = "shaolin/shanlu8",
 	name = "山路",
+	outdoor = "嵩山少林",
 	ways = {
 		["southwest"] = "shaolin/shanlu7",
 		["e;w;e;s;e;n;n;e;w;s"] = "shaolin/qyping",
@@ -23025,14 +26543,17 @@ Room {
 Room {
 	id = "shaolin/shifang",
 	name = "石坊",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shijie11",
 		["north"] = "shaolin/guangchang",
 	},
+	room_relative="广场｜石坊｜石阶石坊",
 }
 Room {
 	id = "shaolin/shijie1",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/shijie2",
 		["east"] = "shaolin/ruzhou",
@@ -23043,14 +26564,17 @@ Room {
 Room {
 	id = "shaolin/shijie10",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/shijie11",
 		["eastdown"] = "shaolin/shijie9",
 	},
+	room_relative="石阶↑石阶←石阶石阶",
 }
 Room {
 	id = "shaolin/shijie11",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/shifang",
 		["southdown"] = "shaolin/shijie10",
@@ -23060,22 +26584,27 @@ Room {
 Room {
 	id = "shaolin/shijie2",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["westup"] = "shaolin/shijie3",
 		["southdown"] = "shaolin/shijie1",
 	},
+	room_relative="石阶←石阶↑石阶石阶",
 }
 Room {
 	id = "shaolin/shijie3",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/shijie4",
 		["eastdown"] = "shaolin/shijie2",
 	},
+	room_relative="石阶↑石阶←石阶石阶",
 }
 Room {
 	id = "shaolin/shijie4",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/shijie5",
 		["southdown"] = "shaolin/shijie3",
@@ -23083,18 +26612,22 @@ Room {
 	objs = {
           ["方天劳"] = "fang tianlao",
            },
+	room_relative="石阶↑石阶↑石阶石阶",
 }
 Room {
 	id = "shaolin/shijie5",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/shijie6",
 		["southdown"] = "shaolin/shijie4",
 	},
+	room_relative="石阶↑石阶↑石阶石阶",
 }
 Room {
 	id = "shaolin/shijie6",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["westup"] = "shaolin/shijie7",
 		["southdown"] = "shaolin/shijie5",
@@ -23108,14 +26641,17 @@ Room {
 Room {
 	id = "shaolin/shijie7",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["eastdown"] = "shaolin/shijie6",
 		["westup"] = "shaolin/shijie8",
 	},
+	room_relative="石阶←石阶←石阶石阶",
 }
 Room {
 	id = "shaolin/shijie8",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/ting",
 		["eastdown"] = "shaolin/shijie7",
@@ -23125,6 +26661,7 @@ Room {
 Room {
 	id = "shaolin/shijie9",
 	name = "石阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["eastup"] = "shaolin/fxjing",
 		["westup"] = "shaolin/shijie10",
@@ -23135,60 +26672,75 @@ Room {
 Room {
 	id = "shaolin/shiting1",
 	name = "石亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/shiting2",
 	},
+	room_relative="石亭石亭",
 }
 Room {
 	id = "shaolin/shiting2",
 	name = "石亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shiting1",
 		["north"] = "shaolin/shiting3",
 	},
+	room_relative="石亭｜石亭石亭",
 }
 Room {
 	id = "shaolin/shiting3",
 	name = "石亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shiting2",
 		["north"] = "shaolin/shiting4",
 	},
+	room_relative="石亭｜石亭石亭",
 }
 Room {
 	id = "shaolin/shiting4",
 	name = "石亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shiting3",
 		["north"] = "shaolin/shiting5",
 	},
+	room_relative="石亭｜石亭石亭",
 }
 Room {
 	id = "shaolin/shiting5",
 	name = "石亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shiting4",
 		["north"] = "shaolin/shiting6",
 	},
+	room_relative="石亭｜石亭石亭",
 }
 Room {
 	id = "shaolin/shiting6",
 	name = "石亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shiting5",
 		["north"] = "shaolin/shiting7",
 	},
+	room_relative="石亭｜石亭石亭",
 }
 Room {
 	id = "shaolin/shiting7",
 	name = "石亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/shiting6",
 	},
+	room_relative="石亭--石亭",
 }
 Room {
 	id = "shaolin/slyuan",
 	name = "舍利院",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
 		["east"] = "shaolin/huaishu4",
@@ -23205,6 +26757,7 @@ Room {
 Room {
 	id = "shaolin/talin1",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["east"] = "shaolin/slyuan",
 		["northeast"] = "shaolin/talin2",
@@ -23216,42 +26769,52 @@ Room {
 Room {
 	id = "shaolin/talin2",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["north"] = "shaolin/talin3",
 		["southeast"] = "shaolin/talin1",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin3",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["south"] = "shaolin/talin2",
 		["northwest"] = "shaolin/talin4",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin4",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["southeast"] = "shaolin/talin3",
 		["southwest"] = "shaolin/talin5",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin5",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["northeast"] = "shaolin/talin4",
 		["west"] = "shaolin/talin6",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin6",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["northeast"] = "shaolin/talin7",
 		["east"] = "shaolin/talin5",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin7",
@@ -23260,34 +26823,42 @@ Room {
 	    ["west"] = "shaolin/talin8",
 		["southwest"] = "shaolin/talin6",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin8",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["south"] = "shaolin/talin9",
 		["east"] = "shaolin/talin7",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin9",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["northwest"] = "shaolin/talin10",
 		["north"] = "shaolin/talin8",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin10",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["southeast"] = "shaolin/talin9",
 		["southwest"] = "shaolin/talin11",
 	},
+	room_relative="塔林｜塔林塔林",
 }
 Room {
 	id = "shaolin/talin11",
 	name = "塔林",
+	outdoor = "嵩山少林",
 	ways = {
 	    ["northeast"] = "shaolin/talin10",
 		["north"] = "shaolin/fotaout",
@@ -23296,6 +26867,7 @@ Room {
 Room {
 	id = "shaolin/smdian",
 	name = "山门殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/guangchang",
 		["north"] = "shaolin/gchang-1",
@@ -23306,48 +26878,58 @@ Room {
 	precmds = {
 		["south"] = "open gate",
 	},
+	
 }
 Room {
 	id = "shaolin/songshu1",
 	name = "松树林",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/songshu2",
 		["northwest"] = "shaolin/hguangz3",
 		["east"] = "shaolin/yaowang",
 	},
+	room_relative="后殿广场↖松树林----药王院｜松树林松树林",
 }
 Room {
 	id = "shaolin/songshu2",
 	name = "松树林",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/songshu3",
 		["north"] = "shaolin/songshu1",
 		["west"] = "shaolin/stoneroad1",
 	},
+	room_relative="松树林｜石板路----松树林｜松树林松树林",
 }
 Room {
 	id = "shaolin/songshu3",
 	name = "松树林",
+	outdoor = "嵩山少林",
 	ways = {
 		["southwest"] = "shaolin/celang2",
 		["east"] = "shaolin/songshu4",
 		["north"] = "shaolin/songshu2",
 	},
+	room_relative="松树林｜松树林----松树林↙侧廊松树林",
 }
 Room {
 	id = "shaolin/songshu4",
 	name = "松树林",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/jieluyua",
 		["west"] = "shaolin/songshu3",
 	},
 	lengths = {
-		["east"] = "if score.party and score.party=='少林派' and hp.shen>0 and skills['force'] and skills['force'].lvl<220 then return 1 else return false end",
+		["east"] = "if score.party and score.party=='嵩山少林' and hp.shen>0 and skills['force'] and skills['force'].lvl<220 then return 1 else return false end",
 	},
+	room_relative="松树林----松树林----戒律院松树林",
 }
 Room {
 	id = "shaolin/stoneroad1",
 	name = "石板路",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/daxiong",
 		["east"] = "shaolin/songshu2",
@@ -23362,6 +26944,7 @@ Room {
 Room {
 	id = "shaolin/stoneroad2",
 	name = "石板路",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/xianglu",
 		["east"] = "shaolin/stoneroad3",
@@ -23376,6 +26959,7 @@ Room {
 Room {
 	id = "shaolin/stoneroad3",
 	name = "石板路",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/celang2",
 		["east"] = "shaolin/brtang",
@@ -23386,6 +26970,7 @@ Room {
 Room {
 	id = "shaolin/stoneroad4",
 	name = "石板路",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/stoneroad2",
 		["north"] = "shaolin/celang1",
@@ -23396,15 +26981,18 @@ Room {
 Room {
 	id = "shaolin/taijie",
 	name = "台阶",
+	outdoor = "嵩山少林",
 	ways = {
 		["northup"] = "shaolin/lxting",
 		["south"] = "shaolin/houdian",
 	},
+	room_relative="立雪亭↑台阶｜后殿台阶",
 }
 
 Room {
 	id = "shaolin/tianming",
 	name = "天鸣禅台",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/fota2",
 	},
@@ -23412,14 +27000,15 @@ Room {
 Room {
 	id = "shaolin/ting",
 	name = "迎客亭",
+	outdoor = "嵩山少林",
 	ways = {
 		["#weaponUnWalk;northup;#weaponWWalk"] = "shaolin/shijie9",
 		["northup"] = "shaolin/shijie9",
 		["southdown"] = "shaolin/shijie8",
 	},
 	lengths = {
-	    ["#weaponUnWalk;northup;#weaponWWalk"] = "if score.party~='少林派' then return 1 else return false end",
-		["northup"] = "if score.party=='少林派' then return 1 else return false end",
+	    ["#weaponUnWalk;northup;#weaponWWalk"] = "if score.party~='嵩山少林' then return 1 else return false end",
+		["northup"] = "if score.party=='嵩山少林' then return 1 else return false end",
 	},
 	objs = {
           ["虚明"] = "xu ming",
@@ -23430,6 +27019,7 @@ Room {
 Room {
 	id = "shaolin/twdian",
 	name = "天王殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/qdian",
 		["north"] = "shaolin/sblu-1",
@@ -23437,17 +27027,21 @@ Room {
 	objs = {
           ["道果禅师"] = "daoguo chanshi",
            },
+	room_relative="石板路｜天王殿｜前殿天王殿",
 }
 Room {
 	id = "shaolin/woshi",
 	name = "卧室",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/xiaowu",
 	},
+	room_relative="卧室｜小土屋卧室",
 }
 Room {
 	id = "shaolin/wstang1",
 	name = "武僧堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wstang2",
 		["east"] = "shaolin/yanwutang",
@@ -23459,6 +27053,7 @@ Room {
 Room {
 	id = "shaolin/wstang2",
 	name = "武僧堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wstang3",
 		["north"] = "shaolin/wstang1",
@@ -23470,6 +27065,7 @@ Room {
 Room {
 	id = "shaolin/wstang3",
 	name = "武僧堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wstang4",
 		["north"] = "shaolin/wstang2",
@@ -23481,6 +27077,7 @@ Room {
 Room {
 	id = "shaolin/wstang4",
 	name = "武僧堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wstang5",
 		["north"] = "shaolin/wstang3",
@@ -23492,6 +27089,7 @@ Room {
 Room {
 	id = "shaolin/wstang5",
 	name = "武僧堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wstang6",
 		["north"] = "shaolin/wstang4",
@@ -23503,6 +27101,7 @@ Room {
 Room {
 	id = "shaolin/wstang6",
 	name = "武僧堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/wstang5",
 	},
@@ -23513,30 +27112,37 @@ Room {
 Room {
 	id = "shaolin/wuqiku",
 	name = "武器库",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/lshuyuan",
 	},
 	objs = {
           ["道尘禅师"] = "daochen chanshi",
            },
+	room_relative="武器库｜龙树院武器库",
 }
 Room {
 	id = "shaolin/wusetai",
 	name = "无色台",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/fota2",
 	},
+	room_relative="圣僧塔--无色台",
 }
 Room {
 	id = "shaolin/wuxiangpai",
 	name = "无相牌",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/fota2",
 	},
+	room_relative="圣僧塔--无相牌",
 }
 Room {
 	id = "shaolin/wuxing0",
 	name = "五行洞",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wuxing3",
 		["east"] = "shaolin/wuxing4",
@@ -23547,6 +27153,7 @@ Room {
 Room {
 	id = "shaolin/wuxing1",
 	name = "五行洞",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wuxing3",
 		["north"] = "shaolin/wuxing2",
@@ -23557,6 +27164,7 @@ Room {
 Room {
 	id = "shaolin/wuxing2",
 	name = "五行洞",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wuxing4",
 		["north"] = "shaolin/wuxing3",
@@ -23567,6 +27175,7 @@ Room {
 Room {
 	id = "shaolin/wuxing3",
 	name = "五行洞",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wuxing2",
 		["north"] = "shaolin/wuxing4",
@@ -23577,6 +27186,7 @@ Room {
 Room {
 	id = "shaolin/wuxing4",
 	name = "五行洞",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/wuxing3",
 		["north"] = "shaolin/wuxing2",
@@ -23587,20 +27197,23 @@ Room {
 Room {
 	id = "shaolin/xclang",
 	name = "石廊",
+	outdoor = "嵩山少林",
 	ways = {
 		["northwest"] = "shaolin/gygu",
 		["east"] = "shaolin/xctang",
 	},
+	room_relative="归元谷｜心禅堂石廊",
 }
 Room {
 	id = "shaolin/xcping",
 	name = "心禅坪",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/xctang",
 		["west"] = "shaolin/fatang",
 	},
 	lengths = {
-		["north"] = "if score.party and score.party=='少林派' then return 1 else return false end",
+		["north"] = "if score.party and score.party=='嵩山少林' then return 1 else return false end",
 	},
 	objs = {
           ["慧云尊者"] = "huiyun zunzhe",
@@ -23609,6 +27222,7 @@ Room {
 Room {
 	id = "shaolin/xctang",
 	name = "心禅堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/xcping",
 		["north"] = "shaolin/duanya",
@@ -23621,14 +27235,17 @@ Room {
 Room {
 	id = "shaolin/xianglu",
 	name = "香炉",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/sblu-1",
 		["north"] = "shaolin/stoneroad2",
 	},
+	room_relative="石板路｜香炉｜石板路香炉",
 }
 Room {
 	id = "shaolin/xiaojin1",
 	name = "小径",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/houyuan",
 		["jump out"] = "shaolin/cjlou1",
@@ -23636,18 +27253,22 @@ Room {
 	nolooks = {
 		["jump out"] = true,
 	},
+	
 }
 Room {
 	id = "shaolin/xiaojing2",
 	name = "田埂边",
+	outdoor = "嵩山少林",
 	ways = {
 		["southdown"] = "group/entry/slxiaoj1",
 		["west"] = "shaolin/houshan",
 	},
+	room_relative="小院----田埂边↑山坡田埂边",
 }
 Room {
 	id = "shaolin/xiaolu-1",
 	name = "小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/xiaolu-2",
 		["north"] = "shaolin/chufang2",
@@ -23657,6 +27278,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu-2",
 	name = "小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/xiaolu-3",
 		["northwest"] = "shaolin/xiaolu-1",
@@ -23666,6 +27288,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu-3",
 	name = "小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/cyzi-1",
 		["north"] = "shaolin/xiaolu-2",
@@ -23675,6 +27298,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu1",
 	name = "林中小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/xiaolu2",
 		["west"] = "shaolin/sblu-2",
@@ -23684,6 +27308,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu2",
 	name = "林中小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["northeast"] = "shaolin/xiaolu3",
 		["west"] = "shaolin/xiaolu1",
@@ -23693,6 +27318,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu3",
 	name = "林中小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/xiaolu4",
 		["southwest"] = "shaolin/xiaolu2",
@@ -23702,6 +27328,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu4",
 	name = "林中小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["northwest"] = "shaolin/xiaolu3",
 		["east"] = "shaolin/xiaoxi",
@@ -23711,6 +27338,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu5",
 	name = "林中小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/sblu-2",
 		["west"] = "shaolin/xiaolu6",
@@ -23720,6 +27348,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu6",
 	name = "林中小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/xiaolu5",
 		["west"] = "shaolin/xiaolu7",
@@ -23729,6 +27358,7 @@ Room {
 Room {
 	id = "shaolin/xiaolu7",
 	name = "林中小路",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/xiaolu6",
 		["west"] = "shaolin/fzjs",
@@ -23738,25 +27368,30 @@ Room {
 Room {
 	id = "shaolin/xiaowu",
 	name = "小土屋",
+	outdoor = "嵩山少林",
 	ways = {
 		["south"] = "shaolin/houshan",
 		["north"] = "shaolin/woshi",
 	},
+	room_relative="卧室｜小土屋｜小院小土屋",
 }
 Room {
 	id = "shaolin/xiaoxi",
 	name = "小溪",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/xiaolu4",
 		["jump river"] = "shaolin/xiaoxi1",
 	},
 	nolooks = {
 		["jump river"] = true,
+	room_relative="林中小路←",
 	},
 }
 Room {
 	id = "shaolin/xiaoxi1",
 	name = "溪旁空地",
+	outdoor = "嵩山少林",
 	ways = {
 		["enter"] = "shaolin/cjlou",
 		["jump river"] = "shaolin/xiaoxi",
@@ -23768,24 +27403,29 @@ Room {
 Room {
 	id = "shaolin/xjchu",
 	name = "粥室",
+	outdoor = "嵩山少林",
 	no_fight = true,
 	ways = {
 		["south"] = "shaolin/zhaitang",
 	},
+	room_relative="粥室｜斋堂粥室",
 }
 Room {
 	id = "shaolin/xumidian",
 	name = "须弥殿",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/dabeidia",
 	},
 	objs = {
           ["木鱼槌"] = "muyu chui",
            },
+		room_relative="须弥殿----大悲殿须弥殿",
 }
 Room {
 	id = "shaolin/yading",
 	name = "崖顶",
+	outdoor = "嵩山少林",
 	ways = {
 		["enter"] = "shaolin/houshand",
 		["down"] = "shaolin/duanya",
@@ -23794,27 +27434,31 @@ Room {
 Room {
 	id = "shaolin/yanwutang",
 	name = "演武堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/luohan5",
 		["west"] = "shaolin/wstang1",
 	},
 	lengths = {
-		["west"] = "if score.party and score.party=='少林派' then return 1 else return false end",
+		["west"] = "if score.party and score.party=='嵩山少林' then return 1 else return false end",
 	},
 }
 Room {
 	id = "shaolin/yaowang",
 	name = "药王院",
+	outdoor = "嵩山少林",
 	ways = {
 		["west"] = "shaolin/songshu1",
 	},
 	objs = {
           ["道象禅师"] = "daoxiang chanshi",
            },
+	room_relative="松树林----药王院药王院",
 }
 Room {
 	id = "shaolin/zdyuan",
 	name = "证道院",
+	outdoor = "嵩山少林",
 	ways = {
 		["east"] = "shaolin/celang-2",
 		["west"] = "shaolin/chanfang-1",
@@ -23823,10 +27467,12 @@ Room {
           ["九环锡杖"] = "jiuhuan xizhang",
 		  ["玄生大师"] = "xuansheng dashi",
            },
+	room_relative="禅房----证道院----西侧廊证道院",
 }
 Room {
 	id = "shaolin/zhaitang",
 	name = "斋堂",
+	outdoor = "嵩山少林",
 	ways = {
 		["north"] = "shaolin/xjchu",
 		["east"] = "shaolin/fanting1",
@@ -23835,10 +27481,12 @@ Room {
 	objs = {
           ["慧洁尊者"] = "huijie zunzhe",
            },
+	room_relative="粥室｜东侧廊-----斋堂-----饭厅斋堂",
 }
 Room {
 	id = "shaolin/zhlou1",
 	name = "钟楼一层",
+	outdoor = "嵩山少林",
 	ways = {
 		["out"] = "shaolin/zhonglou",
 		["up"] = "shaolin/zhlou2",
@@ -23847,6 +27495,7 @@ Room {
 Room {
 	id = "shaolin/zhlou2",
 	name = "钟楼二层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/zhlou1",
 		["up"] = "shaolin/zhlou3",
@@ -23855,6 +27504,7 @@ Room {
 Room {
 	id = "shaolin/zhlou3",
 	name = "钟楼三层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/zhlou2",
 		["up"] = "shaolin/zhlou4",
@@ -23863,6 +27513,7 @@ Room {
 Room {
 	id = "shaolin/zhlou4",
 	name = "钟楼四层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/zhlou3",
 		["up"] = "shaolin/zhlou5",
@@ -23871,6 +27522,7 @@ Room {
 Room {
 	id = "shaolin/zhlou5",
 	name = "钟楼五层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/zhlou4",
 		["up"] = "shaolin/zhlou6",
@@ -23879,6 +27531,7 @@ Room {
 Room {
 	id = "shaolin/zhlou6",
 	name = "钟楼六层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/zhlou5",
 		["up"] = "shaolin/zhlou7",
@@ -23887,6 +27540,7 @@ Room {
 Room {
 	id = "shaolin/zhlou7",
 	name = "钟楼七层",
+	outdoor = "嵩山少林",
 	ways = {
 		["down"] = "shaolin/zhlou6",
 	},
@@ -23897,21 +27551,26 @@ Room {
 Room {
 	id = "shaolin/zhonglou",
 	name = "钟楼小院",
+	outdoor = "嵩山少林",
 	ways = {
 		["enter"] = "shaolin/zhlou1",
 		["west"] = "shaolin/celang-3",
 	},
+	room_relative="钟楼一层∧东侧廊---钟楼小院钟楼小院",
 }
 Room {
 	id = "shaolin/zhushe",
 	name = "猪舍",
+	outdoor = "嵩山少林",
 	ways = {
 		["southeast"] = "shaolin/houshan",
 	},
+	room_relative="猪舍↘小院猪舍",
 }
 Room {
 	id = "sld/blm",
 	name = "白龙门议事厅",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/blmws",
 		["west"] = "sld/blmlgf",
@@ -23921,32 +27580,40 @@ Room {
           ["钟志灵"] = "zhong zhiling",
           ["白龙门弟子"] = "white dizi",
            },
+  room_relative="练功房--白龙门议事厅--卧室∨山坡白龙门议事厅",
 }
 Room {
 	id = "sld/blmlgf",
 	name = "练功房",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/blm",
 	},
+	room_relative="练功房----白龙门议事厅练功房",
 }
 Room {
 	id = "sld/blmws",
 	name = "卧室",
+	outdoor = "神龙岛",
 	no_fight = true,
 	ways = {
 		["west"] = "sld/blm",
 	},
+	room_relative="白龙门议事厅-----卧室卧室",
 }
 Room {
 	id = "sld/cf",
 	name = "厨房",
+	outdoor = "神龙岛",
 	ways = {
 		["west"] = "sld/th",
 	},
+	room_relative="厅后--厨房",
 }
 Room {
 	id = "sld/clm",
 	name = "赤龙门议事厅",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/clmws",
 		["west"] = "sld/clmlgf",
@@ -23956,25 +27623,31 @@ Room {
           ["无根道人"] = "wugen daoren",
           ["赤龙门弟子"] = "red dizi",
            },
+   room_relative="练功房--赤龙门议事厅--卧室∨山坡赤龙门议事厅",
 }
 Room {
 	id = "sld/clmlgf",
 	name = "练功房",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/clm",
 	},
+	room_relative="练功房----赤龙门议事厅练功房",
 }
 Room {
 	id = "sld/clmws",
 	name = "卧室",
+	outdoor = "神龙岛",
 	no_fight = true,
 	ways = {
 		["west"] = "sld/clm",
 	},
+	room_relative="赤龙门议事厅-----卧室卧室",
 }
 Room {
 	id = "sld/dt",
 	name = "大厅",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/slj",
 		["north"] = "sld/th",
@@ -23986,10 +27659,12 @@ Room {
           ["胖头陀"] = "pang toutuo",
           ["苏荃"] = "su quan",
            },
+	room_relative="厅后｜大厅｜走廊大厅",
 }
 Room {
 	id = "sld/dukou",
 	name = "渡口",
+	outdoor = "神龙岛",
 	ways = {
 		["northwest"] = "sld/sandw",
 		["north"] = "sld/trees1",
@@ -23998,10 +27673,12 @@ Room {
 	objs = {
           ["船夫"] = "chuan fu",
            },
+	room_relative="沙滩树林沙滩↖｜↗渡口渡口",
 }
 Room {
 	id = "sld/haitan",
 	name = "海滩",
+	outdoor = "神龙岛",
 	ways = {
 		["southwest"] = "sld/xiaolu",
 		["#toSld"] = "sld/dukou",
@@ -24012,10 +27689,12 @@ Room {
 	lengths = {
 		["#toSld"] = 100,
 	},
+	room_relative="渡口｜小路海滩",
 }
 Room {
 	id = "sld/hlm",
 	name = "黑龙门议事厅",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/hlmws",
 		["west"] = "sld/hlmlgf",
@@ -24025,32 +27704,40 @@ Room {
           ["张淡月"] = "zhang danyue",
           ["黑龙门弟子"] = "black dizi",
            },
+  room_relative="练功房｜山坡-----卧室黑龙门议事厅",
 }
 Room {
 	id = "sld/hlmlgf",
 	name = "练功房",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/hlm",
 	},
+	room_relative="练功房--黑龙门议事厅",
 }
 Room {
 	id = "sld/hlmws",
 	name = "卧室",
+	outdoor = "神龙岛",
 	no_fight = true,
 	ways = {
 		["west"] = "sld/hlm",
 	},
+	room_relative="黑龙门议事厅--卧室",
 }
 Room {
 	id = "sld/ht",
 	name = "后厅",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/th",
 	},
+	room_relative="后厅｜厅后后厅",
 }
 Room {
 	id = "sld/hulm",
 	name = "黄龙门议事厅",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/hulmws",
 		["west"] = "sld/hulmlgf",
@@ -24060,25 +27747,32 @@ Room {
           ["殷锦"] = "yin jin",
           ["黄龙门弟子"] = "yellow dizi",
            },
+	room_relative="练功房--黄龙门议事厅--卧室∨山坡黄龙门议事厅",
 }
 Room {
 	id = "sld/hulmlgf",
 	name = "练功房",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/hulm",
 	},
+	room_relative="练功房----黄龙门议事厅练功房",
 }
+
 Room {
 	id = "sld/hulmws",
 	name = "卧室",
+	outdoor = "神龙岛",
 	no_fight = true,
 	ways = {
 		["west"] = "sld/hulm",
 	},
+	room_relative="黄龙门议事厅-----卧室卧室",
 }
 Room {
 	id = "sld/jitan",
 	name = "祭坛",
+	outdoor = "神龙岛",
 	ways = {
 		["out"] = "sld/pt",
 	},
@@ -24086,6 +27780,7 @@ Room {
 Room {
 	id = "sld/kongdi",
 	name = "林间空地",
+	outdoor = "神龙岛",
 	ways = {
 		["northup"] = "sld/sanroad1",
 		["south"] = "sld/trees2",
@@ -24094,22 +27789,25 @@ Room {
 	},
 	objs = {
           ["神龙教弟子留言版"] = "board",
+	room_relative="树林｜林间空地｜树林林间空地",
            },
-	room_relative="树林｜林间空地｜树林林间空地",	
 }
 Room {
 	id = "sld/lgf",
 	name = "练功房",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/road2",
 	},
 	objs = {
           ["双钩"] = "shuang gou",
            },
+	room_relative="走廊--练功房",
 }
 Room {
 	id = "sld/lgxroom",
 	name = "陆府正厅",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/lgxys",
 		["north"] = "sld/lgxws",
@@ -24126,31 +27824,38 @@ Room {
 Room {
 	id = "sld/lgxws",
 	name = "卧室",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/lgxroom",
 	},
+	room_relative="陆府正厅--卧室",
 }
 Room {
 	id = "sld/lgxys",
 	name = "药室",
+	outdoor = "神龙岛",
 	ways = {
 		["west"] = "sld/lgxroom",
 	},
 	objs = {
           ["药柜"] = "yaogui",
            },
+	room_relative="陆府正厅--药室",
 }
 Room {
 	id = "sld/pt",
 	name = "平台",
+	outdoor = "神龙岛",
 	ways = {
 		["enter"] = "sld/jitan",
 		["east"] = "sld/zl2",
 	},
+	room_relative="祭坛｜竹林平台",
 }
 Room {
 	id = "sld/qlm",
 	name = "青龙门议事厅",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/qlmws",
 		["west"] = "sld/qlmlgf",
@@ -24160,70 +27865,86 @@ Room {
           ["许雪亭"] = "xu xueting",
           ["青龙门弟子"] = "green dizi",
     },
+	room_relative="练功房--青龙门议事厅--卧室∨山坡青龙门议事厅",
 }
 Room {
 	id = "sld/qlmlgf",
 	name = "练功房",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/qlm",
 	},
+	room_relative="练功房----青龙门议事厅练功房",
 }
 Room {
 	id = "sld/qlmws",
 	name = "卧室",
+	outdoor = "神龙岛",
 	no_fight = true,
 	ways = {
 		["west"] = "sld/qlm",
 	},
+	room_relative="青龙门议事厅-----卧室卧室",
 }
 Room {
 	id = "sld/road1",
 	name = "走廊",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/ws",
 		["east"] = "sld/slj",
 		["west"] = "sld/road2",
 	},
+	room_relative="走廊-----走廊-----走廊｜卧室走廊",
 }
 Room {
 	id = "sld/road2",
 	name = "走廊",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/road1",
 		["north"] = "sld/lgf",
 		["west"] = "sld/tz",
 	},
+	room_relative="练功房｜走廊-----走廊-----走廊走廊",
 }
 Room {
 	id = "sld/sande",
 	name = "沙滩",
+	outdoor = "神龙岛",
 	ways = {
 		["southwest"] = "sld/dukou",
 		["northwest"] = "sld/sandn",
 		["west"] = "sld/treee1",
 	},
+	room_relative="渡口｜树林----沙滩沙滩",
 }
 Room {
 	id = "sld/sandn",
 	name = "沙滩",
+	outdoor = "神龙岛",
 	ways = {
 		["southeast"] = "sld/sande",
 		["southwest"] = "sld/sandw",
 		["south"] = "sld/treen1",
 	},
+	room_relative="沙滩↙｜↘沙滩树林沙滩沙滩",
 }
 Room {
 	id = "sld/sandw",
 	name = "沙滩",
+	outdoor = "神龙岛",
 	ways = {
 		["southeast"] = "sld/dukou",
 		["east"] = "sld/treew1",
 		["northeast"] = "sld/sandn",
 	},
+	room_relative="渡口｜树林----沙滩沙滩",
 }
 Room {
 	id = "sld/sanpo1",
 	name = "山坡",
+	outdoor = "神龙岛",
 	ways = {
 		["eastup"] = "sld/sanroad5",
 		["north"] = "sld/sanroad6",
@@ -24234,6 +27955,7 @@ Room {
 Room {
 	id = "sld/sanpo2",
 	name = "山坡",
+	outdoor = "神龙岛",
 	ways = {
 		["westdown"] = "sld/sanroad4",
 		["enter"] = "sld/hlm",
@@ -24243,6 +27965,7 @@ Room {
 Room {
 	id = "sld/sanpo3",
 	name = "山坡",
+	outdoor = "神龙岛",
 	ways = {
 		["southup"] = "sld/sanroad7",
 		["enter"] = "sld/clm",
@@ -24252,6 +27975,7 @@ Room {
 Room {
 	id = "sld/sanpo4",
 	name = "山坡",
+	outdoor = "神龙岛",
 	ways = {
 		["enter"] = "sld/hulm",
 		["southdown"] = "sld/sanroad9",
@@ -24261,6 +27985,7 @@ Room {
 Room {
 	id = "sld/sanpo5",
 	name = "山坡",
+	outdoor = "神龙岛",
 	ways = {
 		["southup"] = "sld/sanroad8",
 		["enter"] = "sld/qlm",
@@ -24270,6 +27995,7 @@ Room {
 Room {
 	id = "sld/sanpo6",
 	name = "山坡",
+	outdoor = "神龙岛",
 	ways = {
 		["westdown"] = "sld/sanroad8",
 		["enter"] = "sld/blm",
@@ -24280,6 +28006,7 @@ Room {
 Room {
 	id = "sld/sanroad1",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["southdown"] = "sld/kongdi",
 		["up"] = "sld/sanroad2",
@@ -24289,6 +28016,7 @@ Room {
 Room {
 	id = "sld/sanroad2",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["northup"] = "sld/sanroad3",
 		["down"] = "sld/sanroad1",
@@ -24299,6 +28027,7 @@ Room {
 Room {
 	id = "sld/sanroad3",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["eastup"] = "sld/sanroad4",
 		["southdown"] = "sld/sanroad2",
@@ -24308,6 +28037,7 @@ Room {
 Room {
 	id = "sld/sanroad4",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["westdown"] = "sld/sanroad3",
 		["eastup"] = "sld/sanpo2",
@@ -24317,16 +28047,18 @@ Room {
 Room {
 	id = "sld/sanroad5",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["northup"] = "sld/sanroad9",
 		["eastup"] = "sld/sanroad8",
 		["westdown"] = "sld/sanpo1",
 	},
-	room_relative="山路↑山坡→山路→山路山路",
+	room_relative="山路↑山坡→山路→山路山路↙",
 }
 Room {
 	id = "sld/sanroad6",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/sanpo1",
 		["northdown"] = "sld/sanroad7",
@@ -24336,6 +28068,7 @@ Room {
 Room {
 	id = "sld/sanroad7",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["southup"] = "sld/sanroad6",
 		["northdown"] = "sld/sanpo3",
@@ -24345,6 +28078,7 @@ Room {
 Room {
 	id = "sld/sanroad8",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["westdown"] = "sld/sanroad5",
 		["eastup"] = "sld/sanpo6",
@@ -24355,16 +28089,18 @@ Room {
 Room {
 	id = "sld/sanroad9",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["northup"] = "sld/sanpo4",
 		["eastup"] = "sld/sanpo7",
-		["southdown"] = "sld/sanroad5",
+		["#sldroad"] = "sld/sanroad5",
 	},
 	room_relative="山坡↑山路→山崖↑山路山路",
 }
 Room {
 	id = "sld/sanroada",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/sanpo6",
 		["up"] = "sld/sanroadb",
@@ -24374,6 +28110,7 @@ Room {
 Room {
 	id = "sld/sanroadb",
 	name = "山路",
+	outdoor = "神龙岛",
 	ways = {
 		["down"] = "sld/sanroada",
 		["up"] = "sld/sfd",
@@ -24383,14 +28120,17 @@ Room {
 Room {
 	id = "sld/sfd",
 	name = "山峰顶",
+	outdoor = "神龙岛",
 	ways = {
 		["enter"] = "sld/slj",
 		["down"] = "sld/sanroadb",
 	},
+	room_relative="走廊∧山峰顶〓山路山峰顶",
 }
 Room {
 	id = "sld/sanpo7",
 	name = "山崖",
+	outdoor = "神龙岛",
 	ways = {
 		["westdown"] = "sld/sanroad9",
 		["#Insldsk"] = "sld/sheku",
@@ -24405,6 +28145,7 @@ Room {
 Room {
 	id = "sld/sheku",
 	name = "蛇窟",
+	outdoor = "神龙岛",
 	ways = {
 		["#Outsldsk"] = "sld/treen1",
 	},
@@ -24419,106 +28160,129 @@ Room {
 Room {
 	id = "sld/slj",
 	name = "走廊",
+	outdoor = "神龙岛",
 	ways = {
 		["north"] = "sld/dt",
 		["west"] = "sld/road1",
 		["out"] = "sld/sfd",
 	},
+	room_relative="大厅｜走廊-----走廊∨山峰顶走廊",
 }
 Room {
 	id = "sld/th",
 	name = "厅后",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/dt",
 		["north"] = "sld/ht",
 		["east"] = "sld/cf",
 	},
+	room_relative="后厅｜厅后-----厨房｜大厅厅后",
 }
 Room {
 	id = "sld/treee1",
 	name = "树林",
+	outdoor = "神龙岛",
 	ways = {
 		["southwest"] = "sld/trees2",
 		["northwest"] = "sld/treen2",
 		["east"] = "sld/sande",
 	},
+	room_relative="沙滩｜树林----树林树林",
 }
 Room {
 	id = "sld/treen1",
 	name = "树林",
+	outdoor = "神龙岛",
 	ways = {
 		["southeast"] = "sld/treee1",
 		["southwest"] = "sld/treew1",
 		["south"] = "sld/treen2",
 		["north"] = "sld/sandn",
 	},
+	room_relative="沙滩｜树林↙｜↘树林树林树林树林",
 }
 Room {
 	id = "sld/treen2",
 	name = "树林",
+	outdoor = "神龙岛",
 	ways = {
 		["southeast"] = "sld/treee1",
 		["southwest"] = "sld/treew1",
 		["south"] = "sld/kongdi",
 		["north"] = "sld/treen1",
 	},
+	room_relative="树林｜树林↙｜↘树林林间空地树林树林",
 }
 Room {
 	id = "sld/trees1",
 	name = "树林",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/dukou",
 		["northwest"] = "sld/treew1",
 		["north"] = "sld/trees2",
 		["northeast"] = "sld/treee1",
 	},
+	room_relative="渡口｜树林----树林｜树林树林",
 }
 Room {
 	id = "sld/trees2",
 	name = "树林",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/trees1",
 		["northwest"] = "sld/treew1",
 		["north"] = "sld/kongdi",
 		["northeast"] = "sld/treee1",
 	},
+	room_relative="林间空地｜树林-----树林↖｜树林树林",
 }
 Room {
 	id = "sld/treew1",
 	name = "树林",
+	outdoor = "神龙岛",
 	ways = {
 		["southeast"] = "sld/trees2",
 		["northeast"] = "sld/treen2",
 		["west"] = "sld/sandw",
 	},
+	room_relative="沙滩｜树林-----树林树林",
 }
 Room {
 	id = "sld/tz",
 	name = "走廊",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/road2",
 		["out"] = "sld/zl1",
 	},
+	room_relative="走廊-----走廊∨竹林走廊",
 }
 Room {
 	id = "sld/ws",
 	name = "卧室",
+	outdoor = "神龙岛",
 	no_fight = true,
 	ways = {
 		["north"] = "sld/road1",
 	},
+	room_relative="走廊--卧室"
 }
 Room {
 	id = "sld/xiaolu",
 	name = "小路",
+	outdoor = "神龙岛",
 	ways = {
 		["southwest"] = "tanggu/gangkou",
 		["northeast"] = "sld/haitan",
 	},
+	room_relative="海滩↗小路↙港口小路",
 }
 Room {
 	id = "sld/yaopu1",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/zl1",
 		["north"] = "sld/yaopu2",
@@ -24528,6 +28292,7 @@ Room {
 Room {
 	id = "sld/yaopu2",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/yaopu1",
 		["north"] = "sld/yaopu3",
@@ -24537,6 +28302,7 @@ Room {
 Room {
 	id = "sld/yaopu3",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/yaopu2",
 		["west"] = "sld/yaopu4",
@@ -24545,6 +28311,7 @@ Room {
 Room {
 	id = "sld/yaopu4",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/yaopu5",
 		["east"] = "sld/yaopu3",
@@ -24554,6 +28321,7 @@ Room {
 Room {
 	id = "sld/yaopu5",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/yaopu6",
 		["north"] = "sld/yaopu4",
@@ -24564,6 +28332,7 @@ Room {
 Room {
 	id = "sld/yaopu6",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["north"] = "sld/yaopu5",
 		["east"] = "sld/yaopu1",
@@ -24573,6 +28342,7 @@ Room {
 Room {
 	id = "sld/yaopu7",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["north"] = "sld/yaopu8",
 		["east"] = "sld/yaopu6",
@@ -24581,6 +28351,7 @@ Room {
 Room {
 	id = "sld/yaopu8",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/yaopu7",
 		["north"] = "sld/yaopu9",
@@ -24590,6 +28361,7 @@ Room {
 Room {
 	id = "sld/yaopu9",
 	name = "药圃",
+	outdoor = "神龙岛",
 	ways = {
 		["south"] = "sld/yaopu8",
 		["east"] = "sld/yaopu4",
@@ -24598,6 +28370,7 @@ Room {
 Room {
 	id = "sld/zl1",
 	name = "竹林",
+	outdoor = "神龙岛",
 	ways = {
 		["enter"] = "sld/tz",
 		["west"] = "sld/zl2",
@@ -24606,6 +28379,7 @@ Room {
 Room {
 	id = "sld/zl2",
 	name = "竹林",
+	outdoor = "神龙岛",
 	ways = {
 		["east"] = "sld/zl1",
 		["west"] = "sld/pt",
@@ -24614,24 +28388,29 @@ Room {
 Room {
 	id = "songshan/cangshu-ge",
 	name = "藏书阁",
+	outdoor = "嵩山",
 	ways = {
-		["south"] = "songshan/yushu-lou",
+		["south"] = "songshan/yushu-lou", 
 	},
+	room_relative="藏书阁｜御书楼藏书阁",
 }
 Room {
 	id = "songshan/chanyuan",
 	name = "峻极禅院",
+	outdoor = "嵩山",
 	ways = {
 		["south"] = "songshan/damen",
 		["north"] = "songshan/shidao1",
 	},
 	objs = {
           ["丁勉"] = "ding mian",
+	room_relative="石道｜峻极禅院｜峻极宫大门峻极禅院",
      },
 }
 Room {
 	id = "songshan/ctmen",
 	name = "朝天门",
+	outdoor = "嵩山",
 	ways = {
 		["southeast"] = "songshan/shanlu4",
 		["northeast"] = "songshan/shanlu5",
@@ -24639,10 +28418,12 @@ Room {
 	objs = {
           ["陆柏"] = "lu bo",
     },
+	room_relative="山路↗朝天门↘山路朝天门",
 }
 Room {
 	id = "songshan/damen",
 	name = "峻极宫大门",
+	outdoor = "嵩山",
 	no_fight = true,
 	ways = {
 		["south"] = "songshan/kuangdi",
@@ -24652,21 +28433,26 @@ Room {
           ["史登达"] = "shi dengda",
           ["韩雄万"] = "han xiongwang",
      },
+	 room_relative="峻极禅院｜峻极宫大门｜旷地峻极宫大门",
 }
 Room {
 	id = "songshan/dtlxia",
 	name = "大铁梁峡",
+	outdoor = "嵩山",
 	ways = {
 		["northup"] = "songshan/xtlxia",
 		["southdown"] = "songshan/qgping",
 	},
 	objs = {
           ["乐厚"] = "le hou",
+	room_relative="小铁梁峡↑大铁梁峡↑青岗坪大铁梁峡",
      },
+	
 }
 Room {
 	id = "songshan/fengchantai",
 	name = "封禅台",
+	outdoor = "嵩山",
 	ways = {
 		["southdown"] = "songshan/peitian-fang",
 		["guan ri"] = "songshan/guanrifeng",
@@ -24675,7 +28461,7 @@ Room {
 		["guan ri"] = true,
 	},
 	lengths = {
-		["guan ri"] = "if score.party and score.party=='嵩山派' then return 1 else return false end",
+		["guan ri"] = "if score.party and score.party=='嵩山' then return 1 else return false end",
 	},
 	objs = {
           ["吕财"] = "lv cai",
@@ -24683,10 +28469,12 @@ Room {
           ["沈罗"] = "shen luo",
           ["左冷禅"] = "zuo lengchan",
      },
+	 room_relative="封禅台↑配天作镇坊封禅台",
 }
 Room {
 	id = "songshan/gsfxia",
 	name = "观胜峰下",
+	outdoor = "嵩山",
 	ways = {
 		["southeast"] = "songshan/shanlu2",
 		["westup"] = "songshan/guanshengfeng",
@@ -24694,10 +28482,12 @@ Room {
 	objs = {
           ["陈安"] = "chen an",
      },
+	room_relative="观胜峰←观胜峰下↘山路观胜峰下",
 }
 Room {
 	id = "songshan/guanrifeng",
 	name = "观日峰",
+	outdoor = "嵩山",
 	ways = {
 		["west"] = "songshan/fengchantai",
 	},
@@ -24705,24 +28495,29 @@ Room {
 Room {
 	id = "songshan/guanshengfeng",
 	name = "观胜峰",
+	outdoor = "嵩山",
 	ways = {
 		["eastdown"] = "songshan/gsfxia",
 		["northdown"] = "songshan/shanlu3",
 	},
+	room_relative="山路↓观胜峰←观胜峰下观胜峰",
 }
 Room {
 	id = "songshan/jiange",
 	name = "轩辕剑阁",
+	outdoor = "嵩山",
 	ways = {
 		["north"] = "songshan/yushu-lou",
 	},
 	objs = {
           ["秦顺昌"] = "qin shunchang",
      },
+	 room_relative="御书楼｜轩辕剑阁轩辕剑阁",
 }
 Room {
 	id = "songshan/junji-dian",
 	name = "峻极殿",
+	outdoor = "嵩山",
 	ways = {
 		["northup"] = "songshan/shidao3",
 		["south"] = "songshan/junji-fang",
@@ -24733,51 +28528,63 @@ Room {
           ["钟镇"] = "zhong zhen",
           ["蒋祥"] = "jiang xiang",
           ["刘华辉"] = "liu huahui",
+	room_relative="石道↑碎石路----峻极殿----碎石路｜崇高峻极坊峻极殿",
      },
 }
 Room {
 	id = "songshan/junji-fang",
 	name = "崇高峻极坊",
+	outdoor = "嵩山",
 	ways = {
 		["north"] = "songshan/junji-dian",
 		["southdown"] = "songshan/shidao2",
 	},
+	room_relative="峻极殿｜崇高峻极坊↑石道崇高峻极坊",
 }
 Room {
 	id = "songshan/kuangdi",
 	name = "旷地",
+	outdoor = "嵩山",
 	ways = {
 		["south"] = "songshan/taishi-que",
 		["north"] = "songshan/damen",
 	},
+	room_relative="峻极宫大门｜旷地｜太室阙旷地",
 }
 Room {
 	id = "songshan/nan-room",
 	name = "休息室",
+	outdoor = "嵩山",
 	no_fight = true,
 	ways = {
 		["north"] = "songshan/qindian",
 	},
+	room_relative="寝殿｜休息室休息室",
 }
 Room {
 	id = "songshan/nv-room",
 	name = "休息室",
+	outdoor = "嵩山",
 	no_fight = true,
 	ways = {
 		["south"] = "songshan/qindian",
 	},
+	room_relative="寝殿--休息室",
 }
 Room {
 	id = "songshan/peitian-fang",
 	name = "配天作镇坊",
+	outdoor = "嵩山",
 	ways = {
 		["northup"] = "songshan/fengchantai",
 		["southdown"] = "songshan/shidao3",
 	},
+	room_relative="封禅台↑配天作镇坊↑石道配天作镇坊",
 }
 Room {
 	id = "songshan/qgfeng",
 	name = "青岗峰",
+	outdoor = "嵩山",
 	ways = {
 		["northup"] = "songshan/qgping",
 		["southdown"] = "songshan/shanlu3",
@@ -24785,18 +28592,22 @@ Room {
 	objs = {
           ["狄修"] = "di xiu",
      },
+	 room_relative="青岗坪↑青岗峰↑山路青岗峰",
 }
 Room {
 	id = "songshan/qgping",
 	name = "青岗坪",
+	outdoor = "嵩山",
 	ways = {
 		["northup"] = "songshan/dtlxia",
 		["southdown"] = "songshan/qgfeng",
 	},
+	room_relative="大铁梁峡↑青岗坪↑青岗峰青岗坪",
 }
 Room {
 	id = "songshan/qindian",
 	name = "寝殿",
+	outdoor = "嵩山",
 	ways = {
 		["south"] = "songshan/nan-room",
 		["east"] = "songshan/zmwshi",
@@ -24810,10 +28621,12 @@ Room {
 	objs = {
           ["高克新"] = "gao kexin",
      },
+	 room_relative="休息室｜碎石路-----寝殿-----掌门卧室｜休息室寝殿",
 }
 Room {
 	id = "songshan/shanfang",
 	name = "膳房",
+	outdoor = "嵩山",
 	no_fight = true,
 	ways = {
 		["west"] = "songshan/suishilu1",
@@ -24821,34 +28634,42 @@ Room {
 	objs = {
           ["厨子"] = "chu zi",
      },
+	 room_relative="碎石路-----膳房膳房",
 }
 Room {
 	id = "songshan/shanlu1",
 	name = "山路",
+	outdoor = "嵩山",
 	ways = {
 		["down"] = "shaolin/shijie6",
 		["west"] = "songshan/shanlu2",
 	},
+	room_relative="山路-----山路〓石阶山路",
 }
 Room {
 	id = "songshan/shanlu2",
 	name = "山路",
+	outdoor = "嵩山",
 	ways = {
 		["northwest"] = "songshan/gsfxia",
 		["east"] = "songshan/shanlu1",
 	},
+	room_relative="观胜峰下↖山路-----山路山路",
 }
 Room {
 	id = "songshan/shanlu3",
 	name = "山路",
+	outdoor = "嵩山",
 	ways = {
 		["northup"] = "songshan/qgfeng",
 		["southup"] = "songshan/guanshengfeng",
 	},
+	room_relative="青岗峰↑山路↓观胜峰山路",
 }
 Room {
 	id = "songshan/shanlu4",
 	name = "山路",
+	outdoor = "嵩山",
 	ways = {
 		["southeast"] = "songshan/xtlxia",
 		["northwest"] = "songshan/ctmen",
@@ -24856,93 +28677,116 @@ Room {
 	objs = {
           ["余进"] = "yu jin",
           ["王祥"] = "wang xiang",
+	 
      },
+	 room_relative="朝天门↖山路↘小铁梁峡山路",	
 }
 Room {
 	id = "songshan/shanlu5",
 	name = "山路",
+	outdoor = "嵩山",
 	ways = {
 		["northup"] = "songshan/taishi-que",
 		["southwest"] = "songshan/ctmen",
 	},
+	room_relative="太室阙↑山路↙朝天门山路",
 }
 Room {
 	id = "songshan/shidao1",
 	name = "石道",
+	outdoor = "嵩山",
 	ways = {
 		["south"] = "songshan/chanyuan",
 		["north"] = "songshan/yaocan-ting",
 	},
+	room_relative="遥参亭｜石道｜峻极禅院石道",
 }
 Room {
 	id = "songshan/shidao2",
 	name = "石道",
+	outdoor = "嵩山",
 	ways = {
 		["northup"] = "songshan/junji-fang",
 		["south"] = "songshan/tianzhong-ge",
 	},
+	room_relative="崇高峻极坊↑石道｜天中阁石道",
 }
 Room {
 	id = "songshan/shidao3",
 	name = "石道",
+	outdoor = "嵩山",
 	ways = {
-		["northup"] = "songshan/peitian-fang",
+		["northup"] = "songshan/peitian-fang",  
 		["southdown"] = "songshan/junji-dian",
 	},
+	room_relative="配天作镇坊↑石道↑峻极殿石道",
 }
 Room {
 	id = "songshan/shufang",
 	name = "掌门书房",
+	outdoor = "嵩山",
 	ways = {
 		["east"] = "songshan/yushu-lou",
 	},
+	room_relative="掌门书房---御书楼掌门书房",
 }
 Room {
 	id = "songshan/suishilu1",
 	name = "碎石路",
+	outdoor = "嵩山",
 	ways = {
 		["east"] = "songshan/shanfang",
 		["west"] = "songshan/tianzhong-ge",
 	},
+	room_relative="天中阁----碎石路----膳房碎石路",
 }
 Room {
 	id = "songshan/suishilu2",
 	name = "碎石路",
+	outdoor = "嵩山",
 	ways = {
 		["east"] = "songshan/tianzhong-ge",
 		["west"] = "songshan/yaofang",
 	},
+	room_relative="药房----碎石路----天中阁碎石路",
 }
 Room {
 	id = "songshan/suishilu3",
 	name = "碎石路",
+	outdoor = "嵩山",
 	ways = {
-		["east"] = "songshan/qindian",
+		["east"] = "songshan/qindian",  
 		["west"] = "songshan/junji-dian",
 	},
+	room_relative="峻极殿----碎石路----寝殿碎石路",
 }
 Room {
 	id = "songshan/suishilu4",
 	name = "碎石路",
+	outdoor = "嵩山",
 	ways = {
 		["east"] = "songshan/junji-dian",
 		["west"] = "songshan/yushu-lou",
 	},
+	room_relative="御书楼----碎石路----峻极殿碎石路",
 }
 Room {
 	id = "songshan/taishi-que",
 	name = "太室阙",
+	outdoor = "嵩山",
 	ways = {
-		["north"] = "songshan/kuangdi",
+		["north"] = "songshan/kuangdi",  
 		["southdown"] = "songshan/shanlu5",
 	},
 	objs = {
           ["万大平"] = "wan daping",
      },
+	 room_relative="旷地｜太室阙↑山路太室阙",
 }
 Room {
 	id = "songshan/tianzhong-ge",
 	name = "天中阁",
+	outdoor = "嵩山",
 	ways = {
 		["south"] = "songshan/yaocan-ting",
 		["east"] = "songshan/suishilu1",
@@ -24951,30 +28795,36 @@ Room {
 	},
 	objs = {
           ["汤英鹗"] = "tang yinge",
+	room_relative="石道｜碎石路----天中阁----碎石路｜遥参亭天中阁",
      },
 }
 Room {
 	id = "songshan/xtlxia",
 	name = "小铁梁峡",
+	outdoor = "嵩山",
 	ways = {
-		["northwest"] = "songshan/shanlu4",
+		["northwest"] = "songshan/shanlu4",  
 		["southdown"] = "songshan/dtlxia",
 	},
+	room_relative="山路↖小铁梁峡↑大铁梁峡小铁梁峡",
 }
 Room {
 	id = "songshan/yaocan-ting",
 	name = "遥参亭",
+	outdoor = "嵩山",
 	ways = {
 		["south"] = "songshan/shidao1",
 		["north"] = "songshan/tianzhong-ge",
 	},
 	objs = {
           ["卜沉"] = "bu chen",
+	room_relative="天中阁｜遥参亭｜石道遥参亭",
      },
 }
 Room {
 	id = "songshan/yaofang",
 	name = "药房",
+	outdoor = "嵩山",
 	no_fight = true,
 	ways = {
 		["east"] = "songshan/suishilu2",
@@ -24982,10 +28832,12 @@ Room {
 	objs = {
           ["药师"] = "yao shi",
      },
+	 room_relative="药房-----碎石路药房",
 }
 Room {
 	id = "songshan/yushu-lou",
 	name = "御书楼",
+	outdoor = "嵩山",
 	ways = {
 		["south"] = "songshan/jiange",
 		["north"] = "songshan/cangshu-ge",
@@ -24994,42 +28846,52 @@ Room {
 	},
 	objs = {
           ["邓八公"] = "deng bagong",
+	room_relative="藏书阁｜掌门书房----御书楼----碎石路｜轩辕剑阁御书楼",
      },
 }
 Room {
 	id = "songshan/zmwshi",
 	name = "掌门卧室",
+	outdoor = "嵩山",
 	ways = {
-		["west"] = "songshan/qindian",
+		["west"] = "songshan/qindian",  
 	},
+	room_relative="寝殿---掌门卧室掌门卧室",
 }
 Room {
 	id = "suzhou/bailianchi",
 	name = "白莲池",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/erxianting",
 	},
+	room_relative="白莲池｜二仙亭白莲池",
 }
 Room {
 	id = "suzhou/baiyunquan",
 	name = "白云泉",
+	outdoor = "苏州城",
 	ways = {
 		["westdown"] = "suzhou/tianpingshan",
 	},
+	room_relative="山坡-----天平山白云泉",
 }
 Room {
 	id = "suzhou/baodaiqiao",
 	name = "宝带桥",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/nandajie1",
 		["northwest"] = "suzhou/xidajie1",
 		["north"] = "suzhou/canglangting",
 		["northeast"] = "suzhou/dongdajie3",
 	},
+	room_relative="西大街沧浪亭东大街↖｜↗宝带桥｜南大街宝带桥",
 }
 Room {
 	id = "suzhou/baoheji",
 	name = "宝和记",
+	outdoor = "苏州城",
 	no_fight = true,
 	ways = {
 		["north"] = "suzhou/dongdajie3",
@@ -25037,10 +28899,12 @@ Room {
 	objs = {
           ["王合计"] = "wang heji",
            },
+room_relative="东大街｜宝和记宝和记",
 }
 Room {
 	id = "suzhou/beidajie1",
 	name = "北大街",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/xiyuanzi",
 		["south"] = "suzhou/canglangting",
@@ -25048,27 +28912,33 @@ Room {
 		["north"] = "suzhou/beidajie2",
 		["west"] = "suzhou/majiu",
 	},
+	room_relative="北大街｜马厩----北大街----客店↙｜戏园子沧浪亭北大街",
 }
 Room {
 	id = "suzhou/beidajie2",
 	name = "北大街",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/beidajie1",
 		["north"] = "suzhou/northgate",
 		["east"] = "suzhou/chunzailou",
 		["west"] = "suzhou/zijinan",
 	},
+	room_relative="北门｜紫金庵----北大街----春在楼｜北大街北大街",
 }
 Room {
 	id = "suzhou/bingyin",
 	name = "兵营",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/bingyindamen",
 	},
+	room_relative="兵营大门--兵营",
 }
 Room {
 	id = "suzhou/bingyindamen",
 	name = "兵营大门",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/bingyin",
 		["north"] = "suzhou/xidajie1",
@@ -25077,11 +28947,15 @@ Room {
 		["south"] = {
 			{id = "guan bing", exp = 10000},
 		},
+	precmds = {
+              ["south"] = "kill guan bing",
+	},
 	},
 }
 Room {
 	id = "suzhou/bingying",
 	name = "北门兵营",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/northgate",
 		["west"] = "suzhou/jail",
@@ -25090,26 +28964,34 @@ Room {
 		["west"] = {
 			{id = "zhao liangdong", exp = 450000},
 		},
+	precmds = {
+              ["west"] = "kill zhao liangdong",
+	},
 	},
 }
 Room {
 	id = "suzhou/bishuiting",
 	name = "碧水亭",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/huzhongdao",
 	},
+	room_relative="湖中岛--碧水亭",
 }
 Room {
 	id = "suzhou/caixiangjing",
 	name = "采香径",
+	outdoor = "苏州城",
 	ways = {
 		["northwest"] = "suzhou/shuiwa",
 		["northeast"] = "suzhou/shuiwa1",
 	},
+ room_relative="划船坞划船坞↖↗采香径采香径",
 }
 Room {
 	id = "suzhou/caizhu",
 	name = "翰林府门",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/wjszhuang",
 		["north"] = "suzhou/dayuan1",
@@ -25117,71 +28999,89 @@ Room {
 	objs = {
           ["恶犬"] = "e quan",
            },
+	room_relative="翰林府院｜翰林府门｜万景山庄翰林府门",
 }
 Room {
 	id = "suzhou/cangjingge",
 	name = "藏经阁",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/dxbdian",
 	},
+	room_relative="藏经阁｜大雄宝殿藏经阁",
 }
 Room {
 	id = "suzhou/canglangting",
 	name = "沧浪亭",
+	outdoor = "苏州城",
 	ways = {
 		["southeast"] = "suzhou/dongdajie3",
 		["southwest"] = "suzhou/xidajie1",
 		["south"] = "suzhou/baodaiqiao",
 		["north"] = "suzhou/beidajie1",
 	},
+	room_relative="北大街｜沧浪亭↙｜↘西大街宝带桥东大街沧浪亭",
 }
 Room {
 	id = "suzhou/caoebei",
 	name = "曹娥碑",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/nongshe",
 		["north"] = "suzhou/jiangbian",
 	},
+	room_relative="江边｜曹娥碑----农舍曹娥碑",
 }
 Room {
 	id = "suzhou/chaguan",
 	name = "茶馆",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/nandajie1",
 	},
+	room_relative="南大街｜茶馆",
 }
 Room {
 	id = "suzhou/chitang",
 	name = "池塘",
+	outdoor = "苏州城",
 	ways = {
 		["northeast"] = "suzhou/gumujiaohe",
 	},
+	room_relative="古木交诃↗池塘池塘",
 }
 Room {
 	id = "suzhou/chunzailou",
 	name = "春在楼",
+	outdoor = "苏州城",
 	ways = {
 		["west"] = "suzhou/beidajie2",
 	},
+	room_relative="北大街----春在楼春在楼",
 }
 Room {
 	id = "suzhou/datiepu",
 	name = "打铁铺",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/dongdajie2",
 	},
+	room_relative="东大街｜打铁铺打铁铺",
 }
 Room {
 	id = "suzhou/dayuan1",
 	name = "翰林府院",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/caizhu",
 		["north"] = "suzhou/houyuan",
 	},
+	room_relative="后院｜翰林府院｜翰林府门翰林府院",
 }
 Room {
 	id = "suzhou/dongdajie2",
 	name = "东大街",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/datiepu",
 		["northwest"] = "suzhou/hutong2",
@@ -25189,28 +29089,33 @@ Room {
 		["east"] = "suzhou/eastgate",
 		["west"] = "suzhou/dongdajie3",
 	},
+	room_relative="胡同立春堂↖｜东大街----东大街----东门｜打铁铺东大街",
 }
 Room {
 	id = "suzhou/dongdajie3",
 	name = "东大街",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/baodaiqiao",
 		["south"] = "suzhou/baoheji",
-		["northwest"] = "suzhou/canglangting",
+		["northwest"] = "suzhou/canglangting",  
 		["north"] = "suzhou/hutong",
 		["east"] = "suzhou/dongdajie2",
 	},
+	room_relative="沧浪亭胡同↖｜东大街----东大街↙｜宝带桥宝和记东大街",
 }
 Room {
 	id = "suzhou/dongting",
 	name = "衙门东厅",
+	outdoor = "苏州城",
 	ways = {
-		["west"] = "suzhou/ymzhengting",
+		["west"] = "suzhou/ymzhengting", 
 	},
 }
 Room {
 	id = "suzhou/dongxiang",
 	name = "闺房",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/houyuan",
 		["west"] = "suzhou/huayuan",
@@ -25222,115 +29127,139 @@ Room {
 Room {
 	id = "suzhou/dxbdian",
 	name = "大雄宝殿",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/cangjingge",
 		["out"] = "suzhou/lingyansi",
 	},
+	room_relative="藏经阁｜大雄宝殿∨灵岩寺大雄宝殿",
 }
 Room {
 	id = "suzhou/eastgate",
 	name = "东门",
+	outdoor = "苏州城",
 	ways = {
 		["west"] = "suzhou/dongdajie2",
 	},
+	room_relative="东大街-----东门东门",
 }
 Room {
 	id = "suzhou/erxianting",
 	name = "二仙亭",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/bailianchi",
 		["west"] = "suzhou/qianrenshi",
 	},
+	room_relative="白莲池｜千人石----二仙亭二仙亭",
 }
 Room {
 	id = "suzhou/fengqiao",
 	name = "枫桥",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/hanshidian",
 		["north"] = "suzhou/tielingguan",
 	},
+	room_relative="铁玲关｜枫桥｜寒拾殿枫桥",
 }
 Room {
 	id = "suzhou/gumujiaohe",
 	name = "古木交诃",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/chitang",
 		["east"] = "suzhou/hehuating",
 	},
+	room_relative="古木交诃---荷花厅↙池塘古木交诃",
 }
 Room {
 	id = "suzhou/hanhanquan",
 	name = "憨憨泉",
+	outdoor = "苏州城",
 	ways = {
 		["eastdown"] = "suzhou/wjszhuang",
 	},
 	objs = {
           ["大石头"] = "da shitou",
            },
+	room_relative="憨憨泉←万景山庄憨憨泉",
 }
 Room {
 	id = "suzhou/hanshansi",
 	name = "寒山寺门",
+	outdoor = "苏州城",
 	ways = {
 		["southeast"] = "suzhou/qsgdao5",
 		["enter"] = "suzhou/zhengdian",
 	},
+	room_relative="寒山寺正殿∧寒山寺门↘枫桥镇寒山寺门",
 }
 Room {
 	id = "suzhou/hanshidian",
 	name = "寒拾殿",
+	outdoor = "苏州城",
 	ways = {
 		["west"] = "suzhou/zhengdian",
 		["out"] = "suzhou/fengqiao",
 	},
+	room_relative="寒山寺正殿----寒拾殿∨枫桥寒拾殿",
 }
 Room {
 	id = "suzhou/hehuating",
 	name = "荷花厅",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/liuyuan",
-		["west"] = "suzhou/gumujiaohe",
+		["west"] = "suzhou/gumujiaohe",  
 	},
+	room_relative="古木交诃----荷花厅----留园荷花厅",
 }
 Room {
 	id = "suzhou/houtang",
 	name = "后堂",
+	outdoor = "苏州城",
 	ways = {
 		["out"] = "suzhou/shuchang",
 	},
+	room_relative="后堂∨书场后堂",
 }
 Room {
 	id = "suzhou/houyuan",
 	name = "后院",
+	outdoor = "苏州城",
 	ways = {
-		["south"] = "suzhou/dayuan1",
-		["#inguifang"] = "suzhou/dongxiang",
+		["south"] = "suzhou/dayuan1",  
+		-- ["north"] = "suzhou/dongxiang",
 	},
 	objs = {
           ["凌退思"] = "ling tuisi",
            },
-	lengths = {
-		["#inguifang"] = "if Bag['铜钥匙'] then return 6 else return false end",
-	},
+	room_relative="后院｜翰林府院后院",
 }
 Room {
 	id = "suzhou/huayuan",
 	name = "花园",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/dongxiang",
 	},
+	room_relative="翰林府院｜花园",
 }
 Room {
 	id = "suzhou/hubiandadao",
 	name = "湖边大道",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/qingshidadao2",
 		["west"] = "thd/guiyun/road1",
 	},
+	room_relative="青石大道｜湖滨小路--湖边大道",
 }
 Room {
 	id = "suzhou/huqiushan",
 	name = "虎丘山",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/toushanmen",
 		["northeast"] = "suzhou/qsgdao6",
@@ -25339,41 +29268,51 @@ Room {
 	      ["小树枝"] = "xiao shuzhi",
           ["大树干"] = "da shugan",
            },
+	room_relative="苏州北郊↗虎丘山｜头门山虎丘山",
 }
 Room {
 	id = "suzhou/hutong",
 	name = "胡同",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/dongdajie3",
 		["northeast"] = "suzhou/hutong1",
 	},
+	room_relative="胡同↗胡同｜东大街胡同",
 }
 Room {
 	id = "suzhou/hutong1",
 	name = "胡同",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/hutong",
-		["east"] = "suzhou/hutong2",
+		["east"] = "suzhou/hutong2", 
 	},
+	room_relative="胡同-----胡同↙胡同胡同",
 }
 Room {
 	id = "suzhou/hutong2",
 	name = "胡同",
+	outdoor = "苏州城",
 	ways = {
 		["southeast"] = "suzhou/dongdajie2",
 		["west"] = "suzhou/hutong1",
 	},
+	room_relative="胡同-----胡同↘东大街胡同",
 }
 Room {
 	id = "suzhou/huzhongdao",
 	name = "湖中岛",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/bishuiting",
 	},
+	room_relative="碧水亭｜湖中岛",
 }
 Room {
 	id = "suzhou/jail",
 	name = "监狱",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/bingying",
 	},
@@ -25384,20 +29323,24 @@ Room {
 Room {
 	id = "suzhou/jiangbian",
 	name = "江边",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/caoebei",
 		["northeast"] = "group/entry/sztulu2",
 	},
+	room_relative="土路↗江边｜曹娥碑江边",
 }
 Room {
 	id = "suzhou/jubaozhai",
 	name = "聚宝斋",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/nandajie1",
 	},
 	objs = {
           ["孙老板"] = "sun laoban",
            },
+	room_relative="聚宝斋----南大街聚宝斋",
 }
 Room {
 	id = "suzhou/kedian",
@@ -25412,10 +29355,12 @@ Room {
 	lengths = {
 		["#szkedian"] = 3,
 	},
+	
 }
 Room {
 	id = "suzhou/kedian2",
 	name = "客店二楼",
+	outdoor = "苏州城",
 	ways = {
 		["enter"] = "suzhou/kedian3",
 		["down"] = "suzhou/kedian",
@@ -25424,6 +29369,7 @@ Room {
 Room {
 	id = "suzhou/kedian3",
 	name = "客店二楼",
+	outdoor = "苏州城",
 	no_fight = true,
 	ways = {
 		["out"] = "suzhou/kedian2",
@@ -25432,13 +29378,16 @@ Room {
 Room {
 	id = "suzhou/lichuntang",
 	name = "立春堂",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/dongdajie2",
 	},
+	room_relative="立春堂｜东大街立春堂",
 }
 Room {
 	id = "suzhou/lingyanshan",
 	name = "灵岩山",
+	outdoor = "苏州城",
 	ways = {
 		["eastup"] = "suzhou/yingxiaoting",
 		["south"] = "suzhou/qingshidadao",
@@ -25447,66 +29396,82 @@ Room {
 	objs = {
           ["小树枝"] = "xiao shuzhi",
           ["大石头"] = "da shitou",
+	room_relative="天平山↖灵岩山→迎笑亭｜青石大道灵岩山",
            },
 }
 Room {
 	id = "suzhou/lingyansi",
 	name = "灵岩寺",
+	outdoor = "苏州城",
 	ways = {
 		["enter"] = "suzhou/dxbdian",
 		["east"] = "suzhou/lingyanta",
 		["northdown"] = "suzhou/shiyuan",
 		["west"] = "suzhou/zhonglou",
 	},
+  room_relative="石鼋↓钟楼小院----灵岩寺----灵岩塔灵岩寺",
 }
 Room {
 	id = "suzhou/lingyanta",
 	name = "灵岩塔",
+	outdoor = "苏州城",
 	ways = {
 		["west"] = "suzhou/lingyansi",
 	},
+	room_relative="灵岩寺----灵岩塔灵岩塔",
 }
 Room {
 	id = "suzhou/liuyuan",
 	name = "留园",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/nandajie2",
-		["west"] = "suzhou/hehuating",
+		["west"] = "suzhou/hehuating",  
 	},
+	room_relative="荷花厅-----留园-----南大街留园",
 }
 Room {
 	id = "suzhou/lixuetang",
 	name = "立雪堂",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/wenmeige",
 	},
+	room_relative="问梅阁｜立雪堂立雪堂",
 }
 Room {
 	id = "suzhou/majiu",
 	name = "马厩",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/xiyuanzi",
 		["east"] = "suzhou/beidajie1",
 	},
+	room_relative="马厩-----北大街｜戏园子马厩",
 }
 Room {
 	id = "suzhou/mubei",
 	name = "坟墓",
+	outdoor = "苏州城",
 	ways = {
 		["northeast"] = "suzhou/shiyuan",
 	},
+	room_relative="石鼋↗坟墓坟墓",
 }
 Room {
 	id = "suzhou/muniangmu",
 	name = "真娘墓",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/shijianshi",
 		["north"] = "suzhou/sunwuting",
 	},
+	room_relative="孙武亭｜真娘墓↙试剑石真娘墓",
 }
 Room {
 	id = "suzhou/nandajie1",
 	name = "南大街",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/shuyuan",
 		["south"] = "suzhou/nandajie2",
@@ -25515,20 +29480,24 @@ Room {
 		["northeast"] = "suzhou/chaguan",
 		["west"] = "suzhou/jubaozhai",
 	},
+	room_relative="宝带桥茶馆｜↗聚宝斋----南大街----狮子林↙｜书院南大街南大街",
 }
 Room {
 	id = "suzhou/nandajie2",
 	name = "南大街",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/southgate",
 		["east"] = "suzhou/tingyuxuan",
 		["north"] = "suzhou/nandajie1",
-		["west"] = "suzhou/liuyuan",
+		["west"] = "suzhou/liuyuan",  
 	},
+	room_relative="南大街｜留园----南大街----听雨轩｜南门南大街",
 }
 Room {
 	id = "suzhou/neizhai",
 	name = "衙门内宅",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/ymzhengting",
 	},
@@ -25536,34 +29505,41 @@ Room {
 Room {
 	id = "suzhou/nongshe",
 	name = "农舍",
+	outdoor = "苏州城",
 	ways = {
 		["west"] = "suzhou/caoebei",
 	},
 	objs = {
           ["阿祥"] = "a xiang",
            },
+	room_relative="曹娥碑-----农舍农舍",
 }
 Room {
 	id = "suzhou/northgate",
 	name = "北门",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/beidajie2",
 		["north"] = "suzhou/qsgdao6",
 		["west"] = "suzhou/bingying",
 	},
+	room_relative="苏州北郊｜北门兵营-----北门｜北大街北门",
 }
 Room {
 	id = "suzhou/qianrenshi",
 	name = "千人石",
+	outdoor = "苏州城",
 	ways = {
 		["northwest"] = "suzhou/zhishuangge",
 		["north"] = "suzhou/shijianshi",
-		["east"] = "suzhou/erxianting",
+		["east"] = "suzhou/erxianting",  
 	},
+	room_relative="致爽阁试剑石↖｜千人石----二仙亭千人石",
 }
 Room {
 	id = "suzhou/qingshidadao",
 	name = "青石大道",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/qingshidadao1",
 		["north"] = "suzhou/lingyanshan",
@@ -25574,6 +29550,7 @@ Room {
 Room {
 	id = "suzhou/qingshidadao1",
 	name = "青石大道",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/qingshidadao2",
 		["north"] = "suzhou/qingshidadao",
@@ -25583,6 +29560,7 @@ Room {
 Room {
 	id = "suzhou/qingshidadao2",
 	name = "青石大道",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/hubiandadao",
 		["north"] = "suzhou/qingshidadao1",
@@ -25592,6 +29570,7 @@ Room {
 Room {
 	id = "suzhou/qsgdao",
 	name = "青石官道",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/tianpingshan",
 		["north"] = "suzhou/qsgdao1",
@@ -25601,6 +29580,7 @@ Room {
 Room {
 	id = "suzhou/qsgdao1",
 	name = "青石官道",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/qsgdao2",
 		["south"] = "suzhou/qsgdao",
@@ -25610,6 +29590,7 @@ Room {
 Room {
 	id = "suzhou/qsgdao2",
 	name = "青石官道",
+	outdoor = "苏州城",
 	ways = {
 		["southeast"] = "jiaxing/road2",
 		["southwest"] = "hz/shanlu1",
@@ -25624,59 +29605,72 @@ Room {
 Room {
 	id = "suzhou/qsgdao3",
 	name = "西门官道",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/qsgdao4",
-		["west"] = "suzhou/qsgdao5",
+		["west"] = "suzhou/qsgdao5",  
 	},
+	room_relative="枫桥镇---西门官道---西门外官道西门官道",
 }
 Room {
 	id = "suzhou/qsgdao4",
 	name = "西门外官道",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/westgate",
 		["west"] = "suzhou/qsgdao3",
 	},
+	room_relative="西门官道--西门外官道--西门西门外官道",
 }
 Room {
 	id = "suzhou/qsgdao5",
 	name = "枫桥镇",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/tulu1",
 		["northwest"] = "suzhou/hanshansi",
 		["east"] = "suzhou/qsgdao3",
 	},
+	room_relative="寒山寺门↖枫桥镇----西门官道｜土路枫桥镇",
 }
 Room {
 	id = "suzhou/qsgdao6",
 	name = "苏州北郊",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "suzhou/huqiushan",
-		["south"] = "suzhou/northgate",
+		["south"] = "suzhou/northgate",  
 		["northwest"] = "city/sroad1",
 		["west"] = "gb/tianjing",
 	},
+	room_relative="江南官道↖田径---苏州北郊↙｜虎丘山北门苏州北郊",
 }
 Room {
 	id = "suzhou/shihu",
 	name = "石湖",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/tianpingshan",
 		["west"] = "suzhou/xingchunqiao",
 	},
+	room_relative="行春桥-----石湖｜天平山石湖",
 }
 Room {
 	id = "suzhou/shijianshi",
 	name = "试剑石",
+	outdoor = "苏州城",
 	ways = {
 		["westdown"] = "suzhou/wjszhuang",
-		["south"] = "suzhou/qianrenshi",
+		["south"] = "suzhou/qianrenshi",  
 		["north"] = "suzhou/zhenshi",
 		["northeast"] = "suzhou/muniangmu",
 	},
+	room_relative="枕石真娘墓｜↗万景山庄→试剑石｜千人石试剑石",
 }
 Room {
 	id = "suzhou/shiyuan",
 	name = "石鼋",
+	outdoor = "苏州城",
 	ways = {
 		["southup"] = "suzhou/lingyansi",
 		["eastdown"] = "suzhou/shuiwa",
@@ -25684,19 +29678,23 @@ Room {
 		["southwest"] = "suzhou/mubei",
 		["northdown"] = "suzhou/yingxiaoting",
 	},
+  room_relative="迎笑亭↓划船坞→石鼋←划船坞↙↓坟墓灵岩寺石鼋",
 }
 Room {
 	id = "suzhou/shizilin",
 	name = "狮子林",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/yanyutang",
 		["northeast"] = "suzhou/zhibaixuan",
-		["west"] = "suzhou/nandajie1",
+		["west"] = "suzhou/nandajie1",   
 	},
+	room_relative="揖峰指柏轩↗南大街----狮子林----燕誉堂狮子林",
 }
 Room {
 	id = "suzhou/shuchang",
 	name = "书场",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/xidajie2",
 		["enter"] = "suzhou/houtang",
@@ -25711,169 +29709,210 @@ Room {
 Room {
 	id = "suzhou/shuiwa",
 	name = "划船坞",
+	outdoor = "苏州城",
 	ways = {
 		["southeast"] = "suzhou/caixiangjing",
-		["westup"] = "suzhou/shiyuan",
+		["westup"] = "suzhou/shiyuan",  
 	},
+	room_relative="石鼋←划船坞↘采香径划船坞",
 }
 Room {
 	id = "suzhou/shuiwa1",
 	name = "划船坞",
+	outdoor = "苏州城",
 	ways = {
-		["eastup"] = "suzhou/shiyuan",
+		["eastup"] = "suzhou/shiyuan",   
 		["southwest"] = "suzhou/caixiangjing",
 	},
+	room_relative="划船坞→石鼋↙采香径划船坞",
 }
 Room {
 	id = "suzhou/shuyuan",
 	name = "书院",
+	outdoor = "苏州城",
 	ways = {
-		["northeast"] = "suzhou/nandajie1",
+		["northeast"] = "suzhou/nandajie1",  
 	},
+	room_relative="南大街｜书院",
 }
 Room {
 	id = "suzhou/southgate",
 	name = "南门",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/qsgdao2",
 		["north"] = "suzhou/nandajie2",
 	},
+	room_relative="南大街｜南门｜青石官道南门",
 }
 Room {
 	id = "suzhou/sunwuting",
 	name = "孙武亭",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/muniangmu",
 	},
+	room_relative="孙武亭｜真娘墓孙武亭",
 }
 Room {
 	id = "suzhou/tianpingshan",
 	name = "天平山",
+	outdoor = "苏州城",
 	ways = {
 		["eastup"] = "suzhou/baiyunquan",
 		["southeast"] = "suzhou/lingyanshan",
 		["north"] = "suzhou/shihu",
 		["northeast"] = "suzhou/qsgdao",
 	},
+	room_relative="石湖青石官道｜↗天平山→白云泉↘灵岩山天平山",
 }
 Room {
 	id = "suzhou/tielingguan",
 	name = "铁玲关",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/fengqiao",
 		["north"] = "suzhou/nanlin",
 	},
+	room_relative="铁玲关｜枫桥铁玲关",
 }
 Room {
 	id = "suzhou/nanlin",
 	name = "南林",
+	outdoor = "苏州城",
 	ways = {
-		["south"] = "suzhou/tielingguan",
+		["south"] = "suzhou/tielingguan",  
 	},
+	room_relative="南林--铁玲关",
 }
 
 Room {
 	id = "suzhou/tingyuxuan",
 	name = "听雨轩",
+	outdoor = "苏州城",
 	ways = {
 		["west"] = "suzhou/nandajie2",
 	},
+	room_relative="南大街--听雨轩",
 }
 Room {
 	id = "suzhou/toushanmen",
 	name = "头门山",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/huqiushan",
 		["west"] = "suzhou/wjszhuang",
 	},
+	room_relative="虎丘山｜万景山庄----头门山头门山",
 }
 Room {
 	id = "suzhou/tulu1",
 	name = "土路",
+	outdoor = "苏州城",
 	ways = {
 		["southwest"] = "group/entry/sztulu2",
-		["north"] = "suzhou/qsgdao5",
+		["north"] = "suzhou/qsgdao5",   
 	},
+	room_relative="枫桥镇｜土路↙土路土路",
 }
 Room {
 	id = "suzhou/wenmeige",
 	name = "问梅阁",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/lixuetang",
 		["west"] = "suzhou/zhenquting",
 	},
+	room_relative="真趣亭----问梅阁｜立雪堂问梅阁",
 }
 Room {
 	id = "suzhou/westgate",
 	name = "西门",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/xidajie2",
 		["west"] = "suzhou/qsgdao4",
 	},
+	room_relative="西门外官道-----西门-----西大街西门",
 }
 Room {
 	id = "suzhou/wjszhuang",
 	name = "万景山庄",
+	outdoor = "苏州城",
 	ways = {
-		["eastup"] = "suzhou/shijianshi",
+		["eastup"] = "suzhou/shijianshi",  
 		["westup"] = "suzhou/hanhanquan",
-		["east"] = "suzhou/toushanmen",
+		["east"] = "suzhou/toushanmen",  
 		["north"] = "suzhou/caizhu",
 	},
+	room_relative="翰林府门｜憨憨泉←万景山庄---头门山万景山庄",
 }
 Room {
 	id = "suzhou/xidajie1",
 	name = "西大街",
+	outdoor = "苏州城",
 	ways = {
 		["southeast"] = "suzhou/baodaiqiao",
 		["south"] = "suzhou/bingyindamen",
 		["north"] = "suzhou/yamen",
-		["northeast"] = "suzhou/canglangting",
+		["northeast"] = "suzhou/canglangting",  
 		["west"] = "suzhou/xidajie2",
 	},
+	room_relative="衙门大门沧浪亭｜↗西大街----西大街｜↘兵营大门宝带桥西大街",
 }
 Room {
 	id = "suzhou/xidajie2",
 	name = "西大街",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/xuanmiaoguan",
 		["east"] = "suzhou/xidajie1",
-		["north"] = "suzhou/shuchang",
-		["west"] = "suzhou/westgate",
+		["north"] = "suzhou/shuchang", 
+		["west"] = "suzhou/westgate",  
 	},
+	room_relative="书场｜西门----西大街----西大街｜玄妙观西大街",
 }
 Room {
 	id = "suzhou/xingchunqiao",
 	name = "行春桥",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/shihu",
 	},
+	room_relative="行春桥----石湖行春桥",
 }
 Room {
 	id = "suzhou/xiting",
 	name = "衙门西厅",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/ymzhengting",
 	},
+	room_relative="衙门正厅｜衙门西厅",
 }
 Room {
 	id = "suzhou/xiyuanzi",
 	name = "戏园子",
+	outdoor = "苏州城",
 	ways = {
-		["north"] = "suzhou/majiu",
+		["north"] = "suzhou/majiu",  
 		["northeast"] = "suzhou/beidajie1",
 	},
+	room_relative="马厩北大街｜↗戏园子戏园子",
 }
 Room {
 	id = "suzhou/xuanmiaoguan",
 	name = "玄妙观",
+	outdoor = "苏州城",
 	ways = {
 		["north"] = "suzhou/xidajie2",
 	},
+	room_relative="西大街｜玄妙观玄妙观",
 }
 Room {
 	id = "suzhou/yamen",
 	name = "衙门大门",
+	outdoor = "苏州城",
 	ways = {
 		["south"] = "suzhou/xidajie1",
 		["north"] = "suzhou/ymzhengting",
@@ -25882,29 +29921,37 @@ Room {
 		["north"] = {
 			{id = "ya yi", exp = 7500},
 		},
+		precmds = {
+              ["north"] = "kill ya yi",
+	},
 	},
 }
 Room {
 	id = "suzhou/yanyutang",
 	name = "燕誉堂",
+	outdoor = "苏州城",
 	ways = {
 		["southeast"] = "suzhou/zhenquting",
-		["west"] = "suzhou/shizilin",
+		["west"] = "suzhou/shizilin",  
 	},
+	room_relative="狮子林----燕誉堂↘真趣亭燕誉堂",
 }
 Room {
 	id = "suzhou/yingxiaoting",
 	name = "迎笑亭",
+	outdoor = "苏州城",
 	ways = {
 		["southup"] = "suzhou/shiyuan",
 		["westdown"] = "suzhou/lingyanshan",
 	},
+	room_relative="灵岩山→迎笑亭↓石鼋迎笑亭",
 }
 Room {
 	id = "suzhou/ymzhengting",
 	name = "衙门正厅",
+	outdoor = "苏州城",
 	ways = {
-		["south"] = "suzhou/yamen",
+		["south"] = "suzhou/yamen",  
 		["north"] = "suzhou/neizhai",
 		["east"] = "suzhou/dongting",
 		["west"] = "suzhou/xiting",
@@ -25913,127 +29960,161 @@ Room {
           ["赵知仁"] = "zhao zhiren",
           ["师爷"] = "shi ye",
            },
+	room_relative="衙门大门｜衙门内宅--衙门东厅｜衙门西厅--衙门正厅",
 }
 Room {
 	id = "suzhou/zhengdian",
 	name = "寒山寺正殿",
+	outdoor = "苏州城",
 	ways = {
-		["east"] = "suzhou/hanshidian",
+		["east"] = "suzhou/hanshidian",  
 		["out"] = "suzhou/hanshansi",
 	},
+	room_relative="寒山寺正殿--寒拾殿∨寒山寺门寒山寺正殿",
 }
 Room {
 	id = "suzhou/zhenquting",
 	name = "真趣亭",
+	outdoor = "苏州城",
 	ways = {
-		["northwest"] = "suzhou/yanyutang",
-		["east"] = "suzhou/wenmeige",
+		["northwest"] = "suzhou/yanyutang",  
+		["east"] = "suzhou/wenmeige",  
 	},
+	room_relative="燕誉堂↖真趣亭----问梅阁真趣亭",
 }
 Room {
 	id = "suzhou/zhenshi",
 	name = "枕石",
+	outdoor = "苏州城",
 	ways = {
-		["south"] = "suzhou/shijianshi",
+		["south"] = "suzhou/shijianshi",  
 	},
+	room_relative="枕石｜试剑石枕石",
 }
 Room {
 	id = "suzhou/zhibaixuan",
 	name = "揖峰指柏轩",
+	outdoor = "苏州城",
 	ways = {
-		["southwest"] = "suzhou/shizilin",
+		["southwest"] = "suzhou/shizilin",  
 	},
+	room_relative="揖峰指柏轩｜狮子林",
 }
 Room {
 	id = "suzhou/zhishuangge",
 	name = "致爽阁",
+	outdoor = "苏州城",
 	ways = {
-		["southeast"] = "suzhou/qianrenshi",
+		["southeast"] = "suzhou/qianrenshi",  
 	},
+	room_relative="致爽阁↘千人石致爽阁",
 }
 Room {
 	id = "suzhou/zhonglou",
 	name = "钟楼小院",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/lingyansi",
 	},
+	room_relative="钟楼小院---灵岩寺钟楼小院",
 }
 Room {
 	id = "suzhou/zijinan",
 	name = "紫金庵",
+	outdoor = "苏州城",
 	ways = {
 		["east"] = "suzhou/beidajie2",
 	},
 	objs = {
           ["慈善箱"] = "cishan xiang",
            },
+	room_relative="紫金庵----北大街紫金庵",
 }
 Room {
 	id = "taishan/baihe",
 	name = "白鹤泉",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/yitian",
 		["southdown"] = "taishan/daizong",
 	},
+	room_relative="一天门↑白鹤泉↑岱宗坊白鹤泉",
 }
 Room {
 	id = "taishan/baozang",
 	name = "宝藏岭",
+	outdoor = "泰山",
 	ways = {
 		["westup"] = "taishan/weipin",
 	},
-}
-Room {
-	id = "taishan/jyzj",
-	name = "记忆之间",
-	ways = {
-		["down"] = "taishan/beitian",
-	},
+	room_relative="围屏山｜宝藏岭",
 }
 Room {
 	id = "taishan/beitian",
 	name = "北天门",
+	outdoor = "泰山",
 	ways = {
 		["southdown"] = "taishan/zhangren",
-	    ["up"] = "taishan/jyzj",
+		["up"] = "taishan/jiyizhijian",
 	},
+	room_relative="记忆之间〓北天门↑丈人峰北天门",
+}
+Room {
+        id = "taishan/jiyizhijian",
+        name = "记忆之间",
+		outdoor = "泰山",
+        no_fight = true,
+        ways = {
+                ["down"] = "taishan/beitian",
+				["worship lao ren"] = "taishan/jiyizhijian",
+        },
+		room_relative="记忆之间〓北天门记忆之间",
 }
 Room {
 	id = "taishan/bixia",
 	name = "碧霞祠",
+	outdoor = "泰山",
 	ways = {
 		["eastdown"] = "taishan/baozang",
 		["west"] = "taishan/weipin",
 	},
+	room_relative="围屏山｜宝藏岭--碧霞祠",
 }
 Room {
 	id = "taishan/daizong",
 	name = "岱宗坊",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/baihe",
 		["south"] = "group/entry/tsyidao3",
 		["east"] = "taishan/haitan",
 		["west"] = "huanghe/huanghe5",
 	},
+  room_relative="白鹤泉↑黄河岸边----岱宗坊----海滩｜大驿道岱宗坊",
 }
 Room {
 	id = "taishan/dongtian",
 	name = "东天门",
+	outdoor = "泰山",
 	ways = {
 		["west"] = "taishan/tanhai",
 	},
+	room_relative="探海石----东天门东天门",
 }
 Room {
 	id = "taishan/doumo",
 	name = "斗母宫",
+	outdoor = "泰山",
 	ways = {
 		["eastup"] = "taishan/shijin",
 		["southdown"] = "taishan/yitian",
 	},
+	room_relative="斗母宫→石经峪↑一天门斗母宫",
 }
 Room {
 	id = "taishan/ertian",
 	name = "二天门",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/wudafu",
 		["southdown"] = "taishan/huima",
@@ -26042,24 +30123,30 @@ Room {
           ["天柏道人"] = "tianbai daoren",
           ["天松道人"] = "tiansong daoren",
      },
+	 room_relative="五大夫松↑二天门↑回马岭二天门",
 }
 Room {
 	id = "taishan/fengchan",
 	name = "封禅台",
+	outdoor = "泰山",
 	ways = {
 		["down"] = "taishan/yuhuang",
 	},
+	room_relative="封禅台〓玉皇顶封禅台",
 }
 Room {
 	id = "taishan/haitan",
 	name = "海滩",
+	outdoor = "泰山",
 	ways = {
 		["west"] = "taishan/daizong",
 	},
+	room_relative="岱宗坊-----海滩海滩",
 }
 Room {
 	id = "taishan/hsroad2",
 	name = "青石大道",
+	outdoor = "泰山",
 	ways = {
 		["east"] = "taishan/yidao2",
 		["west"] = "huanghe/tiandi4",
@@ -26069,22 +30156,27 @@ Room {
 Room {
 	id = "taishan/huima",
 	name = "回马岭",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/ertian",
 		["southdown"] = "taishan/shijin",
 	},
+	room_relative="二天门↑回马岭↑石经峪回马岭",
 }
 Room {
 	id = "taishan/lianhua",
 	name = "莲花峰",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/shixin",
 		["westup"] = "taishan/tianjie",
 	},
+	room_relative="试心石｜天街｜莲花峰",
 }
 Room {
 	id = "taishan/longmen",
 	name = "龙门",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/shengxian",
 		["southdown"] = "taishan/wudafu",
@@ -26092,10 +30184,12 @@ Room {
 	objs = {
           ["迟百城"] = "chi baicheng",
      },
+	 room_relative="升仙坊↑龙门↑五大夫松龙门",
 }
 Room {
 	id = "taishan/nantian",
 	name = "南天门",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/yuhuang",
 		["southdown"] = "taishan/shengxian",
@@ -26103,18 +30197,22 @@ Room {
 	objs = {
           ["亲兵队长"] = "qinbing duizhang",
      },
+	 room_relative="玉皇顶↑南天门↑升仙坊南天门",
 }
 Room {
 	id = "taishan/riguan",
 	name = "日观峰",
+	outdoor = "泰山",
 	ways = {
 		["eastup"] = "taishan/tanhai",
 		["westup"] = "taishan/yuhuang",
 	},
+	room_relative="玉皇顶←日观峰→探海石日观峰",
 }
 Room {
 	id = "taishan/shengxian",
 	name = "升仙坊",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/nantian",
 		["southdown"] = "taishan/longmen",
@@ -26122,26 +30220,32 @@ Room {
 	objs = {
           ["玉玑子"] = "yuji zi",
           ["建除道人"] = "jianchu daoren",
+	room_relative="南天门↑升仙坊↑龙门升仙坊",
      },
 }
 Room {
 	id = "taishan/shijin",
 	name = "石经峪",
+	outdoor = "泰山",
 	ways = {
-		["northup"] = "taishan/huima",
+		["northup"] = "taishan/huima",  
 		["westdown"] = "taishan/doumo",
 	},
+	room_relative="回马岭↑斗母宫→石经峪石经峪",
 }
 Room {
 	id = "taishan/shixin",
 	name = "试心石",
+	outdoor = "泰山",
 	ways = {
 		["southdown"] = "taishan/lianhua",
 	},
+	room_relative="莲花峰｜试心石",
 }
 Room {
 	id = "taishan/shulin1",
 	name = "杨树林",
+	outdoor = "泰山",
 	ways = {
 		["southeast"] = "taishan/yidao2",
 		["north"] = "taishan/sjzhuang",
@@ -26153,20 +30257,24 @@ Room {
           ["单仲山"] = "shan zhongshan",
           ["单季山"] = "shan jishan",
      },
+	 room_relative="单家庄｜杨树林↘大驿道杨树林",
 }
 Room {
 	id = "taishan/sjzhuang",
 	name = "单家庄",
+	outdoor = "泰山",
 	ways = {
 		["south"] = "taishan/shulin1",
 	},
 	objs = {
           ["单正"] = "shan zheng",
      },
+	 room_relative="单家庄｜杨树林单家庄",
 }
 Room {
 	id = "taishan/tanhai",
 	name = "探海石",
+	outdoor = "泰山",
 	ways = {
 		["westdown"] = "taishan/riguan",
 		["east"] = "taishan/dongtian",
@@ -26174,67 +30282,83 @@ Room {
 	objs = {
           ["玉音子"] = "yuyin zi",
      },
+	 room_relative="日观峰→探海石----东天门探海石",
 }
 Room {
 	id = "taishan/tianjie",
 	name = "天街",
+	outdoor = "泰山",
 	ways = {
 		["eastdown"] = "taishan/lianhua",
 		["eastup"] = "taishan/weipin",
 		["westdown"] = "taishan/nantian",
 	},
+	room_relative="莲花峰｜围屏山--南天门｜天街",
 }
 Room {
 	id = "taishan/weipin",
 	name = "围屏山",
+	outdoor = "泰山",
 	ways = {
-		["westdown"] = "taishan/tianjie",
+		["westdown"] = "taishan/tianjie",  
 		["east"] = "taishan/bixia",
 	},
+	room_relative="天街｜碧霞祠--围屏山",
 }
 Room {
 	id = "taishan/wudafu",
 	name = "五大夫松",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/longmen",
 		["southdown"] = "taishan/ertian",
 	},
+  room_relative="龙门↑五大夫松↑二天门五大夫松",
 }
 Room {
 	id = "taishan/xitian",
 	name = "西天门",
+	outdoor = "泰山",
 	ways = {
 		["southdown"] = "taishan/yueguan",
 	},
+	room_relative="月观峰｜西天门",
 }
 Room {
 	id = "taishan/yidao2",
 	name = "大驿道",
+	outdoor = "泰山",
 	ways = {
 		["northwest"] = "taishan/shulin1",
 		["east"] = "group/entry/tsyidao3",
 		["west"] = "taishan/hsroad2",
 	},
+	room_relative="杨树林↖青石大道----大驿道----大驿道大驿道",
 }
 Room {
 	id = "taishan/yitian",
 	name = "一天门",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/doumo",
 		["southdown"] = "taishan/baihe",
 	},
+	room_relative="斗母宫↑一天门↑白鹤泉一天门",
 }
 Room {
 	id = "taishan/yueguan",
 	name = "月观峰",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/xitian",
 		["east"] = "taishan/nantian",
 	},
+	room_relative="西天门｜南天门--月观峰",
 }
 Room {
 	id = "taishan/yuhuang",
 	name = "玉皇顶",
+	outdoor = "泰山",
 	ways = {
 		["eastdown"] = "taishan/riguan",
 		["southdown"] = "taishan/nantian",
@@ -26243,29 +30367,35 @@ Room {
 	},
 	objs = {
           ["天门道人"] = "tianmen daoren",
+	room_relative="封禅台〓丈人峰----玉皇顶←日观峰↑南天门玉皇顶",
       },
 }
 Room {
 	id = "taishan/zhangren",
 	name = "丈人峰",
+	outdoor = "泰山",
 	ways = {
 		["northup"] = "taishan/beitian",
-		["east"] = "taishan/yuhuang",
+		["east"] = "taishan/yuhuang", 
 	},
 	objs = {
           ["玉磬子"] = "yuqing zi",
      },
+	 room_relative="北天门↑丈人峰----玉皇顶丈人峰",
 }
 Room {
 	id = "tanggu/beimen",
 	name = "北城门",
+	outdoor = "塘沽城",
 	ways = {
 		["south"] = "tanggu/stbeijie2",
 	},
+	room_relative="北城门｜北街北城门",
 }
 Room {
 	id = "tanggu/center",
 	name = "中心广场",
+	outdoor = "塘沽城",
 	ways = {
 		["southeast"] = "tanggu/kongchangdi",
 		["south"] = "tanggu/stnanjie2",
@@ -26273,10 +30403,12 @@ Room {
 		["north"] = "tanggu/stbeijie1",
 		["west"] = "tanggu/stxijie1",
 	},
+	room_relative="北街｜西街---中心广场---东街｜↘石头南街广场空地中心广场",
 }
 Room {
 	id = "tanggu/dangpu",
 	name = "万福典当",
+	outdoor = "塘沽城",
 	no_fight = true,
 	ways = {
 		["west"] = "tanggu/stbeijie1",
@@ -26284,17 +30416,21 @@ Room {
 	objs = {
           ["殷老板"] = "yin laoban",
            },
+	room_relative="北街---万福典当万福典当",
 }
 Room {
 	id = "tanggu/dizangmiao",
 	name = "地藏庙",
+	outdoor = "塘沽城",
 	ways = {
 		["west"] = "tanggu/stbeijie2",
 	},
+	room_relative="北街----地藏庙地藏庙",
 }
 Room {
 	id = "tanggu/gangkou",
 	name = "港口",
+	outdoor = "塘沽城",
 	ways = {
 		["northeast"] = "sld/xiaolu",
 		["west"] = "tanggu/stdongjie1",
@@ -26302,13 +30438,16 @@ Room {
 	objs = {
           ["施琅"] = "shi lang",
            },
+	room_relative="小路↗东街-----港口港口",
 }
 Room {
 	id = "tanggu/jiuguan",
 	name = "小酒馆",
+	outdoor = "塘沽城",
 	ways = {
 		["south"] = "tanggu/stxijie2",
 	},
+	room_relative="小酒馆｜西街小酒馆",
 }
 Room {
 	id = "tanggu/kedian",
@@ -26321,10 +30460,12 @@ Room {
 	lengths = {
 		["#xfkz"] = 5,
 	},
+	room_relative="西街｜喜发客栈喜发客栈"
 }
 Room {
 	id = "tanggu/kedian2",
 	name = "客店二楼",
+	outdoor = "塘沽城",
 	ways = {
 		["enter"] = "tanggu/sleeproom",
 		["down"] = "tanggu/kedian",
@@ -26333,62 +30474,77 @@ Room {
 Room {
 	id = "tanggu/kongchangdi",
 	name = "广场空地",
+	outdoor = "塘沽城",
 	no_fight = true,
 	ways = {
-		["northwest"] = "tanggu/center",
+		["#tggc"] = "tanggu/center",
 	},
 	objs = {
           ["穆念慈"] = "mu nianci",
            },
+	room_relative="广场空地--中心广场",
 }
 Room {
 	id = "tanggu/mingju",
 	name = "普通人家",
+	outdoor = "塘沽城",
 	ways = {
 		["east"] = "tanggu/stnanjie1",
 	},
+	room_relative="普通人家---石头南街普通人家",
 }
 Room {
 	id = "tanggu/mingju1",
 	name = "普通人家",
+	outdoor = "塘沽城",
 	ways = {
 		["west"] = "tanggu/stnanjie1",
 	},
+	room_relative="石头南街---普通人家普通人家",
 }
 Room {
 	id = "tanggu/muqidian",
 	name = "木器店",
+	outdoor = "塘沽城",
 	ways = {
 		["north"] = "tanggu/stxijie2",
 	},
+	room_relative="西街｜木器店木器店",
 }
 Room {
 	id = "tanggu/nanmen",
 	name = "南城门",
+	outdoor = "塘沽城",
 	ways = {
 		["north"] = "tanggu/stnanjie1",
 	},
+	room_relative="石头南街｜南城门南城门",
 }
 Room {
 	id = "tanggu/qianyunge",
 	name = "纤云阁",
+	outdoor = "塘沽城",
 	ways = {
 		["north"] = "tanggu/stdongjie1",
 	},
+	room_relative="东街｜纤云阁纤云阁",
 }
 Room {
 	id = "tanggu/qianzhuang",
 	name = "钱庄",
+	outdoor = "塘沽城",
 	ways = {
 		["east"] = "tanggu/stnanjie2",
 	},
 	objs = {
           ["朱富"] = "zhu fu",
            },
+	room_relative="钱庄-----石头南街钱庄",
 }
 Room {
 	id = "tanggu/sleeproom",
 	name = "客店二楼",
+	outdoor = "塘沽城",
 	no_fight = true,
 	ways = {
 		["out"] = "tanggu/kedian2",
@@ -26397,76 +30553,91 @@ Room {
 Room {
 	id = "tanggu/stbeijie1",
 	name = "北街",
+	outdoor = "塘沽城",
 	ways = {
 		["south"] = "tanggu/center",
 		["north"] = "tanggu/stbeijie2",
 		["east"] = "tanggu/dangpu",
 		["west"] = "tanggu/wuqipu",
 	},
+	room_relative="北街｜武器铺-----北街-----万福典当｜中心广场北街",
 }
 Room {
 	id = "tanggu/stbeijie2",
 	name = "北街",
+	outdoor = "塘沽城",
 	ways = {
-		["south"] = "tanggu/stbeijie1",
+		["south"] = "tanggu/stbeijie1", 
 		["east"] = "tanggu/dizangmiao",
 		["north"] = "tanggu/beimen",
 		["west"] = "tanggu/xianjialou",
 	},
+	room_relative="北城门｜仙家楼-----北街-----地藏庙｜北街北街",
 }
 Room {
 	id = "tanggu/stdongjie1",
 	name = "东街",
+	outdoor = "塘沽城",
 	ways = {
 		["south"] = "tanggu/qianyunge",
 		["north"] = "tanggu/zhahuopu",
 		["east"] = "tanggu/gangkou",
 		["west"] = "tanggu/center",
 	},
+	room_relative="杂货铺｜中心广场-----东街-----港口｜纤云阁东街",
 }
 Room {
 	id = "tanggu/stnanjie1",
 	name = "石头南街",
+	outdoor = "塘沽城",
 	ways = {
 		["south"] = "tanggu/nanmen",
 		["north"] = "tanggu/stnanjie2",
 		["east"] = "tanggu/mingju1",
 		["west"] = "tanggu/mingju",
 	},
+	room_relative="石头南街｜普通人家---石头南街---普通人家｜南城门石头南街",
 }
 Room {
 	id = "tanggu/stnanjie2",
 	name = "石头南街",
+	outdoor = "塘沽城",
 	ways = {
-		["south"] = "tanggu/stnanjie1",
+		["south"] = "tanggu/stnanjie1",  
 		["east"] = "tanggu/zhubaohang",
 		["north"] = "tanggu/center",
 		["west"] = "tanggu/qianzhuang",
 	},
+	room_relative="中心广场｜钱庄---石头南街---金银珠宝行｜石头南街石头南街",
 }
 Room {
 	id = "tanggu/stxijie1",
 	name = "西街",
+	outdoor = "塘沽城",
 	ways = {
 		["south"] = "tanggu/kedian",
 		["north"] = "tanggu/yaofang",
 		["east"] = "tanggu/center",
 		["west"] = "tanggu/stxijie2",
 	},
+	room_relative="大药房｜西街-----西街-----中心广场｜喜发客栈西街",
 }
 Room {
 	id = "tanggu/stxijie2",
 	name = "西街",
+	outdoor = "塘沽城",
 	ways = {
 		["south"] = "tanggu/muqidian",
-		["east"] = "tanggu/stxijie1",
+		["east"] = "tanggu/stxijie1",  
 		["north"] = "tanggu/jiuguan",
 		["west"] = "tanggu/ximen",
 	},
+	room_relative="小酒馆｜西城门-----西街-----西街｜木器店西街",
 }
 Room {
 	id = "tanggu/wroad1",
 	name = "大驿道",
+	outdoor = "塘沽城",
 	ways = {
 		["southwest"] = "tanggu/wroad2",
 		["east"] = "tanggu/ximen",
@@ -26476,6 +30647,7 @@ Room {
 Room {
 	id = "tanggu/wroad2",
 	name = "大驿道",
+	outdoor = "塘沽城",
 	ways = {
 		["northeast"] = "tanggu/wroad1",
 		["west"] = "tanggu/wroad3",
@@ -26485,6 +30657,7 @@ Room {
 Room {
 	id = "tanggu/wroad3",
 	name = "大驿道",
+	outdoor = "塘沽城",
 	ways = {
 		["east"] = "tanggu/wroad2",
 		["west"] = "tanggu/wroad4",
@@ -26494,6 +30667,7 @@ Room {
 Room {
 	id = "tanggu/wroad4",
 	name = "大驿道",
+	outdoor = "塘沽城",
 	ways = {
 		["southwest"] = "cangzhou/eroad4",
 		["east"] = "tanggu/wroad3",
@@ -26503,53 +30677,66 @@ Room {
 Room {
 	id = "tanggu/wuqipu",
 	name = "武器铺",
+	outdoor = "塘沽城",
 	ways = {
-		["east"] = "tanggu/stbeijie1",
+		["east"] = "tanggu/stbeijie1", 
 	},
+	room_relative="武器铺----北街武器铺",
 }
 Room {
 	id = "tanggu/xianjialou",
 	name = "仙家楼",
+	outdoor = "塘沽城",
 	ways = {
-		["east"] = "tanggu/stbeijie2",
+		["east"] = "tanggu/stbeijie2",  
 	},
+	room_relative="仙家楼----北街仙家楼",
 }
 Room {
 	id = "tanggu/ximen",
 	name = "西城门",
+	outdoor = "塘沽城",
 	ways = {
-		["east"] = "tanggu/stxijie2",
+		["east"] = "tanggu/stxijie2", 
 		["west"] = "tanggu/wroad1",
 	},
+	room_relative="大驿道----西城门----西街西城门",
 }
 Room {
 	id = "tanggu/yaofang",
 	name = "大药房",
+	outdoor = "塘沽城",
 	ways = {
-		["south"] = "tanggu/stxijie1",
+		["south"] = "tanggu/stxijie1",  
 	},
+	room_relative="大药房｜西街大药房",
 }
 Room {
 	id = "tanggu/zhahuopu",
 	name = "杂货铺",
+	outdoor = "塘沽城",
 	ways = {
-		["south"] = "tanggu/stdongjie1",
+		["south"] = "tanggu/stdongjie1",  
 	},
+	room_relative="杂货铺｜东街杂货铺",
 }
 Room {
 	id = "tanggu/zhubaohang",
 	name = "金银珠宝行",
+	outdoor = "塘沽城",
 	ways = {
-		["west"] = "tanggu/stnanjie2",
+		["west"] = "tanggu/stnanjie2",  
 	},
 	objs = {
           ["龙三爷"] = "long sanye",
            },
+	room_relative="石头南街--金银珠宝行金银珠宝行",
 }
 
 Room {
 	id = "thd/bookroom",
 	name = "书房",
+	outdoor = "塘沽城",
 	ways = {
 		["west"] = "thd/shilu",
 	},
@@ -26557,6 +30744,7 @@ Room {
 Room {
 	id = "thd/caodi",
 	name = "草地",
+	outdoor = "桃花岛",
 	ways = {
 		["eastup"] = "thd/shanjiao",
 		["west"] = "thd/shijian-ting",
@@ -26570,6 +30758,7 @@ Room {
 Room {
 	id = "thd/cave",
 	name = "岩洞",
+	outdoor = "桃花岛",
 	ways = {
 		["out"] = "thd/dongkou",
 	},
@@ -26580,6 +30769,7 @@ Room {
 Room {
 	id = "thd/chafang1",
 	name = "茶房",
+	outdoor = "桃花岛",
 	no_fight = true,
 	ways = {
 		["east"] = "thd/fanting1",
@@ -26588,6 +30778,7 @@ Room {
 Room {
 	id = "thd/chufang",
 	name = "厨房",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/fanting",
 		["east"] = "thd/neishi2",
@@ -26600,6 +30791,7 @@ Room {
 Room {
 	id = "thd/chufang1",
 	name = "厨房",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/fanting1",
 	},
@@ -26611,6 +30803,7 @@ Room {
 Room {
 	id = "thd/dongkou",
 	name = "洞口",
+	outdoor = "桃花岛",
 	ways = {
 		["enter"] = "thd/cave",
 		["west"] = "thd/shangang",
@@ -26622,6 +30815,7 @@ Room {
 Room {
 	id = "thd/entrance",
 	name = "入口",
+	outdoor = "桃花岛",
 	ways = {
 	--	["down"] = "thd/taiji",
 		["west"] = "thd/hill2",
@@ -26630,14 +30824,16 @@ Room {
 Room {
 	id = "thd/fanting",
 	name = "饭厅",
+	outdoor = "桃花岛",
 	ways = {
-		["east"] = "thd/neishi1",
+		["stand;east"] = "thd/neishi1",
 		["north"] = "thd/chufang",
-	},
+			},
 }
 Room {
 	id = "thd/fanting1",
 	name = "饭厅",
+	outdoor = "桃花岛",
 	no_fight = true,
 	ways = {
 		["east"] = "thd/lianwuchang",
@@ -26648,6 +30844,7 @@ Room {
 Room {
 	id = "thd/guiyun/caodi1",
 	name = "草地",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/road4",
 		["north"] = "thd/guiyun/shulin1",
@@ -26658,6 +30855,7 @@ Room {
 Room {
 	id = "thd/guiyun/caodi2",
 	name = "草地",
+	outdoor = "归云庄",
 	ways = {
 		["north"] = "thd/guiyun/shulin2",
 		["east"] = "thd/guiyun/caodi1",
@@ -26666,6 +30864,7 @@ Room {
 Room {
 	id = "thd/guiyun/caodi3",
 	name = "草地",
+	outdoor = "归云庄",
 	ways = {
 		["north"] = "thd/guiyun/shulin3",
 		["west"] = "thd/guiyun/caodi1",
@@ -26674,6 +30873,7 @@ Room {
 Room {
 	id = "thd/guiyun/chafang",
 	name = "茶房",
+	outdoor = "归云庄",
 	no_fight = true,
 	ways = {
 		["stand;east"] = "thd/guiyun/fanting",
@@ -26682,9 +30882,10 @@ Room {
 Room {
 	id = "thd/guiyun/chufang",
 	name = "厨房",
+	outdoor = "归云庄",
 	ways = {
 		["west"] = "thd/guiyun/fanting",
-	},
+				},
 	objs = {
           ["猪肉"] = "rou",
           ["米饭"] = "mi fan",
@@ -26693,6 +30894,7 @@ Room {
 Room {
 	id = "thd/guiyun/fanting",
 	name = "饭厅",
+	outdoor = "归云庄",
 	no_fight = true,
 	ways = {
 		["stand;north"] = "thd/guiyun/lianwuchang",
@@ -26703,6 +30905,7 @@ Room {
 Room {
 	id = "thd/guiyun/houting",
 	name = "后厅",
+	outdoor = "归云庄",
 	ways = {
 		["north"] = "thd/guiyun/zoulang3",
 		["east"] = "thd/guiyun/shufang",
@@ -26737,6 +30940,7 @@ Room {
 Room {
 	id = "thd/guiyun/jiuguan",
 	name = "小酒馆",
+	outdoor = "归云庄",
 	ways = {
 		["north"] = "thd/guiyun/road2",
 	},
@@ -26750,6 +30954,7 @@ Room {
 Room {
 	id = "thd/guiyun/kefang",
 	name = "客房",
+	outdoor = "归云庄",
 	no_fight = true,
 	ways = {
 		["south"] = "thd/guiyun/zoulang2",
@@ -26758,6 +30963,7 @@ Room {
 Room {
 	id = "thd/guiyun/lianwuchang",
 	name = "练武场",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/fanting",
 		["north"] = "thd/guiyun/zoulang6",
@@ -26772,6 +30978,7 @@ Room {
 Room {
 	id = "thd/guiyun/qianting",
 	name = "前厅",
+	outdoor = "归云庄",
 	ways = {
 		["east"] = "thd/guiyun/shiqiao",
 		["west"] = "thd/guiyun/zhongting",
@@ -26784,6 +30991,7 @@ Room {
 Room {
 	id = "thd/guiyun/rivere",
 	name = "小河东岸",
+	outdoor = "归云庄",
 	ways = {
 		["east"] = "thd/guiyun/road1",
 		["e;w;ask lao zhe about 裘千丈;jump river;#walkBusy"] = "thd/guiyun/riverw",
@@ -26798,6 +31006,7 @@ Room {
 Room {
 	id = "thd/guiyun/riverw",
 	name = "小河西岸",
+	outdoor = "归云庄",
 	ways = {
 		["west"] = "thd/guiyun/road2",
 		["w;e;ask lao zhe about 裘千丈;jump river;#walkBusy"] = "thd/guiyun/rivere",
@@ -26812,6 +31021,7 @@ Room {
 Room {
 	id = "thd/guiyun/road1",
 	name = "湖滨小路",
+	outdoor = "归云庄",
 	ways = {
 		["east"] = "suzhou/hubiandadao",
 		["west"] = "thd/guiyun/rivere",
@@ -26820,6 +31030,7 @@ Room {
 Room {
 	id = "thd/guiyun/road2",
 	name = "湖滨小路",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/jiuguan",
 		["north"] = "thd/guiyun/road3",
@@ -26835,6 +31046,7 @@ Room {
 Room {
 	id = "thd/guiyun/road3",
 	name = "湖滨小路",
+	outdoor = "归云庄",
 	ways = {
 		["s;s;s;s;s;e;n;e"] = "thd/guiyun/riverw",
 		["n;n;n;n;n;n;n"] = "thd/guiyun/shulin1",
@@ -26849,6 +31061,7 @@ Room {
 Room {
 	id = "thd/guiyun/road4",
 	name = "归云庄前",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/road3",
 		["north"] = "thd/guiyun/caodi1",
@@ -26861,6 +31074,7 @@ Room {
 Room {
 	id = "thd/guiyun/shiqiao",
 	name = "大石桥",
+	outdoor = "归云庄",
 	ways = {
 		["east"] = "thd/guiyun/road4",
 		["west"] = "thd/guiyun/qianting",
@@ -26869,6 +31083,7 @@ Room {
 Room {
 	id = "thd/guiyun/shufang",
 	name = "书房",
+	outdoor = "归云庄",
 	ways = {
 		["west"] = "thd/guiyun/houting",
 	},
@@ -26880,6 +31095,7 @@ Room {
 Room {
 	id = "thd/guiyun/shulin1",
 	name = "树林",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/caodi1",
 		["east"] = "thd/guiyun/shulin3",
@@ -26889,6 +31105,7 @@ Room {
 Room {
 	id = "thd/guiyun/shulin2",
 	name = "树林",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/caodi2",
 		["east"] = "thd/guiyun/shulin1",
@@ -26900,6 +31117,7 @@ Room {
 Room {
 	id = "thd/guiyun/shulin3",
 	name = "树林",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/caodi3",
 		["north"] = "thd/guiyun/shulin4",
@@ -26912,6 +31130,7 @@ Room {
 Room {
 	id = "thd/guiyun/shulin4",
 	name = "树林深处",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/shulin3",
 		["northwest"] = "thd/guiyun/shulin5",
@@ -26921,6 +31140,7 @@ Room {
 Room {
 	id = "thd/guiyun/shulin5",
 	name = "树林深处",
+	outdoor = "归云庄",
 	ways = {
 		["southeast"] = "thd/guiyun/shulin4",
 		["north"] = "thd/guiyun/shulin7",
@@ -26929,6 +31149,7 @@ Room {
 Room {
 	id = "thd/guiyun/shulin6",
 	name = "树林深处",
+	outdoor = "归云庄",
 	ways = {
 		["west"] = "thd/guiyun/shulin4",
 	},
@@ -26936,6 +31157,7 @@ Room {
 Room {
 	id = "thd/guiyun/shulin7",
 	name = "树林深处",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/shulin5",
 	},
@@ -26946,6 +31168,7 @@ Room {
 Room {
 	id = "thd/guiyun/shushang",
 	name = "树上",
+	outdoor = "归云庄",
 	ways = {
 		["down"] = "thd/guiyun/shulin5",
 	},
@@ -26953,6 +31176,7 @@ Room {
 Room {
 	id = "thd/guiyun/wofang",
 	name = "卧房",
+	outdoor = "归云庄",
 	ways = {
 		["east"] = "thd/guiyun/houting",
 	},
@@ -26960,6 +31184,7 @@ Room {
 Room {
 	id = "thd/guiyun/wofang1",
 	name = "卧房",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/zoulang3",
 	},
@@ -26970,6 +31195,7 @@ Room {
 Room {
 	id = "thd/guiyun/xiuxishi-f",
 	name = "女休息室",
+	outdoor = "归云庄",
 	no_fight = true,
 	ways = {
 		["west"] = "thd/guiyun/lianwuchang",
@@ -26978,6 +31204,7 @@ Room {
 Room {
 	id = "thd/guiyun/xiuxishi-m",
 	name = "男休息室",
+	outdoor = "归云庄",
 	no_fight = true,
 	ways = {
 		["east"] = "thd/guiyun/lianwuchang",
@@ -26986,6 +31213,7 @@ Room {
 Room {
 	id = "thd/guiyun/zhongting",
 	name = "中厅",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/zoulang4",
 		["north"] = "thd/guiyun/zoulang1",
@@ -26995,6 +31223,7 @@ Room {
 Room {
 	id = "thd/guiyun/zoulang1",
 	name = "走廊",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/zhongting",
 		["west"] = "thd/guiyun/zoulang2",
@@ -27004,6 +31233,7 @@ Room {
 Room {
 	id = "thd/guiyun/zoulang2",
 	name = "走廊",
+	outdoor = "归云庄",
 	ways = {
 		["east"] = "thd/guiyun/zoulang1",
 		["north"] = "thd/guiyun/kefang",
@@ -27014,6 +31244,7 @@ Room {
 Room {
 	id = "thd/guiyun/zoulang3",
 	name = "走廊",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/houting",
 		["east"] = "thd/guiyun/zoulang2",
@@ -27024,6 +31255,7 @@ Room {
 Room {
 	id = "thd/guiyun/zoulang4",
 	name = "走廊",
+	outdoor = "归云庄",
 	ways = {
 		["north"] = "thd/guiyun/zhongting",
 		["west"] = "thd/guiyun/zoulang5",
@@ -27033,6 +31265,7 @@ Room {
 Room {
 	id = "thd/guiyun/zoulang5",
 	name = "走廊",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/zoulang6",
 		["east"] = "thd/guiyun/zoulang4",
@@ -27042,11 +31275,12 @@ Room {
 Room {
 	id = "thd/guiyun/zoulang6",
 	name = "走廊",
+	outdoor = "归云庄",
 	ways = {
 		["south"] = "thd/guiyun/lianwuchang",
 		["north"] = "thd/guiyun/zoulang5",
 	},
-	room_relative="走廊｜走廊｜练武场走廊",
+	
 	blocks = {
 		["south"] = {
 			{id = "zhuang ding", exp = 5000, party = "桃花岛"},
@@ -27056,6 +31290,7 @@ Room {
 Room {
 	id = "thd/haibin",
 	name = "海滨",
+	outdoor = "桃花岛",
 	ways = {
 		["west"] = "thd/niujia/jiangpan3",
 		["#toThd"] = "thd/shore",
@@ -27067,6 +31302,7 @@ Room {
 Room {
 	id = "thd/hall",
 	name = "方厅",
+	outdoor = "桃花岛",
 	ways = {
 		["east"] = "thd/shilu",
 		["west"] = "thd/zoulang1",
@@ -27075,6 +31311,7 @@ Room {
 Room {
 	id = "thd/hetang",
 	name = "河塘",
+	outdoor = "桃花岛",
 	ways = {
 		["north"] = "thd/shidi",
 		["s"] = "thd/jicui",
@@ -27086,6 +31323,7 @@ Room {
 Room {
 	id = "thd/hill",
 	name = "小山",
+	outdoor = "桃花岛",
 	ways = {
 		["eastup"] = "thd/hill1",
 		["nd"] = "thd/shangang",
@@ -27100,6 +31338,7 @@ Room {
 Room {
 	id = "thd/hill1",
 	name = "山脊",
+	outdoor = "桃花岛",
 	ways = {
 		["northup"] = "thd/hill2",
 		["westdown"] = "thd/hill",
@@ -27108,6 +31347,7 @@ Room {
 Room {
 	id = "thd/hill2",
 	name = "山顶",
+	outdoor = "桃花岛",
 	ways = {
 		["east"] = "thd/entrance",
 		["southdown"] = "thd/hill1",
@@ -27116,6 +31356,7 @@ Room {
 Room {
 	id = "thd/huo",
 	name = "火",
+	outdoor = "桃花岛",
 	ways = {
 		["jin"] = "thd/jin",
 		["tu"] = "thd/tu",
@@ -27126,6 +31367,7 @@ Room {
 Room {
 	id = "thd/jicui",
 	name = "积翠亭",
+	outdoor = "桃花岛",
 	ways = {
 		["enter"] = "thd/room",
 		["east"] = "thd/kefang",
@@ -27145,6 +31387,7 @@ Room {
 Room {
 	id = "thd/jin",
 	name = "金",
+	outdoor = "桃花岛",
 	ways = {
 		["huo"] = "thd/huo",
 		["tu"] = "thd/tu",
@@ -27155,6 +31398,7 @@ Room {
 Room {
 	id = "thd/jingshe",
 	name = "精舍",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/shilu",
 	},
@@ -27165,6 +31409,7 @@ Room {
 Room {
 	id = "thd/kefang",
 	name = "客房",
+	outdoor = "桃花岛",
 	ways = {
 		["west"] = "thd/jicui",
 	},
@@ -27172,6 +31417,7 @@ Room {
 Room {
 	id = "thd/kefang1",
 	name = "客房",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/shijian-ting",
 	},
@@ -27179,6 +31425,7 @@ Room {
 Room {
 	id = "thd/liandanfang",
 	name = "炼丹房",
+	outdoor = "桃花岛",
 	ways = {
 		["out"] = "thd/jingshe",
 	},
@@ -27186,6 +31433,7 @@ Room {
 Room {
 	id = "thd/liangyi",
 	name = "两仪",
+	outdoor = "桃花岛",
 	ways = {
 		["southwest"] = "thd/yang",
 		["down"] = "thd/sixiang",
@@ -27195,6 +31443,7 @@ Room {
 Room {
 	id = "thd/lianwuchang",
 	name = "练武场",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/xiuxishi-f",
 		["east"] = "thd/zoulang3",
@@ -27212,6 +31461,7 @@ Room {
 Room {
 	id = "thd/mu",
 	name = "木",
+	outdoor = "桃花岛",
 	ways = {
 		["huo"] = "thd/huo",
 		["jin"] = "thd/jin",
@@ -27222,6 +31472,7 @@ Room {
 Room {
 	id = "thd/mudao1",
 	name = "墓道",
+	outdoor = "桃花岛",
 	ways = {
 		["down"] = "thd/mudao2",
 		["out"] = "thd/tomb",
@@ -27230,6 +31481,7 @@ Room {
 Room {
 	id = "thd/mudao2",
 	name = "墓道",
+	outdoor = "桃花岛",
 	ways = {
 		["northup"] = "thd/mudao2",
 		["southup"] = "thd/mudao2",
@@ -27249,6 +31501,7 @@ Room {
 Room {
 	id = "thd/mudao3",
 	name = "墓道",
+	outdoor = "桃花岛",
 	ways = {
 		["northup"] = "thd/mudao3",
 		["southup"] = "thd/mudao3",
@@ -27268,6 +31521,7 @@ Room {
 Room {
 	id = "thd/mudao4",
 	name = "墓道",
+	outdoor = "桃花岛",
 	ways = {
 		["down"] = "thd/mushi",
 	},
@@ -27275,6 +31529,7 @@ Room {
 Room {
 	id = "thd/mushi",
 	name = "墓中圹室",
+	outdoor = "桃花岛",
 	ways = {
 		["up"] = "thd/mudao4",
 	},
@@ -27282,6 +31537,7 @@ Room {
 Room {
 	id = "thd/neishi1",
 	name = "内室",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/zoulang2",
 		["east"] = "thd/woshi1",
@@ -27295,6 +31551,7 @@ Room {
 Room {
 	id = "thd/neishi2",
 	name = "内室",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/neishi1",
 		["east"] = "thd/woshi2",
@@ -27304,32 +31561,39 @@ Room {
 Room {
 	id = "thd/niujia/bay",
 	name = "小渔港",
+	outdoor = "牛家村",
 	ways = {
 		["west"] = "thd/niujia/hbroad",
 	},
 	objs = {
           ["船老大"] = "lao da",
            },
+	room_relative="土路----小渔港小渔港",
 }
 Room {
 	id = "thd/niujia/guojia",
 	name = "民房",
+	outdoor = "牛家村",
 	ways = {
 		["south"] = "thd/niujia/njroad2",
 	},
+	room_relative="村中小路｜民房",
 }
 Room {
 	id = "thd/niujia/hbroad",
 	name = "土路",
+	outdoor = "牛家村",
 	ways = {
 		["southwest"] = "thd/niujia/njeast",
 		["north"] = "thd/niujia/kezhan",
 		["east"] = "thd/niujia/bay",
 	},
+ room_relative="归来客栈｜土路-----小渔港↙村口土路",
 }
 Room {
 	id = "thd/niujia/jiangpan1",
 	name = "江畔",
+	outdoor = "牛家村",
 	ways = {
 		["southeast"] = "thd/niujia/jiangpan2",
 		["north"] = "thd/niujia/njroad5",
@@ -27339,6 +31603,7 @@ Room {
 Room {
 	id = "thd/niujia/jiangpan2",
 	name = "江畔",
+	outdoor = "牛家村",
 	ways = {
 		["northwest"] = "thd/niujia/jiangpan1",
 		["east"] = "thd/niujia/jiangpan3",
@@ -27348,6 +31613,7 @@ Room {
 Room {
 	id = "thd/niujia/jiangpan3",
 	name = "江畔",
+	outdoor = "牛家村",
 	ways = {
 		["west"] = "thd/niujia/jiangpan2",
 		["east"] = "thd/haibin",
@@ -27357,13 +31623,35 @@ Room {
 Room {
 	id = "thd/niujia/kezhan",
 	name = "归来客栈",
+	outdoor = "牛家村",
 	ways = {
 		["south"] = "thd/niujia/hbroad",
 	},
 }
 Room {
+	id = "thd/niujia/kezhan2",
+	name = "二楼",
+	outdoor = "牛家村",
+	no_fight = true,
+	ways = {
+		["down"] = "thd/niujia/kezhan",
+		["east"] = "thd/niujia/kezhan3",
+	},
+}
+Room {
+	id = "thd/niujia/kezhan3",
+	name = "东厢房",
+	outdoor = "牛家村",
+	no_fight = true,
+	ways = {
+		
+		["west"] = "thd/niujia/kezhan2",
+	},
+}
+Room {
 	id = "thd/niujia/mishi",
 	name = "密室",
+	outdoor = "牛家村",
 	ways = {
 		["out"] = "thd/niujia/xiaodian",
 	},
@@ -27371,14 +31659,17 @@ Room {
 Room {
 	id = "thd/niujia/njeast",
 	name = "村口",
+	outdoor = "牛家村",
 	ways = {
 		["northeast"] = "thd/niujia/hbroad",
 		["west"] = "thd/niujia/njroad3",
 	},
+	room_relative="土路↗村中小路-----村口村口",
 }
 Room {
 	id = "thd/niujia/njroad1",
 	name = "村中小路",
+	outdoor = "牛家村",
 	ways = {
 		["south"] = "thd/niujia/xiaodian",
 		["east"] = "thd/niujia/njroad2",
@@ -27389,6 +31680,7 @@ Room {
 Room {
 	id = "thd/niujia/njroad2",
 	name = "村中小路",
+	outdoor = "牛家村",
 	ways = {
 		["east"] = "thd/niujia/njroad3",
 		["north"] = "thd/niujia/guojia",
@@ -27402,6 +31694,7 @@ Room {
 Room {
 	id = "thd/niujia/njroad3",
 	name = "村中小路",
+	outdoor = "牛家村",
 	ways = {
 		["south"] = "thd/niujia/njroad4",
 		["north"] = "thd/niujia/qianyuan",
@@ -27413,14 +31706,17 @@ Room {
 Room {
 	id = "thd/niujia/qianyuan",
 	name = "民房",
+	outdoor = "牛家村",
 	ways = {
 		["south"] = "thd/niujia/njroad3",
 	},
+	room_relative="村中小路｜民房",
 }
 
 Room {
 	id = "thd/niujia/njroad4",
 	name = "村中小路",
+	outdoor = "牛家村",
 	ways = {
 		["south"] = "thd/niujia/njroad5",
 		["north"] = "thd/niujia/njroad3",
@@ -27430,6 +31726,7 @@ Room {
 Room {
 	id = "thd/niujia/njroad5",
 	name = "村中小路",
+	outdoor = "牛家村",
 	ways = {
 		["south"] = "thd/niujia/jiangpan1",
 		["north"] = "thd/niujia/njroad4",
@@ -27439,30 +31736,37 @@ Room {
 Room {
 	id = "thd/niujia/njwest",
 	name = "村口",
+	outdoor = "牛家村",
 	ways = {
 		["northwest"] = "thd/niujia/road2",
 		["east"] = "thd/niujia/njroad1",
 	},
+   room_relative="土路↖村口-----村中小路村口",
 }
 Room {
 	id = "thd/niujia/road",
 	name = "土路",
+	outdoor = "牛家村",
 	ways = {
 		["south"] = "group/entry/thdroad1",
 		["northwest"] = "hz/qsddao3",
 	},
+	room_relative="青石大道↖土路｜土路土路",
 }
 Room {
 	id = "thd/niujia/road2",
 	name = "土路",
+	outdoor = "牛家村",
 	ways = {
 		["southeast"] = "thd/niujia/njwest",
 		["northwest"] = "group/entry/thdroad1",
 	},
+	room_relative="土路↖土路↘村口土路",
 }
 Room {
 	id = "thd/niujia/xiaodian",
 	name = "小酒店",
+	outdoor = "牛家村",
 	ways = {
 		["north"] = "thd/niujia/njroad1",
 		["move wan;zhuan tiewan zuo;zhuan tiewan zuo;zhuan tiewan zuo;zhuan tiewan right;zhuan tiewan right;zhuan tiewan right"] = "thd/niujia/mishi",
@@ -27481,6 +31785,7 @@ Room {
 Room {
 	id = "thd/room",
 	name = "箫房",
+	outdoor = "桃花岛",
 	ways = {
 		["out"] = "thd/jicui",
 	},
@@ -27488,6 +31793,7 @@ Room {
 Room {
 	id = "thd/shangang",
 	name = "山冈",
+	outdoor = "桃花岛",
 	ways = {
 		["north"] = "thd/caodi",
 		["east"] = "thd/dongkou",
@@ -27501,6 +31807,7 @@ Room {
 Room {
 	id = "thd/shanjiao",
 	name = "试剑峰山脚",
+	outdoor = "桃花岛",
 	ways = {
 		["westdown"] = "thd/caodi",
 		["up"] = "thd/shanlu1",
@@ -27509,6 +31816,7 @@ Room {
 Room {
 	id = "thd/shanlu1",
 	name = "山路",
+	outdoor = "桃花岛",
 	ways = {
 		["northup"] = "thd/shanlu2",
 		["down"] = "thd/shanjiao",
@@ -27517,6 +31825,7 @@ Room {
 Room {
 	id = "thd/shanlu2",
 	name = "山路",
+	outdoor = "桃花岛",
 	ways = {
 		["eastup"] = "thd/shanyao",
 		["southdown"] = "thd/shanlu1",
@@ -27525,6 +31834,7 @@ Room {
 Room {
 	id = "thd/shanya",
 	name = "断崖",
+	outdoor = "桃花岛",
 	ways = {
 		["westdown"] = "thd/shanyao",
 	},
@@ -27532,6 +31842,7 @@ Room {
 Room {
 	id = "thd/shanyao",
 	name = "半山腰",
+	outdoor = "桃花岛",
 	ways = {
 		["eastup"] = "thd/shanya",
 		["westdown"] = "thd/shanlu2",
@@ -27540,6 +31851,7 @@ Room {
 Room {
 	id = "thd/shaoyang",
 	name = "少阳",
+	outdoor = "桃花岛",
 	ways = {
 		["east"] = "thd/sixiang",
 		["down"] = "thd/jin",
@@ -27548,6 +31860,7 @@ Room {
 Room {
 	id = "thd/shaoyin",
 	name = "少阴",
+	outdoor = "桃花岛",
 	ways = {
 		["down"] = "thd/mu",
 		["west"] = "thd/sixiang",
@@ -27556,6 +31869,7 @@ Room {
 Room {
 	id = "thd/shidi",
 	name = "小石堤",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/hetang",
 		["north"] = "thd/shilu",
@@ -27564,6 +31878,7 @@ Room {
 Room {
 	id = "thd/shijian-ting",
 	name = "试剑亭",
+	outdoor = "桃花岛",
 	ways = {
 		["north"] = "thd/kefang1",
 		["east"] = "thd/caodi",
@@ -27572,6 +31887,7 @@ Room {
 Room {
 	id = "thd/shilu",
 	name = "石路",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/shidi",
 		["north"] = "thd/jingshe",
@@ -27582,6 +31898,7 @@ Room {
 Room {
 	id = "thd/shore",
 	name = "岸边",
+	outdoor = "桃花岛",
 	ways = {
 		["northup"] = "thd/hill",
 	},
@@ -27589,6 +31906,7 @@ Room {
 Room {
 	id = "thd/shui",
 	name = "水",
+	outdoor = "桃花岛",
 	ways = {
 		["huo"] = "thd/huo",
 		["jin"] = "thd/jin",
@@ -27599,6 +31917,7 @@ Room {
 Room {
 	id = "thd/sixiang",
 	name = "四象",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/taiyang",
 		["down"] = "thd/tu",
@@ -27610,6 +31929,7 @@ Room {
 Room {
 	id = "thd/taiji",
 	name = "太极",
+	outdoor = "桃花岛",
 	ways = {
 		["down"] = "thd/liangyi",
 	},
@@ -27617,6 +31937,7 @@ Room {
 Room {
 	id = "thd/taiyang",
 	name = "太阳",
+	outdoor = "桃花岛",
 	ways = {
 		["north"] = "thd/sixiang",
 		["down"] = "thd/huo",
@@ -27625,6 +31946,7 @@ Room {
 Room {
 	id = "thd/taiyin",
 	name = "太阴",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/sixiang",
 		["down"] = "thd/shui",
@@ -27638,6 +31960,7 @@ Room {
 Room {
 	id = "thd/tomb",
 	name = "石坟",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/taohua1",
 		["east"] = "thd/taohua1",
@@ -27648,6 +31971,7 @@ Room {
 Room {
 	id = "thd/tu",
 	name = "土",
+	outdoor = "桃花岛",
 	ways = {
 		["huo"] = "thd/huo",
 		["jin"] = "thd/jin",
@@ -27658,6 +31982,7 @@ Room {
 Room {
 	id = "thd/woshi1",
 	name = "卧室",
+	outdoor = "桃花岛",
 	ways = {
 		["west"] = "thd/neishi1",
 	},
@@ -27665,6 +31990,7 @@ Room {
 Room {
 	id = "thd/woshi2",
 	name = "卧室",
+	outdoor = "桃花岛",
 	ways = {
 		["west"] = "thd/neishi2",
 	},
@@ -27672,6 +31998,7 @@ Room {
 Room {
 	id = "thd/xiaoyuan",
 	name = "小院",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/taohua1",
 		["north"] = "thd/jicui",
@@ -27680,6 +32007,7 @@ Room {
 Room {
 	id = "thd/xiuxishi-f",
 	name = "女休息室",
+	outdoor = "桃花岛",
 	no_fight = true,
 	ways = {
 		["north"] = "thd/lianwuchang",
@@ -27688,6 +32016,7 @@ Room {
 Room {
 	id = "thd/xiuxishi-m",
 	name = "男休息室",
+	outdoor = "桃花岛",
 	no_fight = true,
 	ways = {
 		["south"] = "thd/lianwuchang",
@@ -27696,6 +32025,7 @@ Room {
 Room {
 	id = "thd/yang",
 	name = "阳",
+	outdoor = "桃花岛",
 	ways = {
 		["northeast"] = "thd/liangyi",
 	},
@@ -27703,6 +32033,7 @@ Room {
 Room {
 	id = "thd/yin",
 	name = "阴",
+	outdoor = "桃花岛",
 	ways = {
 		["southwest"] = "thd/liangyi",
 	},
@@ -27710,6 +32041,7 @@ Room {
 Room {
 	id = "thd/zoulang1",
 	name = "回廊",
+	outdoor = "桃花岛",
 	ways = {
 		["north"] = "thd/zoulang2",
 		["east"] = "thd/hall",
@@ -27719,6 +32051,7 @@ Room {
 Room {
 	id = "thd/zoulang2",
 	name = "回廊",
+	outdoor = "桃花岛",
 	ways = {
 		["south"] = "thd/zoulang1",
 		["north"] = "thd/neishi1",
@@ -27727,6 +32060,7 @@ Room {
 Room {
 	id = "thd/zoulang3",
 	name = "回廊",
+	outdoor = "桃花岛",
 	ways = {
 		["east"] = "thd/zoulang1",
 		["west"] = "thd/lianwuchang",
@@ -27735,6 +32069,7 @@ Room {
 Room {
 	id = "tianshan/banshan",
 	name = "半山",
+	outdoor = "天山",
 	ways = {
 		["southdown"] = "tianshan/shanlu4",
 		["west"] = "tianshan/duanhunya",
@@ -28357,31 +32692,38 @@ Room {
 Room {
 	id = "tiezhang/bqshi",
 	name = "兵器室",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/zoulang-1",
 	},
 	objs = {
           ["兵器架"] = "bingqi jia",
      },
+	 room_relative="兵器室｜走廊兵器室",
 }
 Room {
 	id = "tiezhang/chufang",
 	name = "厨房",
+	outdoor = "铁掌山",
 	no_fight = true,
 	ways = {
 		["south"] = "tiezhang/zoulang-3",
 	},
+	room_relative="厨房｜走廊厨房",
 }
 Room {
 	id = "tiezhang/dashishi",
 	name = "大石室",
+	outdoor = "铁掌山",
 	ways = {
 		["out"] = "tiezhang/taijie-2",
 	},
+	room_relative="石阶｜大石室",
 }
 Room {
 	id = "tiezhang/dezj",
 	name = "第二指节",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/shanlu-8",
 		["south"] = "tiezhang/sslin-5",
@@ -28391,18 +32733,22 @@ Room {
           ["凌震天"] = "ling zhentian",
           ["黄令天"] = "huang lingtian",
      },
+	 room_relative="山路↑第二指节｜松树林第二指节",
 }
 Room {
 	id = "tiezhang/dong-1",
 	name = "山洞",
+	outdoor = "铁掌山",
 	ways = {
 		["enter"] = "tiezhang/dong-2",
 		["out"] = "tiezhang/dezj",
 	},
+	room_relative="山洞｜山洞--第二指节",
 }
 Room {
 	id = "tiezhang/dong-2",
 	name = "山洞",
+	outdoor = "铁掌山",
 	ways = {
 		["enter"] = "tiezhang/dong-3",
 		["out"] = "tiezhang/dong-1",
@@ -28411,6 +32757,7 @@ Room {
 Room {
 	id = "tiezhang/dong-3",
 	name = "山洞",
+	outdoor = "铁掌山",
 	ways = {
 		["enter"] = "tiezhang/trdx",
 		["out"] = "tiezhang/dong-2",
@@ -28419,25 +32766,30 @@ Room {
 Room {
 	id = "tiezhang/gjfang",
 	name = "工具房",
+	outdoor = "铁掌山",
 	no_fight = true,
 	ways = {
 		["west"] = "tiezhang/zoulang-4",
 	},
+	room_relative="走廊----工具房工具房",
 }
 Room {
 	id = "tiezhang/guajia",
 	name = "瓜架",
+	outdoor = "铁掌山",
 	ways = {
 		["southeast"] = "tiezhang/shuijing",
 		["west"] = "tiezhang/guangchang",
 	},
 	objs = {
           ["裘千丈"] = "qiu qianzhang",
+	room_relative="广场-----瓜架↘蝴蝶泉瓜架",
      },
 }
 Room {
 	id = "tiezhang/guangchang",
 	name = "广场",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/wztang",
 		["south"] = "tiezhang/shanlu-2",
@@ -28456,11 +32808,13 @@ Room {
 	objs = {
           ["铁掌帮弟子留言板"] = "board",
           ["张浩天"] = "zhang haotian",
+	
      },
 }
 Room {
 	id = "tiezhang/hclu",
 	name = "荒草路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/hclu-2",
 		["southeast"] = "tiezhang/pingtai",
@@ -28470,6 +32824,7 @@ Room {
 Room {
 	id = "tiezhang/hclu-2",
 	name = "荒草路",
+	outdoor = "铁掌山",
 	ways = {
 		["northwest"] = "tiezhang/hclu-3",
 		["southdown"] = "tiezhang/hclu",
@@ -28479,6 +32834,7 @@ Room {
 Room {
 	id = "tiezhang/hclu-3",
 	name = "荒草路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/hclu-4",
 		["southeast"] = "tiezhang/hclu-2",
@@ -28488,6 +32844,7 @@ Room {
 Room {
 	id = "tiezhang/hclu-4",
 	name = "荒草路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/hclu-5",
 		["southdown"] = "tiezhang/hclu-3",
@@ -28497,6 +32854,7 @@ Room {
 Room {
 	id = "tiezhang/hclu-5",
 	name = "荒草路",
+	outdoor = "铁掌山",
 	ways = {
 		["northwest"] = "tiezhang/hclu-6",
 		["southdown"] = "tiezhang/hclu-4",
@@ -28506,6 +32864,7 @@ Room {
 Room {
 	id = "tiezhang/hclu-6",
 	name = "荒草路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/wmfeng",
 		["southeast"] = "tiezhang/hclu-5",
@@ -28515,30 +32874,37 @@ Room {
 Room {
 	id = "tiezhang/hhyang-2",
 	name = "花圃",
+	outdoor = "铁掌山",
 	ways = {
 		["west"] = "tiezhang/hhyuan-1",
 	},
+	room_relative="后花园-----花圃花圃",
 }
 Room {
 	id = "tiezhang/hhyuan-1",
 	name = "后花园",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/hxfang",
 		["north"] = "tiezhang/shanlu-3",
 		["east"] = "tiezhang/hhyang-2",
 		["west"] = "tiezhang/hhyuan-3",
 	},
+	room_relative="山路｜假山----后花园----花圃｜后厢房后花园",
 }
 Room {
 	id = "tiezhang/hhyuan-3",
 	name = "假山",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/hhyuan-1",
 	},
+	room_relative="假山-----后花园假山",
 }
 Room {
 	id = "tiezhang/hxfang",
 	name = "后厢房",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/wztang",
 		["north"] = "tiezhang/hhyuan-1",
@@ -28546,28 +32912,37 @@ Room {
 	objs = {
           ["裘千仞"] = "qiu qianren",
      },
+	 room_relative="后花园｜后厢房｜五指堂后厢房",
 }
 Room {
 	id = "tiezhang/juebi-1",
 	name = "绝壁",
+	outdoor = "铁掌山",
 	ways = {
 		["southwest"] = "tiezhang/shangu-2",
 	},
+	room_relative="绝壁↙山谷绝壁",
 }
 Room {
 	id = "tiezhang/kedian",
 	name = "客店",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/lx",
-		["give xiao 5 silver;up"] = "tiezhang/kedian2",
+		["#tzkz"] = "tiezhang/kedian2",
 	},
+	lengths = {
+		["#tzkz"] = 5,
+    },
 	nolooks = {
 		["up"] = true,
 	},
+	room_relative="客店二楼〓客店-----泸溪客店",
 }
 Room {
 	id = "tiezhang/kedian2",
 	name = "客店二楼",
+	outdoor = "铁掌山",
 	ways = {
 		["enter"] = "tiezhang/kedian3",
 		["down"] = "tiezhang/kedian",
@@ -28576,6 +32951,7 @@ Room {
 Room {
 	id = "tiezhang/kedian3",
 	name = "客店二楼",
+	outdoor = "铁掌山",
 	no_fight = true,
 	ways = {
 		["out"] = "tiezhang/kedian2",
@@ -28584,22 +32960,27 @@ Room {
 Room {
 	id = "tiezhang/lgfang",
 	name = "练功房",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/guangchang",
 	},
+	room_relative="练功房----广场练功房",
 }
 Room {
 	id = "tiezhang/lx",
 	name = "泸溪",
+	outdoor = "铁掌山",
 	ways = {
 		["southwest"] = "tiezhang/road-1",
 		["north"] = "xiangyang/hunanroad2",
 		["west"] = "tiezhang/kedian",
 	},
+	room_relative="泸溪北｜客店-----泸溪↙黄土路泸溪",
 }
 Room {
 	id = "tiezhang/mishi",
 	name = "密室",
+	outdoor = "铁掌山",
 	ways = {
 		["out"] = "tiezhang/hhyuan-3",
 	},
@@ -28607,13 +32988,16 @@ Room {
 Room {
 	id = "tiezhang/mzfeng",
 	name = "拇指峰",
+	outdoor = "铁掌山",
 	ways = {
 		["southdown"] = "tiezhang/sslu-3",
 	},
+	room_relative="拇指峰↑碎石路拇指峰",
 }
 Room {
 	id = "tiezhang/pingtai",
 	name = "山间平台",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/shanlu-6",
 		["eastup"] = "tiezhang/sslu-1",
@@ -28622,18 +33006,22 @@ Room {
 		["northeast"] = "tiezhang/shangu-1",
 		["southdown"] = "tiezhang/shanlu-4",
 	},
+	room_relative="荒草路山路山谷↖↑↗石板路←山间平台→碎石路↑山路山间平台",
 }
 Room {
 	id = "tiezhang/pubu",
 	name = "瀑布",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/xzfeng",
 		["eastdown"] = "tiezhang/sblu-1",
 	},
+	room_relative="小指峰↑瀑布←石板路瀑布",
 }
 Room {
 	id = "tiezhang/road-1",
 	name = "黄土路",
+	outdoor = "铁掌山",
 	ways = {
 		["southwest"] = "tiezhang/road-2",
 		["northeast"] = "tiezhang/lx",
@@ -28643,6 +33031,7 @@ Room {
 Room {
 	id = "tiezhang/road-2",
 	name = "黄土路",
+	outdoor = "铁掌山",
 	ways = {
 		["northeast"] = "tiezhang/road-1",
 		["west"] = "tiezhang/road-3",
@@ -28652,6 +33041,7 @@ Room {
 Room {
 	id = "tiezhang/road-3",
 	name = "黄土路",
+	outdoor = "铁掌山",
 	ways = {
 		["northwest"] = "tiezhang/shanjiao",
 		["east"] = "tiezhang/road-2",
@@ -28661,6 +33051,7 @@ Room {
 Room {
 	id = "tiezhang/sblu-1",
 	name = "石板路",
+	outdoor = "铁掌山",
 	ways = {
 		["eastdown"] = "tiezhang/shanlu-5",
 		["westup"] = "tiezhang/pubu",
@@ -28670,6 +33061,7 @@ Room {
 Room {
 	id = "tiezhang/shangu-1",
 	name = "山谷",
+	outdoor = "铁掌山",
 	ways = {
 		["southwest"] = "tiezhang/pingtai",
 		["northeast"] = "tiezhang/shangu-2",
@@ -28679,6 +33071,7 @@ Room {
 Room {
 	id = "tiezhang/shangu-2",
 	name = "山谷",
+	outdoor = "铁掌山",
 	ways = {
 		["southwest"] = "tiezhang/shangu-1",
 		["northeast"] = "tiezhang/juebi-1",
@@ -28688,14 +33081,17 @@ Room {
 Room {
 	id = "tiezhang/shanjiao",
 	name = "山脚下",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/shanmen",
 		["southeast"] = "tiezhang/road-3",
 	},
+	room_relative="山门↑山脚下↘黄土路山脚下",
 }
 Room {
 	id = "tiezhang/shanlu-1",
 	name = "山路",
+	outdoor = "铁掌山",
 	ways = {
 		["north"] = "tiezhang/shanlu-2",
 		["southdown"] = "tiezhang/shanmen",
@@ -28705,15 +33101,20 @@ Room {
 Room {
 	id = "tiezhang/shanlu-2",
 	name = "山路",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/shanlu-1",
 		["north"] = "tiezhang/guangchang",
+	},
+	precmds = {
+		["north"] = "#walkBusy",
 	},
 	room_relative="广场｜山路｜山路山路",
 }
 Room {
 	id = "tiezhang/shanlu-3",
 	name = "山路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/shanlu-4",
 		["south"] = "tiezhang/hhyuan-1",
@@ -28723,6 +33124,7 @@ Room {
 Room {
 	id = "tiezhang/shanlu-4",
 	name = "山路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/pingtai",
 		["southdown"] = "tiezhang/shanlu-3",
@@ -28732,6 +33134,7 @@ Room {
 Room {
 	id = "tiezhang/shanlu-5",
 	name = "石板路",
+	outdoor = "铁掌山",
 	ways = {
 		["eastdown"] = "tiezhang/pingtai",
 		["westup"] = "tiezhang/sblu-1",
@@ -28741,6 +33144,7 @@ Room {
 Room {
 	id = "tiezhang/shanlu-6",
 	name = "山路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/shanlu-7",
 		["southdown"] = "tiezhang/pingtai",
@@ -28750,6 +33154,7 @@ Room {
 Room {
 	id = "tiezhang/shanlu-7",
 	name = "山路",
+	outdoor = "铁掌山",
 	ways = {
 		["north"] = "tiezhang/sslin-1",
 		["southdown"] = "tiezhang/shanlu-6",
@@ -28759,6 +33164,7 @@ Room {
 Room {
 	id = "tiezhang/shanlu-8",
 	name = "山路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/shanlu-9",
 		["southdown"] = "tiezhang/dezj",
@@ -28768,6 +33174,7 @@ Room {
 Room {
 	id = "tiezhang/shanlu-9",
 	name = "山路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/zzfeng",
 		["southdown"] = "tiezhang/shanlu-8",
@@ -28777,6 +33184,7 @@ Room {
 Room {
 	id = "tiezhang/shanmen",
 	name = "山门",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/shanlu-1",
 		["east"] = "tiezhang/zhaigou3",
@@ -28785,13 +33193,15 @@ Room {
 	},
 	blocks = {
 		["northup"] = {
-			{id = "heiyi bangzhong", exp = 60000, party = "铁掌帮"},
+			{id = "heiyi bangzhong", exp = 60000, party = "铁掌山"},
 		},
+	
 	},
 }
 Room {
 	id = "tiezhang/shijie-1",
 	name = "石阶",
+	outdoor = "铁掌山",
 	ways = {
 		["eastdown"] = "tiezhang/shijie-2",
 		["out"] = "tiezhang/wmfeng",
@@ -28801,6 +33211,7 @@ Room {
 Room {
 	id = "tiezhang/shijie-2",
 	name = "石阶",
+	outdoor = "铁掌山",
 	ways = {
 		["westup"] = "tiezhang/shijie-1",
 		["northdown"] = "tiezhang/shijie-3",
@@ -28810,6 +33221,7 @@ Room {
 Room {
 	id = "tiezhang/shijie-3",
 	name = "石阶",
+	outdoor = "铁掌山",
 	ways = {
 		["southup"] = "tiezhang/shijie-2",
 		["westdown"] = "tiezhang/shishi",
@@ -28819,6 +33231,7 @@ Room {
 Room {
 	id = "tiezhang/shishi",
 	name = "石室",
+	outdoor = "铁掌山",
 	ways = {
 		["eastup"] = "tiezhang/shijie-3",
 	},
@@ -28829,6 +33242,7 @@ Room {
 Room {
 	id = "tiezhang/shufang",
 	name = "书房",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/zoulang-2",
 	},
@@ -28836,13 +33250,16 @@ Room {
 Room {
 	id = "tiezhang/shuijing",
 	name = "蝴蝶泉",
+	outdoor = "铁掌山",
 	ways = {
 		["northwest"] = "tiezhang/guajia",
 	},
+	room_relative="瓜架↖蝴蝶泉蝴蝶泉",
 }
 Room {
 	id = "tiezhang/sslin-1",
 	name = "松树林",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/shanlu-7",
 		["east"] = "tiezhang/sslin-2",
@@ -28852,6 +33269,7 @@ Room {
 Room {
 	id = "tiezhang/sslin-2",
 	name = "松树林",
+	outdoor = "铁掌山",
 	ways = {
 		["north"] = "tiezhang/sslin-3",
 		["west"] = "tiezhang/sslin-1",
@@ -28860,6 +33278,7 @@ Room {
 Room {
 	id = "tiezhang/sslin-3",
 	name = "松树林",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/sslin-2",
 		["west"] = "tiezhang/sslin-4",
@@ -28872,6 +33291,7 @@ Room {
 Room {
 	id = "tiezhang/sslin-4",
 	name = "松树林",
+	outdoor = "铁掌山",
 	ways = {
 		["north"] = "tiezhang/sslin-5",
 		["east"] = "tiezhang/sslin-3",
@@ -28880,6 +33300,7 @@ Room {
 Room {
 	id = "tiezhang/sslin-5",
 	name = "松树林",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/sslin-4",
 		["north"] = "tiezhang/dezj",
@@ -28888,6 +33309,7 @@ Room {
 Room {
 	id = "tiezhang/sslu-1",
 	name = "碎石路",
+	outdoor = "铁掌山",
 	ways = {
 		["eastup"] = "tiezhang/sslu-2",
 		["westdown"] = "tiezhang/pingtai",
@@ -28897,6 +33319,7 @@ Room {
 Room {
 	id = "tiezhang/sslu-2",
 	name = "碎石路",
+	outdoor = "铁掌山",
 	ways = {
 		["eastup"] = "tiezhang/sslu-3",
 		["westdown"] = "tiezhang/sslu-1",
@@ -28906,6 +33329,7 @@ Room {
 Room {
 	id = "tiezhang/sslu-3",
 	name = "碎石路",
+	outdoor = "铁掌山",
 	ways = {
 		["northup"] = "tiezhang/mzfeng",
 		["westdown"] = "tiezhang/sslu-2",
@@ -28915,6 +33339,7 @@ Room {
 Room {
 	id = "tiezhang/taijie-1",
 	name = "石阶",
+	outdoor = "铁掌山",
 	ways = {
 		["westdown"] = "tiezhang/taijie-2",
 		["out"] = "tiezhang/trdx",
@@ -28923,6 +33348,7 @@ Room {
 Room {
 	id = "tiezhang/taijie-2",
 	name = "石阶",
+	outdoor = "铁掌山",
 	ways = {
 		["eastup"] = "tiezhang/taijie-1",
 	},
@@ -28930,6 +33356,7 @@ Room {
 Room {
 	id = "tiezhang/trdx",
 	name = "天然洞穴",
+	outdoor = "铁掌山",
 	ways = {
 		["out"] = "tiezhang/dong-3",
 	},
@@ -28937,6 +33364,7 @@ Room {
 Room {
 	id = "tiezhang/wmfeng",
 	name = "无名峰",
+	outdoor = "铁掌山",
 	ways = {
 		["southdown"] = "tiezhang/hclu-6",
 		["#PoutShangguan"] = "tiezhang/shijie-1",
@@ -28951,6 +33379,7 @@ Room {
 Room {
 	id = "tiezhang/wztang",
 	name = "五指堂",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/zoulang-1",
 		["north"] = "tiezhang/hxfang",
@@ -28973,6 +33402,7 @@ Room {
 Room {
 	id = "tiezhang/xxsnan",
 	name = "男休息室",
+	outdoor = "铁掌山",
 	no_fight = true,
 	ways = {
 		["south"] = "tiezhang/zoulang-4",
@@ -28981,6 +33411,7 @@ Room {
 Room {
 	id = "tiezhang/xxsnv",
 	name = "女休息室",
+	outdoor = "铁掌山",
 	no_fight = true,
 	ways = {
 		["north"] = "tiezhang/zoulang-4",
@@ -28989,13 +33420,16 @@ Room {
 Room {
 	id = "tiezhang/xzfeng",
 	name = "小指峰",
+	outdoor = "铁掌山",
 	ways = {
 		["southdown"] = "tiezhang/pubu",
 	},
+	room_relative="小指峰↑瀑布小指峰",
 }
 Room {
 	id = "tiezhang/zhaigou1",
 	name = "寨沟",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/shanmen",
 		["west"] = "tiezhang/zhaigou2",
@@ -29005,29 +33439,35 @@ Room {
 Room {
 	id = "tiezhang/zhaigou2",
 	name = "寨沟",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/zhaigou1",
 	},
+	room_relative="寨沟-----寨沟寨沟",
 }
 Room {
 	id = "tiezhang/zhaigou3",
 	name = "寨沟",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/zhaigou4",
 		["west"] = "tiezhang/shanmen",
 	},
-	room_relative="山门-----寨沟-----寨沟寨沟",
+	room_relative="寨沟-----寨沟-----山门寨沟",
 }
 Room {
 	id = "tiezhang/zhaigou4",
 	name = "寨沟",
+	outdoor = "铁掌山",
 	ways = {
 		["west"] = "tiezhang/zhaigou3",
 	},
+	room_relative="寨沟-----寨沟寨沟",
 }
 Room {
 	id = "tiezhang/zoulang-1",
 	name = "走廊",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/zoulang-4",
 		["north"] = "tiezhang/bqshi",
@@ -29038,6 +33478,7 @@ Room {
 Room {
 	id = "tiezhang/zoulang-2",
 	name = "走廊",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/wztang",
 		["north"] = "tiezhang/shufang",
@@ -29051,6 +33492,7 @@ Room {
 Room {
 	id = "tiezhang/zoulang-3",
 	name = "走廊",
+	outdoor = "铁掌山",
 	ways = {
 		["east"] = "tiezhang/zoulang-2",
 		["north"] = "tiezhang/chufang",
@@ -29060,6 +33502,7 @@ Room {
 Room {
 	id = "tiezhang/zoulang-4",
 	name = "走廊",
+	outdoor = "铁掌山",
 	ways = {
 		["south"] = "tiezhang/xxsnv",
 		["north"] = "tiezhang/xxsnan",
@@ -29075,13 +33518,16 @@ Room {
 Room {
 	id = "tiezhang/zzfeng",
 	name = "中指峰",
+	outdoor = "铁掌山",
 	ways = {
 		["southdown"] = "tiezhang/shanlu-9",
 	},
+	room_relative="中指峰↑山路中指峰",
 }
 Room {
 	id = "tls/3wg",
 	name = "三无宫",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/shiyuan",
 		["westup"] = "tls/longxiang1",
@@ -29091,6 +33537,7 @@ Room {
 Room {
 	id = "tls/banruo",
 	name = "般若台",
+	outdoor = "天龙寺",
 	ways = {
 		["westdown"] = "tls/yaotai",
 		["northwest"] = "tls/road2",
@@ -29103,6 +33550,7 @@ Room {
 Room {
 	id = "tls/banruo1",
 	name = "般若台",
+	outdoor = "天龙寺",
 	ways = {
 		["west"] = "tls/banruo",
 	},
@@ -29110,16 +33558,22 @@ Room {
 Room {
 	id = "tls/baodian",
 	name = "大雄宝殿",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/yaoshidian",
 		["north"] = "tls/gfd",
 		["southdown"] = "tls/road1",
 		["west"] = "tls/dizangdian",
-	},	
+	},
+	objs = {
+          ["本因大师"] = "benyin dashi",
+    },
+	
 }
 Room {
 	id = "tls/bingqi",
 	name = "兵器房",
+	outdoor = "天龙寺",
 	ways = {
 		["west"] = "tls/cby",
 	},
@@ -29127,6 +33581,7 @@ Room {
 Room {
 	id = "tls/bzq",
 	name = "百丈桥",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/bzqs",
 		["north"] = "tls/bzqn",
@@ -29135,6 +33590,7 @@ Room {
 Room {
 	id = "tls/bzqn",
 	name = "百丈桥",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/bzq",
 		["east"] = "tls/wxj",
@@ -29144,6 +33600,7 @@ Room {
 Room {
 	id = "tls/bzqs",
 	name = "百丈桥边",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/road5",
 		["north"] = "tls/bzq",
@@ -29155,6 +33612,7 @@ Room {
 Room {
 	id = "tls/cby",
 	name = "慈悲院",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/wuping",
 		["east"] = "tls/bingqi",
@@ -29164,6 +33622,7 @@ Room {
 Room {
 	id = "tls/chufang",
 	name = "天龙寺斋堂",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["east"] = "tls/zt1",
@@ -29176,6 +33635,7 @@ Room {
 Room {
 	id = "tls/dc1",
 	name = "点苍十九峰",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/ylf1",
 		["southdown"] = "tls/dc2",
@@ -29184,6 +33644,7 @@ Room {
 Room {
 	id = "tls/dc2",
 	name = "点苍十九峰",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/dc1",
 		["eastdown"] = "tls/dc3",
@@ -29192,6 +33653,7 @@ Room {
 Room {
 	id = "tls/dc3",
 	name = "点苍十九峰",
+	outdoor = "天龙寺",
 	ways = {
 		["westup"] = "tls/dc2",
 		["southdown"] = "tls/diancang",
@@ -29200,6 +33662,7 @@ Room {
 Room {
 	id = "tls/diancang",
 	name = "点苍山",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/dc3",
 		["eastdown"] = "dali/ximen",
@@ -29211,6 +33674,7 @@ Room {
 Room {
 	id = "tls/dizangdian",
 	name = "地藏殿",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/zhonglou",
 		["northwest"] = "tls/yz5",
@@ -29220,6 +33684,7 @@ Room {
 Room {
 	id = "tls/dmg",
 	name = "斗母宫",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/road6",
 		["east"] = "tls/road4",
@@ -29228,6 +33693,7 @@ Room {
 Room {
 	id = "tls/fqg",
 	name = "飞泉沟",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/wxt",
 		["south"] = "tls/bzqn",
@@ -29236,6 +33702,7 @@ Room {
 Room {
 	id = "tls/gate",
 	name = "崇圣寺",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/shanlu",
 		["enter"] = "tls/road",
@@ -29244,19 +33711,24 @@ Room {
 Room {
 	id = "tls/gfd",
 	name = "光佛宝殿",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/baodian",
 		["east"] = "tls/men1",
 		["northdown"] = "tls/yz6",
 		["west"] = "tls/men2",
 	},
-	objs = {
-          ["本因大师"] = "benyin dashi",
-    },	
+	--blocks = {
+	--	["northdown"] = {
+	--		{id = "benyin dashi", exp = 1350000},
+	--	},
+	--},
+	
 }
 Room {
 	id = "tls/gmd",
 	name = "大光明殿",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/sjt",
 		["east"] = "tls/yz3",
@@ -29265,6 +33737,7 @@ Room {
 Room {
 	id = "tls/goudi",
 	name = "百丈桥底",
+	outdoor = "天龙寺",
 	ways = {
 		["eastup"] = "tls/road5",
 	},
@@ -29276,6 +33749,7 @@ Room {
 Room {
 	id = "tls/gulou",
 	name = "鼓楼",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/zt",
 		["north"] = "tls/yaoshidian",
@@ -29285,6 +33759,7 @@ Room {
 Room {
 	id = "tls/lang",
 	name = "长廊",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/songlin",
 		["west"] = "tls/road3",
@@ -29293,6 +33768,7 @@ Room {
 Room {
 	id = "tls/lang2",
 	name = "长廊",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/songlin2",
 		["enter"] = "tls/monitang",
@@ -29307,6 +33783,7 @@ Room {
 Room {
 	id = "tls/longxiang1",
 	name = "龙象台",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/longxiang2",
 		["eastdown"] = "tls/3wg",
@@ -29317,6 +33794,7 @@ Room {
 Room {
 	id = "tls/longxiang2",
 	name = "西练武场-龙象台",
+	outdoor = "天龙寺",
 	ways = {
 		["southdown"] = "tls/longxiang1",
 	},
@@ -29324,6 +33802,7 @@ Room {
 Room {
 	id = "tls/longxiang3",
 	name = "西练武场-龙象台",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/longxiang1",
 	},
@@ -29331,6 +33810,7 @@ Room {
 Room {
 	id = "tls/longxiang4",
 	name = "西练武场-龙象台",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/longxiang1",
 		["west"] = "tls/shanlu-1",
@@ -29340,18 +33820,27 @@ Room {
      },
 }
 Room {
-	id = "tls/lsy",
-	name = "龙树院",
-	ways = {
-		["out"] = "tls/songlin-1",
-	},
-	objs = {
+        id = "tls/lsy",
+        name = "龙树院",
+		outdoor = "天龙寺",
+        ways = {
+                ["out"] = "tls/songlin-1",
+                ["ask kurong zhanglao about 普云洞"] = "tls/pyd", --modman增加tlsdizi去普云洞
+        },
+        nolooks = {
+                ["ask kurong zhanglao about 普云洞"] = true,
+        },
+        objs = {
           ["枯荣长老"] = "kurong zhanglao",
-     },
+        },
+        lengths = {
+                ["ask kurong zhanglao about 普云洞"] = "if score.party and score.party=='天龙寺' and hp.neili_max>4500 then return 1 else return false end",
+        },
 }
 Room {
 	id = "tls/men1",
 	name = "瑞鹤门",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/yz4",
 		["north"] = "tls/wujingge",
@@ -29364,6 +33853,7 @@ Room {
 Room {
 	id = "tls/men2",
 	name = "翔鹤门",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/wuwoge",
 		["east"] = "tls/gfd",
@@ -29376,6 +33866,7 @@ Room {
 Room {
 	id = "tls/men3",
 	name = "晃天门",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/yaotai",
 		["west"] = "tls/yz4",
@@ -29391,6 +33882,7 @@ Room {
 Room {
 	id = "tls/men4",
 	name = "荡天门",
+	outdoor = "天龙寺",
 	ways = {
 		-- ["south"] = "tls/xiuxishi2",
 		["east"] = "tls/yz5",
@@ -29407,6 +33899,7 @@ Room {
 Room {
 	id = "tls/monitang",
 	name = "牟尼堂",
+	outdoor = "天龙寺",
 	ways = {
 		["out"] = "tls/lang2",
 	},
@@ -29419,6 +33912,7 @@ Room {
 Room {
 	id = "tls/pyd",
 	name = "普云洞",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["northup"] = "tls/shaoshang",
@@ -29433,6 +33927,7 @@ Room {
 Room {
 	id = "tls/pyd/guanchong",
 	name = "关冲",
+	outdoor = "天龙寺",
 	ways = {
 		["southeast"] = "tls/pyd/pyd",
 	},
@@ -29440,6 +33935,7 @@ Room {
 Room {
 	id = "tls/pyd/pyd",
 	name = "普云洞",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/pyd/shaoshang",
 		["southeast"] = "tls/pyd/shaochong",
@@ -29452,6 +33948,7 @@ Room {
 Room {
 	id = "tls/pyd/shangyang",
 	name = "商阳",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/pyd/pyd",
 	},
@@ -29459,6 +33956,7 @@ Room {
 Room {
 	id = "tls/pyd/shaochong",
 	name = "少冲",
+	outdoor = "天龙寺",
 	ways = {
 		["northwest"] = "tls/pyd/shaochong",
 	},
@@ -29466,6 +33964,7 @@ Room {
 Room {
 	id = "tls/pyd/shaoshang",
 	name = "少商",
+	outdoor = "天龙寺",
 	ways = {
 		["southdown"] = "tls/pyd/pyd",
 	},
@@ -29473,6 +33972,7 @@ Room {
 Room {
 	id = "tls/pyd/shaoze",
 	name = "少泽",
+	outdoor = "天龙寺",
 	ways = {
 		["northeast"] = "tls/pyd/shaoze",
 	},
@@ -29480,6 +33980,7 @@ Room {
 Room {
 	id = "tls/pyd/zhongchong",
 	name = "中冲",
+	outdoor = "天龙寺",
 	ways = {
 		["southwest"] = "tls/pyd/pyd",
 	},
@@ -29487,6 +33988,7 @@ Room {
 Room {
 	id = "tls/qxg",
 	name = "清心阁",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["east"] = "tls/shiyuan",
@@ -29495,6 +33997,7 @@ Room {
 Room {
 	id = "tls/road",
 	name = "白石路",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/twd",
 		["east"] = "tls/yz2",
@@ -29509,6 +34012,7 @@ Room {
 Room {
 	id = "tls/road1",
 	name = "白石路",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/baodian",
 		["southup"] = "tls/twd",
@@ -29522,6 +34026,7 @@ Room {
 Room {
 	id = "tls/road2",
 	name = "白石路",
+	outdoor = "天龙寺",
 	ways = {
 		["southeast"] = "tls/banruo",
 		["north"] = "tls/wwj",
@@ -29531,6 +34036,7 @@ Room {
 Room {
 	id = "tls/road3",
 	name = "白石路",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/lang",
 		["west"] = "tls/wwj",
@@ -29539,6 +34045,7 @@ Room {
 Room {
 	id = "tls/road4",
 	name = "白石路",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/sroom",
 		["east"] = "tls/cby",
@@ -29549,6 +34056,7 @@ Room {
 Room {
 	id = "tls/road5",
 	name = "石板路",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/shiyuan",
 		["north"] = "tls/bzqs",
@@ -29557,6 +34065,7 @@ Room {
 Room {
 	id = "tls/road6",
 	name = "白石阶",
+	outdoor = "天龙寺",
 	ways = {
 		["southdown"] = "tls/dmg",
 	},
@@ -29564,6 +34073,7 @@ Room {
 Room {
 	id = "tls/road7",
 	name = "石板路",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/yuhua1",
 		["north"] = "tls/songlin-1",
@@ -29576,6 +34086,7 @@ Room {
 Room {
 	id = "tls/shanlu",
 	name = "山路",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/ylf2",
 		["north"] = "tls/gate",
@@ -29588,6 +34099,7 @@ Room {
 Room {
 	id = "tls/shanlu-1",
 	name = "石板路",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/longxiang4",
 		["west"] = "tls/shanlu-2",
@@ -29596,6 +34108,7 @@ Room {
 Room {
 	id = "tls/shanlu-2",
 	name = "石板路",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/shanlu-1",
 		["west"] = "tls/shanlu-3",
@@ -29604,6 +34117,7 @@ Room {
 Room {
 	id = "tls/shanlu-3",
 	name = "石板路",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/shanlu-2",
 		["west"] = "tls/shanlu-4",
@@ -29612,6 +34126,7 @@ Room {
 Room {
 	id = "tls/shanlu-4",
 	name = "石板路",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/shanlu-3",
 		["west"] = "tls/talin",
@@ -29632,6 +34147,7 @@ Room {
 Room {
 	id = "tls/shiyuan",
 	name = "兜率大士院",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/road5",
 		["southdown"] = "tls/3wg",
@@ -29641,6 +34157,7 @@ Room {
 Room {
 	id = "tls/sjt",
 	name = "诵经堂",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["east"] = "tls/yz6",
@@ -29650,6 +34167,7 @@ Room {
 Room {
 	id = "tls/songlin",
 	name = "松树林",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/songlin2",
 		["south"] = "tls/songlin1",
@@ -29663,6 +34181,7 @@ Room {
 Room {
 	id = "tls/songlin1",
 	name = "松树林",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/songlin2",
 	},
@@ -29670,6 +34189,7 @@ Room {
 Room {
 	id = "tls/songlin2",
 	name = "松树林",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/songlin1",
 		["west"] = "tls/songlin-3",
@@ -29678,6 +34198,7 @@ Room {
 Room {
 	id = "tls/songlin-1",
 	name = "松树林",
+	outdoor = "天龙寺",
 	ways = {
 	    ["east"]  =  "tls/songlin-2",
 		["north"] =  "tls/songlin-4",
@@ -29690,6 +34211,7 @@ Room {
 Room {
 	id = "tls/songlin-2",
 	name = "松树林",
+	outdoor = "天龙寺",
 	ways = {
 	    ["east"]  =  "tls/songlin-4",
 		["west"]  =  "tls/songlin-3",
@@ -29698,6 +34220,7 @@ Room {
 Room {
 	id = "tls/songlin-3",
 	name = "松树林",
+	outdoor = "天龙寺",
 	ways = {
 	    ["south"] = "tls/songlin-1",
 	    ["east"] =  "tls/songlin-2",
@@ -29711,6 +34234,7 @@ Room {
 Room {
 	id = "tls/songlin-4",
 	name = "松树林",
+	outdoor = "天龙寺",
 	ways = {
 	    ["south"] = "tls/songlin-3",
 		["west"] =  "tls/songlin-1",
@@ -29733,6 +34257,7 @@ Room {
 Room {
 	id = "tls/sroom",
 	name = "休息室",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["south"] = "tls/road4",
@@ -29743,6 +34268,7 @@ Room {
 Room {
 	id = "tls/sroom1",
 	name = "休息室",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["south"] = "tls/road4",
@@ -29752,6 +34278,7 @@ Room {
 Room {
 	id = "tls/sroom2",
 	name = "休息室",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["south"] = "tls/road4",
@@ -29761,6 +34288,7 @@ Room {
 Room {
 	id = "tls/ta1",
 	name = "千寻宝塔",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/yz6",
 		["north"] = "tls/yz3",
@@ -29769,6 +34297,7 @@ Room {
 Room {
 	id = "tls/ta2",
 	name = "无相宝塔",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/yz4",
 	},
@@ -29776,6 +34305,7 @@ Room {
 Room {
 	id = "tls/ta3",
 	name = "无住宝塔",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/yz5",
 	},
@@ -29783,6 +34313,7 @@ Room {
 Room {
 	id = "tls/talin",
 	name = "灵塔林",
+	outdoor = "天龙寺",
 	ways = {
 		["east"] = "tls/shanlu-4",
 	},
@@ -29790,6 +34321,7 @@ Room {
 Room {
 	id = "tls/twd",
 	name = "天王殿",
+	outdoor = "天龙寺",
 	ways = {
 		["northdown"] = "tls/road1",
 		["southdown"] = "tls/road",
@@ -29798,6 +34330,7 @@ Room {
 Room {
 	id = "tls/wfd",
 	name = "万佛洞",
+	outdoor = "天龙寺",
 	ways = {
 		["enter"] = "tls/wfd2",
 		["up"] = "tls/wxt",
@@ -29806,6 +34339,7 @@ Room {
 Room {
 	id = "tls/wfd2",
 	name = "万佛洞",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/wfd3",
 		["out"] = "tls/wfd",
@@ -29814,6 +34348,7 @@ Room {
 Room {
 	id = "tls/wfd3",
 	name = "万佛洞内洞",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/wfd2",
 	},
@@ -29821,6 +34356,7 @@ Room {
 Room {
 	id = "tls/wujingge",
 	name = "无净阁",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["south"] = "tls/men1",
@@ -29829,6 +34365,7 @@ Room {
 Room {
 	id = "tls/wuping",
 	name = "物品房",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/cby",
 	},
@@ -29836,6 +34373,7 @@ Room {
 Room {
 	id = "tls/wuwoge",
 	name = "无我阁",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["south"] = "tls/men2",
@@ -29844,6 +34382,7 @@ Room {
 Room {
 	id = "tls/wwj",
 	name = "无无境",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/road2",
 		["north"] = "tls/yuhua",
@@ -29853,6 +34392,7 @@ Room {
 Room {
 	id = "tls/wxj",
 	name = "无心井",
+	outdoor = "天龙寺",
 	ways = {
 		["west"] = "tls/bzqn",
 	},
@@ -29860,6 +34400,7 @@ Room {
 Room {
 	id = "tls/wxt",
 	name = "忘雪亭",
+	outdoor = "天龙寺",
 	ways = {
 		["down"] = "tls/wfd",
 		["southdown"] = "tls/fqg",
@@ -29868,6 +34409,7 @@ Room {
 Room {
 	id = "tls/xdt",
 	name = "小洞天",
+	outdoor = "天龙寺",
 	ways = {
 		["west"] = "tls/songlin-2",
 	},
@@ -29875,6 +34417,7 @@ Room {
 Room {
 	id = "tls/xiuxishi1",
 	name = "休息室",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["north"] = "tls/men3",
@@ -29883,6 +34426,7 @@ Room {
 Room {
 	id = "tls/xiuxishi2",
 	name = "休息室",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["north"] = "tls/men4",
@@ -29891,6 +34435,7 @@ Room {
 Room {
 	id = "tls/xmd",
 	name = "须弥殿",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/ytd",
 		["west"] = "tls/yz3",
@@ -29899,6 +34444,7 @@ Room {
 Room {
 	id = "tls/yaofang",
 	name = "药房",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/yaotai",
 	},
@@ -29909,6 +34455,7 @@ Room {
 Room {
 	id = "tls/yaoshidian",
 	name = "药师殿",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/gulou",
 		["northeast"] = "tls/yz4",
@@ -29918,6 +34465,7 @@ Room {
 Room {
 	id = "tls/yaotai",
 	name = "清都瑶台",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/road2",
 		["eastup"] = "tls/banruo",
@@ -29937,6 +34485,7 @@ Room {
 Room {
 	id = "tls/ylf",
 	name = "应乐峰",
+	outdoor = "天龙寺",
 	ways = {
 		["northdown"] = "tls/ylf2",
 		["southdown"] = "tls/ylf1",
@@ -29945,6 +34494,7 @@ Room {
 Room {
 	id = "tls/ylf1",
 	name = "应乐峰南",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/ylf",
 		["south"] = "tls/dc1",
@@ -29953,6 +34503,7 @@ Room {
 Room {
 	id = "tls/ylf2",
 	name = "应乐峰北",
+	outdoor = "天龙寺",
 	ways = {
 		["southup"] = "tls/ylf",
 		["north"] = "tls/shanlu",
@@ -29965,6 +34516,7 @@ Room {
 Room {
 	id = "tls/ytd",
 	name = "圆通殿",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/xmd",
 		["west"] = "tls/yz6",
@@ -29973,6 +34525,7 @@ Room {
 Room {
 	id = "tls/yuhua",
 	name = "雨花院",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/wwj",
 		["enter"] = "tls/yuhua1",
@@ -29985,6 +34538,7 @@ Room {
 Room {
 	id = "tls/yuhua1",
 	name = "雨花阁",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/road7",
 		["out"] = "tls/yuhua",
@@ -30006,6 +34560,7 @@ Room {
 Room {
 	id = "tls/yz1",
 	name = "松树院",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/zt1",
 		["east"] = "tls/road",
@@ -30014,6 +34569,7 @@ Room {
 Room {
 	id = "tls/yz2",
 	name = "斑竹院",
+	outdoor = "天龙寺",
 	ways = {
 		["north"] = "tls/zt",
 		["west"] = "tls/road",
@@ -30022,6 +34578,7 @@ Room {
 Room {
 	id = "tls/yz3",
 	name = "青竹院",
+	outdoor = "天龙寺",
 	ways = {
 		["northup"] = "tls/road4",
 		["south"] = "tls/ta1",
@@ -30032,6 +34589,7 @@ Room {
 Room {
 	id = "tls/yz4",
 	name = "青竹院",
+	outdoor = "天龙寺",
 	ways = {
 		["southwest"] = "tls/yaoshidian",
 		["north"] = "tls/ta2",
@@ -30042,6 +34600,7 @@ Room {
 Room {
 	id = "tls/yz5",
 	name = "青竹院",
+	outdoor = "天龙寺",
 	ways = {
 		["southeast"] = "tls/dizangdian",
 		["north"] = "tls/ta3",
@@ -30052,6 +34611,7 @@ Room {
 Room {
 	id = "tls/yz6",
 	name = "松树院",
+	outdoor = "天龙寺",
 	ways = {
 		["southup"] = "tls/gfd",
 		["east"] = "tls/ytd",
@@ -30066,6 +34626,7 @@ Room {
 Room {
 	id = "tls/zhonglou",
 	name = "钟楼",
+	outdoor = "天龙寺",
 	ways = {
 		["south"] = "tls/zt1",
 		["east"] = "tls/road1",
@@ -30075,6 +34636,7 @@ Room {
 Room {
 	id = "tls/zt",
 	name = "天龙寺斋堂",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["south"] = "tls/yz2",
@@ -30087,6 +34649,7 @@ Room {
 Room {
 	id = "tls/zt1",
 	name = "天龙寺斋堂",
+	outdoor = "天龙寺",
 	no_fight = true,
 	ways = {
 		["south"] = "tls/yz1",
@@ -30119,110 +34682,17 @@ Room {
 Room {
 	id = "village/eexit",
 	name = "东村口",
+	outdoor = "华山村",
 	ways = {
 		["east"] = "huashan/path1",
 		["west"] = "village/shilu6",
 	},
-}
-Room {
-	id = "village/hsroad3",
-	name = "黄土路",
-	ways = {
-		["south"] = "xiangyang/shanxiroad2",
-		["north"] = "village/sexit",
-	},
-}
-Room {
-	id = "village/jiusi",
-	name = "酒肆",
-	ways = {
-		["south"] = "village/shilu3",
-	},
-}
-Room {
-	id = "village/miaoyu",
-	name = "玄坛庙",
-	ways = {
-		["north"] = "village/shilu5",
-	},
-}
-Room {
-	id = "village/minfang1",
-	name = "民房",
-	ways = {
-		["east"] = "village/shilu1",
-	},
-	room_relative="民房-----碎石路民房",
-}
-Room {
-	id = "village/minfang2",
-	name = "民房",
-	ways = {
-		["north"] = "village/shilu6",
-	},
-	room_relative="碎石路｜民房民房",
-}
-Room {
-	id = "village/sexit",
-	name = "南村口",
-	ways = {
-		["south"] = "village/hsroad3",
-		["north"] = "village/shilu1",
-	},
-}
-Room {
-	id = "village/shilu1",
-	name = "碎石路",
-	ways = {
-		["south"] = "village/sexit",
-		["north"] = "village/shilu2",
-		["west"] = "village/minfang1",
-	},
-	room_relative="碎石路｜民房----碎石路｜南村口碎石路",
-}
-Room {
-	id = "village/shilu2",
-	name = "碎石路",
-	ways = {
-		["south"] = "village/shilu1",
-		["north"] = "village/zhongxin",
-		["east"] = "village/tiejiangpu",
-	},
-	room_relative="村中心｜碎石路----铁匠铺｜碎石路碎石路",
-}
-Room {
-	id = "village/shilu3",
-	name = "碎石路",
-	ways = {
-		["east"] = "village/zhongxin",
-		["north"] = "village/jiusi",
-		["west"] = "village/shilu5",
-	},
-	room_relative="酒肆｜碎石路----碎石路----村中心碎石路",
-}
-Room {
-	id = "village/shilu4",
-	name = "碎石路",
-	ways = {
-		["north"] = "village/zahuopu",
-		["east"] = "village/shilu6",
-		["west"] = "village/zhongxin",
-	},
-	room_relative="杂货铺｜村中心----碎石路----碎石路碎石路",
-}
-Room {
-	id = "village/shilu5",
-	name = "碎石路",
-	ways = {
-		["south"] = "village/miaoyu",
-		["northwest"] = "group/entry/caeroad3",
-		["east"] = "village/shilu3",
-	},
-	room_relative="土路↖碎石路----碎石路｜玄坛庙碎石路",
+  room_relative="碎石路----东村口----山脚下东村口",
 }
 Room {
 	id = "village/shilu6",
 	name = "碎石路",
+	outdoor = "华山村",
 	ways = {
 		["south"] = "village/minfang2",
 		["east"] = "village/eexit",
@@ -30231,22 +34701,20 @@ Room {
 	room_relative="碎石路----碎石路----东村口｜民房碎石路",
 }
 Room {
-	id = "village/tiejiangpu",
-	name = "铁匠铺",
+	id = "village/shilu4",
+	name = "碎石路",
+	outdoor = "华山村",
 	ways = {
-		["west"] = "village/shilu2",
+		["north"] = "village/zahuopu",
+		["east"] = "village/shilu6",
+		["west"] = "village/zhongxin",
 	},
-}
-Room {
-	id = "village/zahuopu",
-	name = "杂货铺",
-	ways = {
-		["south"] = "village/shilu4",
-	},
+	room_relative="杂货铺｜村中心----碎石路----碎石路碎石路",
 }
 Room {
 	id = "village/zhongxin",
 	name = "村中心",
+	outdoor = "华山村",
 	ways = {
 		["south"] = "village/shilu2",
 		["east"] = "village/shilu4",
@@ -30259,10 +34727,131 @@ Room {
 		["northeast"] = "#walkBusy",
 	},
 	lengths = {
-		["northwest"] = 10,
-		["northeast"] = 10,
+		["northwest"] = 3,
+		["northeast"] = 3,
 	},
+	room_relative="碎石路----村中心----碎石路｜碎石路村中心",
 }
+Room {
+	id = "village/shilu3",
+	name = "碎石路",
+	outdoor = "华山村",
+	ways = {
+		["east"] = "village/zhongxin",
+		["north"] = "village/jiusi",
+		["west"] = "village/shilu5",
+	},
+	room_relative="酒肆｜碎石路----碎石路----村中心碎石路",
+}
+Room {
+	id = "village/shilu5",
+	name = "碎石路",
+	outdoor = "华山村",
+	ways = {
+		["south"] = "village/miaoyu",
+		["northwest"] = "group/entry/caeroad3",
+		["east"] = "village/shilu3",
+	},
+	room_relative="土路↖碎石路----碎石路｜玄坛庙碎石路",
+}
+Room {
+	id = "village/shilu2",
+	name = "碎石路",
+	outdoor = "华山村",
+	ways = {
+		["south"] = "village/shilu1",
+		["north"] = "village/zhongxin",
+		["east"] = "village/tiejiangpu",
+	},
+	room_relative="村中心｜碎石路----铁匠铺｜碎石路碎石路",
+}
+Room {
+	id = "village/shilu1",
+	name = "碎石路",
+	outdoor = "华山村",
+	ways = {
+		["south"] = "village/sexit",
+		["north"] = "village/shilu2",
+		["west"] = "village/minfang1",
+	},
+	room_relative="碎石路｜民房----碎石路｜南村口碎石路",
+}
+Room {
+	id = "village/hsroad3",
+	name = "黄土路",
+	outdoor = "华山村",
+	ways = {
+		["south"] = "xiangyang/shanxiroad2",
+		["north"] = "village/sexit",
+	},
+	room_relative="南村口｜黄土路｜土路黄土路",
+}
+Room {
+	id = "village/jiusi",
+	name = "酒肆",
+	outdoor = "华山村",
+	ways = {
+		["south"] = "village/shilu3",
+	},
+	room_relative="酒肆｜碎石路酒肆",
+}
+Room {
+	id = "village/miaoyu",
+	name = "玄坛庙",
+	outdoor = "华山村",
+	ways = {
+		["north"] = "village/shilu5",
+	},
+	room_relative="碎石路｜玄坛庙玄坛庙",
+}
+Room {
+	id = "village/minfang1",
+	name = "民房",
+	outdoor = "华山村",
+	ways = {
+		["east"] = "village/shilu1",
+	},
+	room_relative="民房-----碎石路民房",
+}
+Room {
+	id = "village/minfang2",
+	name = "民房",
+	outdoor = "华山村",
+	ways = {
+		["north"] = "village/shilu6",
+	},
+	room_relative="碎石路｜民房民房",
+}
+Room {
+	id = "village/sexit",
+	name = "南村口",
+	outdoor = "华山村",
+	ways = {
+		["south"] = "village/hsroad3",
+		["north"] = "village/shilu1",
+	},
+	room_relative="碎石路｜南村口｜黄土路南村口",
+}
+
+Room {
+	id = "village/tiejiangpu",
+	name = "铁匠铺",
+	outdoor = "华山村",
+	ways = {
+		["west"] = "village/shilu2",
+	},
+	room_relative="碎石路----铁匠铺铁匠铺",
+}
+Room {
+	id = "village/zahuopu",
+	name = "杂货铺",
+	outdoor = "华山村",
+	ways = {
+		["south"] = "village/shilu4",
+	},
+	room_relative="杂货铺｜碎石路杂货铺",
+}
+
 
 Room {
 	id = "wizard/guest_room",
@@ -30415,24 +35004,29 @@ Room {
 Room {
 	id = "wudang/caihong",
 	name = "雨后彩虹",
+	outdoor = "武当山",
 	ways = {
 		["northup"] = "wudang/wangbei",
 		["southup"] = "wudang/shibapan",
 	},
+	room_relative="望背坡↑雨后彩虹↓十八盘雨后彩虹",
 }
 Room {
 	id = "wudang/chating",
 	name = "茶亭",
+	outdoor = "武当山",
 	ways = {
 		["northwest"] = "wudang/wdroad8",
 	},
 	objs = {
           ["桃花姑娘"] = "tao hua",
            },
+   room_relative="山脚下↖茶亭茶亭",
 }
 Room {
 	id = "wudang/chufang",
 	name = "厨房",
+	outdoor = "武当山",
 	no_fight = true,
 	ways = {
 		["west"] = "wudang/donglang2",
@@ -30441,10 +35035,12 @@ Room {
           ["大碗茶"] = "dawan cha",
           ["香茶"] = "xiang cha",
            },
+	room_relative="东厢走廊--厨房",
 }
 Room {
 	id = "wudang/donglang1",
 	name = "西厢走廊",
+	outdoor = "武当山",
 	ways = {
 		["south"] = "wudang/xiuxishi2",
 		["east"] = "wudang/xiaolu1",
@@ -30453,10 +35049,12 @@ Room {
 	lengths = {
 		["south"] = "if score.gender and score.gender=='女' then return 1 else return false end",
 	},
+	room_relative="藏经阁---西厢走廊---小径｜女休息室西厢走廊",
 }
 Room {
 	id = "wudang/donglang2",
 	name = "东厢走廊",
+	outdoor = "武当山",
 	ways = {
 		["south"] = "wudang/xiuxishi1",
 		["east"] = "wudang/chufang",
@@ -30465,17 +35063,21 @@ Room {
 	lengths = {
 		["south"] = "if score.gender and score.gender=='男' then return 1 else return false end",
 	},
+	room_relative="小径---东厢走廊---厨房｜男休息室东厢走廊",
 }
 Room {
 	id = "wudang/feisheng",
 	name = "飞升崖",
+	outdoor = "武当山",
 	ways = {
 		["northeast"] = "wudang/zhenqing",
 	},
+	room_relative="天乙真庆宫↗飞升崖飞升崖",
 }
 Room {
 	id = "wudang/fuzhen",
 	name = "复真观",
+	outdoor = "武当山",
 	ways = {
 		["westup"] = "wudang/shijie2",
 		["northdown"] = "wudang/shibapan",
@@ -30483,139 +35085,174 @@ Room {
 	},
 	objs = {
           ["谷虚道长"] = "guxu daozhang",
+		  ["道童"] = "dao tong",
            },
+	room_relative="十八盘↓老君岩----复真观复真观",
 }
 Room {
 	id = "wudang/gchang",
 	name = "武当广场",
+	outdoor = "武当山",
 	ways = {
 		["south"] = "wudang/zhenqing",
 		["north"] = "wudang/nanyan",
+},
+	objs = {
+        ["道童"] = "dao tong",
 	},
+	room_relative="大圣南岩宫｜武当广场｜天乙真庆宫武当广场",
 }
 Room {
 	id = "wudang/gsdao1",
 	name = "古神道",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/yuanhe",
 		["northdown"] = "wudang/shijie1",
 	},
+	room_relative="石阶↓古神道↓元和观古神道",
 }
 Room {
 	id = "wudang/gsdao2",
 	name = "古神道",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/yuzhen",
 		["northdown"] = "wudang/yuanhe",
 	},
+	room_relative="元和观↓古神道↓遇真宫古神道",
 }
 Room {
 	id = "wudang/gsdao3",
 	name = "古神道",
+	outdoor = "武当山",
 	ways = {
 		["southwest"] = "wudang/leishen",
 		["east"] = "wudang/zhanqi",
 	},
+	room_relative="古神道----展旗峰↙雷神洞古神道",
 }
 Room {
 	id = "wudang/gsdao4",
 	name = "古神道",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/shijie4",
 		["northdown"] = "wudang/zhenqing",
 	},
+	room_relative="天乙真庆宫↓古神道↓石阶古神道",
 }
 Room {
 	id = "wudang/gsdao5",
 	name = "古神道",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/langmei",
 		["northdown"] = "wudang/shijie4",
 	},
+	room_relative="石阶↓古神道↓榔梅祠古神道",
 }
 Room {
 	id = "wudang/gsdao6",
 	name = "古神道",
+	outdoor = "武当山",
 	ways = {
 		["westdown"] = "wudang/qtguan",
 		["eastup"] = "wudang/hldong",
 	},
+	room_relative="琼台观→古神道→黄龙洞古神道",
 }
 Room {
 	id = "wudang/hldong",
 	name = "黄龙洞",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/taihe",
 		["westdown"] = "wudang/gsdao6",
 	},
+	room_relative="古神道→黄龙洞↓大岳太和宫黄龙洞",
 }
 Room {
 	id = "wudang/houshan/hsxl1",
 	name = "小路",
+	outdoor = "武当后山",
 	ways = {
 		["northdown"] = "wudang/houshan/hsxl2",
 		["pa up"] = "wudang/houshan/taoyuan1",
-		["#wdxlclimb"] = "wudang/houshan/taoyuan1",
 	},
 	nolooks = {
 		["pa up"] = true,
 	},
-    lengths = {
-        ["pa up"] = "if job.name=='huashan' then return false else return 1 end",
-        ["#wdxlclimb"] = "if job.name=='huashan' then return 1 else return false end",
-    },	
+	room_relative="山路↓小路小路",
 }
 Room {
 	id = "wudang/houshan/hsxl2",
 	name = "山路",
+	outdoor = "武当后山",
 	ways = {
 		["southup"] = "wudang/houshan/hsxl1",
 		["northdown"] = "wudang/houshan/hsxl3",
 	},
+	room_relative="山路↓山路↓小路山路",
 }
 Room {
 	id = "wudang/houshan/hsxl3",
 	name = "山路",
+	outdoor = "武当后山",
 	ways = {
 		["southup"] = "wudang/houshan/hsxl2",
 		["northdown"] = "wudang/houshan/hsxl4",
 	},
+	room_relative="山路↓山路↓山路山路",
 }
 Room {
 	id = "wudang/houshan/hsxl4",
 	name = "山路",
+	outdoor = "武当后山",
 	ways = {
 		["southup"] = "wudang/houshan/hsxl3",
 		["northdown"] = "wudang/houshan/hsxl5",
 	},
+	room_relative="小路↓山路↓山路山路",
 }
 Room {
 	id = "wudang/houshan/hsxl5",
 	name = "小路",
+	outdoor = "武当后山",
 	ways = {
 		["southup"] = "wudang/houshan/hsxl4",
 		["northwest"] = "wudang/shanlu2",
 	},
+	room_relative="山路↖小路↓山路小路",
 }
 Room {
 	id = "wudang/houshan/maowu",
 	name = "茅屋",
+	outdoor = "武当后山",
 	ways = {
 		["north"] = "wudang/houshan/taoyuan3",
 	},
+	objs = {
+          ["无名老翁"] = "lao weng",  
+  
+	},
+	room_relative="山顶茅屋",
 }
 Room {
 	id = "wudang/houshan/taoyuan1",
 	name = "峰顶",
+	outdoor = "武当后山",
 	ways = {
 		["east"] = "wudang/houshan/taoyuan3",
 		["down"] = "wudang/houshan/hsxl1",
 		["west"] = "wudang/houshan/taoyuan2",
 	},
+	room_relative="山顶｜小路----山顶峰顶",
 }
 Room {
 	id = "wudang/houshan/taoyuan3",
 	name = "山顶",
+	outdoor = "武当后山",
 	ways = {
 		["west"] = "wudang/houshan/taoyuan1",
 		["#Wdmw"] = "wudang/houshan/maowu",
@@ -30631,6 +35268,7 @@ Room {
 Room {
 	id = "wudang/houshan/taoyuan2",
 	name = "山顶",
+	outdoor = "武当后山",
 	ways = {
 		["east"] = "wudang/houshan/taoyuan1",
 		["#inWdcl"] = "wudang/houshan/gudi",
@@ -30645,6 +35283,7 @@ Room {
 Room {
 	id = "wudang/houshan/gudi",
 	name = "谷底",
+	outdoor = "武当后山",
 	ways = {
 		["southeast"] = "wudang/houshan/clbinyuan1",
 	},
@@ -30652,6 +35291,7 @@ Room {
 Room {
 	id = "wudang/houshan/clbinyuan1",
 	name = "丛林边缘",
+	outdoor = "武当后山",
 	ways = {
 		["northwest"] = "wudang/houshan/gudi",
 		["zuan conglin"] = "wudang/houshan/conglinlh",
@@ -30664,6 +35304,7 @@ Room {
 Room {
 	id = "wudang/houshan/conglinlh",
 	name = "烈火丛林",
+	outdoor = "武当后山",
 	ways = {
 		["#outWdcllh"] = "wudang/houshan/conglinly",
 	},
@@ -30674,6 +35315,7 @@ Room {
 Room {
 	id = "wudang/houshan/conglinly",
 	name = "落叶丛林",
+	outdoor = "武当后山",
 	ways = {
 		["#outWdclly"] = "wudang/houshan/conglinjx",
 	},
@@ -30691,6 +35333,7 @@ Room {
 Room {
 	id = "wudang/houshan/conglinjx",
 	name = "积雪丛林",
+	outdoor = "武当后山",
 	ways = {
 		["#outWdcljx"] = "wudang/houshan/conglinky",
 	},
@@ -30708,6 +35351,7 @@ Room {
 Room {
 	id = "wudang/houshan/conglinky",
 	name = "阔叶丛林",
+	outdoor = "武当后山",
 	ways = {
 		["#outWdclky"] = "wudang/houshan/clbianyuan2",
 	},
@@ -30718,6 +35362,7 @@ Room {
 Room {
 	id = "wudang/houshan/clbianyuan2",
 	name = "丛林边缘",
+	outdoor = "武当后山",
 	ways = {
 		["#wdclToHsda"] = "xiangyang/hanshui2",
 	},
@@ -30730,6 +35375,7 @@ Room {
 Room {
 	id = "wudang/houyuan",
 	name = "后山小院",
+	outdoor = "武当山",
 	ways = {
 		["north"] = "wudang/yuanmen",
 	},
@@ -30746,67 +35392,82 @@ Room {
 Room {
 	id = "wudang/jindian",
 	name = "金殿",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/taihe",
 	},
+	room_relative="金殿-----大岳太和宫金殿",
 }
 Room {
 	id = "wudang/jingge",
 	name = "藏经阁",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/donglang1",
 	},
 	objs = {
           ["道德经「第一章」"] = "jing",
            },
+	room_relative="西厢走廊--藏经阁",
 }
 Room {
 	id = "wudang/langmei",
 	name = "榔梅祠",
+	outdoor = "武当山",
 	ways = {
 		["westup"] = "wudang/qtguan",
 		["northwest"] = "wudang/yxyan",
 		["east"] = "wudang/shanlu2",
 		["northdown"] = "wudang/gsdao5",
 	},
+	room_relative="隐仙岩古神道↖↓琼台观←榔梅祠----山路榔梅祠",
 }
 Room {
 	id = "wudang/laojun",
 	name = "老君岩",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/fuzhen",
 	},
+	room_relative="老君岩----复真观老君岩",
 }
 Room {
 	id = "wudang/ldfang",
 	name = "炼丹房",
+	outdoor = "武当山",
 	ways = {
 		["west"] = "wudang/zoulang2",
 	},
 	objs = {
           ["俞岱岩"] = "yu daiyan",
            },
+	room_relative="东厢走廊----炼丹房炼丹房",
 }
 Room {
 	id = "wudang/leishen",
 	name = "雷神洞",
+	outdoor = "武当山",
 	ways = {
 		["northeast"] = "wudang/gsdao3",
 	},
+	room_relative="古神道↗雷神洞雷神洞",
 }
 Room {
 	id = "wudang/lgfang",
 	name = "练功房",
+	outdoor = "武当山",
 	ways = {
 		["south"] = "wudang/zoulang1",
 	},
 	objs = {
           ["芙蓉金针"] = "furong jinzhen",
            },
+	room_relative="练功房｜走廊练功房",	   
 }
 Room {
 	id = "wudang/lwhole",
 	name = "石壁岩洞",
+	outdoor = "武当山",
 	no_fight = true,
 	ways = {
 		["out"] = "wudang/wanniansong",
@@ -30815,34 +35476,42 @@ Room {
 Room {
 	id = "wudang/mozhen",
 	name = "磨针井",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/wangbei",
 		["eastup"] = "wudang/yuxuyan",
 		["northdown"] = "wudang/yuxu",
 	},
+	room_relative="玉虚宫↓磨针井→玉虚岩↓望背坡磨针井",
 }
 Room {
 	id = "wudang/nanyan",
 	name = "大圣南岩宫",
+	outdoor = "武当山",
 	ways = {
 		["south"] = "wudang/gchang",
 		["northdown"] = "wudang/zixia",
 	},
 	objs = {
           ["陈运清"] = "chen yunqing",
+		  ["道童"] = "dao tong",
            },
+	room_relative="紫霄宫↓大圣南岩宫｜武当广场大圣南岩宫",
 }
 Room {
 	id = "wudang/qtguan",
 	name = "琼台观",
+	outdoor = "武当山",
 	ways = {
 		["eastdown"] = "wudang/langmei",
 		["eastup"] = "wudang/gsdao6",
 	},
+	room_relative="琼台观←榔梅祠琼台观",
 }
 Room {
 	id = "wudang/sanqing",
 	name = "三清殿",
+	outdoor = "武当山",
 	no_fight = true,
 	ways = {
 		["south"] = "wudang/xiaolu1",
@@ -30853,18 +35522,22 @@ Room {
           ["宋远桥"] = "song yuanqiao",
           ["太极八卦图"] = "board",
            },
+	room_relative="走廊｜三清殿｜小径三清殿",
 }
 Room {
 	id = "wudang/shanlu1",
 	name = "山路",
+	outdoor = "武当山",
 	ways = {
 		["westup"] = "wudang/yuxu",
 		["northdown"] = "wudang/wdbolin",
 	},
+	room_relative="武当柏林↓玉虚宫←山路山路",
 }
 Room {
 	id = "wudang/shanlu2",
 	name = "山路",
+	outdoor = "武当山",
 	ways = {
 		["southeast"] = "wudang/houshan/hsxl5",
 		["west"] = "wudang/langmei",
@@ -30885,6 +35558,7 @@ Room {
 Room {
 	id = "wudang/houshan/gudao1",
 	name = "古道",
+	outdoor = "武当后山",
 	ways = {
 		["eastup"] = "wudang/houshan/gudao2",
 		["#OutWdhs"] = "wudang/shanlu2",
@@ -30901,6 +35575,7 @@ Room {
 Room {
 	id = "wudang/houshan/gudao2",
 	name = "古道",
+	outdoor = "武当后山",
 	ways = {
 		["southup"] = "wudang/houshan/husunchou",
 		["northdown"] = "wudang/houshan/gudao3",
@@ -30914,6 +35589,7 @@ Room {
 Room {
 	id = "wudang/houshan/gudao3",
 	name = "古道",
+	outdoor = "武当后山",
 	ways = {
 		["southup"] = "wudang/houshan/gudao2",
 	},
@@ -30925,6 +35601,7 @@ Room {
 Room {
 	id = "wudang/houshan/husunchou",
 	name = "猢狲愁",
+	outdoor = "武当后山",
 	ways = {
 		["northdown"] = "wudang/houshan/gudao2",
 	},
@@ -30936,6 +35613,7 @@ Room {
 Room {
 	id = "wudang/shanlu3",
 	name = "灌木丛",
+	outdoor = "武当山",
 	ways = {
 		["west"] = "wudang/shanlu2",
 	},
@@ -30943,78 +35621,100 @@ Room {
 Room {
 	id = "wudang/shibapan",
 	name = "十八盘",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/fuzhen",
 		["northdown"] = "wudang/caihong",
 	},
+	room_relative="雨后彩虹↓十八盘↓复真观十八盘",
 }
 Room {
 	id = "wudang/shijie1",
 	name = "石阶",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/gsdao1",
 		["northdown"] = "wudang/xuanyue",
 	},
+	room_relative="玄岳门↓石阶↓古神道石阶",
 }
 Room {
 	id = "wudang/shijie2",
 	name = "石阶",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/zhanqi",
 		["eastdown"] = "wudang/fuzhen",
 	},
+	objs = {
+          ["进香客"] = "jinxiang ke",
+	},
+	room_relative="石阶←复真观↓展旗峰石阶",
 }
 Room {
 	id = "wudang/shijie3",
 	name = "石阶",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/zxgdamen",
 		["northdown"] = "wudang/zhanqi",
 	},
+	room_relative="展旗峰↓石阶↓紫霄宫大门石阶",
 }
 Room {
 	id = "wudang/shijie4",
 	name = "石阶",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/gsdao5",
 		["northdown"] = "wudang/gsdao4",
 	},
+	room_relative="古神道↓石阶↓古神道石阶",
 }
 Room {
 	id = "wudang/taihe",
 	name = "大岳太和宫",
+	outdoor = "武当山",
 	ways = {
 		["northdown"] = "wudang/hldong",
 		["west"] = "wudang/jindian",
 	},
+	room_relative="黄龙洞↓金殿--大岳太和宫大岳太和宫",
 }
 Room {
 	id = "wudang/wangbei",
 	name = "望背坡",
+	outdoor = "武当山",
 	ways = {
 		["northdown"] = "wudang/mozhen",
 		["southdown"] = "wudang/caihong",
 	},
+	room_relative="磨针井↓望背坡↑雨后彩虹望背坡",
 }
 Room {
 	id = "wudang/wanniansong",
 	name = "万年松",
+	outdoor = "武当山",
 	ways = {
 		["enter"] = "wudang/lwhole",
 	},
+	room_relative="石壁岩洞--万年松",
 }
 Room {
 	id = "wudang/wdbolin",
 	name = "武当柏林",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/shanlu1",
 		["eastdown"] = "wudang/yuzhen",
 	},
+	room_relative="武当柏林←遇真宫↓山路武当柏林",
 }
 
 Room {
 	id = "wudang/wdroad6",
 	name = "黄土路",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "xiangyang/hanshui2",
 		["west"] = "group/entry/wdroad7",
@@ -31023,11 +35723,13 @@ Room {
 		["泉建男"] = "quan jiannan",
 		["青龙帮弟子"] = "qinglong dizi",
 		 },
+   room_relative="黄土路----黄土路----汉水西岸黄土路",
 }
 Room {
 	id = "wudang/wdroad8",
 	name = "山脚下",
-	ways = {
+	outdoor = "武当山",
+	ways = {   
 		["southeast"] = "wudang/chating",
 		["east"] = "group/entry/wdroad7",
 		["west"] = "wudang/xuanyue",
@@ -31037,13 +35739,16 @@ Room {
 Room {
 	id = "wudang/wulong",
 	name = "五龙宫",
+	outdoor = "武当山",
 	ways = {
 		["eastdown"] = "wudang/yxyan",
 	},
+	room_relative="五龙宫←隐仙岩五龙宫",
 }
 Room {
 	id = "wudang/xiaolu1",
 	name = "小径",
+	outdoor = "武当山",
 	ways = {
 		["south"] = "wudang/xiaolu2",
 		["north"] = "wudang/sanqing",
@@ -31053,10 +35758,12 @@ Room {
 	objs = {
 	    ["俞莲舟"] = "yu lianzhou",
 	},
+	room_relative="三清殿｜西厢走廊-----小径-----东厢走廊｜小径小径",
 }
 Room {
 	id = "wudang/xiaolu2",
 	name = "小径",
+	outdoor = "武当山",
 	ways = {
 		["south"] = "wudang/yuanmen",
 		["north"] = "wudang/xiaolu1",
@@ -31072,6 +35779,7 @@ Room {
 Room {
 	id = "wudang/xiaolu3",
 	name = "小径",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/xiaolu4",
 		["west"] = "wudang/xiaolu5",
@@ -31081,6 +35789,7 @@ Room {
 Room {
 	id = "wudang/xiaolu4",
 	name = "小径",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/xiaolu3",
 		["west"] = "wudang/xiaolu5",
@@ -31090,6 +35799,7 @@ Room {
 Room {
 	id = "wudang/xiaolu5",
 	name = "小径",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/xiaolu3",
 		["west"] = "wudang/xiaolu4",
@@ -31099,6 +35809,7 @@ Room {
 Room {
 	id = "wudang/xiaolu6",
 	name = "小径",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/xiaolu3",
 		["west"] = "wudang/xiaolu4",
@@ -31119,26 +35830,32 @@ Room {
 	ways = {
 		["north"] = "wudang/donglang2",
 	},
+	room_relative="东厢走廊--男休息室",
 }
 Room {
 	id = "wudang/xiuxishi2",
 	name = "女休息室",
+	outdoor = "武当山",
 	no_fight = true,
 	ways = {
 		["north"] = "wudang/donglang1",
 	},
+	room_relative="西厢走廊--女休息室",
 }
 Room {
 	id = "wudang/xuanyue",
 	name = "玄岳门",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/shijie1",
 		["east"] = "wudang/wdroad8",
 	},
+	room_relative="玄岳门----山脚下↓石阶玄岳门",
 }
 Room {
 	id = "wudang/yaofang",
 	name = "药房",
+	outdoor = "武当山",
 	no_fight = true,
 	ways = {
 		["east"] = "wudang/zoulang3",
@@ -31146,26 +35863,33 @@ Room {
 	objs = {
           ["丹炉"] = "dan lu",
            },
+	room_relative="药房-----西厢走廊药房",	   
 }
 Room {
 	id = "wudang/yuanhe",
 	name = "元和观",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/gsdao2",
 		["east"] = "wudang/yuanhe1",
 		["northdown"] = "wudang/gsdao1",
-	},
+	
+  },
+  room_relative="古神道↓元和观----元和观大殿↓古神道元和观",
 }
 Room {
 	id = "wudang/yuanhe1",
 	name = "元和观大殿",
+	outdoor = "武当山",
 	ways = {
 		["west"] = "wudang/yuanhe",
 	},
+	room_relative="元和观--元和观大殿元和观大殿",
 }
 Room {
 	id = "wudang/yuanmen",
 	name = "院门",
+	outdoor = "武当山",
 	ways = {
 		["ask yin liting about 纪晓芙;open door;south"] = "wudang/houyuan",
 		["north;north;north;north;north;north;north;north;north;north"] = "wudang/lgfang",
@@ -31186,21 +35910,26 @@ Room {
 Room {
 	id = "wudang/yuxu",
 	name = "玉虚宫",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/mozhen",
 		["eastdown"] = "wudang/shanlu1",
 	},
+	room_relative="玉虚宫←山路↓磨针井玉虚宫",
 }
 Room {
 	id = "wudang/yuxuyan",
 	name = "玉虚岩",
+	outdoor = "武当山",
 	ways = {
 		["westdown"] = "wudang/mozhen",
 	},
+	room_relative="磨针井→玉虚岩玉虚岩",
 }
 Room {
 	id = "wudang/yuzhen",
 	name = "遇真宫",
+	outdoor = "武当山",
 	ways = {
 		["westup"] = "wudang/wdbolin",
 		["northdown"] = "wudang/gsdao2",
@@ -31209,91 +35938,117 @@ Room {
           ["知客道长"] = "zhike daozhang",
           ["功德箱"] = "gongde xiang",
            },
+  room_relative="古神道↓武当柏林←遇真宫遇真宫",
 }
 Room {
 	id = "wudang/yxyan",
 	name = "隐仙岩",
+	outdoor = "武当山",
 	ways = {
 		["southeast"] = "wudang/langmei",
 		["westup"] = "wudang/wulong",
 	},
+	room_relative="五龙宫←隐仙岩↘榔梅祠隐仙岩",
 }
 Room {
 	id = "wudang/zhanqi",
 	name = "展旗峰",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/shijie3",
 		["northdown"] = "wudang/shijie2",
 		["west"] = "wudang/gsdao3",
 	},
+	room_relative="石阶↓古神道----展旗峰↓石阶展旗峰",
 }
 Room {
 	id = "wudang/zhenqing",
 	name = "天乙真庆宫",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/gsdao4",
 		["southwest"] = "wudang/feisheng",
 		["enter"] = "wudang/sanqing",
 		["north"] = "wudang/gchang",
+	
+        },
+		precmds = {
+              ["enter"] = "#walkBusy",
 	},
 	objs = {
           ["莫声谷"] = "mo shenggu",
+		  ["道童"] = "dao tong",
            },
+	room_relative="武当广场｜天乙真庆宫↙↓飞升崖古神道天乙真庆宫",
 }
 Room {
 	id = "wudang/zixia",
 	name = "紫霄宫",
+	outdoor = "武当山",
 	ways = {
 		["southup"] = "wudang/nanyan",
 		["out"] = "wudang/zxgdamen",
 	},
 	objs = {
           ["万青里"] = "wan qingli",
+		  ["道童"] = "dao tong",
            },
+	room_relative="紫霄宫↓大圣南岩宫紫霄宫",
 }
 Room {
 	id = "wudang/zoulang1",
 	name = "走廊",
+	outdoor = "武当山",
 	ways = {
 		["south"] = "wudang/sanqing",
 		["east"] = "wudang/zoulang2",
 		["north"] = "wudang/lgfang",
 		["west"] = "wudang/zoulang3",
 	},
+	room_relative="练功房｜西厢走廊-----走廊-----东厢走廊｜三清殿走廊",
 }
 Room {
 	id = "wudang/zoulang2",
 	name = "东厢走廊",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/ldfang",
 		["west"] = "wudang/zoulang1",
 	},
+	room_relative="走廊---东厢走廊---炼丹房东厢走廊",
 }
 Room {
 	id = "wudang/zoulang3",
 	name = "西厢走廊",
+	outdoor = "武当山",
 	ways = {
 		["east"] = "wudang/zoulang1",
 		["west"] = "wudang/yaofang",
 	},
+	room_relative="药房---西厢走廊---走廊西厢走廊",
 }
 Room {
 	id = "wudang/zxgdamen",
 	name = "紫霄宫大门",
+	outdoor = "武当山",
 	ways = {
 		["enter"] = "wudang/zixia",
 		["northdown"] = "wudang/shijie3",
 	},
 	objs = {
           ["风松道长"] = "fengsong daozhang",
-           },
+		  ["道童"] = "dao tong",
+		            },
+	room_relative="石阶↓紫霄宫大门紫霄宫大门",
 }
 Room {
 	id = "wuguan/bingqiku",
 	name = "兵器库",
+	outdoor = "武当山",
 	ways = {
 		["north"] = "wuguan/wuchang3",
 	},
+	room_relative="紫霄宫｜石阶紫霄宫大门",
 }
 Room {
 	id = "wuguan/caidi",
@@ -32532,7 +37287,7 @@ Room {
 Room {
 	id = "xiakedao/yingbin",
 	name = "迎宾馆",
-	ways = {
+		ways = {
 		["south"] = "xiakedao/shidong2",
 		["east"] = "xiakedao/xiaodian",
 		["west"] = "xiakedao/xiuxis",
@@ -32542,7 +37297,7 @@ Room {
 Room {
 	id = "xiakedao/yongdao1",
 	name = "甬道",
-	ways = {
+		ways = {
 		["south"] = "xiakedao/yongdao2",
 		["out"] = "xiakedao/pubu",
 	},
@@ -32550,7 +37305,7 @@ Room {
 Room {
 	id = "xiakedao/yongdao2",
 	name = "甬道",
-	ways = {
+		ways = {
 		["south"] = "xiakedao/shidong1",
 		["north"] = "xiakedao/yongdao1",
 	},
@@ -32558,6 +37313,7 @@ Room {
 Room {
 	id = "xiakedao/yongdao3",
 	name = "甬道",
+	
 	ways = {
 		["south"] = "xiakedao/shimen",
 		["north"] = "xiakedao/dating",
@@ -32566,42 +37322,51 @@ Room {
 Room {
 	id = "xiangyang/baihumen",
 	name = "白虎门",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/bhmnj",
 		["west"] = "xiangyang/outwroad1",
 	},
+	room_relative="西门外----白虎门----白虎门内街白虎门",
 }
 Room {
 	id = "xiangyang/bank",
 	name = "宝龙斋",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/njie3",
 	},
 	objs = {
           ["钱善人"] = "qian shanren",
            },
+	room_relative="宝龙斋----南街宝龙斋",
 }
 Room {
 	id = "xiangyang/baozipu",
 	name = "包子铺",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/xcx4",
 	},
 	objs = {
 		["包子王"] = "baozi wang",
 	},
+	room_relative="包子铺----西城巷包子铺",
 }
 Room {
 	id = "xiangyang/bcx1",
 	name = "北城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/bjie1",
 		["west"] = "xiangyang/bcx2",
 	},
+	room_relative="北城巷----北城巷----北街北城巷",
 }
 Room {
 	id = "xiangyang/bcx2",
 	name = "北城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/guangc",
 		["north"] = "xiangyang/zrdian",
@@ -32611,46 +37376,58 @@ Room {
 	objs = {
 		["武敦儒"] = "wu dunru",
 	},
+	room_relative="猪肉店｜北城巷----北城巷----北城巷｜擂台前广场北城巷",
 }
 Room {
 	id = "xiangyang/bcx3",
 	name = "北城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/bcx4",
 		["north"] = "xiangyang/jianghukz",
 		["east"] = "xiangyang/bcx2",
 		["west"] = "xiangyang/xyudian",
 	},
+	room_relative="江湖客栈｜鲜鱼店----北城巷----北城巷｜北城巷北城巷",
 }
 Room {
 	id = "xiangyang/bcx4",
 	name = "北城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/bhmnj",
 		["north"] = "xiangyang/bcx3",
 		["west"] = "xiangyang/xiaocd",
 	},
+  room_relative="北城巷｜小吃店----北城巷｜白虎门内街北城巷",
 }
 Room {
 	id = "xiangyang/bhmnj",
 	name = "白虎门内街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/xcx1",
 		["east"] = "xiangyang/xjie",
 		["north"] = "xiangyang/bcx4",
 		["west"] = "xiangyang/baihumen",
+	
 	},
+	room_relative="北城巷｜白虎门--白虎门内街--西街｜西城巷白虎门内街",
+	
 }
 Room {
 	id = "xiangyang/bingying",
 	name = "兵营",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/ncx3",
 	},
+	room_relative="兵营｜南城巷兵营",
 }
 Room {
 	id = "xiangyang/bjie1",
 	name = "北街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/bjie2",
 		["north"] = "xiangyang/nroad1",
@@ -32662,6 +37439,7 @@ Room {
 Room {
 	id = "xiangyang/bjie2",
 	name = "北街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/bjie3",
 		["east"] = "xiangyang/chalou",
@@ -32675,6 +37453,7 @@ Room {
 Room {
 	id = "xiangyang/bjie3",
 	name = "北街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/dpailou",
 		["north"] = "xiangyang/bjie2",
@@ -32685,75 +37464,94 @@ Room {
 Room {
 	id = "xiangyang/caiyongmanor",
 	name = "蔡邕庄",
+	outdoor = "襄阳城",
 	ways = {
 		["north"] = "xiangyang/caiyongtomb",
 		["east"] = "changan/southroad3",
 	},
+	room_relative="蔡邕墓｜蔡邕庄----官道蔡邕庄",
 }
 Room {
 	id = "xiangyang/caiyongtomb",
 	name = "蔡邕墓",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/caiyongmanor",
 	},
+	room_relative="蔡邕墓｜蔡邕庄蔡邕墓",
 }
 Room {
 	id = "xiangyang/chalou",
 	name = "天香楼",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/bjie2",
 		["up"] = "xiangyang/chalou2",
 	},
+	room_relative="茶楼二楼〓北街----天香楼天香楼",
 }
 Room {
 	id = "xiangyang/chalou2",
 	name = "茶楼二楼",
+	outdoor = "襄阳城",
 	ways = {
 		["down"] = "xiangyang/chalou",
 	},
+	room_relative="茶楼二楼〓天香楼茶楼二楼",
 }
 Room {
 	id = "xiangyang/chayedian",
 	name = "茶叶店",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/xcx1",
 	},
+	room_relative="茶叶店----西城巷茶叶店",
 }
 Room {
 	id = "xiangyang/chemahang",
 	name = "车马行",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/ncx2",
 	},
+	room_relative="车马行｜南城巷车马行",
 }
 Room {
 	id = "xiangyang/chengyipu",
 	name = "成衣铺",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/dcx3",
 	},
 	objs = {
         ["于三娘"] = "yu sanniang",
     },
+	room_relative="东城巷----成衣铺成衣铺",
 }
 Room {
 	id = "xiangyang/chucshi",
 	name = "储藏室",
+	outdoor = "襄阳城",
 	ways = {
 		["north"] = "xiangyang/yamen",
 	},
+	room_relative="衙门--储藏室",
 }
 Room {
 	id = "xiangyang/conglin1",
 	name = "山路",
+	outdoor = "襄阳城",
 	ways = {
 		["eastdown"] = "xiangyang/outsroad3",
 		["westup"] = "xiangyang/conglin2",
 	},
+	room_relative="山路←山路←湘鄂土路山路",
 }
 Room {
 	id = "xiangyang/conglin2",
 	name = "山路",
+	outdoor = "襄阳城",
 	ways = {
 		["eastdown"] = "xiangyang/conglin1",
 		["westup"] = "xiangyang/conglin3",
@@ -32765,10 +37563,12 @@ Room {
 	lengths = {
 	    ["westup"] = "if hp.exp>500000 then return 1 else return false end",
 	},
+	room_relative="山路←山路←山路山路",
 }
 Room {
 	id = "xiangyang/conglin3",
 	name = "山路",
+	outdoor = "襄阳城",
 	ways = {
 		["eastdown"] = "xiangyang/conglin2",
 		["westup"] = "xiangyang/conglin4",
@@ -32776,10 +37576,12 @@ Room {
 	objs = {
         ["怪蟒"] = "guai mang",
     },
+	room_relative="山间空地←山路←山路山路",
 }
 Room {
 	id = "xiangyang/conglin4",
 	name = "山间空地",
+	outdoor = "襄阳城",
 	ways = {
 		["eastdown"] = "xiangyang/conglin3",
 		["northwest"] = "gumu/xuantie/xiaolu4",
@@ -32791,28 +37593,34 @@ Room {
         ["史仲猛"] = "shi zhongmeng",
         ["史孟捷"] = "shi mengjie",
     },
+	room_relative="山路↖山间空地←山路山间空地",
 }
 Room {
 	id = "xiangyang/cross1",
 	name = "北丁字街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/xpailou",
 		["east"] = "xiangyang/bjie3",
 		["west"] = "xiangyang/xjie",
-	},
+	},room_relative="西街---北丁字街---北街｜西牌楼北丁字街",
+	
 }
 Room {
 	id = "xiangyang/cross2",
 	name = "南丁字街",
+	outdoor = "襄阳城",
 	ways = {
 		["north"] = "xiangyang/dpailou",
 		["east"] = "xiangyang/djie1",
 		["west"] = "xiangyang/njie1",
 	},
+	room_relative="东牌楼｜南街---南丁字街---东街南丁字街",
 }
 Room {
 	id = "xiangyang/damen",
 	name = "武馆大门",
+	outdoor = "襄阳城",
 	no_fight = true,
 	ways = {
 		["south"] = "xiangyang/eroad1",
@@ -32828,6 +37636,7 @@ Room {
 Room {
 	id = "xiangyang/dangpu",
 	name = "当铺",
+	outdoor = "襄阳城",
 	no_fight = true,
 	ways = {
 		["south"] = "xiangyang/djie1",
@@ -32835,17 +37644,21 @@ Room {
 	objs = {
         ["崔老板"] = "cui laoban",
     },
+	room_relative="当铺｜东街当铺",
 }
 Room {
 	id = "xiangyang/datiepu",
 	name = "打铁铺",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/ncx5",
 	},
+	room_relative="南城巷----打铁铺打铁铺",
 }
 Room {
 	id = "xiangyang/dcx1",
 	name = "东城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/dcx2",
 		["east"] = "xiangyang/feizhai",
@@ -32856,6 +37669,7 @@ Room {
 Room {
 	id = "xiangyang/dcx2",
 	name = "东城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/dcx3",
 		["east"] = "xiangyang/zahuopu",
@@ -32869,6 +37683,7 @@ Room {
 Room {
 	id = "xiangyang/dcx3",
 	name = "东城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/dcx4",
 		["north"] = "xiangyang/dcx2",
@@ -32882,6 +37697,7 @@ Room {
 Room {
 	id = "xiangyang/dcx4",
 	name = "东城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/dcx5",
 		["east"] = "xiangyang/xiyuan",
@@ -32892,15 +37708,19 @@ Room {
 Room {
 	id = "xiangyang/dcx5",
 	name = "东城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/djie2",
 		["north"] = "xiangyang/dcx4",
-	},
+},
+	
+
 	room_relative="东城巷｜东城巷｜东街东城巷",
 }
 Room {
 	id = "xiangyang/djie1",
 	name = "东街",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/djie2",
 		["north"] = "xiangyang/dangpu",
@@ -32911,49 +37731,62 @@ Room {
 Room {
 	id = "xiangyang/djie2",
 	name = "东街",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/eroad1",
 		["north"] = "xiangyang/dcx5",
 		["west"] = "xiangyang/djie1",
 	},
-	room_relative="东城巷｜东街-----东街-----青龙门内街东街",
+	precmds = {
+   ["west"] = "#walkBusy",
+   },
+	
 }
 Room {
 	id = "xiangyang/doufufang",
 	name = "豆腐坊",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/xcx2",
 	},
+	room_relative="豆腐坊----西城巷豆腐坊",
 }
 Room {
 	id = "xiangyang/dpailou",
 	name = "东牌楼",
+	outdoor = "襄阳",
 	ways = {
 		["south"] = "xiangyang/cross2",
 		["north"] = "xiangyang/bjie3",
 	},
+	room_relative="北街｜东牌楼｜南丁字街东牌楼",
 }
 Room {
 	id = "xiangyang/duchang",
 	name = "万金赌坊",
+	outdoor = "襄阳城",
 	no_fight = true,
 	ways = {
 		["west"] = "xiangyang/bjie1",
 	},
+	room_relative="北街---万金赌坊万金赌坊",
 }
 Room {
 	id = "xiangyang/eroad1",
 	name = "青龙门内街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/ncx5",
 		["east"] = "xiangyang/qinglongmen",
 		["north"] = "xiangyang/damen",
 		["west"] = "xiangyang/djie2",
 	},
+	room_relative="武馆大门｜东街--青龙门内街--青龙门｜南城巷青龙门内街",
 }
 Room {
 	id = "xiangyang/feizhai",
 	name = "废宅",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/dcx1",
 	},
@@ -32961,10 +37794,12 @@ Room {
         ["徐小五"] = "xu xiaowu",
         ["项长老"] = "xiang zhanglao",
     },
+	room_relative="东城巷-----废宅废宅",
 }
 Room {
 	id = "xiangyang/guangc",
 	name = "擂台前广场",
+	outdoor = "襄阳城",
 	ways = {
 		["north"] = "xiangyang/bcx2",
 		-- ["longhu"] = "wizard/lt2",
@@ -32976,10 +37811,12 @@ Room {
 		["fengyun"] = true,
 		["tiandi"] = true,
 	},
+	room_relative="北城巷｜擂台前广场擂台前广场",
 }
 Room {
 	id = "xiangyang/hanshui1",
 	name = "汉水东岸",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/outnroad3",
 		["dujiang"] = "xiangyang/hanshui2",
@@ -32987,10 +37824,12 @@ Room {
 	nolooks = {
 		["dujiang"] = true,
 	},
+	room_relative="土路｜汉水西岸汉水东岸",
 }
 Room {
 	id = "xiangyang/hanshui2",
 	name = "汉水西岸",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "wudang/wdroad6",
 		["dujiang"] = "xiangyang/hanshui1",
@@ -32998,10 +37837,12 @@ Room {
 	nolooks = {
 		["dujiang"] = true,
 	},
+	room_relative="黄土路｜汉水东岸汉水西岸",
 }
 Room {
 	id = "xiangyang/henanroad1",
 	name = "土路",
+	outdoor = "襄阳城",
 	ways = {
 		["southwest"] = "xiangyang/outnroad3",
 		["northeast"] = "xiangyang/henanroad2",
@@ -33011,6 +37852,7 @@ Room {
 Room {
 	id = "xiangyang/henanroad2",
 	name = "土路",
+	outdoor = "襄阳城",
 	ways = {
 		["southwest"] = "xiangyang/henanroad1",
 		["north"] = "nanyang/yidao",
@@ -33020,14 +37862,17 @@ Room {
 Room {
 	id = "xiangyang/hunanroad1",
 	name = "湘鄂交界",
+	outdoor = "襄阳城",
 	ways = {
 		["southwest"] = "xiangyang/hunanroad2",
 		["north"] = "xiangyang/outsroad3",
 	},
+ room_relative="湘鄂土路｜湘鄂交界↙泸溪北湘鄂交界",
 }
 Room {
 	id = "xiangyang/hunanroad2",
 	name = "泸溪北",
+	outdoor = "襄阳城",
 	ways = {
 		["southwest"] = "group/entry/mjshan2",
 		["south"] = "tiezhang/lx",
@@ -33035,31 +37880,37 @@ Room {
 	},
 	objs = {
         ["独脚大盗"] = "dujiao dadao",
+	room_relative="湘鄂交界↗泸溪北↙｜山路泸溪泸溪北",
     },
 }
 Room {
 	id = "xiangyang/jianghukz",
 	name = "江湖客栈",
+	outdoor = "襄阳城",
 	no_fight = true,
 	ways = {
 		["south"] = "xiangyang/bcx3",
-		["give xiao 5 silver;up"] = "xiangyang/kezhan2",
+		-- ["up"] = "xiangyang/kezhan2",
 	},
 	nolooks = {
 		["up"] = true,
 	},
+	room_relative="客栈二楼〓江湖客栈｜北城巷江湖客栈",
 }
 Room {
 	id = "xiangyang/junying",
 	name = "蒙古军营",
+	outdoor = "襄阳城",
 	ways = {
 		["southwest"] = "xiangyang/outnroad2",
 		["enter"] = "xiangyang/yingzhang",
 	},
+	room_relative="营帐中∧蒙古军营↙青石大道蒙古军营",
 }
 Room {
 	id = "xiangyang/kezhan2",
 	name = "客栈二楼",
+	outdoor = "襄阳城",
 	no_fight = true,
 	ways = {
 		["down"] = "xiangyang/jianghukz",
@@ -33068,134 +37919,167 @@ Room {
 Room {
 	id = "xiangyang/lantian",
 	name = "蓝田",
+	outdoor = "襄阳城",
 	ways = {
 		["southeast"] = "xiangyang/shanxiroad2",
 		["north"] = "changan/southroad3",
 	},
+	room_relative="官道｜蓝田↘土路蓝田",
 }
 Room {
 	id = "xiangyang/lipindian",
 	name = "礼品店",
+	outdoor = "襄阳城",
 	ways = {
 		["out"] = "xiangyang/cross2",
 	},
+	room_relative="南丁字街--礼品店",
 }
 Room {
 	id = "xiangyang/lzz/chelang1",
 	name = "侧廊",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/yaofang",
 		["east"] = "xiangyang/lzz/tjing",
 		["west"] = "xiangyang/lzz/chelang2",
 	},
+	room_relative="侧廊-----侧廊-----天井｜药房侧廊",
 }
 Room {
 	id = "xiangyang/lzz/chelang2",
 	name = "侧廊",
+	outdoor = "柳宗镇",
 	ways = {
 		["north"] = "xiangyang/lzz/houyuan",
 		["east"] = "xiangyang/lzz/chelang1",
 	},
+	room_relative="后院｜侧廊-----侧廊侧廊",
 }
 Room {
 	id = "xiangyang/lzz/houyuan",
 	name = "后院",
+    outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/chelang2",
 		["north"] = "xiangyang/lzz/huayuan",
 	},
+	room_relative="花园｜后院｜侧廊后院",
 }
 Room {
 	id = "xiangyang/lzz/huayuan",
 	name = "花园",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/houyuan",
 	},
+	room_relative="花园｜后院花园",
 }
 Room {
 	id = "xiangyang/lzz/jiuguan",
 	name = "四季小吃店",
+	outdoor = "柳宗镇",
 	ways = {
 		["east"] = "xiangyang/lzz/liuzz",
 	},
+	room_relative="四季小吃店--柳宗镇四季小吃店",
 }
 Room {
 	id = "xiangyang/lzz/liuzz",
 	name = "柳宗镇",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/xiaolu",
 		["north"] = "xiangyang/lzz/xiaohe",
 		["west"] = "xiangyang/lzz/jiuguan",
 	},
+  room_relative="小河｜四季小吃店----柳宗镇｜小路柳宗镇",
 }
 Room {
 	id = "xiangyang/lzz/qiant",
 	name = "前厅",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/xue_men",
 		["north"] = "xiangyang/lzz/tjing",
 	},
+	room_relative="天井｜前厅｜薛府大门前厅",
 }
 Room {
 	id = "xiangyang/lzz/tjing",
 	name = "天井",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/qiant",
 		["north"] = "xiangyang/lzz/zhengt",
 		["west"] = "xiangyang/lzz/chelang1",
 	},
+	room_relative="正厅｜侧廊-----天井｜前厅天井",
 }
 Room {
 	id = "xiangyang/lzz/xiaohe",
 	name = "小河",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/liuzz",
 		["north"] = "xiangyang/lzz/xue_men",
 	},
+	room_relative="薛府大门｜小河｜柳宗镇小河",
 }
 Room {
 	id = "xiangyang/lzz/xiaolu",
 	name = "小路",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/xiaolu1",
 		["north"] = "xiangyang/lzz/liuzz",
 	},
+	room_relative="柳宗镇｜小路｜小路小路",
 }
 Room {
 	id = "xiangyang/lzz/xue_men",
 	name = "薛府大门",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/xiaohe",
 		["north"] = "xiangyang/lzz/qiant",
 	},
+ room_relative="前厅｜薛府大门｜小河薛府大门",
 }
 Room {
 	id = "xiangyang/lzz/yaofang",
 	name = "药房",
+	outdoor = "柳宗镇",
 	ways = {
 		["north"] = "xiangyang/lzz/chelang1",
 	},
+	room_relative="侧廊｜药房药房",
 }
 Room {
 	id = "xiangyang/lzz/zhengt",
 	name = "正厅",
+	outdoor = "柳宗镇",
 	ways = {
 		["south"] = "xiangyang/lzz/tjing",
 	},
+	room_relative="正厅｜天井正厅",
 }
 Room {
 	id = "xiangyang/mujiangpu",
 	name = "木匠铺",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/ncx4",
 	},
 	objs = {
 		["木匠"] = "mu jiang",
 	},
+	room_relative="南城巷----木匠铺木匠铺",
 }
 Room {
 	id = "xiangyang/ncx1",
 	name = "南城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["north"] = "xiangyang/shuoshug",
 		["east"] = "xiangyang/ncx2",
@@ -33206,6 +38090,7 @@ Room {
 Room {
 	id = "xiangyang/ncx2",
 	name = "南城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/ncx3",
 		["north"] = "xiangyang/chemahang",
@@ -33219,6 +38104,7 @@ Room {
 Room {
 	id = "xiangyang/ncx3",
 	name = "南城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/wen/damen",
 		["east"] = "xiangyang/ncx4",
@@ -33230,6 +38116,7 @@ Room {
 Room {
 	id = "xiangyang/ncx4",
 	name = "南城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["north"] = "xiangyang/ncx5",
 		["east"] = "xiangyang/mujiangpu",
@@ -33240,6 +38127,7 @@ Room {
 Room {
 	id = "xiangyang/ncx5",
 	name = "南城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/ncx4",
 		["north"] = "xiangyang/eroad1",
@@ -33250,6 +38138,7 @@ Room {
 Room {
 	id = "xiangyang/njie1",
 	name = "南街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/njie2",
 		["north"] = "xiangyang/xpailou",
@@ -33261,6 +38150,7 @@ Room {
 Room {
 	id = "xiangyang/njie2",
 	name = "南街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/njie3",
 		["north"] = "xiangyang/njie1",
@@ -33273,6 +38163,7 @@ Room {
 Room {
 	id = "xiangyang/njie3",
 	name = "南街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/zqmnj",
 		["north"] = "xiangyang/njie2",
@@ -33284,23 +38175,28 @@ Room {
 Room {
 	id = "xiangyang/nroad1",
 	name = "玄武门内街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/bjie1",
 		["north"] = "xiangyang/xuanwumen",
 		["east"] = "xiangyang/dcx1",
 	},
+	room_relative="玄武门｜玄武门内街--东城巷｜北街玄武门内街",
 }
 Room {
 	id = "xiangyang/outeroad1",
 	name = "东门外",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "city/wroad3",
 		["west"] = "xiangyang/qinglongmen",
 	},
+	room_relative="青龙门----东门外----土路东门外",
 }
 Room {
 	id = "xiangyang/outnroad1",
 	name = "青石大道",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/xuanwumen",
 		["north"] = "xiangyang/outnroad2",
@@ -33310,6 +38206,7 @@ Room {
 Room {
 	id = "xiangyang/outnroad2",
 	name = "青石大道",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/outnroad1",
 		["north"] = "xiangyang/outnroad3",
@@ -33320,6 +38217,7 @@ Room {
 Room {
 	id = "xiangyang/outnroad3",
 	name = "土路",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/outnroad2",
 		["northwest"] = "xiangyang/shanxiroad1",
@@ -33331,14 +38229,17 @@ Room {
 Room {
 	id = "xiangyang/outsroad1",
 	name = "南门外",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/outsroad2",
 		["north"] = "xiangyang/zhuquemen",
 	},
+	room_relative="朱雀门｜南门外｜青石大道南门外",
 }
 Room {
 	id = "xiangyang/outsroad2",
 	name = "青石大道",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/outsroad3",
 		["north"] = "xiangyang/outsroad1",
@@ -33348,33 +38249,40 @@ Room {
 Room {
 	id = "xiangyang/outsroad3",
 	name = "湘鄂土路",
+	outdoor = "襄阳城",
 	ways = {
 		["westup"] = "xiangyang/conglin1",
 		["south"] = "xiangyang/hunanroad1",
 		["north"] = "xiangyang/outsroad2",
 	},
+	room_relative="青石大道｜山路←湘鄂土路｜湘鄂交界湘鄂土路",
 }
 Room {
 	id = "xiangyang/outwroad1",
 	name = "西门外",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/shanlu1",
 		["east"] = "xiangyang/baihumen",
 		["north"] = "gumu/jqg/shanlu3",
 		["west"] = "xiangyang/tanxi",
 	},
+	room_relative="山间小路｜檀溪----西门外----白虎门｜山间小路西门外",
 }
 Room {
 	id = "xiangyang/qinglongmen",
 	name = "青龙门",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/outeroad1",
 		["west"] = "xiangyang/eroad1",
 	},
+	room_relative="青龙门内街----青龙门----东门外青龙门",
 }
 Room {
 	id = "xiangyang/shanlu1",
 	name = "山间小路",
+	outdoor = "襄阳城",
 	ways = {
 		["southup"] = "xiangyang/shanlu2",
 		["north"] = "xiangyang/outwroad1",
@@ -33384,6 +38292,7 @@ Room {
 Room {
 	id = "xiangyang/shanlu2",
 	name = "山间小路",
+	outdoor = "襄阳城",
 	ways = {
 		["southwest"] = "xiangyang/shanlu3",
 		["northdown"] = "xiangyang/shanlu1",
@@ -33393,6 +38302,7 @@ Room {
 Room {
 	id = "xiangyang/shanlu3",
 	name = "山间小路",
+	outdoor = "襄阳城",
 	ways = {
 		["northeast"] = "xiangyang/shanlu2",
 	},
@@ -33406,6 +38316,7 @@ Room {
 Room {
 	id = "xiangyang/shanxiroad1",
 	name = "土路",
+	outdoor = "襄阳城",
 	ways = {
 		["southeast"] = "xiangyang/outnroad3",
 		["northwest"] = "xiangyang/shanxiroad2",
@@ -33416,6 +38327,7 @@ Room {
 Room {
 	id = "xiangyang/shanxiroad2",
 	name = "土路",
+	outdoor = "襄阳城",
 	ways = {
 		["southeast"] = "xiangyang/shanxiroad1",
 		["northwest"] = "xiangyang/lantian",
@@ -33429,76 +38341,93 @@ Room {
 Room {
 	id = "xiangyang/shaobingpu",
 	name = "烧饼铺",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/xcx3",
 	},
 	objs = {
 		["烧饼刘"] = "shaobing liu",
 	},
+	room_relative="烧饼铺----西城巷烧饼铺",
 }
 Room {
 	id = "xiangyang/shuoshug",
 	name = "说书馆",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/ncx1",
 	},
+	room_relative="说书馆｜南城巷说书馆",
 }
 Room {
 	id = "xiangyang/sishu",
 	name = "私塾",
+	outdoor = "襄阳城",
 	ways = {
 		["north"] = "xiangyang/xcx5",
 	},
+	room_relative="西城巷｜私塾私塾",
 }
 Room {
 	id = "xiangyang/tanxi",
 	name = "檀溪",
+	outdoor = "襄阳城",
 	ways = {
 		["southwest"] = "xiangyang/xiaolu1",
 		["east"] = "xiangyang/outwroad1",
 	},
+	room_relative="檀溪-----西门外↙小路檀溪",
 }
 Room {
 	id = "xiangyang/wen/damen",
 	name = "温府大门",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/wen/shidetang",
 		["north"] = "xiangyang/ncx3",
 	},
+	room_relative="南城巷｜温府大门｜世德堂温府大门",
 }
 Room {
 	id = "xiangyang/wen/guifang",
 	name = "吟淼阁",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/wen/tianjing",
 	},
 	objs = {
 		["温仪"] = "wen yi",
 	},
+	room_relative="天井----吟淼阁吟淼阁",
 }
 Room {
 	id = "xiangyang/wen/houhuayuan",
 	name = "后花园",
+	outdoor = "襄阳城",
 	ways = {
 		["north"] = "xiangyang/wen/tianjing",
 	},
 	objs = {
 		["温方义"] = "wen fangyi",
 	},
+	room_relative="天井｜后花园后花园",
 }
 Room {
 	id = "xiangyang/wen/lianwu",
 	name = "练武场",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/wen/tianjing",
 	},
 	objs = {
 		["温方达"] = "wen fangda",
 	},
+	room_relative="练武场----天井练武场",
 }
 Room {
 	id = "xiangyang/wen/shidetang",
 	name = "世德堂",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/wen/tianjing",
 		["east"] = "xiangyang/wen/wofang2",
@@ -33507,11 +38436,13 @@ Room {
 	},
 	objs = {
 		["温南扬"] = "wen nanyang",
+	room_relative="温府大门｜卧房----世德堂----卧房｜天井世德堂",
 	},
 }
 Room {
 	id = "xiangyang/wen/tianjing",
 	name = "天井",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/wen/houhuayuan",
 		["north"] = "xiangyang/wen/shidetang",
@@ -33520,31 +38451,37 @@ Room {
 	},
 	objs = {
 		["温方施"] = "wen fangshi",
+	room_relative="世德堂｜练武场-----天井-----吟淼阁｜后花园天井",
 	},
 }
 Room {
 	id = "xiangyang/wen/wofang1",
 	name = "卧房",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/wen/shidetang",
 	},
 	objs = {
 		["温方山"] = "wen fangshan",
 	},
+	room_relative="卧房-----世德堂卧房",
 }
 Room {
 	id = "xiangyang/wen/wofang2",
 	name = "卧房",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/wen/shidetang",
 	},
 	objs = {
 		["温方悟"] = "wen fangwu",
 	},
+	room_relative="世德堂-----卧房卧房",
 }
 Room {
 	id = "xiangyang/xcx1",
 	name = "西城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/xcx2",
 		["north"] = "xiangyang/bhmnj",
@@ -33555,6 +38492,7 @@ Room {
 Room {
 	id = "xiangyang/xcx2",
 	name = "西城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/xcx3",
 		["north"] = "xiangyang/xcx1",
@@ -33565,6 +38503,7 @@ Room {
 Room {
 	id = "xiangyang/xcx3",
 	name = "西城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/xcx4",
 		["north"] = "xiangyang/xcx2",
@@ -33575,6 +38514,7 @@ Room {
 Room {
 	id = "xiangyang/xcx4",
 	name = "西城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/xcx5",
 		["north"] = "xiangyang/xcx3",
@@ -33585,6 +38525,7 @@ Room {
 Room {
 	id = "xiangyang/xcx5",
 	name = "西城巷",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/sishu",
 		["east"] = "xiangyang/zqmnj",
@@ -33596,71 +38537,88 @@ Room {
 Room {
 	id = "xiangyang/xiaocd",
 	name = "小吃店",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/bcx4",
 	},
+	room_relative="小吃店----北城巷小吃店",
 }
 Room {
 	id = "xiangyang/xiaolu1",
 	name = "小路",
+	outdoor = "襄阳城",
 	ways = {
 		["southwest"] = "xiangyang/xiaolu2",
 		["north"] = "xiangyang/lzz/xiaolu",
 		["northeast"] = "xiangyang/tanxi",
 	},
+	room_relative="小路檀溪｜↗小路↙小路小路",
 }
 Room {
 	id = "xiangyang/xiaolu2",
 	name = "小路",
+	outdoor = "襄阳城",
 	ways = {
 		["northeast"] = "xiangyang/xiaolu1",
 		["west"] = "group/entry/cderoad4",
 	},
+	room_relative="小路↗大道-----小路小路",
 }
 Room {
 	id = "xiangyang/xiyuan",
 	name = "戏院",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/dcx4",
 	},
+	room_relative="东城巷-----戏院戏院",
 }
 Room {
 	id = "xiangyang/xjie",
 	name = "西街",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/cross1",
 		["west"] = "xiangyang/bhmnj",
 	},
+	room_relative="北丁字街-----白虎门内街西街",
 }
 Room {
 	id = "xiangyang/xpailou",
 	name = "西牌楼",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/njie1",
 		["north"] = "xiangyang/cross1",
 	},
+	room_relative="北丁字街｜西牌楼｜南街西牌楼",
 }
 Room {
 	id = "xiangyang/xuanwumen",
 	name = "玄武门",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/nroad1",
 		["north"] = "xiangyang/outnroad1",
 	},
+	room_relative="青石大道｜玄武门｜玄武门内街玄武门",
 }
 Room {
 	id = "xiangyang/xyudian",
 	name = "鲜鱼店",
+	outdoor = "襄阳城",
 	ways = {
 		["east"] = "xiangyang/bcx3",
 	},
 	objs = {
 		["李二嫂"] = "li ersao",
 	},
+	room_relative="鲜鱼店----北城巷鲜鱼店",
 }
 Room {
 	id = "xiangyang/yamen",
 	name = "衙门",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/chucshi",
 		["north"] = "xiangyang/ymzhengting",
@@ -33673,11 +38631,16 @@ Room {
 		["south"] = {
 			{id = "ya yi", exp = 7500},
 		},
+		precmds = {
+              ["north"] = "kill ya yi",
+			   ["south"] = "kill ya yi",
+	},
 	},
 }
 Room {
 	id = "xiangyang/yaopu",
 	name = "药材铺",
+	outdoor = "襄阳城",
 	no_fight = true,
 	ways = {
 		["east"] = "xiangyang/xcx5",
@@ -33685,10 +38648,12 @@ Room {
 	objs = {
 		["平一指"] = "ping yizhi",
 	},
+	room_relative="药材铺----西城巷药材铺",
 }
 Room {
 	id = "xiangyang/yingzhang",
 	name = "营帐中",
+	outdoor = "襄阳城",
 	no_fight = true,
 	ways = {
 		["out"] = "xiangyang/junying",
@@ -33696,17 +38661,21 @@ Room {
 	objs = {
 		["蒙哥"] = "meng ge",
 	},
+	room_relative="营帐中∨蒙古军营营帐中",
 }
 Room {
 	id = "xiangyang/ymzhengting",
 	name = "正厅",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/yamen",
 	},
+	room_relative="衙门--正厅",
 }
 Room {
 	id = "xiangyang/zahuopu",
 	name = "杂货铺",
+	outdoor = "襄阳城",
 	ways = {
 		["west"] = "xiangyang/dcx2",
 		["up"] = "xiangyang/qnbank",
@@ -33714,75 +38683,91 @@ Room {
 	objs = {
 		["牛老板"] = "niu laoban",
 	},
+	room_relative="东城巷----杂货铺杂货铺",
 }
 Room {
 	id = "xiangyang/qnbank",
 	name = "潜能银行",
+	outdoor = "襄阳城",
 	ways = {
 		["down"] = "xiangyang/zahuopu",
 	},
+	room_relative="杂货铺--潜能银行",
 }
 
 Room {
 	id = "xiangyang/zhuquemen",
 	name = "朱雀门",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/outsroad1",
 		["north"] = "xiangyang/zqmnj",
 	},
+	room_relative="朱雀门内街｜朱雀门｜南门外朱雀门",
 }
 Room {
 	id = "xiangyang/zqmnj",
 	name = "朱雀门内街",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/zhuquemen",
 		["north"] = "xiangyang/njie3",
 		["west"] = "xiangyang/xcx5",
 	},
+ room_relative="南街｜西城巷--朱雀门内街｜朱雀门朱雀门内街",
 }
 Room {
 	id = "xiangyang/zrdian",
 	name = "猪肉店",
+	outdoor = "襄阳城",
 	ways = {
 		["south"] = "xiangyang/bcx2",
 	},
 	objs = {
         ["猪肉荣"] = "zhurou rong",
     },
+	room_relative="猪肉店｜北城巷猪肉店",
 }
 Room {
 	id = "xingxiu/bank",
 	name = "万宝斋",
+	outdoor = "星宿海",
 	ways = {
 		["east"] = "xingxiu/silk8",
 	},
 	objs = {
           ["马掌柜"] = "ma zhanggui",
            },
+   room_relative="万宝斋----吐谷浑伏俟城万宝斋",
 }
 Room {
 	id = "xingxiu/baozang/bingqiku",
 	name = "兵器库",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/baozang/midong3",
 		["east"] = "xingxiu/baozang/tiantan",
 		["north"] = "xingxiu/baozang/midong3",
 		["west"] = "xingxiu/baozang/midong3",
 	},
+	room_relative="密洞｜大厅-----密洞｜密洞兵器库",
 }
 Room {
 	id = "xingxiu/baozang/jinku",
 	name = "金库",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/baozang/midong2",
 		["north"] = "xingxiu/baozang/tiantan",
 		["east"] = "xingxiu/baozang/midong2",
 		["west"] = "xingxiu/baozang/midong2",
 	},
+	
 }
 Room {
 	id = "xingxiu/baozang/midong1",
 	name = "密洞",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/baozang/midong1",
 		["north"] = "xingxiu/baozang/midong1",
@@ -33793,6 +38778,7 @@ Room {
 Room {
 	id = "xingxiu/baozang/midong2",
 	name = "密洞",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/baozang/midong2",
 		["east"] = "xingxiu/baozang/midong2",
@@ -33803,6 +38789,7 @@ Room {
 Room {
 	id = "xingxiu/baozang/midong3",
 	name = "密洞",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/baozang/midong3",
 		["north"] = "xingxiu/baozang/midong3",
@@ -33850,6 +38837,7 @@ Room {
 Room {
 	id = "xingxiu/baozang/yaoku",
 	name = "药库",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/baozang/tiantan",
 		["north"] = "xingxiu/baozang/midong4",
@@ -33860,6 +38848,7 @@ Room {
 Room {
 	id = "xingxiu/cangku",
 	name = "天然石洞",
+	outdoor = "星宿海",
 	ways = {
 		["out"] = "xingxiu/xx2",
 	},
@@ -33872,6 +38861,7 @@ Room {
 Room {
 	id = "xingxiu/cave",
 	name = "山洞",
+	outdoor = "星宿海",
 	ways = {
 		["out"] = "xingxiu/shanshi",
 		["zuan"] = "xingxiu/cave2",
@@ -33886,11 +38876,12 @@ Room {
 	lengths = {
 		["zuan"] = "if Bag['火折'] then return 10 else return false end",
 	},
-	room_relative="山洞∨山石山洞",
+	
 }
 Room {
 	id = "xingxiu/cave2",
 	name = "山洞",
+	outdoor = "星宿海",
 	ways = {
 		["zuan out"] = "xingxiu/cave",
 	},
@@ -33903,11 +38894,12 @@ Room {
 	lengths = {
 		["zuan out"] = "if Bag['火折'] then return 10 else return false end",
 	},
-	room_relative="山洞山洞",
+	
 }
 Room {
 	id = "xingxiu/chufang",
 	name = "厨房",
+	outdoor = "星宿海",
 	no_fight = true,
 	ways = {
 		["east"] = "xingxiu/xx3",
@@ -33931,6 +38923,7 @@ Room {
 		["south"] = "xingxiu/daliao/shulin",
 		["northwest"] = "xingxiu/daliao/shanlu2",
 	},
+	room_relative="树林｜山路山路",
 }
 Room {
 	id = "xingxiu/daliao/shanlu2",
@@ -33939,6 +38932,7 @@ Room {
 		["northup"] = "xingxiu/daliao/shanlu3",
 		["southeast"] = "xingxiu/daliao/shanlu1",
 	},
+	room_relative="山路｜山路山路",
 }
 Room {
 	id = "xingxiu/daliao/shanlu3",
@@ -33947,6 +38941,7 @@ Room {
 		["north"] = "xingxiu/daliao/yingmen",
 		["southdown"] = "xingxiu/daliao/shanlu2",
 	},
+	room_relative="营门｜山路山路",
 }
 Room {
 	id = "xingxiu/daliao/shulin",
@@ -33965,6 +38960,7 @@ Room {
 		["south"] = "xingxiu/daliao/shanlu3",
 		["north"] = "xingxiu/daliao/zhongying",
 	},
+	room_relative="南院大营｜山路营门",
 }
 Room {
 	id = "xingxiu/daliao/youtang",
@@ -33993,21 +38989,26 @@ Room {
 Room {
 	id = "xingxiu/fangpan",
 	name = "大方盘城",
+	outdoor = "星宿海",
 	ways = {
 		["east"] = "xingxiu/road4",
 		["west"] = "xingxiu/road5",
 	},
+	room_relative="万里长城---大方盘城---万里长城大方盘城",
 }
 Room {
 	id = "xingxiu/jushi",
 	name = "巨石",
+	outdoor = "星宿海",
 	ways = {
 		["down"] = "xingxiu/xx4",
 	},
+	room_relative="小路--巨石",
 }
 Room {
 	id = "xingxiu/jyg",
 	name = "雁门关",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/jyg_1",
 		["north"] = "xingxiu/xiaowu",
@@ -34017,10 +39018,12 @@ Room {
 	objs = {
           ["侯君集"] = "hou junji",
            },
+	room_relative="天阁斋分店｜星宿小屋-----嘉峪关东城门｜嘉峪关西城门雁门关",
 }
 Room {
 	id = "xingxiu/jyg_1",
 	name = "天阁斋分店",
+	outdoor = "星宿海",
 	no_fight = true,
 	ways = {
 		["north"] = "xingxiu/jyg",
@@ -34028,10 +39031,12 @@ Room {
 	objs = {
           ["黄真"] = "huang zhen",
            },
+	room_relative="雁门关｜天阁斋分店天阁斋分店",
 }
 Room {
 	id = "xingxiu/jyge",
 	name = "嘉峪关东城门",
+	outdoor = "星宿海",
 	ways = {
 		["eastup"] = "xingxiu/road5",
 		["west"] = "xingxiu/jyg",
@@ -34040,11 +39045,12 @@ Room {
 		["eastup"] = "#wipe guan bing",
 		["west"] = "#wipe guan bing",
 	},
-	room_relative="雁门关--嘉峪关东城门→万里长城嘉峪关东城门",
+	
 }
 Room {
 	id = "xingxiu/jygw",
 	name = "嘉峪关西城门",
+	outdoor = "星宿海",
 	ways = {
 		["east"] = "xingxiu/jyg",
 		["west"] = "xingxiu/silk",
@@ -34053,10 +39059,12 @@ Room {
 		["east"] = "#wipe guan bing",
 		["west"] = "#wipe guan bing",
 	},
+	
 }
 Room {
 	id = "xingxiu/mogaoku",
 	name = "莫高窟",
+	outdoor = "星宿海",
 	ways = {
 		["out"] = "xingxiu/silk3c",
 	},
@@ -34065,6 +39073,7 @@ Room {
           ["阿含经"] = "shu",
           ["般若经"] = "shu",
            },
+	room_relative="月牙泉--莫高窟",
 }
 Room {
 	id = "xingxiu/nanjiang",
@@ -34079,47 +39088,56 @@ name = "南疆沙漠",
 Room {
 	id = "xingxiu/road4",
 	name = "万里长城",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "lanzhou/wuwei",
 		["west"] = "xingxiu/fangpan",
 	},
+	room_relative="大方盘城---万里长城↘武威万里长城",
 }
 Room {
 	id = "xingxiu/road5",
 	name = "万里长城",
+	outdoor = "星宿海",
 	ways = {
 		["westdown"] = "xingxiu/jyge",
 		["east"] = "xingxiu/fangpan",
 	},
+	room_relative="嘉峪关东城门→万里长城---大方盘城万里长城",
 }
 Room {
 	id = "xingxiu/rukou",
 	name = "虫谷入口",
+	outdoor = "星宿海",
 	ways = {
 		["southwest"] = "xingxiu/xx1",
 	},
 	objs = {
           ["看守"] = "kan shou",
            },
+	room_relative="虫谷入口↙山前荒地虫谷入口",
 }
 Room {
 	id = "xingxiu/ryd",
 	name = "日月洞",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/ryd1",
 		["north"] = "xingxiu/yaolu",
 	},
 	lengths = {
-		["north"] = "if score.party and score.party=='星宿派' then return 1 else return false end",
+		["north"] = "if score.party and score.party=='星宿海' then return 1 else return false end",
 	},
 	objs = {
           ["丁春秋"] = "ding chunqiu",
           ["摘星子"] = "zhaixing zi",
            },
+  room_relative="药庐｜日月洞｜日月洞口日月洞",
 }
 Room {
 	id = "xingxiu/ryd1",
 	name = "日月洞口",
+	outdoor = "星宿海",
 	ways = {
 		["east"] = "xingxiu/xxh3",
 		["north"] = "xingxiu/ryd",
@@ -34133,10 +39151,12 @@ Room {
           ["老仙颂德牌"] = "board",
           ["黯然子"] = "anran zi",
            },
+   room_relative="日月洞｜星宿海---日月洞口---星宿海↑山前荒地日月洞口",
 }
 Room {
 	id = "xingxiu/shamo",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["w;w;w;w;w;w;w;w;w;w"] = "hj/caoyuan",
 		["e;e;e;e;e;e;e;e;e;e"] = "xingxiu/silk9",
@@ -34158,6 +39178,7 @@ Room {
 Room {
 	id = "xingxiu/shamo1",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo2",
 	},
@@ -34165,6 +39186,7 @@ Room {
 Room {
 	id = "xingxiu/shamo2",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo3",
 	},
@@ -34172,6 +39194,7 @@ Room {
 Room {
 	id = "xingxiu/shamo3",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo4",
 	},
@@ -34179,6 +39202,7 @@ Room {
 Room {
 	id = "xingxiu/shamo4",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo5",
 	},
@@ -34186,6 +39210,7 @@ Room {
 Room {
 	id = "xingxiu/shamo5",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo6",
 	},
@@ -34193,6 +39218,7 @@ Room {
 Room {
 	id = "xingxiu/shamo6",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo7",
 	},
@@ -34200,6 +39226,7 @@ Room {
 Room {
 	id = "xingxiu/shamo7",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo8",
 	},
@@ -34207,6 +39234,7 @@ Room {
 Room {
 	id = "xingxiu/shamo8",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo9",
 	},
@@ -34214,6 +39242,7 @@ Room {
 Room {
 	id = "xingxiu/shamo9",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo10",
 	},
@@ -34221,6 +39250,7 @@ Room {
 Room {
 	id = "xingxiu/shamo10",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo11",
 	},
@@ -34228,6 +39258,7 @@ Room {
 Room {
 	id = "xingxiu/shamo11",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo12",
 	},
@@ -34235,6 +39266,7 @@ Room {
 Room {
 	id = "xingxiu/shamo12",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/shamo13",
 	},
@@ -34242,6 +39274,7 @@ Room {
 Room {
 	id = "xingxiu/shamo13",
 	name = "大沙漠",
+	outdoor = "星宿海",
 	ways = {
 		["w;w;w;w;w;w;w;w;w;w;w"] = "hj/caoyuan",
 		["e;e;e;e;e;e;e;e;e;e;e"] = "xingxiu/silk9",
@@ -34251,6 +39284,7 @@ Room {
 Room {
 	id = "xingxiu/shanjiao",
 	name = "天山脚下",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/silk9",
 		["southwest"] = "hj/senlinn",
@@ -34259,22 +39293,24 @@ Room {
 	},
 	blocks = {
 		["southeast"] = {
-			{id = "xingxiu dizi", exp = 2000, party = "星宿派"},
+			{id = "xingxiu dizi", exp = 2000, party = "星宿海"},
 		},
 		["southwest"] = {
-			{id = "xingxiu dizi", exp = 2000, party = "星宿派"},
+			{id = "xingxiu dizi", exp = 2000, party = "星宿海"},
 		},
 		["east"] = {
-			{id = "xingxiu dizi", exp = 2000, party = "星宿派"},
+			{id = "xingxiu dizi", exp = 2000, party = "星宿海"},
 		},
 		["north"] = {
-			{id = "xingxiu dizi", exp = 2000, party = "星宿派"},
+			{id = "xingxiu dizi", exp = 2000, party = "星宿海"},
 		},
 	},
+	
 }
 Room {
 	id = "xingxiu/shanshi",
 	name = "山石",
+	outdoor = "星宿海",
 	ways = {
 		["eastdown"] = "xingxiu/xx6",
 		["#xingxiushandong"] = "xingxiu/cave",
@@ -34285,10 +39321,12 @@ Room {
 	objs = {
           ["狮吼子"] = "shihou zi",
     },
+	room_relative="山石←海边荒路山石",
 }
 Room {
 	id = "xingxiu/silk",
 	name = "丝绸之路",
+	outdoor = "星宿海",
 	ways = {
 		["southwest"] = "xingxiu/silk1b",
 		["northwest"] = "xingxiu/silk1",
@@ -34299,15 +39337,18 @@ Room {
 Room {
 	id = "xingxiu/silk1",
 	name = "仇池山",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/silk",
 		["southwest"] = "xingxiu/silk1a",
 		["north"] = "xingxiu/silk2",
 	},
+	room_relative="丝绸之路｜仇池山↙↘水帘洞丝绸之路仇池山",
 }
 Room {
 	id = "xingxiu/silk10",
 	name = "丝绸之路",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/silk8",
 		["north"] = "yili/yilih",
@@ -34317,22 +39358,27 @@ Room {
 Room {
 	id = "xingxiu/silk1a",
 	name = "水帘洞",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/silk1b",
 		["northeast"] = "xingxiu/silk1",
 	},
+	room_relative="仇池山↗水帘洞↘仙人崖水帘洞",
 }
 Room {
 	id = "xingxiu/silk1b",
 	name = "仙人崖",
+	outdoor = "星宿海",
 	ways = {
 		["northwest"] = "xingxiu/silk1a",
 		["northeast"] = "xingxiu/silk",
 	},
+	room_relative="水帘洞丝绸之路↖↗仙人崖仙人崖",
 }
 Room {
 	id = "xingxiu/silk2",
 	name = "丝绸之路",
+	outdoor = "星宿海",
 	ways = {
 		["westup"] = "xingxiu/silk3",
 		["south"] = "xingxiu/silk1",
@@ -34342,31 +39388,38 @@ Room {
 Room {
 	id = "xingxiu/silk3",
 	name = "颂摩崖",
+	outdoor = "星宿海",
 	ways = {
 		["eastdown"] = "xingxiu/silk2",
 		["westdown"] = "xingxiu/silk4",
 		["north"] = "xingxiu/silk3a",
 	},
+	room_relative="鸣沙山｜丝绸之路→颂摩崖←丝绸之路颂摩崖",
 }
 Room {
 	id = "xingxiu/silk3a",
 	name = "鸣沙山",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/silk3",
 		["west"] = "xingxiu/silk3b",
 	},
+	room_relative="万象洞----鸣沙山｜颂摩崖鸣沙山",
 }
 Room {
 	id = "xingxiu/silk3b",
 	name = "万象洞",
+	outdoor = "星宿海",
 	ways = {
 		["northwest"] = "xingxiu/silk3c",
 		["east"] = "xingxiu/silk3a",
 	},
+	room_relative="月牙泉↖万象洞----鸣沙山万象洞",
 }
 Room {
 	id = "xingxiu/silk3c",
 	name = "月牙泉",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/silk3b",
 		["west"] = "xingxiu/silk7a",
@@ -34375,10 +39428,12 @@ Room {
 	nolooks = {
 		["enter hole"] = true,
 	},
+	room_relative="人头疙瘩----月牙泉↘万象洞月牙泉",
 }
 Room {
 	id = "xingxiu/silk4",
 	name = "丝绸之路",
+	outdoor = "星宿海",
 	ways = {
 		["eastup"] = "xingxiu/silk3",
 		["northwest"] = "xingxiu/silk5a",
@@ -34389,32 +39444,39 @@ Room {
 Room {
 	id = "xingxiu/silk5",
 	name = "石门",
+	outdoor = "星宿海",
 	ways = {
 		["northup"] = "xingxiu/silk5a",
 		["south"] = "xingxiu/silk5b",
 		["northwest"] = "xingxiu/silk6",
 		["east"] = "xingxiu/silk4",
 	},
+	room_relative="丝绸之路胭脂山↖↑石门-----丝绸之路｜兴隆山石门",
 }
 Room {
 	id = "xingxiu/silk5a",
 	name = "胭脂山",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/silk4",
 		["northwest"] = "xingxiu/silk7a",
 		["southdown"] = "xingxiu/silk5",
 	},
+	room_relative="人头疙瘩↖胭脂山↑↘石门丝绸之路胭脂山",
 }
 Room {
 	id = "xingxiu/silk5b",
 	name = "兴隆山",
+	outdoor = "星宿海",
 	ways = {
 		["north"] = "xingxiu/silk5",
 	},
+	room_relative="石门｜兴隆山兴隆山",
 }
 Room {
 	id = "xingxiu/silk6",
 	name = "丝绸之路",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/silk5",
 		["southwest"] = "group/entry/mjshamo1",
@@ -34425,41 +39487,45 @@ Room {
 Room {
 	id = "xingxiu/silk7",
 	name = "沙洲",
+	outdoor = "星宿海",
 	ways = {
 		["northup"] = "xingxiu/silk7a",
 		["southeast"] = "xingxiu/silk6",
 		["west"] = "xingxiu/silk8",
 	},
+	room_relative="人头疙瘩↑吐谷浑伏俟城-----沙洲↘丝绸之路沙洲",
 }
 Room {
 	id = "xingxiu/silk7a",
 	name = "人头疙瘩",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/silk5a",
 		["east"] = "xingxiu/silk3c",
 		["southdown"] = "xingxiu/silk7",
 	},
+	room_relative="人头疙瘩---月牙泉↑↘沙洲胭脂山人头疙瘩",
 }
 Room {
-        id = "xingxiu/silk8",
-        name = "吐谷浑伏俟城",
-        ways = {
-                ["#eaeac"] = "xingxiu/silk9",
-                ["#eaead"] = "xingxiu/silk10",
-                ["#eaeab"] = "xingxiu/bank",
-                ["#eaea"] = "xingxiu/silk7",
-                --["east"] = "xingxiu/silk7",
-        },
-        --lengths = {
-                --["#eaea"] = 10,
-        --},
-        --nolooks = {
-                --["#eaea"] = true,
-        --},
+	id = "xingxiu/silk8",
+	name = "吐谷浑伏俟城",
+	ways = {
+		["northwest"] = "xingxiu/silk9",
+		["north"] = "xingxiu/silk10",
+		["west"] = "xingxiu/bank",
+		["#eaea"] = "xingxiu/silk7",
+	},
+	lengths = {
+		["#eaea"] = 10,
+	},
+	nolooks = {
+		["#eaea"] = true,
+	},
 }
 Room {
 	id = "xingxiu/silk9",
 	name = "丝绸之路",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/silk8",
 		["northwest"] = "xingxiu/shanjiao",
@@ -34470,39 +39536,48 @@ Room {
 Room {
 	id = "xingxiu/tianshan",
 	name = "天山山路",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "hj/senlinn",
 		["west"] = "tianshan/kongchang",
 	},
+	room_relative="针叶林｜空场天山山路",
 }
 Room {
 	id = "xingxiu/wenquan",
 	name = "清水温泉",
+	outdoor = "星宿海",
 	ways = {
 		["northeast"] = "xingxiu/silk8",
 	},
+	room_relative="吐谷浑伏俟城清水温泉",
 }
 Room {
 	id = "xingxiu/xiaowu",
 	name = "星宿小屋",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/jyg",
 	},
 	objs = {
           ["马光佐"] = "ma guangzuo",
            },
+  room_relative="星宿小屋｜雁门关星宿小屋",
 }
 Room {
 	id = "xingxiu/xiaoyao",
 	name = "逍遥洞",
+	outdoor = "星宿海",
 	no_fight = true,
 	ways = {
 		["out"] = "xingxiu/xx3",
 	},
+	room_relative="石道--逍遥洞",
 }
 Room {
 	id = "xingxiu/xx1",
 	name = "山前荒地",
+	outdoor = "星宿海",
 	ways = {
 		["northup"] = "xingxiu/ryd1",
 		["south"] = "xingxiu/xxh2",
@@ -34512,10 +39587,12 @@ Room {
 	objs = {
           ["飞天子"] = "feitian zi",
            },
+	room_relative="星宿海日月洞口虫谷入口↖↑↗山前荒地｜星宿海山前荒地",
 }
 Room {
 	id = "xingxiu/xx2",
 	name = "星宿海",
+	outdoor = "星宿海",
 	ways = {
 		["southeast"] = "xingxiu/xx1",
 		["enter"] = "xingxiu/cangku",
@@ -34525,14 +39602,19 @@ Room {
 		["enter"] = {
 			{id = "chuchen zi", exp = 200000},
 		},
+	precmds = {
+              ["enter"] = "kill chuchen zi",
+	},
 	},
 	objs = {
           ["出尘子"] = "chuchen zi",
            },
+  
 }
 Room {
 	id = "xingxiu/xx3",
 	name = "石道",
+	outdoor = "星宿海",
 	ways = {
 		["enter"] = "xingxiu/xiaoyao",
 		["east"] = "xingxiu/xx2",
@@ -34540,13 +39622,18 @@ Room {
 	},
 	blocks = {
 		["enter"] = {
-			{id = "caihua zi", exp = 25000, party = "星宿派"},
+			{id = "caihua zi", exp = 25000, party = "星宿海"},
 		},
+	precmds = {
+              ["enter"] = "kill caihua zi",
 	},
+	},
+	
 }
 Room {
 	id = "xingxiu/xx4",
 	name = "小路",
+	outdoor = "星宿海",
 	ways = {
 		["northup"] = "xingxiu/xx5",
 		["south"] = "xingxiu/xxh2",
@@ -34555,27 +39642,33 @@ Room {
 	objs = {
           ["天狼子"] = "tianlang zi",
            },
+	room_relative="山壁↑星宿海-----小路｜星宿海小路",
 }
 Room {
 	id = "xingxiu/xx5",
 	name = "山壁",
+	outdoor = "星宿海",
 	ways = {
 		["southdown"] = "xingxiu/xx4",
 	},
+	room_relative="山壁↑小路山壁",
 }
 Room {
 	id = "xingxiu/xx6",
 	name = "海边荒路",
+	outdoor = "星宿海",
 	ways = {
 		["westup"] = "xingxiu/shanshi",
 		["south"] = "xingxiu/xxh4",
 		["north"] = "xingxiu/xxh3",
 		["east"] = "xingxiu/xxh2",
 	},
+	room_relative="星宿海｜山石←海边荒路---星宿海｜星宿海海边荒路",
 }
 Room {
 	id = "xingxiu/xxh",
 	name = "星宿海",
+	outdoor = "星宿海",
 	ways = {
 		--["southeast"] = "yili/yilih",
 		["south"] = "xingxiu/shanjiao",
@@ -34584,6 +39677,7 @@ Room {
 	objs = {
           ["阿紫"] = "azi",
            },
+	room_relative="星宿海｜星宿海｜↘天山脚下惠远星宿海",
 }
 --[[
 Room {
@@ -34619,6 +39713,7 @@ Room {
 Room {
   id = "xingxiu/xxh1",
   name = "星宿海",
+  outdoor = "星宿海",
   ways = {
     ["east"]  = "xingxiu/xxh2",
   },
@@ -34626,6 +39721,7 @@ Room {
 Room {
   id = "xingxiu/xxh2",
   name = "星宿海",
+  outdoor = "星宿海",
   ways = {
     ["north"] = "xingxiu/xxh3",
   }, 
@@ -34633,6 +39729,7 @@ Room {
 Room {
   id = "xingxiu/xxh3",
   name = "星宿海",
+  outdoor = "星宿海",
   ways = {
     ["west"]  = "xingxiu/xxh4",
   },
@@ -34640,6 +39737,7 @@ Room {
 Room {
   id = "xingxiu/xxh4",
   name = "星宿海",
+  outdoor = "星宿海",
   ways = {
     ["s;s;s;s;s;s;s"] = "xingxiu/xxh",
     ["n;n;n;n;n;n"] = "xingxiu/xx1",
@@ -34656,20 +39754,25 @@ Room {
 Room {
 	id = "xingxiu/yaolu",
 	name = "药庐",
+	outdoor = "星宿海",
 	ways = {
 		["south"] = "xingxiu/ryd",
 	},
+	room_relative="日月洞--药庐",
 }
 Room {
 	id = "yili/house",
 	name = "巴依家院",
+	outdoor = "伊犁城",
 	ways = {
 		["west"] = "yili/yili2",
 	},
+	room_relative="城中心---巴依家院巴依家院",
 }
 Room {
 	id = "yili/kezhan",
 	name = "客栈",
+	outdoor = "伊犁城",
 	ways = {
 		["southeast"] = "yili/yili2",
 		["up"] = "yili/kezhan2",
@@ -34677,10 +39780,15 @@ Room {
 	objs = {
           ["阿拉木罕"] = "alamuhan",
            },
+precmds = {
+		["up"] = "give xiao 5 silver",
+	},
+	room_relative="客栈二楼〓客栈↘城中心客栈",
 }
 Room {
 	id = "yili/kezhan2",
 	name = "客栈二楼",
+	outdoor = "伊犁城",
 	ways = {
 		["down"] = "yili/kezhan",
 	},
@@ -34688,54 +39796,61 @@ Room {
 Room {
 	id = "yili/store",
 	name = "商铺",
+	outdoor = "伊犁城",
 	ways = {
 		["east"] = "yili/yili2",
 	},
 	objs = {
           ["买卖提"] = "maimaiti",
            },
+	room_relative="商铺-----城中心商铺",
 }
 Room {
 	id = "yili/store1",
 	name = "铁铺",
+	outdoor = "伊犁城",
 	ways = {
 		["south"] = "yili/yili2",
 	},
-	objs = {
+	objs = { 
           ["薛烛"] = "xue zhu",
            },
+	room_relative="铁铺｜城中心铁铺",
 }
 Room {
 	id = "yili/yilih",
 	name = "惠远",
+	outdoor = "伊犁城",
 	ways = {
 		["south"] = "xingxiu/silk10",
 		["northwest"] = "xingxiu/xxh",
 		["north"] = "yili/yilihe",
 		["west"] = "xingxiu/shanjiao",
 	},
+	room_relative="星宿海伊犁河↖｜天山脚下-----惠远｜丝绸之路惠远",
 }
 Room {
-        id = "yili/yili1",
-        name = "南城门",
-        ways = {
-                ["#yilicheckwds"] = "yili/yilihe",
-                --["north"] = "yili/yili2",
-                ["#yilicheckwd"] = "yili/yili2",
-        },
-        nolooks = {
-                --["north"] = true,
-                ["#yilicheckwd"] = true,
-        },
-        lengths = {
-                --["north"] = "if MidNight[locl.time] or job.name=='wudang' then return false else return 1 end",
-                --["#yilicheckwd"] = "if job.name=='wudang' then return 5 else return false end",
-                ["#yilicheckwd"] = "if MidNight[locl.time] and job.area~='伊犁城' and job.area~='南城门' then return false else return 2 end",
-        },
+	id = "yili/yili1",
+	name = "南城门",
+	outdoor = "伊犁城",
+	ways = {
+		["#yilicheckwds"] = "yili/yilihe",
+		["#yilicheckwd"] = "yili/yili2",
+	},
+	nolooks = {
+		--["north"] = true,
+		["#yilicheckwd"] = true,
+	},
+	lengths = {
+		--["north"] = "if MidNight[locl.time] then return false else return 1 end",
+		["#yilicheckwd"] = "if MidNight[locl.time] and job.area~='伊犁城' and job.area~='南城门' then return false else return 1 end",
+	},
+	room_relative="城中心｜南城门｜伊犁河南城门",
 }
 Room {
 	id = "yili/yili2",
 	name = "城中心",
+	outdoor = "伊犁城",
 	ways = {
 		["south"] = "yili/yili1",
 		["northwest"] = "yili/kezhan",
@@ -34743,24 +39858,22 @@ Room {
 		["east"] = "yili/house",
 		["west"] = "yili/store",
 	},
-	--nolooks = {
-		--["south"] = true,
-	--},
-	--lengths = {
-		--["south"] = "if MidNight[locl.time] then return false else return 1 end",
-	--},
+	room_relative="客栈铁铺↖｜商铺----城中心----巴依家院｜南城门城中心",
 }
 Room {
 	id = "yili/yilihe",
 	name = "伊犁河",
+	outdoor = "伊犁城",
 	ways = {
 		["south"] = "yili/yilih",
 		["north"] = "yili/yili1",
 	},
+	room_relative="南城门｜伊犁河｜惠远伊犁河",
 }
 Room {
 	id = "xueshan/anshi",
 	name = "暗室",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/fatang2",
 	},
@@ -34768,6 +39881,7 @@ Room {
 Room {
 	id = "xueshan/binglinfeng",
 	name = "冰林峰",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/shanpo",
 	},
@@ -34775,13 +39889,16 @@ Room {
 Room {
 	id = "xueshan/boluomiyuan",
 	name = "波罗蜜院",
+	outdoor = "大雪山",
 	ways = {
 		["west"] = "xueshan/huilang8",
 	},
+	room_relative="遮雨廊---波罗蜜院波罗蜜院",
 }
 Room {
 	id = "xueshan/caishichang",
 	name = "采石场",
+	outdoor = "大雪山",
 	ways = {
 		["eastdown"] = "xueshan/cunluo1",
 		["west"] = "xueshan/tianyunmc",
@@ -34789,10 +39906,12 @@ Room {
 	objs = {
           ["色楞"] = "se leng",
            },
+	room_relative="天云马场----采石场←藏民部落采石场",
 }
 Room {
 	id = "xueshan/caoyuan/caohai1",
 	name = "草海",
+	outdoor = "大草原",
 	ways = {
 		["south"] = "hj/caoyuan2",
 		["west"] = "xueshan/caoyuan/caohain",
@@ -34805,6 +39924,7 @@ Room {
 Room {
 	id = "xueshan/caoyuan/caohain",
 	name = "草海",
+	outdoor = "大草原",
 	ways = {
 		["east"] = "xueshan/caoyuan/caohain",
 		["west"] = "xueshan/caoyuan/zhaozen",
@@ -34822,6 +39942,7 @@ Room {
 Room {
 	id = "xueshan/caoyuan/caohai4",
 	name = "草海",
+	outdoor = "大草原",
 	ways = {
 		["north"] = "xueshan/caoyuan/caohai5",
 		["south"] = "xueshan/caoyuan/zhaozen",
@@ -34834,6 +39955,7 @@ Room {
 Room {
 	id = "xueshan/caoyuan/caohai5",
 	name = "草海",
+	outdoor = "大草原",
 	ways = {
 		["west"] = "xueshan/caoyuan/caohai6",
 		["south"] = "xueshan/caoyuan/zhaozen",
@@ -34846,6 +39968,7 @@ Room {
 Room {
 	id = "xueshan/caoyuan/caohai6",
 	name = "草海",
+	outdoor = "大草原",
 	ways = {
 		["east"] = "xueshan/caoyuan/yingmen",
 		["west"] = "xueshan/caoyuan/zhaozen",
@@ -34858,6 +39981,7 @@ Room {
 Room {
 	id = "xueshan/caoyuan/dazhang",
 	name = "牛皮大帐",
+	outdoor = "大草原",
 	ways = {
 		["south"] = "xueshan/caoyuan/shenfeng",
 	},
@@ -34867,10 +39991,12 @@ Room {
           ["金轮法王"] = "jinlun fawang",
           ["尼摩星"] = "nimo xing",
            },
+	room_relative="牛皮大帐｜神风营牛皮大帐",
 }
 Room {
 	id = "xueshan/caoyuan/jifeng",
 	name = "疾风营",
+	outdoor = "大草原",
 	ways = {
 		["south"] = "xueshan/caoyuan/yingmen",
 		["north"] = "xueshan/caoyuan/shenfeng",
@@ -34878,10 +40004,12 @@ Room {
 	objs = {
           ["哲别"] = "zhe bie",
            },
+  room_relative="神风营｜疾风营｜营门疾风营",
 }
 Room {
 	id = "xueshan/caoyuan/shenfeng",
 	name = "神风营",
+	outdoor = "大草原",
 	ways = {
 		["south"] = "xueshan/caoyuan/jifeng",
 		["north"] = "xueshan/caoyuan/dazhang",
@@ -34889,18 +40017,22 @@ Room {
 	objs = {
           ["者勒米"] = "zhe lemi",
            },
+	room_relative="牛皮大帐｜神风营｜疾风营神风营",
 }
 Room {
 	id = "xueshan/caoyuan/yingmen",
 	name = "营门",
+	outdoor = "大草原",
 	ways = {
 		["south"] = "xueshan/caoyuan/caohai1",
 		["north"] = "xueshan/caoyuan/jifeng",
 	},
+	 room_relative="疾风营｜营门｜草海营门",
 }
 Room {
 	id = "xueshan/caoyuan/zhaozen",
 	name = "沼泽",
+	outdoor = "大草原",
 	ways = {
 		["w;n"] = "xueshan/caoyuan/caohai5",
 	},
@@ -34918,41 +40050,50 @@ Room {
 Room {
 	id = "xueshan/chiyangmen",
 	name = "炽阳门",
+	outdoor = "大雪山",
 	ways = {
 		["enter"] = "xueshan/qingxinshe",
 		["west"] = "xueshan/rimulundian",
 	},
+	room_relative="清心舍∧日木伦殿----炽阳门炽阳门",
 }
 Room {
 	id = "xueshan/chufang",
 	name = "厨房",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/zhaitang",
 	},
+	room_relative="厨房｜斋堂厨房",
 }
 Room {
 	id = "xueshan/cunluo1",
 	name = "藏民部落",
+	outdoor = "大雪山",
 	ways = {
 		["westup"] = "xueshan/caishichang",
 		["north"] = "xueshan/cunluo2",
 		["west"] = "xueshan/muchang3",
 		["east"] = "xueshan/muchang7",
 	},
+	room_relative="藏民村落｜牧场---藏民部落---牧场藏民部落",
 }
 Room {
 	id = "xueshan/cunluo2",
 	name = "藏民村落",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/cunluo1",
 		["north"] = "xueshan/muchang4",
 		["west"] = "xueshan/muchang2",
 		["east"] = "xueshan/muchang6",
 	},
+	room_relative="牧场｜藏民部落-----牧场｜牧场藏民村落",
 }
 Room {
 	id = "xueshan/dachedian",
 	name = "招财大车店",
+	outdoor = "大雪山",
 	ways = {
 		["enter"] = "xueshan/zhengfang",
 		["#xsdachedian"] = "xueshan/jiedao1",
@@ -34968,12 +40109,14 @@ Room {
 	},
 	--Bag[l_name].cnt
 	lengths = {
-		["enter"] = "if Bag['白银'] and Bag['白银'].cnt>5 then return 10 else return false end ",
+		["enter"] = "if Bag['白银'] and Bag['白银'].cnt>5 and job.name=='wudang' and flag.times==2 then return 1 else return false end ",
 	},
+	room_relative="正房∧街道--招财大车店招财大车店",
 }
 Room {
 	id = "xueshan/dadian",
 	name = "礼佛大殿",
+	outdoor = "大雪山",
 	ways = {
 		["eastdown"] = "xueshan/huilang4",
 		["westdown"] = "xueshan/huilang3",
@@ -34982,21 +40125,25 @@ Room {
 	},
 	objs = {
           ["灵智上人"] = "lingzhi shangren",
+	room_relative="却日殿｜遮雨廊→礼佛大殿←遮雨廊↑殿前广场礼佛大殿",
            },
 }
 Room {
 	id = "xueshan/daritang",
 	name = "大日法堂",
+	outdoor = "大雪山",
 	ways = {
 		["west"] = "xueshan/luoweitang",
 	},
 	objs = {
           ["哲布尊巴丹"] = "huo fo",
            },
+	room_relative="洛微堂---大日法堂大日法堂",
 }
 Room {
 	id = "xueshan/fanyinge",
 	name = "梵音阁",
+	outdoor = "大雪山",
 	ways = {
 		["northwest"] = "xueshan/fotang",
 		["east"] = "xueshan/jingtang",
@@ -35012,61 +40159,79 @@ Room {
 	},
 	blocks = {
 		["northwest"] = {
-			{id = "hufa lama", exp = 600000, party = "大轮寺"},
+			{id = "hufa lama", exp = 600000, party = "大雪山"},
 		},
+	precmds = {
+              ["northwest"] = "kill hufa lama",
 	},
+	},
+	
 }
 Room {
 	id = "xueshan/fatang",
 	name = "萨迦法堂",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/fanyinge",
 		["up"] = "xueshan/fatang2",
 	},
 	blocks = {
 		["up"] = {
-			{id = "zayi lama", exp = 30000, party = "大轮寺"},
+			{id = "zayi lama", exp = 30000, party = "大雪山"},
 		},
+	precmds = {
+              ["up"] = "kill zayi lama",
 	},
+	},
+	
 }
 Room {
 	id = "xueshan/fatang2",
 	name = "法堂二楼",
+	outdoor = "大雪山",
 	ways = {
 		["down"] = "xueshan/fatang",
 	},
 	objs = {
           ["鸠摩智"] = "jiumo zhi",
            },
+	room_relative="萨迦法堂--法堂二楼",
 }
 Room {
 	id = "xueshan/fengjiantai",
 	name = "风见台",
+	outdoor = "大雪山",
 	ways = {
 		["northup"] = "xueshan/xuelingquan",
 		["eastdown"] = "xueshan/shanlu4",
 		["west"] = "xueshan/luofenggang",
 	},
+	room_relative="雪灵泉↑落风岗----风见台←入幽口风见台",
 }
 Room {
 	id = "xueshan/fotang",
 	name = "镜庐佛堂",
+	outdoor = "大雪山",
 	ways = {
 		["southeast"] = "xueshan/fanyinge",
 		["west"] = "xueshan/lingtalin",
 	},
+	room_relative="灵塔林---镜庐佛堂↘梵音阁镜庐佛堂",
 }
 Room {
 	id = "xueshan/fozhaomen",
 	name = "佛照门",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/zanpugc",
 		["west"] = "xueshan/xiaolu3",
 	},
+	room_relative="湖边小路----佛照门----赞普广场佛照门",
 }
 Room {
 	id = "xueshan/guangchang",
 	name = "殿前广场",
+	outdoor = "大雪山",
 	ways = {
 		["northup"] = "xueshan/dadian",
 		["west"] = "xueshan/huilang1",
@@ -35082,108 +40247,132 @@ Room {
 	objs = {
           ["黑林钵夫"] = "heilin bofu",
           ["大轮寺辩经板"] = "board",
+	room_relative="礼佛大殿↑遮雨廊---殿前广场---遮雨廊↑大轮寺山门殿前广场",
            },
 }
 Room {
 	id = "xueshan/gulou",
 	name = "鼓楼",
+	outdoor = "大雪山",
 	ways = {
 		["west"] = "xueshan/huilang2",
 	},
+	room_relative="遮雨廊-----鼓楼鼓楼",
 }
 Room {
 	id = "xueshan/houzidong",
 	name = "猴子洞",
+	outdoor = "大雪山",
 	ways = {
 		["southeast"] = "xueshan/jiaopan",
 		["westup"] = "xueshan/shanlu7",
 	},
+	room_relative="雪积古道←猴子洞↘绞盘猴子洞",
 }
 Room {
 	id = "xueshan/huanggong",
 	name = "皇宫",
+	outdoor = "大雪山",
 	ways = {
 		["west"] = "xueshan/zanpugc",
 	},
+	room_relative="赞普广场-----皇宫皇宫",
 }
 Room {
 	id = "xueshan/hubian",
 	name = "湖边",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/xiaolu3",
 	},
+	room_relative="湖边｜湖边小路湖边",
 }
 Room {
 	id = "xueshan/hufazhacang",
 	name = "护法扎仓",
+	outdoor = "大雪山",
 	ways = {
 		["northup"] = "xueshan/fanyinge",
 		["south"] = "xueshan/rimulundian",
 		["east"] = "xueshan/jingjinzhacang",
 		["west"] = "xueshan/kuxiuzhacang",
 	},
+	room_relative="梵音阁↑苦修扎仓---护法扎仓---精进扎仓｜日木伦殿护法扎仓",
 }
 Room {
 	id = "xueshan/huilang1",
 	name = "遮雨廊",
+	outdoor = "大雪山",
 	ways = {
 		["north"] = "xueshan/huilang3",
 		["east"] = "xueshan/guangchang",
 		["west"] = "xueshan/zhonglou",
 	},
+	room_relative="遮雨廊｜钟楼----遮雨廊----殿前广场遮雨廊",
 }
 Room {
 	id = "xueshan/huilang2",
 	name = "遮雨廊",
+	outdoor = "大雪山",
 	ways = {
 		["north"] = "xueshan/huilang4",
 		["east"] = "xueshan/gulou",
 		["west"] = "xueshan/guangchang",
 	},
+	room_relative="遮雨廊｜殿前广场----遮雨廊----鼓楼遮雨廊",
 }
 Room {
 	id = "xueshan/huilang3",
 	name = "遮雨廊",
+	outdoor = "大雪山",
 	ways = {
 		["eastup"] = "xueshan/dadian",
 		["south"] = "xueshan/huilang1",
 		["north"] = "xueshan/huilang5",
 		["west"] = "xueshan/jieyuantang",
 	},
+	room_relative="遮雨廊｜结缘堂----遮雨廊→礼佛大殿｜遮雨廊遮雨廊",
 }
 Room {
 	id = "xueshan/huilang4",
 	name = "遮雨廊",
+	outdoor = "大雪山",
 	ways = {
 		["westup"] = "xueshan/dadian",
 		["south"] = "xueshan/huilang2",
 		["east"] = "xueshan/luoweitang",
 		["north"] = "xueshan/huilang6",
 	},
+	room_relative="遮雨廊｜礼佛大殿←遮雨廊----洛微堂｜遮雨廊遮雨廊",
 }
 Room {
 	id = "xueshan/huilang5",
 	name = "遮雨廊",
+	outdoor = "大雪山",
 	ways = {
 		["eastup"] = "xueshan/queridian",
 		["south"] = "xueshan/huilang3",
 		["north"] = "xueshan/huilang7",
 		["west"] = "xueshan/jishantang",
 	},
+	room_relative="遮雨廊｜积善堂----遮雨廊→却日殿｜遮雨廊遮雨廊",
 }
 Room {
 	id = "xueshan/huilang6",
 	name = "遮雨廊",
+	outdoor = "大雪山",
 	ways = {
 		["westup"] = "xueshan/queridian",
 		["south"] = "xueshan/huilang4",
 		["east"] = "xueshan/yimogong",
 		["north"] = "xueshan/huilang8",
 	},
+	room_relative="遮雨廊｜却日殿←遮雨廊----怡摩宫｜遮雨廊遮雨廊",
 }
 Room {
 	id = "xueshan/huilang7",
 	name = "遮雨廊",
+	outdoor = "大雪山",
 	ways = {
 		["eastup"] = "xueshan/zhudubadian",
 		["south"] = "xueshan/huilang5",
@@ -35191,27 +40380,33 @@ Room {
 	},
 	objs = {
           ["呼巴音"] = "hu bayin",
+	room_relative="御圣殿----遮雨廊→珠都巴殿｜遮雨廊遮雨廊",
            },
 }
 Room {
 	id = "xueshan/huilang8",
 	name = "遮雨廊",
+	outdoor = "大雪山",
 	ways = {
 		["westup"] = "xueshan/zhudubadian",
 		["south"] = "xueshan/huilang6",
 		["east"] = "xueshan/boluomiyuan",
 	},
+ room_relative="珠都巴殿←遮雨廊----波罗蜜院｜遮雨廊遮雨廊",
 }
 Room {
 	id = "xueshan/jiaopan",
 	name = "绞盘",
+	outdoor = "大雪山",
 	ways = {
 		["northwest"] = "xueshan/houzidong",
 	},
+	room_relative="猴子洞↖绞盘绞盘",
 }
 Room {
 	id = "xueshan/jiedao1",
 	name = "街道",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/mingxiamen",
 		["north"] = "xueshan/jiedao2",
@@ -35223,49 +40418,60 @@ Room {
 Room {
 	id = "xueshan/jiedao2",
 	name = "街道",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/jiedao1",
 		["north"] = "xueshan/zanpugc",
 		["east"] = "xueshan/yixianglou",
 		["west"] = "xueshan/zuofang",
 	},
+	room_relative="赞普广场｜吐蕃织造作坊-----街道-----溢香楼｜街道街道",
 }
 Room {
 	id = "xueshan/jiedao3",
 	name = "街道",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/zanpugc",
 		["east"] = "xueshan/wangdali",
 		["north"] = "xueshan/jushuimen",
 		["west"] = "xueshan/laifu",
 	},
+	room_relative="巨水门｜来福杂货-----街道-----王大力记｜赞普广场街道",
 }
 Room {
 	id = "xueshan/jieyuantang",
 	name = "结缘堂",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/huilang3",
 	},
+	room_relative="结缘堂----遮雨廊结缘堂",
 }
 Room {
 	id = "xueshan/jifengying",
 	name = "疾风营",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/yingmen",
 		["north"] = "xueshan/shenfengying",
 	},
+	room_relative="营门｜神风营疾风营",
 }
 Room {
 	id = "xueshan/jingangyuan",
 	name = "金刚院",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/kuxiuzhacang",
 		["east"] = "xueshan/fanyinge",
 	},
+	room_relative="金刚院----梵音阁｜苦修扎仓金刚院",
 }
 Room {
 	id = "xueshan/jingjinzhacang",
 	name = "精进扎仓",
+	outdoor = "大雪山",
 	ways = {
 		["north"] = "xueshan/jingtang",
 		["west"] = "xueshan/hufazhacang",
@@ -35273,55 +40479,69 @@ Room {
 	objs = {
           ["善勇"] = "shan yong",
            },
+	room_relative="大经堂｜护法扎仓---精进扎仓精进扎仓",
 }
 Room {
 	id = "xueshan/jingtang",
 	name = "大经堂",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/jingjinzhacang",
 		["west"] = "xueshan/fanyinge",
 	},
+	room_relative="梵音阁----大经堂｜精进扎仓大经堂",
 }
 Room {
 	id = "xueshan/jishantang",
 	name = "积善堂",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/huilang5",
 	},
+	room_relative="积善堂----遮雨廊积善堂",
 }
 Room {
 	id = "xueshan/jlshan",
 	name = "积雷山",
+	outdoor = "大雪山",
 	ways = {
 		["southdown"] = "xueshan/tianxi",
 	},
+	room_relative="天溪--积雷山",
 }
 Room {
 	id = "xueshan/juechenyuan",
 	name = "绝尘院",
+	outdoor = "大雪山",
 	no_fight = true,
 	ways = {
 		["out"] = "xueshan/yueliangmen",
 	},
+	room_relative="绝尘院∨月亮门绝尘院",
 }
 Room {
 	id = "xueshan/jueding",
 	name = "绝顶",
+	outdoor = "大雪山",
 	ways = {
 		["down"] = "xueshan/shanpo",
 	},
+	room_relative="问天台--绝顶",
 }
 Room {
 	id = "xueshan/jushuimen",
 	name = "巨水门",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/jiedao3",
 		["north"] = "xueshan/tianyunmc",
 	},
+	room_relative="天云马场｜巨水门｜街道巨水门",
 }
 Room {
 	id = "xueshan/kuxiuzhacang",
 	name = "苦修扎仓",
+	outdoor = "大雪山",
 	ways = {
 		["north"] = "xueshan/jingangyuan",
 		["east"] = "xueshan/hufazhacang",
@@ -35329,10 +40549,12 @@ Room {
 	objs = {
           ["胜谛"] = "sheng di",
            },
+	room_relative="金刚院｜苦修扎仓---护法扎仓苦修扎仓",
 }
 Room {
 	id = "xueshan/laifu",
 	name = "来福杂货",
+	outdoor = "大雪山",
 	no_fight = true,
 	ways = {
 		["east"] = "xueshan/jiedao3",
@@ -35340,10 +40562,12 @@ Room {
 	objs = {
           ["江来福"] = "jiang laifu",
            },
+	room_relative="来福杂货---街道来福杂货",
 }
 Room {
 	id = "xueshan/lingtalin",
 	name = "灵塔林",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/fotang",
 		["enter"] = "xueshan/baota1",
@@ -35352,17 +40576,21 @@ Room {
 	nolooks = {
 		["westup"] = true,
 	},
+	room_relative="玲珑舍利塔∧积雪小路←灵塔林----镜庐佛堂灵塔林",
 }
 Room {
 	id = "xueshan/baota1",
 	name = "玲珑舍利塔",
+	outdoor = "大雪山",
 	ways = {
 		["out"] = "xueshan/lingtalin",
 	},
+	room_relative="玲珑舍利塔∨灵塔林玲珑舍利塔",
 }
 Room {
 	id = "xueshan/luofenggang",
 	name = "落风岗",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/fengjiantai",
 		["tiao down"] = "xueshan/xuegu",
@@ -35370,10 +40598,12 @@ Room {
 	nolooks = {
 		["tiao down"] = true,
 	},
+	room_relative="落风岗----风见台落风岗",
 }
 Room {
 	id = "xueshan/luoweitang",
 	name = "洛微堂",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/daritang",
 		["west"] = "xueshan/huilang4",
@@ -35381,25 +40611,31 @@ Room {
 	objs = {
           ["哲罗星"] = "zheluo xing",
            },
+	room_relative="遮雨廊----洛微堂----大日法堂洛微堂",
 }
 Room {
 	id = "xueshan/menghuying",
 	name = "猛虎营",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/jiedao1",
 	},
+	room_relative="猛虎营----街道猛虎营",
 }
 Room {
 	id = "xueshan/mingxiamen",
 	name = "明霞门",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/tulu3",
 		["north"] = "xueshan/jiedao1",
 	},
+	room_relative="街道｜明霞门----藏边土路明霞门",
 }
 Room {
 	id = "xueshan/muchang1",
 	name = "牧场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/muchang2",
 		["east"] = "xueshan/muchang4",
@@ -35409,30 +40645,36 @@ Room {
 	objs = {
           ["藏獒"] = "zang ao",
            },
+	room_relative="牧场｜牧场----牧场｜牧场牧场",
 }
 Room {
 	id = "xueshan/muchang2",
 	name = "牧场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/muchang3",
 		["north"] = "xueshan/muchang1",
 		["west"] = "xueshan/muchang2",
 		["east"] = "xueshan/cunluo2",
 	},
+	room_relative="牧场｜牧场----牧场｜藏民部落牧场",
 }
 Room {
 	id = "xueshan/muchang3",
 	name = "牧场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/muchang3",
 		["north"] = "xueshan/muchang2",
 		["west"] = "xueshan/muchang3",
 		["east"] = "xueshan/cunluo1",
 	},
+	room_relative="牧场｜牧场----牧场｜藏民部落牧场",
 }
 Room {
 	id = "xueshan/muchang4",
 	name = "牧场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/cunluo2",
 		["north"] = "xueshan/muchang4",
@@ -35442,55 +40684,67 @@ Room {
 	objs = {
           ["牦牛"] = "mao niu",
            },
+	room_relative="牧场｜牧场----牧场｜藏民部落牧场",
 }
 Room {
 	id = "xueshan/muchang5",
 	name = "牧场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/muchang6",
 		["north"] = "xueshan/muchang5",
 		["west"] = "xueshan/muchang1",
 		["east"] = "xueshan/muchang5",
 	},
+	room_relative="牧场｜牧场----牧场｜牧场牧场",
 }
 Room {
 	id = "xueshan/muchang6",
 	name = "牧场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/muchang7",
 		["north"] = "xueshan/muchang5",
 		["west"] = "xueshan/cunluo2",
 		["east"] = "xueshan/muchang6",
 	},
+	room_relative="牧场｜牧场----牧场｜藏民部落牧场",
 }
 Room {
 	id = "xueshan/muchang7",
 	name = "牧场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/muchang7",
 		["east"] = "xueshan/muchang7",
 		["north"] = "xueshan/muchang6",
 		["west"] = "xueshan/cunluo1",
 	},
+	room_relative="牧场｜牧场----牧场｜藏民部落牧场",
 }
 Room {
 	id = "xueshan/niupidazhang",
 	name = "牛皮大帐",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/shenfengying",
 	},
+	room_relative="神风营--牛皮大帐",
 }
 Room {
 	id = "xueshan/qingxinshe",
 	name = "清心舍",
+	outdoor = "大雪山",
 	no_fight = true,
 	ways = {
 		["out"] = "xueshan/chiyangmen",
 	},
+	room_relative="清心舍∨炽阳门清心舍",
 }
 Room {
 	id = "xueshan/queridian",
 	name = "却日殿",
+	outdoor = "大雪山",
 	ways = {
 		["eastdown"] = "xueshan/huilang6",
 		["westdown"] = "xueshan/huilang5",
@@ -35500,10 +40754,12 @@ Room {
 	objs = {
           ["摩诃巴思"] = "mohe basi",
            },
+	room_relative="珠都巴殿｜遮雨廊→却日殿←遮雨廊｜礼佛大殿却日殿",
 }
 Room {
 	id = "xueshan/rimulundian",
 	name = "日木伦殿",
+	outdoor = "大雪山",
 	ways = {
 		["southeast"] = "xueshan/zhaitang",
 		["north"] = "xueshan/hufazhacang",
@@ -35513,42 +40769,60 @@ Room {
 	},
 	blocks = {
 		["southeast"] = {
-			{id = "hufa lama", exp = 100000, party = "大轮寺"},
-		},	
-		["east"] = {
-			{id = "hufa lama", exp = 100000, party = "大轮寺"},
+			{id = "hufa lama", exp = 100000, party = "大雪山"},
 		},
+		["east"] = {
+                        {id = "hufa lama", exp = 100000, party = "大雪山"},
+                },
+                ["west"] = {
+                        {id = "hufa lama", exp = 100000, party = "大雪山"},
+                },
+		precmds = {
+              ["southeast"] = "kill hufa lama",
+			  ["east"] = "kill hufa lama",
+			  ["west"] = "kill hufa lama",
 	},
+	},
+	
 }
 Room {
 	id = "xueshan/shanlu1",
 	name = "善禅渡",
+	outdoor = "大雪山",
 	ways = {
 		["northwest"] = "xueshan/shanlu2",
 		["east"] = "xueshan/tianhu",
 	},
+	room_relative="千步岭↖善禅渡----天湖善禅渡",
 }
 Room {
 	id = "xueshan/shanlu2",
 	name = "千步岭",
+	outdoor = "大雪山",
 	ways = {
 		["southeast"] = "xueshan/shanlu1",
 		["westup"] = "xueshan/shanlu3",
-	},
+	
+   },
 	room_relative="千步岭←千步岭↘善禅渡千步岭",
 }
 Room {
 	id = "xueshan/shanlu3",
 	name = "千步岭",
+	outdoor = "大雪山",
 	ways = {
 		["eastdown"] = "xueshan/shanlu2",
 		["westdown"] = "xueshan/shanlu4",
+   },
+   precmds = {
+		["westdown"] = "#walkBusy",
 	},
 	room_relative="入幽口→千步岭←千步岭千步岭",
 }
 Room {
 	id = "xueshan/shanlu4",
 	name = "入幽口",
+	outdoor = "大雪山",
 	ways = {
 		["eastup"] = "xueshan/shanlu3",
 		["westup"] = "xueshan/fengjiantai",
@@ -35560,10 +40834,12 @@ Room {
 	objs = {
           ["宝象"] = "bao xiang",
            },
+	room_relative="风见台←入幽口→千步岭入幽口",
 }
 Room {
 	id = "xueshan/shanlu5",
 	name = "雪积古道",
+	outdoor = "大雪山",
 	ways = {
 		["southeast"] = "xueshan/shanlu6",
 		["southwest"] = "xueshan/xuelingquan",
@@ -35572,27 +40848,33 @@ Room {
           ["雪豹皮"] = "bao pi",
 		  ["雪豹"] = "xue bao",
            },
+	room_relative="雪积古道↙↘雪灵泉雪积古道雪积古道",
 }
 Room {
 	id = "xueshan/shanlu6",
 	name = "雪积古道",
+	outdoor = "大雪山",
 	ways = {
 		["eastup"] = "xueshan/shanlu7",
 		["northwest"] = "xueshan/shanlu5",
 	},
+	room_relative="雪积古道↖雪积古道→雪积古道雪积古道",
 }
 Room {
 	id = "xueshan/shanlu7",
 	name = "雪积古道",
+	outdoor = "大雪山",
 	ways = {
 		["eastdown"] = "xueshan/houzidong",
 		["westdown"] = "xueshan/shanlu6",
 		["northwest"] = "xueshan/shanmen",
 	},
+	room_relative="大轮寺山门↖雪积古道→雪积古道←猴子洞雪积古道",
 }
 Room {
 	id = "xueshan/shanmen",
 	name = "大轮寺山门",
+	outdoor = "大雪山",
 	ways = {
 		["southeast"] = "xueshan/shanlu7",
 		["northup"] = "xueshan/guangchang",
@@ -35603,26 +40885,32 @@ Room {
 	precmds = {
 		["northup"] = "knock gate;#walkBusy",
 	},
+	room_relative="殿前广场↑大轮寺山门↘雪积古道大轮寺山门",
 }
 Room {
 	id = "xueshan/shanpo",
 	name = "问天台",
+	outdoor = "大雪山",
 	ways = {
 		["southdown"] = "xueshan/xuelu3",
 		["east"] = "xueshan/binglinfeng",
 	},
+	room_relative="积雪小路｜冰林峰问天台",
 }
 Room {
 	id = "xueshan/shenfengying",
 	name = "神风营",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/jifengying",
 		["north"] = "xueshan/niupidazhang",
 	},
+	room_relative="疾风营｜牛皮大帐神风营",
 }
 Room {
 	id = "xueshan/tianhu",
 	name = "天湖",
+	outdoor = "大雪山",
 	ways = {
 		["southwest"] = "xueshan/xiaolu1",
 		["south"] = "xueshan/xiaodian",
@@ -35633,51 +40921,63 @@ Room {
           ["支麻鸭"] = "zhima ya",
           ["斑头雁"] = "bantou yan",
            },
+	room_relative="天溪｜善禅渡-----天湖↙｜湖边小路湖边小店天湖",
 }
 Room {
 	id = "xueshan/tianxi",
 	name = "天溪",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/tianhu",
 	},
+	room_relative="天溪｜天湖天溪",
 }
 Room {
 	id = "xueshan/tianyunmc",
 	name = "天云马场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/jushuimen",
 		["east"] = "xueshan/caishichang",
 	},
+	room_relative="天云马场---采石场｜巨水门天云马场",
 }
 Room {
 	id = "xueshan/tulu1",
 	name = "川西土路",
+	outdoor = "大雪山",
 	ways = {
 		["southwest"] = "group/entry/xstulu2",
 		["east"] = "chengdu/wroad2",
 	},
+	room_relative="川西土路---大道↙藏边土路川西土路",
 }
 Room {
 	id = "xueshan/tulu3",
 	name = "藏边土路",
+	outdoor = "大雪山",
 	ways = {
 		["northeast"] = "group/entry/xstulu2",
 		["west"] = "xueshan/mingxiamen",
 	},
+	room_relative="藏边土路↗明霞门---藏边土路藏边土路",
 }
 Room {
 	id = "xueshan/wangdali",
 	name = "王大力记",
+	outdoor = "大雪山",
 	ways = {
 		["west"] = "xueshan/jiedao3",
 	},
 	objs = {
           ["王三力"] = "wang sanli",
            },
+	room_relative="街道---王大力记王大力记",
 }
 Room {
 	id = "xueshan/xiaodian",
 	name = "湖边小店",
+	outdoor = "大雪山",
 	ways = {
 		["north"] = "xueshan/tianhu",
 	},
@@ -35688,18 +40988,22 @@ Room {
           ["四丑"] = "si chou",
           ["五丑"] = "wu chou",
            },
+	room_relative="天湖｜湖边小店湖边小店",
 }
 Room {
 	id = "xueshan/xiaolu1",
 	name = "湖边小路",
+	outdoor = "大雪山",
 	ways = {
 		["southeast"] = "group/entry/xsxiao2",
 		["northeast"] = "xueshan/tianhu",
 	},
+	room_relative="天湖↗湖边小路↘湖边小路湖边小路",
 }
 Room {
 	id = "xueshan/xiaolu3",
 	name = "湖边小路",
+	outdoor = "大雪山",
 	ways = {
 		["north"] = "xueshan/hubian",
 		["east"] = "xueshan/fozhaomen",
@@ -35710,6 +41014,7 @@ Room {
 Room {
 	id = "xueshan/xiekemen",
 	name = "谢客亭",
+	outdoor = "大雪山",
 	ways = {
 		["southup"] = "xueshan/zhudubadian",
 		["enter"] = "xueshan/rimulundian",
@@ -35722,16 +41027,21 @@ Room {
 	},
 	blocks = {
 		["enter"] = {
-			{id = "hufa lama", exp = 100000, party = "大轮寺"},
+			{id = "hufa lama", exp = 100000, party = "大雪山"},
 		},
+	precmds = {
+              ["enter"] = "kill hufa lama",
+	},
 	},
 	objs = {
           ["桑结"] = "sang jie",
            },
+	
 }
 Room {
 	id = "xueshan/xuegu",
 	name = "雪谷",
+	outdoor = "大雪山",
 	ways = {
 		["eastdown"] = "xueshan/shanlu2",
 		["tiao down;#walkBusy"] = "xueshan/xuegu2",
@@ -35743,10 +41053,12 @@ Room {
 	objs = {
           ["血刀老祖"] = "xuedao laozu",
            },
+	room_relative="千步岭｜岩石雪谷",
 }
 Room {
 	id = "xueshan/xuegu2",
 	name = "岩石",
+	outdoor = "大雪山",
 	ways = {
 		["ask di yun about 离开;jump up;#walkBusy"] = "xueshan/xuegu",
 		--["#xsMianbi;askk di yun about 离开;jump up;#walkBusy"] = "xueshan/xuegu",
@@ -35762,122 +41074,153 @@ Room {
 Room {
 	id = "xueshan/xuelingquan",
 	name = "雪灵泉",
+	outdoor = "大雪山",
 	ways = {
 		["northeast"] = "xueshan/shanlu5",
 		["southdown"] = "xueshan/fengjiantai",
 		["tiao quanshui"] = "xueshan/quanshui",
 	},
+	room_relative="雪积古道↗雪灵泉↑风见台雪灵泉",
 }
 Room {
 	id = "xueshan/quanshui",
 	name = "泉水中",
+	outdoor = "大雪山",
 	ways = {
 		["tiao out"] = "xueshan/xuelingquan",
 	},
+	room_relative="雪灵泉--泉水中",
 }
 Room {
 	id = "xueshan/xuelu1",
 	name = "积雪小路",
+	outdoor = "大雪山",
 	ways = {
 		["northup"] = "xueshan/xuelu2",
 		["eastdown"] = "xueshan/lingtalin",
 	},
+	room_relative="积雪小路｜灵塔林积雪小路",
 }
 Room {
 	id = "xueshan/xuelu2",
 	name = "积雪小路",
+	outdoor = "大雪山",
 	ways = {
 		["southdown"] = "xueshan/xuelu1",
 		["westup"] = "xueshan/xuelu3",
 	},
+	room_relative="积雪小路｜积雪小路积雪小路",
 }
 Room {
 	id = "xueshan/xuelu3",
 	name = "积雪小路",
+	outdoor = "大雪山",
 	ways = {
 		["eastdown"] = "xueshan/xuelu2",
 		["northup"] = "xueshan/shanpo",
 	},
+	room_relative="积雪小路｜问天台积雪小路",
 }
 Room {
 	id = "xueshan/yimogong",
 	name = "怡摩宫",
+	outdoor = "大雪山",
 	ways = {
 		["west"] = "xueshan/huilang6",
 	},
 	objs = {
           ["波罗星"] = "boluo xing",
            },
+	room_relative="遮雨廊----怡摩宫怡摩宫",
 }
 Room {
 	id = "xueshan/yingmen",
 	name = "营门",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/caohai1",
 		["north"] = "xueshan/jifengying",
 	},
+	
 }
 Room {
 	id = "xueshan/yixianglou",
 	name = "溢香楼",
+	outdoor = "大雪山",
 	ways = {
 		["west"] = "xueshan/jiedao2",
 	},
 	objs = {
           ["胡贵"] = "hu gui",
            },
+	room_relative="街道----溢香楼溢香楼",
 }
 Room {
 	id = "xueshan/yueliangmen",
 	name = "月亮门",
+	outdoor = "大雪山",
 	ways = {
 		["enter"] = "xueshan/juechenyuan",
 		["east"] = "xueshan/rimulundian",
 	},
+	room_relative="绝尘院∧月亮门----日木伦殿月亮门",
 }
 Room {
 	id = "xueshan/yushengdian",
 	name = "御圣殿",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/huilang7",
 	},
+	room_relative="御圣殿----遮雨廊御圣殿",
 }
 Room {
 	id = "xueshan/zanpugc",
 	name = "赞普广场",
+	outdoor = "大雪山",
 	ways = {
 		["south"] = "xueshan/jiedao2",
 		["north"] = "xueshan/jiedao3",
 		["east"] = "xueshan/huanggong",
 		["west"] = "xueshan/fozhaomen",
 	},
+	room_relative="街道｜佛照门---赞普广场---皇宫｜街道赞普广场",
 }
 Room {
 	id = "xueshan/zhaitang",
 	name = "斋堂",
+	outdoor = "大雪山",
 	ways = {
+	    ["drop cha;northwest"] = "xueshan/rimulundian",
+		["drop cha;north"] = "xueshan/chufang",
 		["northwest"] = "xueshan/rimulundian",
 		["north"] = "xueshan/chufang",
 	},
+	room_relative="日木伦殿厨房↖｜斋堂斋堂",
 }
 Room {
 	id = "xueshan/zhengfang",
 	name = "正房",
+	outdoor = "大雪山",
 	no_fight = true,
 	ways = {
 		["out"] = "xueshan/dachedian",
 	},
+	room_relative="招财大车店--正房",
 }
 Room {
 	id = "xueshan/zhonglou",
 	name = "钟楼",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/huilang1",
 	},
+	room_relative="钟楼-----遮雨廊钟楼",
 }
 Room {
 	id = "xueshan/zhudubadian",
 	name = "珠都巴殿",
+	outdoor = "大雪山",
 	ways = {
 		["eastdown"] = "xueshan/huilang8",
 		["westdown"] = "xueshan/huilang7",
@@ -35886,14 +41229,17 @@ Room {
 	},
 	objs = {
           ["温卧儿"] = "wenwo er",
+	room_relative="谢客亭↓遮雨廊→珠都巴殿←遮雨廊｜却日殿珠都巴殿",
            },
 }
 Room {
 	id = "xueshan/zuofang",
 	name = "吐蕃织造作坊",
+	outdoor = "大雪山",
 	ways = {
 		["east"] = "xueshan/jiedao2",
 	},
+	room_relative="吐蕃织造作坊--街道吐蕃织造作坊",
 }
 Room {
 	id = "zhiye/biaoju1",
@@ -35902,6 +41248,7 @@ Room {
 	ways = {
 		["south"] = "city/dongmen",
 	},
+	room_relative="不知道哪里龙门镖局 不知道哪里 龙门镖局",
 }
 Room {
 	id = "zhiye/bingqipu1",
@@ -35915,6 +41262,7 @@ Room {
           ["火炉"] = "huo lu",
           ["韩铁匠"] = "han tiejiang",
            },
+	room_relative="不知道哪里兵器铺 不知道哪里 兵器铺",
 }
 Room {
 	id = "zhiye/caifengpu1",
@@ -35927,6 +41275,7 @@ Room {
 	objs = {
           ["裁缝桌"] = "caifeng zhuo",
      },
+	 room_relative="不知道哪里裁缝铺 不知道哪里 裁缝铺",
 }
 Room {
 	id = "zhiye/caikuang-chang0",
@@ -36010,6 +41359,7 @@ Room {
 	ways = {
 		["south"] = "city/dongdajie0",
 	},
+	room_relative="不知道哪里打铁铺 不知道哪里 打铁铺",
 }
 Room {
 	id = "zhiye/gaoshan0",
@@ -36055,6 +41405,7 @@ Room {
 	objs = {
           ["经验交流版"] = "board",
            },
+	room_relative="不知道哪里陈列室 不知道哪里 陈列室",
 }
 Room {
 	id = "zhiye/jimaidian1",
@@ -36064,6 +41415,7 @@ Room {
 		["north"] = "city/dongdajie1",
 		["west"] = "zhiye/jiaoliushi1",
 	},
+	room_relative="不知道哪里寄卖店 不知道哪里 寄卖店",
 }
 Room {
 	id = "zhiye/nongtian0",
@@ -36201,6 +41553,7 @@ Room {
 	ways = {
 		["west"] = "chengdu/beidajie2",
 	},
+	room_relative="不知道哪里制药作坊 不知道哪里 制药作坊",
 }
 Room {
 	id = "zhiye/yaodian1",
@@ -36210,6 +41563,7 @@ Room {
 	ways = {
 		["east"] = "chengdu/beidajie2",
 	},
+	room_relative="不知道哪里药店 不知道哪里 药店",
 }
 Room {
 	id = "zhiye/zhibufang1",
@@ -36219,4 +41573,74 @@ Room {
 	ways = {
 		["west"] = "changan/northjie2",
 	},
+	room_relative="不知道哪里织布坊 不知道哪里 织布坊",
 }	
+------------绝情谷石窟-------------
+Room {
+id = "gumu/jqg/shiyao",
+name = "石窟",
+ways = {
+["east"] = "gumu/jqg/cave3",
+["#shikuout"] = "gumu/jqg/shanlu6",
+},
+}
+
+Room {
+id = "gumu/jqg/shiyao1",
+name = "石壁",
+ways = {
+["pa down"] = "gumu/jqg/shiyao",
+},
+}
+Room {
+    id = "gumu/jqg/cave3",
+    name = "隧洞",
+    ways =
+    {
+        ["west"] = "gumu/jqg/shiyao",
+    },
+}
+Room {
+id = "gumu/jqg/danfang",
+name = "丹房",
+ways = {
+["south"] = "gumu/jqg/lang2",
+["#shikuyin"] = "gumu/jqg/cave3",
+},
+nolooks = {
+["#shikuyin"] = true,
+},
+lengths = {
+["#shikuyin"] = 1000,
+ },
+}
+Room {
+id = "gumu/jqg/eyutan",
+name = "鳄鱼潭",
+ways = {
+["#shikuyin3"] = "gumu/jqg/eyutan2",
+   },
+   blocks = {
+		["gumu/jqg/eyutan2"] = {
+			{id = "e yu", exp = 10000},
+			
+			},
+			},
+}
+
+Room {
+id = "gumu/jqg/eyutan2",
+name = "洞口",
+ways = {
+["zuan dong"] = "gumu/jqg/eyutan3",
+},
+
+}
+
+Room {
+id = "gumu/jqg/eyutan3",
+name = "山洞",
+ways = {
+["pa down"] = "gumu/jqg/cave3",
+},
+}

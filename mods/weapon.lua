@@ -202,7 +202,13 @@ function bqcheck()
     end
 end
 weaponWWalk = function()
-    weapon_wield()
+    -- weapon_wield()
+    local leweapon = GetVariable("learnweapon")
+    if leweapon then
+        exe('wield ' .. leweapon)
+    else
+        weapon_wield()
+    end
     return walk_wait()
 end
 weapon_unwield = function()

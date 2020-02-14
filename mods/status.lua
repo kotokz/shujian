@@ -139,7 +139,9 @@ end
 hp_exp_check = function(n, l, w)
     hp.water = tonumber(w[1])
     hp.exp = tonumber(del_string(tostring(w[2]), ','))
-    draw_statuswindow()
+    if draw_statuswindow ~=nil then
+        draw_statuswindow()
+    end
 end
 hp_dazuo_check = function(n, l, w)
     hp.dazuo = trans(w[1])
@@ -602,7 +604,9 @@ end
 function lingwu_go()
     exe('nick 少林领悟达摩院后殿')
     messageShow('去少林领悟')
-    draw_statuswindow()
+    if draw_statuswindow ~=nil then
+        draw_statuswindow()
+    end
     jifaAll()
     go(lingwu_unwield, '嵩山少林', '达摩院')
 end
@@ -776,7 +780,9 @@ end
 function xuexi()
     exe('nick 回门派学习')
     messageShow('回门派学习')
-    draw_statuswindow()
+    if draw_statuswindow ~=nil then
+        draw_statuswindow()
+    end
     master = {}
 
     if hp.exp < 150000 then

@@ -2789,7 +2789,9 @@ function check_food()
     exe('nick 去武当吃喝;remove all;wear all')
     exe('hp;unset no_kill_ap;yield no')
     score.zt = '去武当吃喝'
-    draw_statuswindow()
+    if draw_statuswindow ~=nil then
+        draw_statuswindow()
+    end
     wait.make(function()
         wait_busy()
         if (hp.food < 60 or hp.water < 60) and hp.exp < 500000 then

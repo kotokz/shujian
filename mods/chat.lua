@@ -145,7 +145,7 @@ function chats_log(logs, color, bcolor)
     if score.id then
         logs = '¡¾' .. score.id .. '¡¿' .. logs
         score.zt = logs
-        draw_statuswindow()
+        if draw_statuswindow ~= nil then draw_statuswindow() end
     end
 
     if flag.log and flag.log == "yes" then

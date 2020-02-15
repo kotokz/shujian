@@ -214,15 +214,7 @@ weapon_unwield = function()
             end
         end
     end
-    -- ain
-    -- exe('uweapon shape zhanlu sword')
     exe('unwield lianyu')
-    -- exe('unwield dagger')
-    -- exe('unwield whip')
-    -- exe('unwield xiao')
-    -- exe('unwield ansha bishou')
-    -- exe('unwield shizi')
-    -- exe('unwield coin')
     exe('unwield mu jian')
     exe('unwield wuji xiao')
     checkWield()
@@ -266,7 +258,7 @@ weaponUcheck = function()
                 if string.find(l, '没有什么损坏') then
                     weaponUsave[p] = true
                 else
-                    weaponUsave[p] = 'repair'
+                    weaponUsave[p] = false
                 end
 
             end
@@ -278,8 +270,7 @@ end
 weaponUdone = function()
     EnableTriggerGroup("weapon", false)
     for p in pairs(weaponUsave) do
-        if weaponUsave[p] and type(weaponUsave[p]) == "string" and
-            weaponUsave[p] == 'repair' then
+        if weaponUsave[p] == false then
             dis_all()
             DiscardQueue()
             return weaponRepair(p)
@@ -351,7 +342,8 @@ weaponRepairBuy = function()
 end
 weaponRepairItem = function()
     if cntr1() > 0 and not Bag["铁锤"] then return weaponRepairBuy() end
-    if not Bag["铁锤"] then return weaponRepairGoCun() end
+    -- if not Bag["铁锤"] then return weaponRepairGoCun() end
+    if not Bag["铁锤"] then messageShow('没有找到铁匠师傅') end
     return weaponRepairGo()
 end
 weaponRepairGo =
@@ -370,19 +362,17 @@ weaponRepairDo = function()
         weapon_unwield()
         ungeta()
         bqxl = bqxl + 1
-        exe(
-            'unwield zhanlu;unwield mu jian;unwield taiji sword;unwield qiankun sword;unwield qiankun xiao')
         exe('wield tie chui')
         local cannotRepair = false
         local l, w = nil
         for p in pairs(weaponUsave) do
-            if weaponUsave[p] and type(weaponUsave[p]) == "string" and
-                weaponUsave[p] == 'repair' and Bag[p] then
+            if weaponUsave[p] == false and Bag[p] then
                 repeat
                     exe('uweapon shape ' .. Bag[p].fullid)
                     exe('repair ' .. Bag[p].fullid)
                     l, w = wait.regexp(
-                               '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！)',1)
+                               '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！)',
+                               2)
                 until l ~= nil
                 if l:find('恢复了它的原貌') or l:find('无需修理') then
                     weaponUsave[p] = true
@@ -390,6 +380,7 @@ weaponRepairDo = function()
                     cannotRepair = true
                     break
                 end
+                l = nil
             end
         end
         if cannotRepair then

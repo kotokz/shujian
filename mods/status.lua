@@ -640,11 +640,7 @@ end
 function lingwu_goon()
     if locl.room ~= "达摩院后殿" then return lingwu_finish() end
     EnableTriggerGroup("lingwu", true)
-    -- local skill = skillsLingwu[tmp.lingwu]
-
-    -- if not skills[skill] or skills[skill].lvl == 0 or skills[skill].lvl >=
-    --     hp.pot_max - 100 then return lingwu_next() end
-
+    
     if hp.neili < 1000 then
         if hp.exp > 20000000 or score.gender == '无' then
             exe('eat ' .. drug.neili)
@@ -654,15 +650,6 @@ function lingwu_goon()
         end
     end
     flag.idle = nil
-    -- wait.make(function()
-    --     exe('#10(lingwu ' .. skill .. ')')
-    --     if tmp.stop then
-    --        return lingwu_finish()
-    --     else
-    --        exe('yun jing')
-    --     end
-    -- end)
-
     local skill_max =  hp.pot_max - 100
     wait.make(function()    
         for i,skill in pairs(skillsLingwu) do

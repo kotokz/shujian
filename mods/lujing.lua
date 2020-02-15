@@ -4841,8 +4841,8 @@ function locateroom(where)
    return false
 end
 bohuacong=function()
-    exe('opendoor;tell mentonga 开门;tell mentongb 开门')
-     return bohuacong11()
+    exe('tell zhou 开门;whisper startd 开门')
+    return bohuacong11()
 end
 bohuacong11=function()
     wait.make(function() 

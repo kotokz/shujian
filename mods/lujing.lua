@@ -460,6 +460,17 @@ function goto(where)
 
 end
 
+function await_go(area, room, sId) 
+    local self = coroutine.running()
+    local async_continue = function(...)       
+        print("async resume")
+        coroutine.resume(self, ...)
+    end
+    go(async_continue,area,room,sId)
+    print("async yield")
+    return coroutine.yield()
+end
+
 function go(job,area,room,sId)
 	--map.rooms["sld/lgxroom"].ways["#outSld"]="huanghe/huanghe8"
 	flag.search=0

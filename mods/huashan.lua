@@ -142,7 +142,12 @@ function huashan_start()
     DeleteTriggerGroup("huashan_over")
     DeleteTriggerGroup("huashan_find")
     flag.idle = nil
-    return go(hsaskjob, '华山', '正气堂')
+
+    wait.make(function()
+        await_go('华山', '正气堂')
+        return hsaskjob()
+    end)
+    -- return go(hsaskjob, '华山', '正气堂')
 end
 function hsaskjob()
     if newbie == 1 then

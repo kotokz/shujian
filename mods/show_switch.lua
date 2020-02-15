@@ -1,4 +1,57 @@
 require "movewindow"  -- load the movewindow.lua module
+misc_skills={
+	['buddhism']=true,
+	['taoism']=true,
+	['qimen-bagua']=true,
+	['literate']=true,
+	['trade']=true,
+	['medicine']=true,
+	['liumai-shenjian']=true,
+	['poison']=true,
+	['beauty']=true,
+	['zhengqi-jue']=true,
+	['flute']=true,
+	['art']=true,
+	['begging']=true,
+	['checking']=true,
+	['stealing']=true,
+	['duanzao']=true,
+	['bangjue']=true,
+	['huanxi-chan']=true,
+	['betting']=true,
+	['dacheng-fofa']=true,
+	['daode-jing']=true,
+	['murong-xinfa']=true,
+	['shenlong-yaoli']=true,
+	['zhengqi-jue']=true,
+}
+basic_skills={
+	['force']=true,
+	['finger']=true,
+	['parry']=true,
+	['dodge']=true,
+	['strike']=true,
+	['blade']=true,
+	['cuff']=true,
+	['claw']=true,
+	['hand']=true,
+	['leg']=true,
+	['whip']=true,
+	['club']=true,
+	['sword']=true,
+	['hammer']=true,
+	['dagger']=true,
+	['brush']=true,
+	['throwing']=true,
+	['staff']=true,
+	['hook']=true,
+	['axe']=true,
+	['spear']=true,
+	['stick']=true,
+	['unarmed']=true,
+}
+	
+	
 
 
 function button_smyteam()
@@ -813,7 +866,21 @@ function show_skills(n,l,w)
   end)
 end
 function draw_skillswindow()
-   if not flag_win_skills or flag_win_skills~=1 then
+	local sfi = GetInfo (67) .. "plugs\\wj.ini"
+    
+	local sfo = io.open(sfi,"w")
+
+	if sfo then
+		sfo:close()
+		draw_skillswindow_savetofile()
+	else
+		draw_skillswindow_to_mini()
+	end
+
+end
+
+function draw_skillswindow_to_mini()
+    if not flag_win_skills or flag_win_skills~=1 then
        if win_skills then
           WindowShow (win_skills, false)
        end
@@ -822,45 +889,467 @@ function draw_skillswindow()
     if not skills then
        return
     end
-    local _basic ={}
+    local _basic={}--local _basic ={}
 	local _skills_ch = {}
-    local _skills_lev = {}
+	local _skills_lev = {}
 	local _skills_pot = {}
-    for k,v in pairs(skills) do
-     table.insert(_basic,k)
-    end
-    for i=1,#_basic do
-    	table.insert(_skills_ch,skills[_basic[i]]["name"])
-		table.insert(_skills_lev,skills[_basic[i]]["lvl"])
-		table.insert(_skills_pot,skills[_basic[i]]["pot"])
-    end
-   local sfi = GetInfo (67) .. "plugs\\wj.ini"
-    
- local sfo = io.open(sfi,"w")
-    for i = 1,#_basic do
-	    if _skills_ch[i] == "" or _skills_ch[i] == nil then
-	        _skills_ch[i] = "数据丢失" 
-	    end
-	    if _basic[i] == "" or _basic[i] == nil then
-	        _basic[i] = "数据丢失"
-	    end
-	    if _skills_lev[i] == "" or _skills_lev[i] == nil then
- 	        _skills_lev[i] = "数据丢失"
-	    end
-	    if _skills_pot[i] == "" or _skills_pot[i] == nil then
- 	        _skills_pot[i] = "数据丢失"
-	    end
-		
-          sfo:write(_skills_ch[i].."@".._skills_lev[i].."|")
-	  
+--[[	for k,v in pairs (skills) do--modman 原来是skills，现在分类插入
+		if misc_skills[k] then
+			table.insert(_basic,k)
+		end
 	end
-	sfo:close()
+	for k,v in pairs (skills) do--modman 原来是skills，现在分类插入
+		if basic_skills[k] then
+			table.insert(_basic,k)
+		end
+	end
+	for k,v in pairs (skills) do--modman 原来是skills，现在分类插入
+		if not misc_skills[k] and not basic_skills[k] then
+			table.insert(_basic,k)
+		end
+	end]]
+	my_misc_skills={}--modman 将skills分类成三种
+	my_basic_skills={}
+	my_special_skills={}
+   for k,v in pairs(skills) do --modman增加分组
+	if not misc_skills[k] and not basic_skills[k] then
+		table.insert(my_special_skills,v)	
+	elseif basic_skills[k] then 
+		table.insert(my_basic_skills,v)
+	elseif misc_skills[k] then 
+		table.insert(my_misc_skills,v)		
+	end
+   end
+    for k,v in pairs (my_misc_skills) do--modman 原来是skills，现在分类插入
+     table.insert(_basic,v)
+    end
+    for k,v in pairs (my_basic_skills) do
+     table.insert(_basic,v)
+    end
+    for k,v in pairs (my_special_skills) do
+     table.insert(_basic,v)
+    end--]]
+    for i=1,#_basic do
+	    --table.insert(_skills_ch,skills[_basic[i]]["name"])
+	    --table.insert(_skills_lev,skills[_basic[i]]["lvl"])
+	    --table.insert(_skills_pot,skills[_basic[i]]["pot"])
+	table.insert(_skills_ch,_basic[i]["name"])
+	table.insert(_skills_lev,_basic[i]["lvl"])
+	table.insert(_skills_pot,_basic[i]["pot"])
+    end
+    WINDOW_WIDTH = 190
+	if win_skills_show == 0 then
+		WINDOW_HEIGHT = 30
+		WINDOW_WIDTH = 70
+	else
+		WINDOW_HEIGHT = (#_basic + 1)*15+40
+		WINDOW_WIDTH = 200
+	end
+    -- Create the window
+--	WindowCreate (win_skills, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_POSITION, 4, 0x000010)  -- create window
+  WindowCreate (win_skills, 
+                windowinfo_skills.window_left, 
+                windowinfo_skills.window_top, 
+                WINDOW_WIDTH,    
+                WINDOW_HEIGHT,  
+                windowinfo_skills.window_mode, 
+                windowinfo_skills.window_flags,
+                0x000010)
+    -- define the fonts
+	WindowFont (win_skills, "f1", FONT_NAME1, FONT_SIZE_12)
+	WindowFont (win_skills, "f2", FONT_NAME2, FONT_SIZE_11)
+	WindowFont (win_skills, "f3", FONT_NAME1, FONT_SIZE_12, true)
+	WindowFont (win_skills, "f4", FONT_NAME3, FONT_SIZE_11, true)
+	WindowFont (win_skills, "f5", FONT_NAME1, FONT_SIZE_11)
 
-end 
+    -- work out how high the font is
+	font_height = WindowFontInfo (win_skills, "f1", 1)   -- height of the font  
+
+  movewindow.save_state (win_skills)          
+
+    -- draw the border of the whole box
+	WindowCircleOp (win_skills, miniwin.circle_round_rectangle, 0, 2, WINDOW_WIDTH-2, WINDOW_HEIGHT, 0xc0c0c0, 0, 1,0, 0, 9, 9) 
+    -- ensure window visible
+    local head_width   = (WINDOW_WIDTH - WindowTextWidth (win_skills, "f1", "技能列表"))/2
+	local head_width1  = (WindowTextWidth (win_skills, "f1", "━")) + 11
+	local head_width2  = (WindowTextWidth (win_skills, "f1", "━　　领悟中━")) + 11
+	if win_skills_show == 0 then
+	WindowAddHotspot(win_skills, "skills",  
+					0, 0, 0, 0, 
+					"", -- mouseover (do nothing)
+					"", -- cancelmouseover (do nothing)
+					"", -- mousedown
+					"", -- cancelmousedown (do nothing)
+					"mouseup", -- mouseup (do nothing)
+					"点击关闭开启",    -- hint text if they hover over it              
+					0, 0)
+
+		WindowText (win_skills, "f5", 
+					"技能列表",   -- text
+					5, 9, 0, 0,        -- rectangle
+					ColourNameToRGB ("yellow"), -- colour
+					false)              -- not Unicode
+	else
+	WindowLine (win_skills, 0, font_height + 15,WINDOW_WIDTH-2,font_height + 15,0xc0c0c0, 0,1)
+	movewindow.add_drag_handler (win_skills, 0, 0, 0, font_height + 15, miniwin.cursor_hand)
+	WindowAddHotspot(win_skills, "skills",  
+					0, font_height + 15, 0, 0, 
+					"", -- mouseover (do nothing)
+					"", -- cancelmouseover (do nothing)
+					"", -- mousedown
+					"", -- cancelmousedown (do nothing)
+					"mouseup", -- mouseup (do nothing)
+					"点击关闭开启",    -- hint text if they hover over it              
+					0, 0)
+
+		WindowText (win_skills, "f5", 
+					"技能列表",   -- text
+					head_width, 9, 0, 0,        -- rectangle
+					ColourNameToRGB ("yellow"), -- colour
+					false)              -- not Unicode
+
+	WindowText (win_skills, "f1", 
+				"共"..#_basic.."种技能  当前人物等级："..hp.pot_max-100,   -- text
+					11, 30, 0, 0,        -- rectangle
+					ColourNameToRGB ("white"), -- colour
+					false)              -- not Unicode
+	--[[ WindowText (win_skills, "f1", 
+				"红色",   -- text
+					head_width1, 30, 0, 0,        -- rectangle
+					ColourNameToRGB ("red"), -- colour
+					false)              -- not Unicode
+
+	WindowText (win_skills, "f1", 
+				"青绿",   -- text
+					head_width2, 30, 0, 0,        -- rectangle
+					ColourNameToRGB ("cyan"), -- colour
+					false)              -- not Unicode
+		]]
+		require "gauge"
+		for i=1,#my_misc_skills do --for i = 1,#_basic do
+			if _skills_ch[i] == "" or _skills_ch[i] == nil then
+				_skills_ch[i] = "数据丢失" 
+			end
+			if _basic[i] == "" or _basic[i] == nil then
+				_basic[i] = "数据丢失"
+			end
+			if _skills_lev[i] == "" or _skills_lev[i] == nil then
+				_skills_lev[i] = "数据丢失"
+			end
+			if _skills_pot[i] == "" or _skills_pot[i] == nil then
+				_skills_pot[i] = "数据丢失"
+			end
+			
+			local txt2
+			if string.len(_skills_ch[i]) == 10 then
+				txt2 = " ".._skills_ch[i].."  ".._skills_lev[i].."  "
+			elseif string.len(_skills_ch[i]) == 8 then
+				txt2 = " ".._skills_ch[i].."    ".._skills_lev[i].."  "
+			elseif string.len(_skills_ch[i]) == 6 then
+				txt2 = " ".._skills_ch[i].."      ".._skills_lev[i].."  "
+					else
+				txt2 = " ".._skills_ch[i].."        ".._skills_lev[i].."  "
+			end
+			local _high = i*15 + 30
+		WindowText (win_skills, "f1", 
+						txt2,   -- text
+						5, _high, 0, 0,        -- rectangle
+					--  ColourNameToRGB (_colour), -- colour
+					ColourNameToRGB ("orange"), -- colour
+						false)              -- not Unicode
+			if _skills_ch[i] ~= "数据丢失"  and _skills_pot[i] ~= "数据丢失" and _skills_lev[i] ~= "数据丢失" then
+				gauge (win_skills, txt2, (_skills_pot[i]), (_skills_lev[i]+1)^2, 110, _high, 80, 12, ColourNameToRGB ("orange"), 0x808080,  0, 0x000000, 0x000000, 0x000000)             
+			end
+			
+			--[[if _skills_ch[i] ~= "数据丢失" then
+				gauge (win_skills, txt2, GetVariable(Replace("skills_pot_".._basic[i], "-", "_", true)), (_skills_lev[i]+1)^2, 102, _high, 80, 12, ColourNameToRGB (_colour), 0x808080,  0, 0x000000, 0x000000, 0x000000)             
+			end
+		--]]
+		end
+		for i = #my_misc_skills + 1,#my_misc_skills + #my_basic_skills do
+			if _skills_ch[i] == "" or _skills_ch[i] == nil then
+				_skills_ch[i] = "数据丢失" 
+			end
+			if _basic[i] == "" or _basic[i] == nil then
+				_basic[i] = "数据丢失"
+			end
+			if _skills_lev[i] == "" or _skills_lev[i] == nil then
+				_skills_lev[i] = "数据丢失"
+			end
+			if _skills_pot[i] == "" or _skills_pot[i] == nil then
+				_skills_pot[i] = "数据丢失"
+			end
+			
+			local txt2
+			if string.len(_skills_ch[i]) == 10 then
+				txt2 = " ".._skills_ch[i].."  ".._skills_lev[i].."  "
+			elseif string.len(_skills_ch[i]) == 8 then
+				txt2 = " ".._skills_ch[i].."    ".._skills_lev[i].."  "
+			elseif string.len(_skills_ch[i]) == 6 then
+				txt2 = " ".._skills_ch[i].."      ".._skills_lev[i].."  "
+					else
+				txt2 = " ".._skills_ch[i].."        ".._skills_lev[i].."  "
+			end
+			local _high = i*15 + 30
+		WindowText (win_skills, "f1", 
+						txt2,   -- text
+						5, _high, 0, 0,        -- rectangle
+					--  ColourNameToRGB (_colour), -- colour
+					ColourNameToRGB ("white"), -- colour
+						false)              -- not Unicode
+			if _skills_ch[i] ~= "数据丢失"  and _skills_pot[i] ~= "数据丢失" and _skills_lev[i] ~= "数据丢失" then
+				gauge (win_skills, txt2, (_skills_pot[i]), (_skills_lev[i]+1)^2, 110, _high, 80, 12, ColourNameToRGB ("white"), 0x808080,  0, 0x000000, 0x000000, 0x000000)             
+			end
+			
+			--[[if _skills_ch[i] ~= "数据丢失" then
+				gauge (win_skills, txt2, GetVariable(Replace("skills_pot_".._basic[i], "-", "_", true)), (_skills_lev[i]+1)^2, 102, _high, 80, 12, ColourNameToRGB (_colour), 0x808080,  0, 0x000000, 0x000000, 0x000000)             
+			end
+		--]]
+		end
+		for i = #my_misc_skills + #my_basic_skills + 1,#_basic do
+			if _skills_ch[i] == "" or _skills_ch[i] == nil then
+				_skills_ch[i] = "数据丢失" 
+			end
+			if _basic[i] == "" or _basic[i] == nil then
+				_basic[i] = "数据丢失"
+			end
+			if _skills_lev[i] == "" or _skills_lev[i] == nil then
+				_skills_lev[i] = "数据丢失"
+			end
+			if _skills_pot[i] == "" or _skills_pot[i] == nil then
+				_skills_pot[i] = "数据丢失"
+			end
+			
+			local txt2
+			if string.len(_skills_ch[i]) == 10 then
+				txt2 = " ".._skills_ch[i].."  ".._skills_lev[i].."  "
+			elseif string.len(_skills_ch[i]) == 8 then
+				txt2 = " ".._skills_ch[i].."    ".._skills_lev[i].."  "
+			elseif string.len(_skills_ch[i]) == 6 then
+				txt2 = " ".._skills_ch[i].."      ".._skills_lev[i].."  "
+					else
+				txt2 = " ".._skills_ch[i].."        ".._skills_lev[i].."  "
+			end
+			local _high = i*15 + 30
+		WindowText (win_skills, "f1", 
+						txt2,   -- text
+						5, _high, 0, 0,        -- rectangle
+					--  ColourNameToRGB (_colour), -- colour
+					ColourNameToRGB ("cyan"), -- colour
+						false)              -- not Unicode
+			if _skills_ch[i] ~= "数据丢失"  and _skills_pot[i] ~= "数据丢失" and _skills_lev[i] ~= "数据丢失" then
+				gauge (win_skills, txt2, (_skills_pot[i]), (_skills_lev[i]+1)^2, 110, _high, 80, 12, ColourNameToRGB ("cyan"), 0x808080,  0, 0x000000, 0x000000, 0x000000)             
+			end
+			
+			--[[if _skills_ch[i] ~= "数据丢失" then
+				gauge (win_skills, txt2, GetVariable(Replace("skills_pot_".._basic[i], "-", "_", true)), (_skills_lev[i]+1)^2, 102, _high, 80, 12, ColourNameToRGB (_colour), 0x808080,  0, 0x000000, 0x000000, 0x000000)             
+			end
+		--]]
+		end
+	end
+	if flag_win_skills and flag_win_skills==1 then
+		WindowShow (win_skills, true)
+	else
+		WindowShow (win_skills, false)
+	end
+end  
+
+function draw_skillswindow_savetofile()
+	if not flag_win_skills or flag_win_skills~=1 then
+		if win_skills then
+		   WindowShow (win_skills, false)
+		end
+		return
+	 end
+	 if not skills then
+		return
+	 end
+	 local _basic ={}
+	 local _skills_ch = {}
+	 local _skills_lev = {}
+	 local _skills_pot = {}
+	 for k,v in pairs(skills) do
+	  table.insert(_basic,k)
+	 end
+	 for i=1,#_basic do
+		 table.insert(_skills_ch,skills[_basic[i]]["name"])
+		 table.insert(_skills_lev,skills[_basic[i]]["lvl"])
+		 table.insert(_skills_pot,skills[_basic[i]]["pot"])
+	 end
+	local sfi = GetInfo (67) .. "plugs\\wj.ini"
+	 
+	 local sfo = io.open(sfi,"w")
+		 for i = 1,#_basic do
+			 if _skills_ch[i] == "" or _skills_ch[i] == nil then
+				 _skills_ch[i] = "数据丢失" 
+			 end
+			 if _basic[i] == "" or _basic[i] == nil then
+				 _basic[i] = "数据丢失"
+			 end
+			 if _skills_lev[i] == "" or _skills_lev[i] == nil then
+				 _skills_lev[i] = "数据丢失"
+			 end
+			 if _skills_pot[i] == "" or _skills_pot[i] == nil then
+				 _skills_pot[i] = "数据丢失"
+			 end
+			 
+			 sfo:write(_skills_ch[i].."@".._skills_lev[i].."|")
+		 
+		 end
+		 sfo:close()
+end
 	
+function draw_bagwindow() 
+	local sfi = GetInfo (67) .. "plugs\\wp.ini"
+    
+	local sfo = io.open(sfi,"w")
+
+	if sfo then
+		sfo:close()
+		draw_bagwindow_sf()
+	else 
+		draw_bagwindow_miniwin()
+	end
+end
+
+
+function draw_bagwindow_miniwin()
+    if not flag_win_bag or flag_win_bag~=1 then
+       if win_bag then
+          WindowShow (win_bag, false)
+       end
+       return
+    end
+    if not Bag then
+       return
+    end
+    local _bag_ch = {}
+    local _bag_cn = {}
+    for k,v in pairs(Bag) do
+     if k~='ENCB' then
+        table.insert(_bag_ch,k)
+     end
+    end
+    for i=1,#_bag_ch do
+    	table.insert(_bag_cn,Bag[_bag_ch[i]]["cnt"])
+    end
+	if win_bag_show == 0 then
+		WINDOW_HEIGHT = 30
+		WINDOW_WIDTH = 70
+	else
+		WINDOW_HEIGHT = (math.ceil(#_bag_ch / 2) + 1)*15+40
+		WINDOW_WIDTH = 190
+	end
+    -- Create the window
+--	WindowCreate (win_bag, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_POSITION, 4, 0x000010)  -- create window
+  WindowCreate (win_bag, 
+                windowinfo_bag.window_left, 
+                windowinfo_bag.window_top, 
+                WINDOW_WIDTH,    
+                WINDOW_HEIGHT,  
+                windowinfo_bag.window_mode, 
+                windowinfo_bag.window_flags, 
+                0x000010) 
+
+        movewindow.save_state (win_bag)          
+    -- define the fonts
+	WindowFont (win_bag, "f1", FONT_NAME1, FONT_SIZE_12)
+	WindowFont (win_bag, "f2", FONT_NAME2, FONT_SIZE_11)
+	WindowFont (win_bag, "f3", FONT_NAME1, FONT_SIZE_12, true)
+	WindowFont (win_bag, "f4", FONT_NAME3, FONT_SIZE_11, true)
+	WindowFont (win_bag, "f5", FONT_NAME1, FONT_SIZE_11)
+
+    -- work out how high the font is
+	font_height = WindowFontInfo (win_bag, "f1", 1)   -- height of the font  
+
+    -- draw the border of the whole box
+	WindowCircleOp (win_bag, miniwin.circle_round_rectangle, 0, 2, WINDOW_WIDTH-2, WINDOW_HEIGHT, 0xc0c0c0, 0, 1,0, 0, 9, 9) 
+
+    -- ensure window visible
+    local head_width   = (WINDOW_WIDTH - WindowTextWidth (win_bag, "f1", "物品列表"))/2
+	if win_bag_show == 0 then
+	WindowAddHotspot(win_bag, "bag",  
+					0, 0, 0, 0, 
+					"", -- mouseover (do nothing)
+					"", -- cancelmouseover (do nothing)
+					"",
+					"", -- cancelmousedown (do nothing)
+					"mouseup", -- mouseup (do nothing)
+					"点击关闭开启",    -- hint text if they hover over it              
+					0, 0)
+
+		WindowText (win_bag, "f5", 
+					"物品列表",   -- text
+					5, 9, 0, 0,        -- rectangle
+					ColourNameToRGB ("yellow"), -- colour
+					false)              -- not Unicode
+	else
+	WindowLine (win_bag, 0, font_height + 15,WINDOW_WIDTH-2,font_height + 15,0xc0c0c0, 0,1)
+	movewindow.add_drag_handler (win_bag, 0, 0, 0, font_height + 15)
+	WindowAddHotspot(win_bag, "bag",  
+					0, font_height + 15, 0, 0, 
+					"", -- mouseover (do nothing)
+					"", -- cancelmouseover (do nothing)
+					"",
+					"", -- cancelmousedown (do nothing)
+					"mouseup", -- mouseup (do nothing)
+					"点击关闭开启",    -- hint text if they hover over it              
+					0, 0)
+
+		WindowText (win_bag, "f5", 
+					"物品列表",   -- text
+					head_width, 9, 0, 0,        -- rectangle
+					ColourNameToRGB ("yellow"), -- colour
+					false)              -- not Unicode
+
+	WindowText (win_bag, "f1", 
+				"共"..#_bag_ch.."件物品",   -- text
+					5, 30, 0, 0,        -- rectangle
+					ColourNameToRGB ("white"), -- colour
+					false)              -- not Unicode
+	if Bag["ENCB"].value then
+	WindowText (win_bag, "f1", 
+				"负重".. Bag["ENCB"].value .."%",   -- text
+					100, 30, 0, 0,        -- rectangle
+					ColourNameToRGB ("white"), -- colour
+					false)              -- not Unicode
+
+	end
+		for i = 1,#_bag_ch do
+			if _bag_ch[i] == "" or _bag_ch[i] == nil then
+				_bag_ch[i] = "数据丢失" 
+			end
+			if _bag_ch[i] == "" or _bag_ch[i] == nil then
+				_basic[i] = "数据丢失"
+			end
+			
+			local txt2 = _bag_ch[i].." *".._bag_cn[i]
+			local _high = math.ceil(i/2)*15 + 30
+		if i/2 < math.ceil(i/2) then
+		WindowText (win_bag, "f1", 
+						txt2,   -- text
+						5, _high, 0, 0,        -- rectangle
+					--  ColourNameToRGB (_colour), -- colour
+					ColourNameToRGB ("green"), -- colour
+						false)              -- not Unicode
+		else
+		WindowText (win_bag, "f1", 
+						txt2,   -- text
+						95+5, _high, 0, 0,        -- rectangle
+					--  ColourNameToRGB (_colour), -- colour
+					ColourNameToRGB ("green"), -- colour
+						false)              -- not Unicode
+		end	
+		end
+	end
+	if flag_win_bag and flag_win_bag==1 then
+		WindowShow (win_bag, true)
+	else
+		WindowShow (win_bag, false)
+	end
+end
 	
-	
-function draw_bagwindow()
+function draw_bagwindow_sf()
    
     if not Bag then
        return
@@ -897,8 +1386,125 @@ function draw_bagwindow()
 sfo:close()
 
 end
-	
+
 function draw_beinangwindow()
+	local sfi = GetInfo (67) .. "plugs\\bn.ini"
+    
+	local sfo = io.open(sfi,"w")
+
+	if sfo then
+		sfo:close()
+		draw_beinangwindow_sf()
+	else
+		draw_beinangwindow_miniwin()
+	end
+
+end
+
+function draw_beinangwindow_miniwin()
+    if not flag_win_beinang or flag_win_beinang~=1 then
+       if win_beinang then
+          WindowShow (win_beinang, false)
+       end
+       return
+    end
+    if not Beinang then
+       return
+    end
+
+if win_beinang_show == 0 then
+    WINDOW_HEIGHT = 30
+    WINDOW_WIDTH = 70
+else
+    WINDOW_HEIGHT = (#Beinang + 1)*15+40
+    WINDOW_WIDTH = 190
+end
+    -- Create the window
+--	WindowCreate (win_beinang, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_POSITION, 4, 0x000010)  -- create window
+  WindowCreate (win_beinang, 
+                windowinfo_beinang.window_left, 
+                windowinfo_beinang.window_top, 
+                WINDOW_WIDTH,    
+                WINDOW_HEIGHT,  
+                windowinfo_beinang.window_mode, 
+                windowinfo_beinang.window_flags, 
+                0x000010) 
+
+        movewindow.save_state (win_beinang)          
+    -- define the fonts
+	WindowFont (win_beinang, "f1", FONT_NAME1, FONT_SIZE_12)
+	WindowFont (win_beinang, "f2", FONT_NAME2, FONT_SIZE_11)
+	WindowFont (win_beinang, "f3", FONT_NAME1, FONT_SIZE_12, true)
+	WindowFont (win_beinang, "f4", FONT_NAME3, FONT_SIZE_11, true)
+	WindowFont (win_beinang, "f5", FONT_NAME1, FONT_SIZE_11)
+
+    -- work out how high the font is
+	font_height = WindowFontInfo (win_beinang, "f1", 1)   -- height of the font  
+
+    -- draw the border of the whole box
+	WindowCircleOp (win_beinang, miniwin.circle_round_rectangle, 0, 2, WINDOW_WIDTH-2, WINDOW_HEIGHT, 0xc0c0c0, 0, 1,0, 0, 9, 9) 
+
+    -- ensure window visible
+    local head_width   = (WINDOW_WIDTH - WindowTextWidth (win_beinang, "f1", "背囊列表"))/2
+	if win_beinang_show == 0 then
+	WindowAddHotspot(win_beinang, "beinang",  
+					0, 0, 0, 0, 
+					"", -- mouseover (do nothing)
+					"", -- cancelmouseover (do nothing)
+					"",
+					"", -- cancelmousedown (do nothing)
+					"mouseup", -- mouseup (do nothing)
+					"点击关闭开启",    -- hint text if they hover over it              
+					0, 0)
+
+		WindowText (win_beinang, "f5", 
+					"背囊列表",   -- text
+					5, 9, 0, 0,        -- rectangle
+					ColourNameToRGB ("yellow"), -- colour
+					false)              -- not Unicode
+	else
+	WindowLine (win_beinang, 0, font_height + 15,WINDOW_WIDTH-2,font_height + 15,0xc0c0c0, 0,1)
+	movewindow.add_drag_handler (win_beinang, 0, 0, 0, font_height + 15)
+	WindowAddHotspot(win_beinang, "beinang",  
+					0, font_height + 15, 0, 0, 
+					"", -- mouseover (do nothing)
+					"", -- cancelmouseover (do nothing)
+					"",
+					"", -- cancelmousedown (do nothing)
+					"mouseup", -- mouseup (do nothing)
+					"点击关闭开启",    -- hint text if they hover over it              
+					0, 0)
+
+		WindowText (win_beinang, "f5", 
+					"背囊列表",   -- text
+					head_width, 9, 0, 0,        -- rectangle
+					ColourNameToRGB ("yellow"), -- colour
+					false)              -- not Unicode
+
+		for i = 1,#Beinang do
+			if Beinang[i] == "" or Beinang[i] == nil then
+				Beinang[i] = "数据丢失" 
+			end
+			
+			local txt2 = Beinang[i]
+			local _high = i*15 + 30
+		WindowText (win_beinang, "f1", 
+						txt2,   -- text
+						12, _high, 0, 0,        -- rectangle
+					--  ColourNameToRGB (_colour), -- colour
+					ColourNameToRGB ("deeppink"), -- colour
+						false)              -- not Unicode
+	end
+	end
+	if flag_win_beinang and flag_win_beinang==1 then
+		WindowShow (win_beinang, true)
+	else
+		WindowShow (win_beinang, false)
+	end
+end
+
+	
+function draw_beinangwindow_sf()
     if not flag_win_beinang or flag_win_beinang~=1 then
        if win_beinang then
           WindowShow (win_beinang, false)
@@ -922,8 +1528,9 @@ local sfo = io.open(sfi,"w")
     
 		
      end
-sfo:close()
+	sfo:close()
 end
+
 function draw_statuswindow()
  
        local sfi = GetInfo (67) .. "plugs\\State.ini"

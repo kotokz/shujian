@@ -434,7 +434,8 @@ function hp_trigger()
     SetTriggerOption("hp23","group","hp")
 	SetTriggerOption("hp28","group","hp")
 	SetTriggerOption("hp29","group","hp")
-	SetTriggerOption("hp30","group","hp")
+    SetTriggerOption("hp30","group","hp")
+    SetTriggerOption("hp31","group","hp")
     DeleteTriggerGroup("score")
     create_trigger_t('score1',"^┃姓    名：(\\D*)\\((\\D*)\\)\\s*┃身  法：「(\\d*)\/(\\d*)」\\s*悟  性：「(\\d*)\/(\\d*)」",'','score_name_check')
     create_trigger_t('score2',"^┃头    衔：(\\D*)\\s*┃臂  力：「(\\d*)\/(\\d*)」\\s*根  骨：「(\\d*)\/(\\d*)」",'','score_title_check')
@@ -666,7 +667,7 @@ function lingwu_goon()
                         break
                     elseif l:find('内力不够') then 
                         exe('eat ' .. drug.neili)
-                        exe('eat ' .. drug.neili2)
+                        exe('eat ' .. drug.neili2 .. ';yun jing')
                     elseif l:find('潜能已经用完了') then
                         return lingwu_finish()
                     elseif tmp.lingwunext then

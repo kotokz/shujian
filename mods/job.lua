@@ -1451,6 +1451,312 @@ function job.flag()
     flag.wait = 0
 end
 
+jobtimes = {}
+function checkJobtimes(n, l, w) jobtimes[w[1]] = tonumber(w[2]) end
+function checkJoblast(n, l, w)
+    local joblast = {
+        ["武当锄奸"] = "wudang",
+        ["大理送信"] = "songxin",
+        ["强抢美女"] = "xueshan",
+        ["惩恶扬善"] = "huashan",
+        ["长乐帮"] = "clb",
+        ["天地会"] = "tdh",
+        ["嵩山并派"] = "songshan",
+        ["丐帮任务"] = "gaibang",
+        ["颂摩崖抗敌任务"] = "songmoya"
+
+    }
+
+    if joblast[w[2]] then job.last = joblast[w[2]] end
+end
+
+function check_job()
+    job_exp_tongji()
+    if locl.weekday == '四' and locl.hour == 7 and locl.min >= 58 then
+        if not flag.cun then
+            Note('快重启服务器了！去存东西！')
+            return go(reboot_before_cun, "扬州城", "杂货铺")
+        end
+    end
+    if xcexp == 0 and hp.exp < 1000000 then
+        print('巡城到1M')
+        kdummy = 0
+        return xunCheng()
+    end
+    if xcexp == 1 and hp.exp < 2000000 then
+        print('巡城到2M')
+        kdummy = 0
+        return xunCheng()
+    end
+    if not perform.skill or not perform.pre or not job.zuhe or
+        countTab(job.zuhe) < 2 then return shujian_set() end
+
+    create_triggerex_lvl('dmlflag1',
+                         '^(> )*【江湖传闻】玩家竞技活动开始了！',
+                         '', 'dml_on', 95)
+    SetTriggerOption('dmlflag1', 'group', 'hp')
+    if not dml_cnt then dml_cnt = 0 end
+    if dml_cnt < 5 and (not condition.busy or condition.busy == 0) and vippoison ==
+        0 then
+        local fn = GetInfo(67) .. 'logs\\diemenglou_mark_' .. score.id .. '.log'
+        local f = io.open(fn, "r")
+        if not f then
+            ColourNote('orange', 'black',
+                       '未检测到蝶梦楼记录，准备进行蝶梦楼竞技！')
+            return dml_check()
+        else
+            local s = f:read()
+            f:close()
+            if s ~= os.date("%Y%m%d%H") then
+                if os.date("%Y%m%d%H") - s >= 100 then
+                    local x = tostring(os.date("%Y%m%d%H"))
+                    local y1 = tonumber(string.sub(x, -4, -3))
+                    if y1 == 1 then
+                        local y = tonumber(string.sub(x, -2, -1))
+                        s = tostring(s)
+                        local z = tonumber(string.sub(s, -2, -1))
+                        if y >= z then
+                            ColourNote('lime', 'black', '找到' .. s ..
+                                           '蝶梦楼记录，日期为昨天。准备进行蝶梦楼竞技！')
+                            return dml_check()
+                        else
+                            ColourNote('white', 'red', '找到' .. s ..
+                                           '蝶梦楼记录，时间间隔不足【',
+                                       'yellow', 'black', '24', 'white', 'red',
+                                       '】小时不开启蝶梦楼竞技！')
+                        end
+                    else
+                        ColourNote('lime', 'black', '找到' .. s ..
+                                       '蝶梦楼记录，日期为昨天。准备进行蝶梦楼竞技！')
+                        return dml_check()
+                    end
+                else
+                    ColourNote('white', 'red', '找到' .. s ..
+                                   '蝶梦楼记录，时间间隔不足【',
+                               'yellow', 'black', '24', 'white', 'red',
+                               '】小时不开启蝶梦楼竞技！')
+                end
+            end
+        end
+    end
+    if score.party == "桃花岛" and (hp.shen > 150000 or hp.shen < -150000) then
+        return thdJiaohui()
+    end
+    if condition.busy and condition.busy > 10 then
+        return check_halt(weaponUcheck)
+    end
+    if job.last == "xueshan" or job.last == "wudang" or job.last == "songxin" or
+        hsruntime ~= 0 then
+        return check_halt(check_jobx) -- 雪山、武当任务结束后不检查武器状态，直接做下一个任务。
+    else
+        return check_halt(weaponUcheck)
+    end
+end
+
+function check_jobx()
+    for p in pairs(weaponUsave) do
+        if Bag and not Bag[p] then job.zuhe["songmoya"] = nil end
+    end
+    --[[if score.id=='kkfromch' and (isInBags('三才乾坤剑')==nil or isInBags('龙灵乾坤箫')==nil or isInBags('巧制风云箫')==nil) then
+   return weapon_lost()
+end]]
+    if fqyytmp.goArmorD == 1 then return fqyyArmorGoCheck() end
+    if job.zuhe == nil then job.zuhe = {} end
+    if job.zuhe["zhuoshe"] and score.party ~= "丐帮" then
+        job.zuhe["zhuoshe"] = nil
+    end
+    if job.zuhe["sldsm"] and score.party ~= "神龙教" then
+        job.zuhe["sldsm"] = nil
+    end
+    if job.zuhe["songmoya"] and hp.exp < 5000000 then
+        job.zuhe["songmoya"] = nil
+    end
+    if smydie * 1 >= smyall * 1 then job.zuhe["songmoya"] = nil end
+    if job.zuhe["husong"] and (score.party ~= "少林派" or hp.exp < 2000000) then
+        job.zuhe["husong"] = nil
+    end
+    if job.zuhe["songmoya"] and job.last ~= "songmoya" and mytime <= os.time() then
+        return songmoya()
+    end
+    if job.zuhe["hubiao"] and job.last ~= "hubiao" and job.teamname and
+        ((not condition.hubiao) or (condition.hubiao and condition.hubiao <= 0)) then
+        return hubiao()
+    elseif job.zuhe["husong"] then
+        return husong()
+    else
+        return checkJob()
+    end
+end
+function checkJob()
+    if job.last ~= 'hqgzc' then
+        local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
+        local f = io.open(fn, "r")
+        if not f then
+            return hqgzc()
+        else
+            local s = f:read()
+            f:close()
+            if s ~= os.date("%Y%m%d%H") then
+                if os.date("%Y%m%d%H") - s >= 100 then
+                    local x = tostring(os.date("%Y%m%d%H"))
+                    local y1 = tonumber(string.sub(x, -4, -3))
+                    if y1 == 1 then
+                        local y = tonumber(string.sub(x, -2, -1))
+                        s = tostring(s)
+                        local z = tonumber(string.sub(s, -2, -1))
+                        if y >= z then return hqgzc() end
+                    else
+                        return hqgzc()
+                    end
+                end
+            end
+        end
+    end
+    -- if hp.exp>2000000 then job.zuhe["zhuoshe"]=nil end
+    -- if hp.shen>0 or hp.exp>6000000 then job.zuhe["songshan"]=nil end
+    if job.zuhe["songxin2"] then
+        job.zuhe["songxin2"] = nil
+        job.zuhe["songxin"] = true
+        flag.sx2 = true
+    end
+    if job.last and job.zuhe[job.last] then
+        if type(job.zuhe[job.last]) == "number" then
+            job.zuhe[job.last] = job.zuhe[job.last] + 1
+        else
+            job.zuhe[job.last] = 1
+        end
+    end
+    if countTab(job.zuhe) > 2 and not skills["xixing-dafa"] and
+        job.zuhe["huashan"] and job.zuhe["wudang"] and
+        jobtimes["华山岳不群惩恶扬善"] and
+        jobtimes["武当宋远桥杀恶贼"] then
+        local t_hs = jobtimes["华山岳不群惩恶扬善"]
+        local t_wd = jobtimes["武当宋远桥杀恶贼"]
+        local t_times = math.fmod((t_hs + t_wd), 50)
+        if t_times > 48 then
+            exe('pray pearl')
+            if job.last ~= "huashan" then
+                return huashan()
+            else
+                for p in pairs(job.zuhe) do
+                    if p ~= "huashan" and p ~= "wudang" and p ~= "hubiao" and p ~=
+                        "husong" and p ~= "songmoya" then
+                        return _G[p]()
+                    end
+                end
+            end
+        end
+    end
+    if score.party and score.party == "华山派" and countTab(job.zuhe) > 2 and
+        not skills["dugu-jiujian"] and job.zuhe["huashan"] and
+        job.zuhe["songxin"] then
+        local t_hs, t_sx, t_gb
+
+        if jobtimes["华山岳不群惩恶扬善"] then
+            t_hs = jobtimes["华山岳不群惩恶扬善"]
+        else
+            t_hs = 0
+        end
+        if jobtimes["大理王府送信任务"] then
+            t_sx = jobtimes["大理王府送信任务"]
+        else
+            t_sx = 0
+        end
+        if jobtimes["丐帮吴长老杀人任务"] then
+            t_gb = jobtimes["丐帮吴长老杀人任务"]
+        else
+            t_gb = 0
+        end
+        local t_times = math.fmod((t_hs + t_sx + t_gb), 50)
+        if t_times > 47 then
+            exe('pray pearl')
+            if job.last ~= "huashan" then
+                return huashan()
+            else
+                for p in pairs(job.zuhe) do
+                    if p ~= "huashan" and p ~= "songxin" and p ~= "hubiao" and p ~=
+                        "husong" and p ~= "songmoya" then
+                        return _G[p]()
+                    end
+                end
+            end
+        end
+    end
+
+    if job.third and job.zuhe[job.third] and job.last ~= job.third then
+        if job.second and job.last == job.second then
+            if job.third == "wudang" and
+                (not job.wdtime or job.wdtime <= os.time()) then
+                return _G[job.third]()
+            end
+            if job.third ~= "wudang" and job.third ~= "songmoya" then
+                return _G[job.third]()
+            end
+        end
+    end
+    if job.first and job.zuhe[job.first] and job.last ~= job.first then
+        if job.first ~= "xueshan" and job.first ~= "wudang" and job.first ~=
+            "songmoya" then return _G[job.first]() end
+        if job.first == "xueshan" and
+            ((not condition.xueshan) or
+                (condition.xueshan and condition.xueshan <= 0)) then
+            return _G[job.first]()
+        end
+        if job.first == "wudang" and (not job.wdtime or job.wdtime <= os.time()) then
+            return _G[job.first]()
+        end
+        if job.first == "xueshan" and condition.xueshan and condition.busy and
+            condition.busy >= condition.xueshan then
+            return _G[job.first]()
+        end
+    end
+    if job.second and job.zuhe[job.second] and job.last ~= job.second then
+        if job.second ~= "xueshan" and job.second ~= "wudang" and job.second ~=
+            "songmoya" then return _G[job.second]() end
+        if job.second == "xueshan" and
+            ((not condition.xueshan) or
+                (condition.xueshan and condition.xueshan <= 0)) then
+            return _G[job.second]()
+        end
+        if job.second == "wudang" and
+            (not job.wdtime or job.wdtime <= os.time()) then
+            return _G[job.second]()
+        end
+        if job.second == "xueshan" and condition.xueshan and condition.busy and
+            condition.busy >= condition.xueshan then
+            return _G[job.second]()
+        end
+    end
+
+    for p in pairs(job.zuhe) do
+        if job.last ~= p and job.first ~= p and job.second ~= p and p ~=
+            "songmoya" then return _G[p]() end
+    end
+
+    for p in pairs(job.zuhe) do
+        if job.last ~= p and p ~= "songmoya" then return _G[p]() end
+    end
+    if job.zuhe["xueshan"] and job.last ~= "xueshan" then return xueshan() end
+    if job.zuhe["huashan"] and job.last ~= "huashan" then return huashan() end
+    if job.zuhe["tmonk"] and job.last ~= "tmonk" then return tmonk() end
+    if job.zuhe["songxin"] and job.last ~= "songxin" then return songxin() end
+    if job.zuhe["wudang"] and job.last ~= "wudang" then return wudang() end
+    if job.zuhe["gaibang"] and job.last ~= "gaibang" then return gaibang() end
+    if job.zuhe["zhuoshe"] and job.last ~= "zhuoshe" then return zhuoshe() end
+    if job.zuhe["sldsm"] and job.last ~= "sldsm" then return sldsm() end
+    if job.zuhe["songshan"] and job.last ~= "songshan" then return songshan() end
+    if job.last ~= "songxin" then return songxin() end
+    if job.last ~= "xueshan" and hp.shen < 0 then return xueshan() end
+    if job.last ~= "wudang" and hp.shen > 100000 then return wudang() end
+    if job.last ~= "gaibang" and hp.exp < 2000000 and hp.shen > 0 then
+        return gaibang()
+    end
+    if job.last ~= "songshan" and hp.shen < 0 and hp.exp < 2000000 then
+        return songshan()
+    end
+
+end
+
 function job_exp_trigger()
     DeleteTriggerGroup("job_exp")
     create_trigger_t('job_exp1', "^(> )*(\\D*)点潜能!$", '', 'jobExppot')

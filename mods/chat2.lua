@@ -3,8 +3,9 @@ Mchat.time = os.time()
 
 chat_trigger = function()
     DeleteTriggerGroup("chat")
+    dekelllogtemp = GetVariable("dsjl")
     create_trigger_t('chat1',
-                     "^(> )*(\\! )*【(江湖传闻|官府通告|活动公告|嵩山派|古墓派|闲聊|丐帮|昆仑派|铁掌帮|天龙寺|大轮寺|明教|星宿派|姑苏慕容|神龙教|华山派|武当派|桃花岛|少林派|峨嵋派|队伍|谣言|书剑|新闻|表决)】",
+                     "^(> )*(\\! )*【(江湖传闻|官府通告|嵩山派|古墓派|闲聊|丐帮|昆仑派|铁掌帮|天龙寺|大轮寺|明教|星宿派|姑苏慕容|神龙教|华山派|武当派|桃花岛|少林派|峨嵋派|队伍|谣言|书剑|新闻|表决)】",
                      '', 'color_chats')
     create_triggerex_lvl('chat3',
                          "^(> )*(\\! )*【谣言】某人：(\\D*)弄到了一(件|条|支|把|副|根|柄|对|本|个)(\\D*)！$",
@@ -18,12 +19,14 @@ chat_trigger = function()
     create_triggerex_lvl('chat6',
                          "^(> )*(\\! )*【闲聊】(\\D*)\\((\\D*)\\)：(.*)",
                          '', 'chatUser', 95)
+    create_trigger_t('chat2', "^(> )*(" .. dekelllogtemp .. ")", '',
+                     'color_chats')
     SetTriggerOption("chat1", "group", "chat")
     SetTriggerOption("chat3", "group", "chat")
     SetTriggerOption("chat4", "group", "chat")
     SetTriggerOption("chat5", "group", "chat")
     SetTriggerOption("chat6", "group", "chat")
-    SetTriggerOption("chat1", "keep_evaluating", "y")
+    SetTriggerOption("chat2", "group", "chat")
 end
 
 MudUser = {}
@@ -64,6 +67,8 @@ local first_time = true
 function color_chats(name, line, wildcards, styles)
 
     if not flag.log or flag.log == "no" then return end
+    score.chat = line
+    draw_statuswindow()
 
     -- try to find "chat" world
     local w = GetWorld(chat_world) -- get "chat" world
@@ -126,13 +131,15 @@ function chatUser(name, line, wildcards, styles)
 end
 
 function chatChat(id, chat)
+
     create_alias('chatt', 'chatt', 'chat ' .. chat)
     exe('chatt')
 end
 
 function chatTel(id, chat)
-    -- create_alias('tel','tel','tell '..id..' '..chat)
-    -- exe('tel')
+
+    create_alias('tel', 'tel', 'tell ' .. id .. ' ' .. chat)
+    exe('tel')
 end
 function chats_log(logs, color, bcolor)
     local w = GetWorld("log") -- get "chat" world
@@ -143,8 +150,11 @@ function chats_log(logs, color, bcolor)
     -- if not flag.log or flag.log=="no" then return end
 
     if score.id then
-        logs = '【' .. score.id .. '】' .. logs
         score.zt = logs
+        score.ztt = logs
+        draw_statuswindow()
+        logs = '【' .. score.id .. '】' .. logs
+
     end
 
     if flag.log and flag.log == "yes" then
@@ -171,6 +181,7 @@ function chats_log(logs, color, bcolor)
             c_text = 'darkviolet'
         end
         if job.name == 'huashan' then c_text = 'hotpink' end
+        if job.name == 'dolost' then c_text = 'hotpink' end
         if color ~= nil then c_text = color end
 
         if w then
@@ -200,7 +211,11 @@ function chats_locate(logs, color)
 
     if color ~= nil then c_text = color end
 
-    if score.id then logs = '【' .. score.id .. '】' .. logs end
+    if score.id then
+        score.loc = logs
+        draw_statuswindow()
+        logs = '【' .. score.id .. '】' .. logs
+    end
 
     -- if not found, try to open it
     if first_time and not w then

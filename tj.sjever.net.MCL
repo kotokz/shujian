@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE muclient>
-<!-- Saved on ÐÇÆÚÈÕ, ¶þÔÂ 02, 2020, 10:10 ÏÂÎç -->
+<!-- Saved on ÐÇÆÚÁù, ¶þÔÂ 15, 2020, 8:41 ÏÂÎç -->
 <!-- MuClient version 5.06 -->
 <!-- Written by Nick Gammon -->
 <!-- Home Page: http://www.mushclient.com/ -->
@@ -8,7 +8,7 @@
 <world
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
 
    auto_say_override_prefix="-"
    auto_say_string="say "
@@ -78,7 +78,7 @@
    output_font_charset="1"
    paste_delay_per_lines="1"
    pixel_offset="1"
-   port="5555"
+   port="7777"
    proxy_port="1080"
    send_file_delay_per_lines="1"
    send_mxp_afk_response="y"
@@ -115,10 +115,9 @@
 <triggers
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
   >
   <trigger
-   enabled="y"
    group="chat"
    match="^(&gt; )*(\! )*¡¾ÏÐÁÄ¡¿(\D*)\((\D*)\)£º(.*)"
    name="chat6"
@@ -130,7 +129,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="chat"
    match="^(&gt; )*(\! )*¡¾Ò¥ÑÔ¡¿Ä³ÈË£º(\D*)´Ó(\D*)´¦µÃµ½ÁËÒ»(¼þ|Ìõ|Ö§|°Ñ|¸±|¸ù|±ú|¶Ô|±¾|¸ö)(\D*)£¡$"
    name="chat5"
@@ -142,7 +140,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="chat"
    match="^(&gt; )*(\! )*¡¾Ò¥ÑÔ¡¿Ä³ÈË£º(\D*)Åªµ½ÁËÒ»(¼þ|Ìõ|Ö§|°Ñ|¸±|¸ù|±ú|¶Ô|±¾|¸ö)(\D*)£¡$"
    name="chat3"
@@ -154,7 +151,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="chat"
    match="^(&gt; )*(\! )*¡¾Ò¥ÑÔ¡¿Ä³ÈË£ºÓÐÈË´ø×Å(\D*)ÔÚ(\D*)Ò»´ø³öÏÖ£¡$"
    name="chat4"
@@ -166,7 +162,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="chat"
    keep_evaluating="y"
    match="^(&gt; )*(\! )*¡¾(½­ºþ´«ÎÅ|¹Ù¸®Í¨¸æ|»î¶¯¹«¸æ|áÔÉ½ÅÉ|¹ÅÄ¹ÅÉ|ÏÐÁÄ|Ø¤°ï|À¥ÂØÅÉ|ÌúÕÆ°ï|ÌìÁúËÂ|´óÂÖËÂ|Ã÷½Ì|ÐÇËÞÅÉ|¹ÃËÕÄ½ÈÝ|ÉñÁú½Ì|»ªÉ½ÅÉ|Îäµ±ÅÉ|ÌÒ»¨µº|ÉÙÁÖÅÉ|¶ëáÒÅÉ|¶ÓÎé|Ò¥ÑÔ|Êé½£|ÐÂÎÅ|±í¾ö)¡¿"
@@ -178,7 +173,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*(\D*)(Ö»¾õÈ«ÉíÒ»Âé|Í»È»Ò»²ü£¬Á³ÉÏË²¼äÃ°³öÐí¶àÀäº¹|Ä¿Ç°Õý×Ô¹Ë²»Ï¾|×ó´ÚÓÒÌø£¬Ê¼ÖÕÌÓ²»³ö°ôÓ°|³¤³¤µØÊæÁËÒ»¿ÚÆø¡£|ÉîÉîÎüÁË¼¸¿ÚÆø£¬Á³É«¿´ÆðÀ´ºÃ¶àÁË|µÄÉí×ÓÍ»È»»ÎÁËÁ½»Î£¬ÑÀ¹Ø¸ñ¸ñµØÏìÁËÆðÀ´)"
    name="fight3"
@@ -231,7 +225,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*(ÄãÉÃÀëÖ°ÊØ£¬ÈÎÎñÊ§°Ü¡£|ÄãËÙ¶ÈÌ«Âý£¬Î÷ÏÄÎäÊ¿ÒÑ¹ýËÌÄ¦ÑÂ£¬ÈÎÎñÊ§°Ü¡£)"
    name="job_exp17"
@@ -253,7 +246,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*(ÄãÒòÎª×Ô¼ºÊ°¡¸ÐÅ¡¹²»ÃÁ£¬|Äã)»ñµÃÁË(\D*)µã¾­Ñé£¬(\D*)µãÇ±ÄÜ¡£"
    name="job_exp19"
@@ -275,7 +267,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*¹§Ï²Äã£¡Äã³É¹¦µÄÍê³ÉÁË(\D*)ÈÎÎñ£¡Äã±»½±ÀøÁË"
    name="job_exp5"
@@ -286,7 +277,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*¹§Ï²ÄãÈÎÎñË³ÀûÍê³É£¬Äã»ñµÃÁË(\D*)¾­Ñé£¬(\D*)µãÇ±ÄÜµÄ½±Àø¡£$"
    name="job_exp16"
@@ -297,7 +287,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*ºÃ£¡ÈÎÎñÍê³É£¬Äã±»½±ÀøÁË£º(\D*)µãÊµÕ½¾­Ñé£¬(\D*)µãÇ±ÄÜ¡£(\D*)Éñ¡£$"
    name="job_exp10"
@@ -308,7 +297,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*½á¹û(\D*)(ÆøÑªÒ»ÖÍ£¬ÒÑ±»¶¨ÔÚµ±ÌÃ|¶ÙÊ±ÊÖÃ¦½ÅÂÒ£¬Ê©Õ¹³ö»ëÉí½âÊý|¶ÙÊ±ÃæÉ«²Ô°×£¬¸Ð¾õ»ëÉíÄÚÏ¢)"
    name="fight11"
@@ -330,7 +318,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*Äã(±ØÐëÄÃ×Å|Ê¹ÓÃµÄ±øÈÐ²»¶Ô|Ê¹ÓÃµÄ±øÈÐ²»ÕýÈ·|Ê¹ÓÃµÄÎäÆ÷²»¶Ô|ËùÊ¹ÓÃµÄÍâ¹¦ÖÐÃ»ÓÐÕâÖÖ¹¦ÄÜ|²»¹»ºÝ¶¾|ÌÍÁËÌÍ±³ÄÒ£¬·¢ÏÖÀïÃæµÄ°µÆ÷ÒÑ¾­²»¹»)"
    name="fight6"
@@ -341,7 +328,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*Äã(±ØÐëÊ¹ÓÃ½£|ÄÃ×ÅÎäÆ÷ÔõÃ´ÄÜ|±ØÐë¿ÕÊÖ|ÊÖÀïÃ»ÓÐ|ÊÖÀïÎÞ|ÊÖÉÏÎÞ|ÊÖÖÐÎÞ½£|ËùÊ¹ÓÃµÄÍâ¹¦ÖÐÃ»ÓÐÕâÖÖ¹¦ÄÜ)"
    name="fight18"
@@ -352,7 +338,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*Äã(´óÉù½ÐµÀ£º¡°ºé½ÌÖ÷ÉñÍ¨¹ã´ó£¬ÎÒ½ÌÕ½ÎÞ²»Ê¤|·¢·è°ãµÄ½ÐµÀ£º¡°ºé½ÌÖ÷ÉñÍ¨»¤ÓÓ)"
    name="fight10"
@@ -363,7 +348,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*Äã(µÄÄÚÁ¦Ì«ÉÙ|ÏÖÔÚÄÚÁ¦Ì«Èõ|ÏÖÔÚÕæÆø|ÏÖÔÚÄÚÁ¦²»|µÄÄÚÁ¦²»|ÄÚÁ¦ÏÖÔÚ²»¹»|Ä¿Ç°ÄÚÁ¦Ì«ÉÙ|µÄÕæÆø²»×ã£¬ÎÞ·¨|µÄÕæÆø²»×ãÒÔ|·¢ÏÖ×Ô¼ºÏÖÔÚÕæÆøÌ«Èõ|ÕæÆøÌ«Èõ|µÄÕæÆø²»¹»£¡)"
    name="fight12"
@@ -385,7 +369,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*Äã(»º»ºÊÕ»ØÄÚÁ¦£¬ÑÛÖÐµÄºì¹â|ÏÖÔÚÎÞ·¨ÊÕ¹¦|ºÃÏóÐéÍÑÁËÒ»Ñù£¬Í»È»¿åÁËÏÂÀ´|ÐÄÉñÒ»ËÉ£¬ÔÙÒ²Ö§³Ö²»)"
    name="fight9"
@@ -407,7 +390,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*Äã¡¸Å¾¡¹µÄÒ»Éùµ¹ÔÚµØÉÏ£¬ÕõÔú×Å³é¶¯ÁË¼¸ÏÂ¾ÍËÀÁË¡£$"
    name="fight2"
@@ -438,7 +420,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*Äã±»½±ÀøÁË(\D*)µã¾­Ñé£¬(\D*)µãÇ±ÄÜ£¡Äã¸Ð¾õÐ°¶ñÖ®Æø¸üÊ¤´ÓÇ°£¡$"
    name="job_exp13"
@@ -449,7 +430,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*Äã±»½±ÀøÁË£º(\D*)µãÊµÕ½¾­Ñé£¬(\D*)µãÇ±ÄÜ£¬(\D*)°×Òø£¬(\D*)Éñ¡£$"
    name="job_exp14"
@@ -460,7 +440,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*ÄãµÃµ½ÁËÉÍ½ð(\D*)¶§»Æ½ð£¬(\D*)µãÇ±ÄÜ£¬(\D*)¸ö¾º¼¼±ÒºÍ(\D*)µã¾­Ñé£¡"
    name="job_exp21"
@@ -493,7 +472,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*Äã»ñµÃÁË(\D*)µã¾­Ñé£¬(\D*)µãÇ±ÄÜ£¡ÄãµÄÏÀÒåÕýÆøÔö¼ÓÁË£¡$"
    name="job_exp11"
@@ -504,7 +482,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*Äã»ñµÃÁË(\D*)µã¾­Ñé£¬(\D*)µãÇ±ÄÜ£¬(\D*)µã\D*Éñ¡£$"
    name="job_exp12"
@@ -515,7 +492,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*Äã»ñµÃÁË(\D*)µã¾­Ñé£¬(\D*)µãÇ±ÄÜ£¬Äã¹²Îª(\D*)²ù³ýÁË(\D*)¸ö¶ñÔô¡£$"
    name="job_exp15"
@@ -537,7 +513,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*Äã¾²ÏÂÐÄÀ´£¬·´¸´»ØÏë¸Õ²ÅµÄÈÎÎñ¹ý³Ì£¬²»½û»íÈ»¿ªÀÊ¡£¡£Äã¶îÍâµØµÃµ½ÁË(\D*)µã¾­Ñé£¡"
    name="job_exp3"
@@ -569,7 +544,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*ÄãÒò±»ÈË±©×á¶ø³öÃû£¬½­ºþÉùÍûÔö¼ÓÁË(\D*)µã¡£"
    name="job_exp20"
@@ -591,7 +565,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*Äú±»½±ÀøÁË(\D*)µã¾­Ñé£¬(\D*)µãÇ±ÄÜ£¬ÄúÒÑ¾­Îª³¤ÀÖ°ï³öÁ¦(\D*)´Î¡£"
    name="job_exp8"
@@ -613,7 +586,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*Ê¹ÓÃ¡¸³åÈ­¡¹Ê±±ØÐë¿ÕÊÖ£¡"
    name="fight17"
@@ -624,7 +596,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(&gt; )*Ì«¼«Õß£¬ÎÞ¼«¶øÉú£»¶¯Ö®Ôò·Ö£¬¾²Ö®ÔòºÏ£¡ÄãÁ¢Èç³Ó×¼£¬»îÈç³µÂÖ£¬ÔËÆð\D*´ø¶¯\D*µÄ(\D*)Ò»ËÍ£¬ÈÃËûÂí²½²»ÎÈ£¬È«Á¦¶¼´òÏò¿Õ´¦"
    name="fight8"
@@ -646,7 +617,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^(&gt; )*ÔãÁË£¡(\D*)ËÀÍö£¬ÈÎÎñÊ§°Ü£¡"
    name="job_exp18"
@@ -668,7 +638,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(\D*)ÑÛ»¨çÔÂÒ£¬±»¹¥ÁË¸ö´ëÊÖ²»¼°£¡"
    name="fight7"
@@ -690,7 +659,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^(Äã)(µÄÌåÁ¦¿ìÏûºÄÍêÁË|ÏÖÔÚÌ«ÀÛÁË|ÏÖÔÚÕæÆøÌ«Èõ)"
    name="fight5"
@@ -734,7 +702,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="fight"
    match="^&gt;*\s*\( (\D*)(ÒÑ¾­ÉËºÛÀÛÀÛ£¬ÕýÔÚÃãÁ¦Ö§³Å×Å²»µ¹ÏÂÈ¥|ÊÜÁËÏàµ±ÖØµÄÉË£¬Ö»ÅÂ»áÓÐÉúÃüÎ£ÏÕ|ÒÑ¾­Ò»¸±Í·ÖØ½ÅÇáµÄÄ£Ñù£¬ÕýÔÚÃãÁ¦Ö§³Å×Å²»µ¹ÏÂÈ¥|ÆøÏ¢´ÖÖØ£¬¶¯×÷¿ªÊ¼É¢ÂÒ£¬¿´À´ËùÊÜµÄÉË×ÅÊµ²»Çá|ÒÑ¾­Ò»¸±Í·ÖØ½ÅÇáµÄÄ£Ñù£¬ÕýÔÚÃãÁ¦Ö§³Å×Å²»µ¹ÏÂÈ¥|ËÆºõÊ®·ÖÆ£±¹£¬¿´À´ÐèÒªºÃºÃÐÝÏ¢ÁË|¿´ÆðÀ´ÒÑ¾­Á¦²»´ÓÐÄÁË|Æø´­ÐêÐê£¬¿´ÆðÀ´×´¿ö²¢²»Ì«ºÃ|¶¯×÷ËÆºõ¿ªÊ¼ÓÐµã²»Ì«Áé¹â£¬µ«ÊÇÈÔÈ»ÓÐÌõ²»ÎÉ|¿´ÆðÀ´¿ÉÄÜÊÜÁËµãÇáÉË|¿´ÆðÀ´¿ÉÄÜÓÐÐ©ÀÛÁË|ÊÜÁË¼¸´¦ÉË£¬²»¹ýËÆºõ²¢²»°­ÊÂ|ÊÜÉË²»Çá£¬¿´ÆðÀ´×´¿ö²¢²»Ì«ºÃ|ËÆºõÊÜÁËµãÇáÉË£¬²»¹ý¹â´ÓÍâ±í¿´²»´ó³öÀ´|ËÆºõÓÐÐ©Æ£±¹£¬µ«ÊÇÈÔÈ»Ê®·ÖÓÐ»îÁ¦|ÒÑ¾­ÏÝÈë°ë»èÃÔ×´Ì¬£¬ËæÊ±¶¼¿ÉÄÜË¤µ¹ÔÎÈ¥|ÊÜÉË¹ýÖØ£¬ÒÑ¾­ÑÙÑÙÒ»Ï¢£¬ÃüÔÚµ©Ï¦ÁË|ÊÜÉË¹ýÖØ£¬ÒÑ¾­ÓÐÈç·çÖÐ²ÐÖò£¬ËæÊ±¶¼¿ÉÄÜ¶ÏÆø)¡£ \)"
    name="fight1"
@@ -745,7 +712,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^&gt;*\s*ºÃ£¬ÈÎÎñÍê³ÉÁË£¬ÄãµÃµ½ÁË(\D*)µãÊµÕ½¾­Ñé£¬(\D*)µãÇ±ÄÜ"
    name="job_exp6"
@@ -756,7 +722,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^&gt;*\s*Äã±»½±ÀøÁË(\D*)µã¾­Ñé£¬(\D*)µãÇ±ÄÜ£¬(\D*)µã¸ºÉñ£¡$"
    name="job_exp7"
@@ -767,7 +732,6 @@
   >
   </trigger>
   <trigger
-   enabled="y"
    group="job_exp"
    match="^&gt;*\s*Äã¾õµÃÄÔÖÐ»íÈ»¿ªÀÊ£¬Ôö¼ÓÁË(\D*)µãÇ±ÄÜºÍ(\D*)µã¾­Ñé£¡"
    name="job_exp4"
@@ -1039,7 +1003,26 @@
   >
   </trigger>
   <trigger
-   enabled="y"
+   group="login"
+   match="^ÄúÉÏ´ÎÁ¬ÏßµØÖ·ÊÇ"
+   name="login1"
+   regexp="y"
+   script="logincheck"
+   sequence="100"
+   variable="login1"
+  >
+  </trigger>
+  <trigger
+   group="login"
+   match="^ÇëÄúÊäÈëÕâ¸öÈËÎïµÄÊ¶±ðÃÜÂë\(passwd\)£º"
+   name="login2"
+   regexp="y"
+   script="login_passwd"
+   sequence="100"
+   variable="login2"
+  >
+  </trigger>
+  <trigger
    group="fight"
    match="^Ò»¹ÉÅ¯Á÷·¢×Ôµ¤ÌïÁ÷ÏòÈ«Éí£¬ÂýÂýµØÄãÓÖ»Ö¸´ÁËÖª¾õ¡­¡­"
    name="fight16"
@@ -1068,7 +1051,7 @@
 <aliases
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
   >
   <alias
    name="dushu"
@@ -1404,11 +1387,8 @@
 <timers
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
   >
-  <timer name="idle" script="idle_set" enabled="y" second="30.00" offset_second="0.00" active_closed="y" >
-
-  </timer>
 </timers>
 
 <!-- macros -->
@@ -1416,7 +1396,7 @@
 <macros
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
   >
 
   <macro name="up" type="send_now" >
@@ -1510,7 +1490,7 @@
 <variables
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
   >
   <variable name="drugprepare">Å£Æ¤¾Æ´ü</variable>
   <variable name="flagautoxuexi">0</variable>
@@ -1546,7 +1526,7 @@
 <colours
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
   >
 
 <ansi>
@@ -1603,7 +1583,7 @@
 <keypad
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
   >
 
   <key name="0" >
@@ -1717,7 +1697,7 @@
 <printing
    muclient_version="5.06"
    world_file_version="15"
-   date_saved="2020-02-02 22:10:18"
+   date_saved="2020-02-15 20:41:12"
   >
 
 <ansi>

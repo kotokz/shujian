@@ -214,9 +214,6 @@ weapon_unwield = function()
             end
         end
     end
-    exe('unwield lianyu')
-    exe('unwield mu jian')
-    exe('unwield wuji xiao')
     checkWield()
 end
 weaponUnWalk = function()
@@ -263,7 +260,6 @@ weaponUcheck = function()
 
             end
         end
-        tmp.uweapon = nil
         tprint(weaponUsave)
         for p in pairs(weaponUsave) do
             if weaponUsave[p] == false then
@@ -360,41 +356,46 @@ function ungeta()
     if u_cmd ~= nil then exe('unwield ' .. u_cmd) end
 end
 weaponRepairDo = function()
-    await_go("扬州城", "兵器铺")
-    weapon_unwield()
-    ungeta()
-    bqxl = bqxl + 1
-    exe('wield tie chui')
-    local cannotRepair = false
-    local l, w = nil
-    for p in pairs(weaponUsave) do
-        if weaponUsave[p] == false and Bag[p] then
+    wait.make(function()
+        await_go("扬州城", "兵器铺")
+        weapon_unwield()
+        ungeta()
+        bqxl = bqxl + 1
+        exe('wield tie chui')
+        local cannotRepair = false
+        local l, w = nil
+        if tmp.uweapon and Bag[tmp.uweapon] then
             repeat
-                exe('uweapon shape ' .. Bag[p].fullid)
-                exe('repair ' .. Bag[p].fullid)
+                exe('uweapon shape ' .. Bag[tmp.uweapon].fullid)
+                exe('repair ' .. Bag[tmp.uweapon].fullid)
                 l, w = wait.regexp(
                            '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！)',
                            2)
             until l ~= nil
             if l:find('恢复了它的原貌') or l:find('无需修理') then
-                weaponUsave[p] = true
+                weaponUsave[tmp.uweapon] = true
+                tmp.uweapon = nil
             else
                 cannotRepair = true
-                break
             end
-            l = nil
-        end
-    end
-    if cannotRepair then
-        if l:find('无需修理') then
-            return weaponRepairBuy()
-        elseif l:find('你带的零钱不够了') then
-            return weaponRepairGold()
         else
-            return weaponRepairCannt()
+            messageShow('武器修理出错，找不到需要修的武器' ..
+                            tmp.uweapon)
         end
-    end
-    weaponRepairGoCun()
+
+        if cannotRepair then
+            if l:find('无需修理') then
+                return weaponRepairBuy()
+            elseif l:find('你带的零钱不够了') then
+                return weaponRepairGold()
+            else
+                return weaponRepairCannt()
+            end
+        end
+        messageShow('武器修理完毕，继续下一步')
+        weaponRepairGoCun()
+    end)
+
 end
 function weaponRepairCannt()
     weaponUcannt = weaponUcannt or {}

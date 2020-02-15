@@ -139,9 +139,6 @@ end
 hp_exp_check = function(n, l, w)
     hp.water = tonumber(w[1])
     hp.exp = tonumber(del_string(tostring(w[2]), ','))
-    if draw_statuswindow ~=nil then
-        draw_statuswindow()
-    end
 end
 hp_dazuo_check = function(n, l, w)
     hp.dazuo = trans(w[1])
@@ -600,9 +597,6 @@ end
 function lingwu_go()
     exe('nick 少林领悟达摩院后殿')
     messageShow('去少林领悟')
-    if draw_statuswindow ~=nil then
-        draw_statuswindow()
-    end
     jifaAll()
     go(lingwu_unwield, '嵩山少林', '达摩院')
 end
@@ -764,9 +758,6 @@ end
 function xuexi()
     exe('nick 回门派学习')
     messageShow('回门派学习')
-    if draw_statuswindow ~=nil then
-        draw_statuswindow()
-    end
     master = {}
 
     if hp.exp < 150000 then
@@ -1059,4 +1050,374 @@ function xuexiFinish()
     exe('cha;unwield ' .. leweapon)
     dis_all()
     return check_busy(check_food)
+end
+
+function check_xuexi()
+    if MidHsDay[locl.time] and score.master == '风清扬' then
+        return check_job()
+    end
+    -- if needxuexi==0 then
+    -- return check_job()
+    -- end
+    -- if needxuexi==1 then
+    return check_pot()
+    -- end
+end
+function literate()
+    exe('nick 学习读书写字')
+    messageShow('学习读书写字！')
+    DeleteTemporaryTriggers()
+    if hp.exp < 151000 then
+        master.times = 10
+    else
+        master.times = math.modf(hp.jingxue / 120)
+        if master.times > 50 then
+            master.times = 50
+        elseif master.times < 10 then
+            master.times = 10
+        end
+    end
+    return check_busy(literateGo)
+end
+function literateGo()
+    weapon_unwield()
+    local leweapon = GetVariable("learnweapon")
+    exe('wield ' .. leweapon)
+    go(literateCheck, '扬州城', '书院')
+end
+function literateCheck()
+    DeleteTriggerGroup("litxuexi")
+    create_trigger_t('litxuexi1',
+                     "^(> )*顾炎武对着你端详了一番道：“你因经验所制，暂时无法再进修更高深的学问了。”",
+                     '', 'litxuexiover')
+    create_trigger_t('litxuexi2',
+                     "^(> )*你今天太累了，结果什么也没有学到",
+                     '', 'litxuexisleep')
+    create_trigger_t('litxuexi3',
+                     "^.*说道：您太客气了，这怎么敢当？", '',
+                     'litxuexiover')
+    SetTriggerOption("litxuexi1", "group", "litxuexi")
+    SetTriggerOption("litxuexi2", "group", "litxuexi")
+    SetTriggerOption("litxuexi3", "group", "litxuexi")
+    EnableTriggerGroup("litxuexi", true)
+    flag.idle = nil
+    exe('hp')
+    return checkWait(literateXue, 0.8)
+end
+function litxuexiover()
+    DeleteTriggerGroup("litxuexi")
+    dis_all()
+    return check_halt(literateBack)
+end
+function literateXue()
+    if not locl.id["顾炎武"] then return literateBack() end
+    if hp.neili < 100 then
+        if hqd_cur > 0 then
+            exe('eat huangqi dan')
+        elseif hp.exp < 800000 and needxuexi == 1 then
+            return xuexi()
+        else
+            return literateBack()
+        end
+    end
+    if hp.neili < 1000 then exe('eat ' .. drug.neili2) end
+    if hp.pot > master.times - 1 then
+        -- yunAddInt()
+        exe('yun jing;xue gu literate ' .. master.times)
+        return check_busy(literateCheck)
+    elseif hp.pot < master.times then
+        return literateBack()
+    else
+        return literateBack()
+    end
+end
+function literateBack()
+    messageShow('读书写字学习完毕！')
+    weapon_unwield()
+    local leweapon = GetVariable("learnweapon")
+    exe('unwield ' .. leweapon)
+    exe('hp;score;cha;yun jing;yun qi;yun jingli')
+    dis_all()
+    return check_busy(check_food)
+end
+function litxuexisleep()
+    if score.gender == '男' then
+        return go(litxuexiSleepOver, "songshan/nan-room", "")
+    else
+        return go(litxuexiSleepOver, "songshan/nv-room", "")
+    end
+end
+function litxuexiSleepOver()
+    exe('sleep')
+    checkWait(checkPrepare, 3)
+end
+function duanzao()
+    exe('nick 学习锻造')
+    DeleteTemporaryTriggers()
+    if hp.exp < 151000 then
+        master.times = 3
+    else
+        master.times = math.modf(hp.jingxue / 120)
+        if master.times > 50 then master.times = 50 end
+    end
+    return check_busy(duanzaoGo)
+end
+function duanzaoGo() return go(duanzaoCheck, '扬州城', '兵器铺') end
+function duanzaoCheck()
+    flag.idle = nil
+    exe('score;hp;cha')
+    checkBags()
+    return checkWait(duanzaoXue, 0.8)
+end
+function duanzaoXue()
+    if not locl.id["铸剑师"] then return duanzaoBack() end
+    if hp.neili < 100 then
+        if hqd_cur > 0 then
+            exe('eat huangqi dan')
+        else
+            return duanzaoBack()
+        end
+    end
+    if hp.neili < 1000 then exe('eat ' .. drug.neili2) end
+    if skills["duanzao"] and skills["duanzao"].lvl >= 221 then
+        return duanzaoBack()
+    end
+    if Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt > 30 and
+        hp.pot > master.times - 1 then
+        -- yunAddInt()
+        exe('yun jing;xue shi duanzao ' .. master.times)
+        return duanzaoCheck()
+    elseif hp.pot < master.times then
+        return duanzaoBack()
+    elseif score.gold > 300 then
+        return check_bei(duanzaoQu, 1)
+    else
+        return duanzaoBack()
+    end
+end
+function duanzaoQu()
+    exe('n;#3w;#3n;w;qu 30 gold')
+    exe('e;#3s;#3e;s')
+    return check_busy(duanzaoCheck, 1)
+end
+function duanzaoBack()
+    exe('hp')
+    return check_busy(check_food)
+end
+
+function zhizao()
+    exe('nick 学习织造')
+    DeleteTemporaryTriggers()
+    if hp.exp < 151000 then
+        master.times = 3
+    else
+        master.times = math.modf(hp.jingxue / 120)
+        if master.times > 50 then master.times = 50 end
+    end
+    return check_busy(zhizaoGo)
+end
+function zhizaoGo() return go(zhizaoCheck, '大理城', '裁缝店') end
+function zhizaoCheck()
+    flag.idle = nil
+    exe('score;hp;cha')
+    checkBags()
+    return checkWait(zhizaoXue, 0.8)
+end
+function zhizaoXue()
+    if not locl.id["老裁缝"] then return zhizaoBack() end
+    if hp.neili < 100 then
+        if hqd_cur > 0 then
+            exe('eat huangqi dan')
+        else
+            return zhizaoBack()
+        end
+    end
+    if hp.neili < 1000 then exe('eat ' .. drug.neili2) end
+    if skills["zhizao"] and skills["zhizao"].lvl >= 221 then
+        return zhizaoBack()
+    end
+    if Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt > 30 and hp.pot >
+        master.times - 1 then
+        -- yunAddInt()
+        exe('yun jing;xue caifeng zhizao ' .. master.times)
+        return zhizaoCheck()
+    elseif hp.pot < master.times then
+        return zhizaoBack()
+    elseif score.gold > 300 then
+        return check_bei(zhizaoQu, 1)
+    else
+        return zhizaoBack()
+    end
+end
+function zhizaoQu()
+    exe('e;n;#3e;n;qu 30 gold')
+    exe('s;#3w;s;w')
+    return check_busy(zhizaoCheck, 1)
+end
+function zhizaoBack()
+    exe('hp')
+    return check_busy(check_food)
+end
+
+function lianxi(times, xskill)
+    local weapontype
+    flag.lianxi = 1
+    local lianxi_times = 5
+    if times ~= nil then lianxi_times = times end
+    tmp.xskill = xskill
+    if perform.force then
+        if not skills[perform.force] then perform.force = nil end
+    end
+    if not perform.force then
+        tmp.lvl = 0
+        for p in pairs(skills) do
+            q = skillEnable[p]
+            if q == "force" then
+                if skills[p].lvl > tmp.lvl then
+                    tmp.lvl = skills[p].lvl
+                    perform.force = p
+                end
+            end
+        end
+    end
+    if flag.lianxi == 1 then
+        for p in pairs(skills) do
+            q = skillEnable[p]
+            if (not tmp.xskill or tmp.xskill == p) and q == "force" and
+                skills[p].full == 0 and perform.force and perform.force == p then
+                lianxi_times = lianxi_times * 0.5
+                exe('lian ' .. q .. ' ' .. lianxi_times)
+                flag.lianxi = 0
+                tmp.pskill = p
+                exe('hp')
+                break
+            end
+        end
+    end
+    if flag.lianxi == 1 then
+        for p in pairs(skills) do
+            q = skillEnable[p]
+            if (not tmp.xskill or tmp.xskill == p) and q == "dodge" and
+                skills[p].full == 0 then
+                exe('bei none;jifa ' .. q .. ' ' .. p)
+                exe('lian ' .. q .. ' ' .. lianxi_times)
+                flag.lianxi = 0
+                tmp.pskill = p
+                break
+            end
+        end
+    end
+    if flag.lianxi == 1 then
+        for p in pairs(skills) do
+            q = skillEnable[p]
+            if p == "yuxiao-jian" then
+                weapontype = "xiao"
+            else
+                weapontype = q
+            end
+            if (not tmp.xskill or tmp.xskill == p) and q and p == perform.skill and
+                skills[p].full == 0 and
+                ((weaponKind[weapontype] and weaponInBag(weapontype)) or
+                    unarmedKind[q]) then
+                exe('bei none;jifa ' .. q .. ' ' .. p)
+                weapon_unwield()
+                if weaponKind[q] then
+                    exe('wield ' .. q)
+                    for k, v in pairs(Bag) do
+                        if Bag[k].kind == weapontype then
+                            exe('wield ' .. Bag[k].fullid)
+                        end
+                    end
+                end
+                exe('i;lian ' .. q .. ' ' .. lianxi_times)
+                flag.lianxi = 0
+                tmp.pskill = p
+                break
+            end
+        end
+    end
+    if flag.lianxi == 1 then
+        for p in pairs(skills) do
+            q = skillEnable[p]
+            if p == "yuxiao-jian" then
+                weapontype = "xiao"
+            else
+                weapontype = q
+            end
+            if (not tmp.xskill or tmp.xskill == p) and q and q ~= "force" and
+                skills[p].full == 0 and
+                ((weaponKind[weapontype] and weaponInBag(weapontype)) or
+                    unarmedKind[q]) then
+                exe('bei none;jifa ' .. q .. ' ' .. p)
+                weapon_unwield()
+                if weaponKind[q] then
+                    exe('wield ' .. q)
+                    for k, v in pairs(Bag) do
+                        if Bag[k].kind == weapontype then
+                            exe('wield ' .. Bag[k].fullid)
+                        end
+                    end
+                end
+                exe('i;lian ' .. q .. ' ' .. lianxi_times)
+                flag.lianxi = 0
+                tmp.pskill = p
+                break
+            end
+        end
+    end
+    beiUnarmed()
+end
+function beiUnarmed()
+    local l_skill = beiUnarmedSkill()
+    if l_skill and type(l_skill) == "string" and skillEnable[l_skill] then
+        exe('bei none')
+        exe('jifa ' .. skillEnable[l_skill] .. ' ' .. l_skill)
+        exe('bei ' .. skillEnable[l_skill])
+    end
+    if skillHubei[l_skill] and skills[skillHubei[l_skill]] then
+        l_skill = skillHubei[l_skill]
+        exe('jifa ' .. skillEnable[l_skill] .. ' ' .. l_skill)
+        exe('bei ' .. skillEnable[l_skill])
+    end
+end
+function beiUnarmedSkill()
+    local l_lvl = 0
+    local l_skill
+    if perform and perform.skill and skillEnable[perform.skill] and
+        unarmedKind[skillEnable[perform.skill]] then
+        -- exe('bei '.. skillEnable[perform.skill])
+        return perform.skill
+    end
+    for p in pairs(flagFull) do
+        if skills[p] and skillEnable[p] and unarmedKind[skillEnable[p]] then
+            q = skillEnable[p]
+            -- exe('bei none;jifa '..q..' '..p..';bei '..q)
+            return p
+        end
+    end
+    if score.party then
+        if score.party == "峨嵋派" and skills["hand"] and
+            skills["jieshou-jiushi"] then
+            -- exe('bei none;jifa hand jieshou-jiushi;bei hand')
+            return "jieshou-jiushi"
+        end
+        if score.party == "丐帮" and skills["strike"] and
+            skills["xianglong-zhang"] then
+            -- exe('bei none;jifa strike xianglong-zhang;bei strike')
+            return "xianglong-zhang"
+        end
+    end
+    for p in pairs(skills) do
+        if skillEnable[p] then
+            q = skillEnable[p]
+            if unarmedKind[q] then
+                if skills[p].lvl > l_lvl then
+                    l_lvl = skills[p].lvl
+                    l_skill = p
+                    -- exe('bei none;jifa '..q..' '..p..';bei '..q)
+                end
+            end
+        end
+    end
+    return l_skill
 end

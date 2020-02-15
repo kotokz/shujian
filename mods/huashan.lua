@@ -839,13 +839,8 @@ huashan_finish = function()
     locl.room = '正气堂'
     hsjob2 = 0
     exe('drop ling pai;drop head;drop corpse')
-    -- jobExpTongji()
     huashan_triggerDel()
-    -- if job.zuhe["wudang"] then
-    --     job.last='wudang'
-    -- end
     setLocateRoomID = 'huashan/zhengqi'
-    -- return check_halt(check_food)原来的check_food注销掉。
     if Bag and Bag["白银"] and Bag["白银"].cnt and Bag["白银"].cnt > 500 then
         return check_gold()
     end

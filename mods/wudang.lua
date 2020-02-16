@@ -466,7 +466,7 @@ function wudangFind()
     -- exe('kezhiwugongpfm')
     if score.id == 'kkfromch' then exe('set À¼»¨ÊÖ µûÎèÊ½') end
     exe('unset wimpy;set wimpycmd pfmpfm\\hp')
-    if string.find(job.where, 'ºûµû¹È') then return hudiegu() end
+    -- if string.find(job.where, 'ºûµû¹È') then return hudiegu() end
     go(wudangFindAct, job.area, job.room)
 end
 function wudangdebugFind()

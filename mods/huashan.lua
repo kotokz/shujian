@@ -444,7 +444,7 @@ huashan_find = function(n, l, w)
         (job.room == "紫杉林" or string.find(job.room, "字门")) then
         job.room = "紫杉林"
     end
-    if string.find(job.where, '蝴蝶谷') then return hudiegu() end
+    -- if string.find(job.where, '蝴蝶谷') then return hudiegu() end
     return go(huashanFindAct, job.area, job.room, "huashan/shulin")
 end
 function huashan_find_again()
@@ -457,7 +457,7 @@ function huashan_find_again()
         wait.time(1.0)
         dis_all()
         EnableTriggerGroup("huashan_find", true)
-        if string.find(job.where, '蝴蝶谷') then return hudiegu() end
+        -- if string.find(job.where, '蝴蝶谷') then return hudiegu() end
         go(huashanFindAct, job.area, job.room)
     end)
 end
@@ -662,13 +662,14 @@ huashan_get_con = function(n, l, w)
     DeleteTriggerGroup("all_fight")
     EnableTriggerGroup("huashan_npc", false)
     kezhiwugongclose()
-    if fqyytmp.goArmorD ~= 1 then checkBags() end
+    -- if fqyytmp.goArmorD ~= 1 then checkBags() end
     if job.target == tostring(w[2]) then
         EnableTriggerGroup("huashan_npc", false)
         EnableTriggerGroup("huashan_cut", false)
         -- fpk_prepare()--预防pk的设置，定义在skill.lua中
+        checkBags()
         for i = 1, 3 do exe('get ling pai from corpse ' .. i) end
-        road.id = nil
+        -- road.id = nil
         fightoverweapon()
         return go(huashan_yls_give, '华山', '祭坛')
     else
@@ -764,19 +765,17 @@ huashan_yls_ask = function(n, l, w)
     EnableTriggerGroup("huashan_yls_ask", false)
     quick_locate = 1
     if w[2] == '二' then return huashan_yls_back() end
-    if w[2] == '一' and (dohs2 == 0 or (lostletter == 1 and needdolost == 1)) then
-        wait.make(function()
-            wait.time(2.0)
-            return check_bei(huashan_yls_lbcx)
-        end)
-        -- return check_bei(huashan_yls_lbcx)
-    else
-        wait.make(function()
-            wait.time(2.0)
-            return check_bei(huashan_heal)
-        end)
-        -- return check_bei(huashan_heal)
-    end
+    wait.make(function()
+        wait.time(1.0)
+        wait_busy()
+        if w[2] == '一' and
+            (dohs2 == 0 or (lostletter == 1 and needdolost == 1)) then
+            return huashan_yls_lbcx()
+        else
+            return huashan_heal()
+        end
+    end)
+
 end
 huashan_heal = function()
     exe('set no_kill_ap')
@@ -841,13 +840,6 @@ huashan_finish = function()
     exe('drop ling pai;drop head;drop corpse')
     huashan_triggerDel()
     setLocateRoomID = 'huashan/zhengqi'
-    if Bag and Bag["白银"] and Bag["白银"].cnt and Bag["白银"].cnt > 500 then
-        return check_gold()
-    end
-    if (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt <
-        count.gold_max and score.gold > count.gold_max) or
-        (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt >
-            count.gold_max * 4) then return check_gold() end
     messageShow('华山任务地点统计：神龙岛【' .. tosld ..
                     '】次 ！菜地【' .. tocaidi .. '】次 ！慕容【' ..
                     tomr .. '】次 ！燕子坞【' .. toyzw ..
@@ -863,6 +855,14 @@ huashan_finish = function()
         g_stop_flag = false
         return disAll()
     end
+    if Bag and Bag["白银"] and Bag["白银"].cnt and Bag["白银"].cnt > 500 then
+        return check_gold()
+    end
+    if (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt <
+        count.gold_max and score.gold > count.gold_max) or
+        (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt >
+            count.gold_max * 4) then return check_gold() end
+
     hsruntime = hsruntime + 1
     if hsruntime > 9 then
         hsruntime = 0

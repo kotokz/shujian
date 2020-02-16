@@ -214,6 +214,7 @@ weapon_unwield = function()
             end
         end
     end
+    ungeta()
     checkWield()
 end
 weaponUnWalk = function()
@@ -235,7 +236,7 @@ weaponWieldCut = function()
         end
     end
     exe('wield mu jian')
-    exe('uweapon shape lianyu sword;wield lianyu')
+    -- exe('uweapon shape lianyu sword;wield lianyu')
     checkWield()
 end
 weaponUcheck = function()
@@ -359,7 +360,6 @@ weaponRepairDo = function()
     wait.make(function()
         await_go("ÑïÖÝ³Ç", "±øÆ÷ÆÌ")
         weapon_unwield()
-        ungeta()
         bqxl = bqxl + 1
         exe('wield tie chui')
         local cannotRepair = false

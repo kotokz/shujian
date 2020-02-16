@@ -543,7 +543,7 @@ function xueshan_find()
     check_halt(xueshan_find_go)
 end
 function xueshan_find_go()
-    if string.find(job.where, 'ºûµû¹È') then return hudiegu() end
+    -- if string.find(job.where, 'ºûµû¹È') then return hudiegu() end
     if job.area == 'Ã÷½Ì' and
         (job.room == "×ÏÉ¼ÁÖ" or string.find(job.room, "×ÖÃÅ")) then
         job.room = "×ÏÉ¼ÁÖ"

@@ -38,11 +38,11 @@ score.gold = 0
 score.tb = 0
 score.yb = 0
 score.jjb = 0
-score.sww=0
-score.sw=0
-score.dj=0
-score.dz=0
-score.zt=''
+score.sww = 0
+score.sw = 0
+score.dj = 0
+score.dz = 0
+score.zt = ''
 
 check_skills = function(n, l, w)
 
@@ -263,214 +263,288 @@ hpheqi = function()
     EnableTriggerGroup("hpheqi", false)
 end
 
-
-hp_dazuo_count=function()
+hp_dazuo_count = function()
     DeleteTriggerGroup("dz_count")
-    create_trigger_t('dz_count1','^>*\\s*卧室不能打坐，会影响别人休息。','','hp_dz_where')
-    create_trigger_t('dz_count2','^>*\\s*你无法静下心来修炼。','','hp_dz_where')
-    create_trigger_t('dz_count3','^>*\\s*(这里不准战斗，也不准打坐。|这里可不是让你提高内力的地方。)','','hp_dz_where')
-	create_trigger_t('dz_count4',"^(> )*你现在手脚戴着镣铐，不能做出正确的姿势来打坐",'','hp_dz_liaokao')
-	create_trigger_t('dz_count5',"^(> )*(你正要有所动作|你无法静下心来修炼|你还是专心拱猪吧)",'','hp_dz_where')
-	create_trigger_t('dz_count6',"^(> )*你现在精不够，无法控制内息的流动！",'','loginerror')
-    SetTriggerOption("dz_count1","group","dz_count")
-    SetTriggerOption("dz_count2","group","dz_count")
-    SetTriggerOption("dz_count3","group","dz_count")
-	SetTriggerOption("dz_count4","group","dz_count")
-	SetTriggerOption("dz_count5","group","dz_count")
-	SetTriggerOption("dz_count6","group","dz_count")
+    create_trigger_t('dz_count1',
+                     '^>*\\s*卧室不能打坐，会影响别人休息。', '',
+                     'hp_dz_where')
+    create_trigger_t('dz_count2', '^>*\\s*你无法静下心来修炼。', '',
+                     'hp_dz_where')
+    create_trigger_t('dz_count3',
+                     '^>*\\s*(这里不准战斗，也不准打坐。|这里可不是让你提高内力的地方。)',
+                     '', 'hp_dz_where')
+    create_trigger_t('dz_count4',
+                     "^(> )*你现在手脚戴着镣铐，不能做出正确的姿势来打坐",
+                     '', 'hp_dz_liaokao')
+    create_trigger_t('dz_count5',
+                     "^(> )*(你正要有所动作|你无法静下心来修炼|你还是专心拱猪吧)",
+                     '', 'hp_dz_where')
+    create_trigger_t('dz_count6',
+                     "^(> )*你现在精不够，无法控制内息的流动！",
+                     '', 'loginerror')
+    SetTriggerOption("dz_count1", "group", "dz_count")
+    SetTriggerOption("dz_count2", "group", "dz_count")
+    SetTriggerOption("dz_count3", "group", "dz_count")
+    SetTriggerOption("dz_count4", "group", "dz_count")
+    SetTriggerOption("dz_count5", "group", "dz_count")
+    SetTriggerOption("dz_count6", "group", "dz_count")
     if perform.force and skills[perform.force] then
-	   exe('jifa force '.. perform.force)
-	else
-	   for p in pairs(skills) do
-	      if skillEnable[p] == "force" then
-		     exe('jifa force '.. p)
-			 exe('cha')
-		  end
-	   end
-	end
-    if skills["linji-zhuang"] and skills["linji-zhuang"].lvl>149 then
-       exe('yun yinyang')
+        exe('jifa force ' .. perform.force)
+    else
+        for p in pairs(skills) do
+            if skillEnable[p] == "force" then
+                exe('jifa force ' .. p)
+                exe('cha')
+            end
+        end
     end
-	if skills["force"] and skills["force"].lvl<450 and skills["force"].lvl<hp.pot_max-100 then
-       flag.xuexi=1
+    if skills["linji-zhuang"] and skills["linji-zhuang"].lvl > 149 then
+        exe('yun yinyang')
     end
+    if skills["force"] and skills["force"].lvl < 450 and skills["force"].lvl <
+        hp.pot_max - 100 then flag.xuexi = 1 end
     exe('yun qi;hp')
-    hp.dazuo=10
+    hp.dazuo = 10
     return check_bei(hp_dazuo_act)
 end
-loginerror=function()
-	  DeleteTriggerGroup("dz_count")
-	  DeleteTimer("dazuo_count")
-    return checkWait(check_heal,0.5)
+loginerror = function()
+    DeleteTriggerGroup("dz_count")
+    DeleteTimer("dazuo_count")
+    return checkWait(check_heal, 0.5)
 end
-hp_dazuo_act=function()
-    tmp.qixue=hp.qixue
-    exe('yun jing;dazuo '..hp.qixue)
-    tmp.i=0
-    return create_timer_s('dazuo_count',1.5,'hp_dazuo_timer')
+hp_dazuo_act = function()
+    tmp.qixue = hp.qixue
+    exe('yun jing;dazuo ' .. hp.qixue)
+    tmp.i = 0
+    return create_timer_s('dazuo_count', 1.5, 'hp_dazuo_timer')
 end
-hp_dazuo_timer=function()
+hp_dazuo_timer = function()
     if tmp.i == nil then tmp.i = 0 end
     tmp.i = tmp.i + 1
-    if tmp.i > 30 then
-       return main()
-    end
-    exe('hp;yun jing;yun qi;dazuo '..hp.qixue)
-    return checkWait(hp_dz_count,0.5)
+    if tmp.i > 30 then return main() end
+    exe('hp;yun jing;yun qi;dazuo ' .. hp.qixue)
+    return checkWait(hp_dz_count, 0.5)
 end
-hp_dz_count=function()
-    EnableTriggerGroup("dz_count",false)
+hp_dz_count = function()
+    EnableTriggerGroup("dz_count", false)
 
-    local l_times=1
-       if hp.qixue<tmp.qixue then
-          if hp.qixue_max>1000 then
-             l_times=math.modf(math.modf(hp.qixue_max/5)/(tmp.qixue-hp.qixue))+1
-	  end
-	  hp.dazuo=l_times*(tmp.qixue-hp.qixue)+150
-	  if hp.dazuo<10 then
-	     hp.dazuo=10
-	  end
-	  --if hp.dazuo>10 and hp.dazuo <100 then
-	  --   l_times=math.modf(100/hp.dazuo)+1
-	  --   hp.dazuo=l_times*hp.dazuo
-	  --end
-	  Note('最佳打坐值为：'..hp.dazuo)
-	  DeleteTriggerGroup("dz_count")
-	  DeleteTimer("dazuo_count")
-	  exe('halt')
-	  if kdummy==1 and hp.exp>2000000 then opendummy() end
-	  return check_bei(vcheck)
-	 end
+    local l_times = 1
+    if hp.qixue < tmp.qixue then
+        if hp.qixue_max > 1000 then
+            l_times = math.modf(math.modf(hp.qixue_max / 5) /
+                                    (tmp.qixue - hp.qixue)) + 1
+        end
+        hp.dazuo = l_times * (tmp.qixue - hp.qixue) + 150
+        if hp.dazuo < 10 then hp.dazuo = 10 end
+        -- if hp.dazuo>10 and hp.dazuo <100 then
+        --   l_times=math.modf(100/hp.dazuo)+1
+        --   hp.dazuo=l_times*hp.dazuo
+        -- end
+        Note('最佳打坐值为：' .. hp.dazuo)
+        DeleteTriggerGroup("dz_count")
+        DeleteTimer("dazuo_count")
+        exe('halt')
+        if kdummy == 1 and hp.exp > 2000000 then opendummy() end
+        return check_bei(vcheck)
+    end
 end
 function vcheck()
-if score.id and score.id=='ptbx' and ptbxvip==1 then
-      job.name='ptbx'
-      exe('cond')
-      return go(VIPask,'扬州城','当铺')
-   else
-      return Gstart()
-   end
+    if score.id and score.id == 'ptbx' and ptbxvip == 1 then
+        job.name = 'ptbx'
+        exe('cond')
+        return go(VIPask, '扬州城', '当铺')
+    else
+        return Gstart()
+    end
 end
-function Gstart()
-	  return check_bei(check_food)
+function Gstart() return check_bei(check_food) end
+hp_dz_where = function()
+    EnableTriggerGroup("dz_count", false)
+    DeleteTimer("dazuo_count")
+    locate()
+    check_bei(hp_dz_go)
 end
-hp_dz_where=function()
-   EnableTriggerGroup("dz_count",false)
-   DeleteTimer("dazuo_count")
-   locate()
-   check_bei(hp_dz_go)
-end
-hp_dz_go=function()
-   EnableTriggerGroup("dz_count",true)
-   exe(locl.dir)
-   hp_dazuo_act()
+hp_dz_go = function()
+    EnableTriggerGroup("dz_count", true)
+    exe(locl.dir)
+    hp_dazuo_act()
 end
 function hp_dz_liaokao()
     dis_all()
-	return tiaoshui()
+    return tiaoshui()
 end
 function hp_trigger()
     DeleteTriggerGroup("hp")
-    create_trigger_t('hp1',"^·精血·\\s*(\\d*)\\s*\\/\\s*(\\d*)\\s*\\(\\s*(\\d*)\\%\\)\\s*·精力·\\s*(\\d*)\\s*\\/\\s*(\\d*)\\((\\d*)\\)$",'','hp_jingxue_check')
-    create_trigger_t('hp2',"^·气血·\\s*(\\d*)\\s*\\/\\s*(\\d*)\\s*\\(\\s*(\\d*)\\%\\)\\s*·内力·\\s*(\\d*)\\s*\\/\\s*(\\s*\\d*)\\(\\+\\d*\\)$",'','hp_qixue_check')
-    create_trigger_t('hp3',"^·食物·\\s*(\\d*)\\.\\d*\\%\\s*·潜能·\\s*(\\d*)\\s*\\/\\s*(\\d*)$",'','hp_pot_check')
-    create_trigger_t('hp4',"^·饮水·\\s*(\\d*)\\.\\d*\\%\\s*·经验·\\s*(.*)\\s*\\(",'','hp_exp_check')
-    create_trigger_t('hp5',"^·(戾|正)气·\\s*(.*)\\s*·内力上限·\\s*(\\d*)\\s*\\/",'','hp_shen_check')
-    create_trigger_t('hp7',"^(□)*\\s*(\\D*)\\s*\\((\\D*)(\\-)*(\\D*)\\)\\s*\\-\\s*\\D*\\s*(\\d*)\\/\\s*(\\d*)$",'','check_skills')
-    create_trigger_t('hp8',"^>*\\s*你至少需要(\\D*)点的气来打坐！",'','hp_dazuo_check')
-    create_trigger_t('hp9',"^│(\\D*)任务\\s*│\\s*(\\d*) 次\\s*│ ",'','checkJobtimes')
-    create_trigger_t('hp10',"^□(\\D*)\\(\\D*\\)$",'','checkWieldCatch')
-    create_trigger_t('hp11',"^(> )*你最近刚完成了(\\D*)任务。$",'','checkJoblast')
-    create_triggerex_lvl('hp12',"^(> )*(\\D*)",'','resetWait',200)
-    create_trigger_t('hp13',"^(> )*你还在巡城呢，仔细完成你的任务吧。",'','checkQuit')
-    create_trigger_t('hp14',"^\\D*被一阵风卷走了。$",'','checkRefresh')
-    create_trigger_t('hp15',"^(> )*一个月又过去",'','checkMonth')
-    create_trigger_t('hp16',"^(> )*昨天完成失落信笺任务(\\N*)次，今天完成失落信笺任务(\\N*)/(\\N*)次。",'','checkLLlost')
-    create_trigger_t('hp17',"^(> )*你(渴得眼冒金星，全身无力|饿得头昏眼花，直冒冷汗)|满天黄沙，你感到喉咙冒烟，干渴难熬！",'','checkQuit')
-    create_trigger_t('hp18',"^(> )*(你舔了舔干裂的嘴唇，看来是很久没有喝水了|突然一阵“咕咕”声传来，原来是你的肚子在叫了)",'','checkfood')
-    create_trigger_t('hp19',"^(> )*(忽然一阵刺骨的奇寒袭来，你中的星宿掌毒发作了|忽然一股寒气犹似冰箭，循着手臂，迅速无伦的射入胸膛，你中的寒毒发作了)",'','checkDebug')
-    create_trigger_t('hp20',"^(> )*你(服下一颗活血疗精丹，顿时感觉精血不再流失|服下一颗内息丸，顿时觉得内力充沛了不少|服下一颗川贝内息丸，顿时感觉内力充沛|服下一颗黄芪内息丹，顿时感觉空虚的丹田充盈了不少|敷上一副蝉蜕金疮药，顿时感觉伤势好了不少|吃下一颗大还丹顿时伤势痊愈气血充盈)。",'','hpeatOver')
-    create_trigger_t('hp21',"^(> )*你必须先用 enable 选择你要用的特殊内功。",'','jifaOver')
-    create_trigger_t('hp22',"^(> )*(\\D*)目前学过(\\D*)种技能：",'','show_skills')
-    create_trigger_t('hp23',"^(> )*你的背囊里有：",'','show_beinang')
-    create_trigger_t('hp24','^(> )*你眼中一亮看到\\D*的身边掉落一(件|副|双|袭|顶|个|条|对)(\\D*)(手套|靴|甲胄|腰带|披风|彩衣|头盔)。','','fqyyArmorGet')
-    create_trigger_t('hp25','^(> )*你捡起一(件|副|双|袭|顶|个|条|对)(\\D*)(手套|靴|甲胄|腰带|披风|彩衣|头盔)。','','fqyyArmorCheck')
-	create_trigger_t('hp26','^(> )*\\D*告诉你：城门(\\D*)','','yiliCheck')
-	create_trigger_t('hp27','^(> )*客官已经付了银子，怎(么|麽)不住店就走了呢！旁人还以为小店伺候不周呢！','','kedian_sleep')
-	create_trigger_t('hp28','^.*穷光蛋，一边呆着去','','newbie_qu_gold')
-	create_trigger_t('hp29','^.*狐疑地看着你：「这信怎么落到你的手上？」','','dolost_hitlog_open')
-    create_trigger_t('hp30','^.*据说'..score.name..'被.*打傻了!','','dolost_hitlog_close')
-    create_trigger_t('hp31',"^\\D*你把钱交给船家，船家领你上了一条小舟",'','job_lianstart')
-    create_trigger_t('hp71',"^(> )*【活动公告】书剑永恒天玑站砸金蛋活动开始了！",'','egg_huodong')
-    SetTriggerOption("hp71","group","hp")
-    SetTriggerOption("hp24","group","hp")
-    SetTriggerOption("hp25","group","hp")
-	SetTriggerOption("hp26","group","hp")
-	SetTriggerOption("hp27","group","hp")
-    SetTriggerOption("hp1","group","hp")
-    SetTriggerOption("hp2","group","hp")
-    SetTriggerOption("hp3","group","hp")
-    SetTriggerOption("hp4","group","hp")
-    SetTriggerOption("hp5","group","hp")
-    SetTriggerOption("hp7","group","hp")
-    SetTriggerOption("hp8","group","hp")
-    SetTriggerOption("hp9","group","hp")
-    SetTriggerOption("hp10","group","hp")
-    SetTriggerOption("hp11","group","hp")
-    SetTriggerOption("hp12","group","hp")
-    SetTriggerOption("hp13","group","hp")
-    SetTriggerOption("hp14","group","hp")
-    SetTriggerOption("hp15","group","hp")
-    SetTriggerOption("hp16","group","hp")
-    SetTriggerOption("hp17","group","hp")
-    SetTriggerOption("hp18","group","hp")
-    SetTriggerOption("hp19","group","hp")
-    SetTriggerOption("hp20","group","hp")
-    SetTriggerOption("hp21","group","hp")
-    SetTriggerOption("hp22","group","hp")
-    SetTriggerOption("hp23","group","hp")
-	SetTriggerOption("hp28","group","hp")
-	SetTriggerOption("hp29","group","hp")
-    SetTriggerOption("hp30","group","hp")
-    SetTriggerOption("hp31","group","hp")
+    create_trigger_t('hp1',
+                     "^·精血·\\s*(\\d*)\\s*\\/\\s*(\\d*)\\s*\\(\\s*(\\d*)\\%\\)\\s*·精力·\\s*(\\d*)\\s*\\/\\s*(\\d*)\\((\\d*)\\)$",
+                     '', 'hp_jingxue_check')
+    create_trigger_t('hp2',
+                     "^·气血·\\s*(\\d*)\\s*\\/\\s*(\\d*)\\s*\\(\\s*(\\d*)\\%\\)\\s*·内力·\\s*(\\d*)\\s*\\/\\s*(\\s*\\d*)\\(\\+\\d*\\)$",
+                     '', 'hp_qixue_check')
+    create_trigger_t('hp3',
+                     "^·食物·\\s*(\\d*)\\.\\d*\\%\\s*·潜能·\\s*(\\d*)\\s*\\/\\s*(\\d*)$",
+                     '', 'hp_pot_check')
+    create_trigger_t('hp4',
+                     "^·饮水·\\s*(\\d*)\\.\\d*\\%\\s*·经验·\\s*(.*)\\s*\\(",
+                     '', 'hp_exp_check')
+    create_trigger_t('hp5',
+                     "^·(戾|正)气·\\s*(.*)\\s*·内力上限·\\s*(\\d*)\\s*\\/",
+                     '', 'hp_shen_check')
+    create_trigger_t('hp7',
+                     "^(□)*\\s*(\\D*)\\s*\\((\\D*)(\\-)*(\\D*)\\)\\s*\\-\\s*\\D*\\s*(\\d*)\\/\\s*(\\d*)$",
+                     '', 'check_skills')
+    create_trigger_t('hp8', "^>*\\s*你至少需要(\\D*)点的气来打坐！",
+                     '', 'hp_dazuo_check')
+    create_trigger_t('hp9', "^│(\\D*)任务\\s*│\\s*(\\d*) 次\\s*│ ", '',
+                     'checkJobtimes')
+    create_trigger_t('hp10', "^□(\\D*)\\(\\D*\\)$", '', 'checkWieldCatch')
+    create_trigger_t('hp11', "^(> )*你最近刚完成了(\\D*)任务。$", '',
+                     'checkJoblast')
+    create_triggerex_lvl('hp12', "^(> )*(\\D*)", '', 'resetWait', 200)
+    create_trigger_t('hp13',
+                     "^(> )*你还在巡城呢，仔细完成你的任务吧。",
+                     '', 'checkQuit')
+    create_trigger_t('hp14', "^\\D*被一阵风卷走了。$", '',
+                     'checkRefresh')
+    create_trigger_t('hp15', "^(> )*一个月又过去", '', 'checkMonth')
+    create_trigger_t('hp16',
+                     "^(> )*昨天完成失落信笺任务(\\N*)次，今天完成失落信笺任务(\\N*)/(\\N*)次。",
+                     '', 'checkLLlost')
+    create_trigger_t('hp17',
+                     "^(> )*你(渴得眼冒金星，全身无力|饿得头昏眼花，直冒冷汗)|满天黄沙，你感到喉咙冒烟，干渴难熬！",
+                     '', 'checkQuit')
+    create_trigger_t('hp18',
+                     "^(> )*(你舔了舔干裂的嘴唇，看来是很久没有喝水了|突然一阵“咕咕”声传来，原来是你的肚子在叫了)",
+                     '', 'checkfood')
+    create_trigger_t('hp19',
+                     "^(> )*(忽然一阵刺骨的奇寒袭来，你中的星宿掌毒发作了|忽然一股寒气犹似冰箭，循着手臂，迅速无伦的射入胸膛，你中的寒毒发作了)",
+                     '', 'checkDebug')
+    create_trigger_t('hp20',
+                     "^(> )*你(服下一颗活血疗精丹，顿时感觉精血不再流失|服下一颗内息丸，顿时觉得内力充沛了不少|服下一颗川贝内息丸，顿时感觉内力充沛|服下一颗黄芪内息丹，顿时感觉空虚的丹田充盈了不少|敷上一副蝉蜕金疮药，顿时感觉伤势好了不少|吃下一颗大还丹顿时伤势痊愈气血充盈)。",
+                     '', 'hpeatOver')
+    create_trigger_t('hp21',
+                     "^(> )*你必须先用 enable 选择你要用的特殊内功。",
+                     '', 'jifaOver')
+    create_trigger_t('hp22', "^(> )*(\\D*)目前学过(\\D*)种技能：", '',
+                     'show_skills')
+    create_trigger_t('hp23', "^(> )*你的背囊里有：", '', 'show_beinang')
+    create_trigger_t('hp24',
+                     '^(> )*你眼中一亮看到\\D*的身边掉落一(件|副|双|袭|顶|个|条|对)(\\D*)(手套|靴|甲胄|腰带|披风|彩衣|头盔)。',
+                     '', 'fqyyArmorGet')
+    create_trigger_t('hp25',
+                     '^(> )*你捡起一(件|副|双|袭|顶|个|条|对)(\\D*)(手套|靴|甲胄|腰带|披风|彩衣|头盔)。',
+                     '', 'fqyyArmorCheck')
+    create_trigger_t('hp26', '^(> )*\\D*告诉你：城门(\\D*)', '',
+                     'yiliCheck')
+    create_trigger_t('hp27',
+                     '^(> )*客官已经付了银子，怎(么|麽)不住店就走了呢！旁人还以为小店伺候不周呢！',
+                     '', 'kedian_sleep')
+    create_trigger_t('hp28', '^.*穷光蛋，一边呆着去', '',
+                     'newbie_qu_gold')
+    create_trigger_t('hp29',
+                     '^.*狐疑地看着你：「这信怎么落到你的手上？」',
+                     '', 'dolost_hitlog_open')
+    create_trigger_t('hp30', '^.*据说' .. score.name .. '被.*打傻了!', '',
+                     'dolost_hitlog_close')
+    create_trigger_t('hp31',
+                     "^\\D*你把钱交给船家，船家领你上了一条小舟",
+                     '', 'job_lianstart')
+    create_trigger_t('hp71',
+                     "^(> )*【活动公告】书剑永恒天玑站砸金蛋活动开始了！",
+                     '', 'egg_huodong')
+    SetTriggerOption("hp71", "group", "hp")
+    SetTriggerOption("hp24", "group", "hp")
+    SetTriggerOption("hp25", "group", "hp")
+    SetTriggerOption("hp26", "group", "hp")
+    SetTriggerOption("hp27", "group", "hp")
+    SetTriggerOption("hp1", "group", "hp")
+    SetTriggerOption("hp2", "group", "hp")
+    SetTriggerOption("hp3", "group", "hp")
+    SetTriggerOption("hp4", "group", "hp")
+    SetTriggerOption("hp5", "group", "hp")
+    SetTriggerOption("hp7", "group", "hp")
+    SetTriggerOption("hp8", "group", "hp")
+    SetTriggerOption("hp9", "group", "hp")
+    SetTriggerOption("hp10", "group", "hp")
+    SetTriggerOption("hp11", "group", "hp")
+    SetTriggerOption("hp12", "group", "hp")
+    SetTriggerOption("hp13", "group", "hp")
+    SetTriggerOption("hp14", "group", "hp")
+    SetTriggerOption("hp15", "group", "hp")
+    SetTriggerOption("hp16", "group", "hp")
+    SetTriggerOption("hp17", "group", "hp")
+    SetTriggerOption("hp18", "group", "hp")
+    SetTriggerOption("hp19", "group", "hp")
+    SetTriggerOption("hp20", "group", "hp")
+    SetTriggerOption("hp21", "group", "hp")
+    SetTriggerOption("hp22", "group", "hp")
+    SetTriggerOption("hp23", "group", "hp")
+    SetTriggerOption("hp28", "group", "hp")
+    SetTriggerOption("hp29", "group", "hp")
+    SetTriggerOption("hp30", "group", "hp")
+    SetTriggerOption("hp31", "group", "hp")
     DeleteTriggerGroup("score")
-    create_trigger_t('score1',"^┃姓    名：(\\D*)\\((\\D*)\\)\\s*┃身  法：「(\\d*)\/(\\d*)」\\s*悟  性：「(\\d*)\/(\\d*)」",'','score_name_check')
-    create_trigger_t('score2',"^┃头    衔：(\\D*)\\s*┃臂  力：「(\\d*)\/(\\d*)」\\s*根  骨：「(\\d*)\/(\\d*)」",'','score_title_check')
-    create_trigger_t('score3',"^┃年    龄：(\\D*)岁\\D*\\s*生    辰：",'','score_age_check')
-    create_trigger_t('score4',"^│(任务繁忙状态|雪山强抢美女|双倍经验|明悟|寒毒|星宿掌毒|蔓陀萝花毒|虎爪绝户手伤|福州镖局护镖倒计时|真实视野)\\s*(\\D*)(分|秒)\\s*",'','score_busy_check')
-    create_trigger_t('score5',"^┃(婚    姻|娇    妻|夫    君)：(\\D*)\\s*师\\s*承：【(\\D*)】【(\\D*)】",'','score_party_check')
-    create_trigger_t('score6',"^┃性    别：(\\D*)性\\s*攻：(\\D*)\\s* 躲：",'','score_gender_check')
-    create_trigger_t('score7',"^┃(婚    姻|娇    妻|夫    君)：(\\D*)\\s*师\\s*承：【(普通百姓)】(\\D*)",'','score_party_check')
-    create_trigger_t('score9',"^┃注    册：(\\D*)\\s*钱庄存款：(\\D*)",'','score_gold_check')
-    create_trigger_t('score8',"^您目前的存款上限是：(\\D*)锭黄金",'','checkGoldLmt')
-    create_trigger_t('score10','^┃致命抗性：\\d*.*理相：(\\D*)\\((\\d*)\\)\\s*┃','','score_check_xy')
-    create_trigger_t('score11','^┃书剑通宝：(\\N*)\\s*书剑元宝：(\\N*)\\s*竞技币：(\\N*)\\s*┃','','score_tb_check')
-    create_trigger_t('score12',"^本周您已经使用精英之书(\\D*)次。",'','score_ebook_check')
-    create_trigger_t('score13','^┃江湖声望：(\\d*)','','score_sw_check')
+    create_trigger_t('score1',
+                     "^┃姓    名：(\\D*)\\((\\D*)\\)\\s*┃身  法：「(\\d*)/(\\d*)」\\s*悟  性：「(\\d*)/(\\d*)」",
+                     '', 'score_name_check')
+    create_trigger_t('score2',
+                     "^┃头    衔：(\\D*)\\s*┃臂  力：「(\\d*)/(\\d*)」\\s*根  骨：「(\\d*)/(\\d*)」",
+                     '', 'score_title_check')
+    create_trigger_t('score3',
+                     "^┃年    龄：(\\D*)岁\\D*\\s*生    辰：", '',
+                     'score_age_check')
+    create_trigger_t('score4',
+                     "^│(任务繁忙状态|雪山强抢美女|双倍经验|明悟|寒毒|星宿掌毒|蔓陀萝花毒|虎爪绝户手伤|福州镖局护镖倒计时|真实视野)\\s*(\\D*)(分|秒)\\s*",
+                     '', 'score_busy_check')
+    create_trigger_t('score5',
+                     "^┃(婚    姻|娇    妻|夫    君)：(\\D*)\\s*师\\s*承：【(\\D*)】【(\\D*)】",
+                     '', 'score_party_check')
+    create_trigger_t('score6',
+                     "^┃性    别：(\\D*)性\\s*攻：(\\D*)\\s* 躲：",
+                     '', 'score_gender_check')
+    create_trigger_t('score7',
+                     "^┃(婚    姻|娇    妻|夫    君)：(\\D*)\\s*师\\s*承：【(普通百姓)】(\\D*)",
+                     '', 'score_party_check')
+    create_trigger_t('score9',
+                     "^┃注    册：(\\D*)\\s*钱庄存款：(\\D*)", '',
+                     'score_gold_check')
+    create_trigger_t('score8', "^您目前的存款上限是：(\\D*)锭黄金",
+                     '', 'checkGoldLmt')
+    create_trigger_t('score10',
+                     '^┃致命抗性：\\d*.*理相：(\\D*)\\((\\d*)\\)\\s*┃',
+                     '', 'score_check_xy')
+    create_trigger_t('score11',
+                     '^┃书剑通宝：(\\N*)\\s*书剑元宝：(\\N*)\\s*竞技币：(\\N*)\\s*┃',
+                     '', 'score_tb_check')
+    create_trigger_t('score12',
+                     "^本周您已经使用精英之书(\\D*)次。", '',
+                     'score_ebook_check')
+    create_trigger_t('score13', '^┃江湖声望：(\\d*)', '',
+                     'score_sw_check')
 
-    create_trigger_t('score14','^┃当前等级：(\\N*)\\s*死亡：(\\N*)\\s*打造机会：(\\N*)\\s*┃','','score_dz_check')    
-    SetTriggerOption("score1","group","score")
-    SetTriggerOption("score2","group","score")
-    SetTriggerOption("score3","group","score")
-    SetTriggerOption("score4","group","score")
-    SetTriggerOption("score5","group","score")
-    SetTriggerOption("score6","group","score")
-    SetTriggerOption("score7","group","score")
-    SetTriggerOption("score8","group","score")
-    SetTriggerOption("score9","group","score")
-    SetTriggerOption("score10","group","score")
-    SetTriggerOption("score11","group","score")
-    SetTriggerOption("score12","group","score")
+    create_trigger_t('score14',
+                     '^┃当前等级：(\\N*)\\s*死亡：(\\N*)\\s*打造机会：(\\N*)\\s*┃',
+                     '', 'score_dz_check')
+    SetTriggerOption("score1", "group", "score")
+    SetTriggerOption("score2", "group", "score")
+    SetTriggerOption("score3", "group", "score")
+    SetTriggerOption("score4", "group", "score")
+    SetTriggerOption("score5", "group", "score")
+    SetTriggerOption("score6", "group", "score")
+    SetTriggerOption("score7", "group", "score")
+    SetTriggerOption("score8", "group", "score")
+    SetTriggerOption("score9", "group", "score")
+    SetTriggerOption("score10", "group", "score")
+    SetTriggerOption("score11", "group", "score")
+    SetTriggerOption("score12", "group", "score")
 end
-score_dz_check=function(n,l,w)
-    score.dj=tonumber(w[1])
-    score.sww=tonumber(w[2])
-    score.dz=tonumber(w[3])
+score_dz_check = function(n, l, w)
+    score.dj = tonumber(w[1])
+    score.sww = tonumber(w[2])
+    score.dz = tonumber(w[3])
 end
 
-score_sw_check=function(n,l,w)
-    score.sw=trans(w[1]) 
-end
+score_sw_check = function(n, l, w) score.sw = trans(w[1]) end
 
 function check_pot(p_cmd)
     if hp.exp < 5000000 then
@@ -484,7 +558,7 @@ function check_pot(p_cmd)
 
     if flag.autoxuexi == nil then flag.autoxuexi = 0 end
 
-    if hp.pot < l_pot  then
+    if hp.pot < l_pot then
         print("潜能不够，继续工作")
         return check_job()
     elseif flag.autoxuexi == 0 then
@@ -494,10 +568,9 @@ function check_pot(p_cmd)
 
     local max_skill = hp.pot_max - 100
     if score.party == "普通百姓" then
-        if score.gold and skills["literate"] and score.gold > 3000 and skills["literate"].lvl < max_skill then
-            return literate()
-        end
-        if skills["parry"].lvl < max_skill and skills["parry"].lvl >= 101 then 
+        if score.gold and skills["literate"] and score.gold > 3000 and
+            skills["literate"].lvl < max_skill then return literate() end
+        if skills["parry"].lvl < max_skill and skills["parry"].lvl >= 101 then
             return checklingwu()
         end
         if skills["force"].lvl > 50 and skills["force"].lvl < 101 then
@@ -506,15 +579,13 @@ function check_pot(p_cmd)
             end
             return huxi()
         end
-        if skills["shenzhao-jing"] and skills["shenzhao-jing"].lvl < 200 then 
+        if skills["shenzhao-jing"] and skills["shenzhao-jing"].lvl < 200 then
             return learnSzj()
         end
     else
         if score.gold and skills["literate"] and score.gold > 3000 and
-                skills["literate"].lvl < max_skill then
-                return literate()
-            end
-        
+            skills["literate"].lvl < max_skill then return literate() end
+
         -- flag.xuexi = 1 when parry < 450
         if flag.type and flag.type ~= 'lingwu' and flag.xuexi == 1 then
             return checkxue()
@@ -524,7 +595,7 @@ function check_pot(p_cmd)
         for p in pairs(skills) do
             local q = qrySkillEnable(p)
             if q and q['force'] and perform.force and p == perform.force and
-                skills[p].lvl < 100  then
+                skills[p].lvl < 100 then
                 if skills[p].mstlvl and skills[p].mstlvl > skills[p].lvl then
                     return checkxue()
                 end
@@ -532,9 +603,8 @@ function check_pot(p_cmd)
         end
 
         -- check perform skill, if less than 450 go xuexi.  This clause might need to remove.
-        if perform.skill and skills[perform.skill] and skills[perform.skill].lvl < 450 then 
-            return checkxue()
-        end
+        if perform.skill and skills[perform.skill] and skills[perform.skill].lvl <
+            450 then return checkxue() end
 
         -- if parry > 450, always lingwu.
         if skills["parry"] and skills["parry"].lvl >= 450 then
@@ -543,20 +613,22 @@ function check_pot(p_cmd)
             else
                 local skillsLingwu = {}
                 skillsLingwu = utils.split(GetVariable("lingwuskills"), '|')
-                for i,p in pairs(skillsLingwu) do 
-                    if skillEnable[p] == nil and skills[p] and skills[p].lvl < max_skill then
+                for i, p in pairs(skillsLingwu) do
+                    if skillEnable[p] == nil and skills[p] and skills[p].lvl <
+                        max_skill then
                         flag.lingwu = 1
                         break
                     end
                 end
             end
         end
-        
+
         if flag.lingwu == 1 then return checklingwu() end
-        
+
         if not flag.wxjz then flag.wxjz = 0 end
         if skills["wuxiang-zhi"] and flag.wxjz == 0 then
-            if skills["finger"].lvl > skills["wuxiang-zhi"].lvl and skills["wuxiang-zhi"].lvl < max_skill then
+            if skills["finger"].lvl > skills["wuxiang-zhi"].lvl and
+                skills["wuxiang-zhi"].lvl < max_skill then
                 return wxjzFofa()
             end
         end
@@ -566,17 +638,24 @@ end
 
 function lingwu_trigger()
     DeleteTriggerGroup("lingwu")
-    create_trigger_t('lingwu1',"^.*(你只能从特殊技能中领悟。|你不会这种技能。|你要领悟什么？)",'','lingwu_next')
-    create_trigger_t('lingwu2',"^.*你的\\D*不够，无法领悟更深一层的基本",'','lingwu_next')
-    create_trigger_t('lingwu3',"^.*以你现在的基本内功修为，尚无法领悟基本内功。",'','lingwu_next')
-    create_trigger_t('lingwu4',"^.*由于实战经验不足，阻碍了你的「\\D*」进步",'','lingwu_next')
-    SetTriggerOption("lingwu1","group","lingwu")
-    SetTriggerOption("lingwu2","group","lingwu")
-    SetTriggerOption("lingwu3","group","lingwu")
-    SetTriggerOption("lingwu4","group","lingwu")
-    EnableTriggerGroup("lingwu",false)
+    create_trigger_t('lingwu1',
+                     "^.*(你只能从特殊技能中领悟。|你不会这种技能。|你要领悟什么？)",
+                     '', 'lingwu_next')
+    create_trigger_t('lingwu2',
+                     "^.*你的\\D*不够，无法领悟更深一层的基本",
+                     '', 'lingwu_next')
+    create_trigger_t('lingwu3',
+                     "^.*以你现在的基本内功修为，尚无法领悟基本内功。",
+                     '', 'lingwu_next')
+    create_trigger_t('lingwu4',
+                     "^.*由于实战经验不足，阻碍了你的「\\D*」进步",
+                     '', 'lingwu_next')
+    SetTriggerOption("lingwu1", "group", "lingwu")
+    SetTriggerOption("lingwu2", "group", "lingwu")
+    SetTriggerOption("lingwu3", "group", "lingwu")
+    SetTriggerOption("lingwu4", "group", "lingwu")
+    EnableTriggerGroup("lingwu", false)
 end
-
 
 function checklingwu()
     if lingwudie == 0 then return lingwu() end
@@ -616,9 +695,9 @@ function lingwu_unwield()
     -- return check_busy(lingwuzb) -- 不准备内力，直接领悟。
 end
 function lingwuzb() zhunbeineili(lingwuzbok) end
-function lingwuzbok() 
+function lingwuzbok()
     lingwu_trigger()
-    go(lingwu_goon, '嵩山少林', '达摩院后殿') 
+    go(lingwu_goon, '嵩山少林', '达摩院后殿')
 end
 function lingwuSleep()
     if score.gender == '男' then
@@ -635,7 +714,7 @@ end
 function lingwu_goon()
     if locl.room ~= "达摩院后殿" then return lingwu_finish() end
     EnableTriggerGroup("lingwu", true)
-    
+
     if hp.neili < 1000 then
         if hp.exp > 20000000 or score.gender == '无' then
             exe('eat ' .. drug.neili)
@@ -645,21 +724,24 @@ function lingwu_goon()
         end
     end
     flag.idle = nil
-    local skill_max =  hp.pot_max - 100
-    wait.make(function()    
-        for i,skill in pairs(skillsLingwu) do
-            if not skills[skill] or skills[skill].lvl == 0 or skills[skill].lvl >= skill_max then
+    local skill_max = hp.pot_max - 100
+    wait.make(function()
+        for i, skill in pairs(skillsLingwu) do
+            if not skills[skill] or skills[skill].lvl == 0 or skills[skill].lvl >=
+                skill_max then
                 print("不需要学习:" .. skill)
             else
-                tmp.lingwunext = false      
+                tmp.lingwunext = false
                 local l, w
-                while true do                
+                while true do
                     exe('#9(lingwu ' .. skill .. ');yun jing')
-                    l, w = wait.regexp('.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)',1)    
+                    l, w = wait.regexp(
+                               '.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)',
+                               1)
                     if l == nil then
                         -- 可能昏迷了，超时返回
                         break
-                    elseif l:find('内力不够') then 
+                    elseif l:find('内力不够') then
                         exe('eat ' .. drug.neili)
                         exe('eat ' .. drug.neili2 .. ';yun jing')
                     elseif l:find('潜能已经用完了') then
@@ -690,9 +772,7 @@ function lingwu_eat()
     end
 end
 
-function lingwu_next()
-    tmp.lingwunext = true
-end
+function lingwu_next() tmp.lingwunext = true end
 
 function lingwu_finish()
     tmp.stop = true
@@ -708,7 +788,6 @@ function lingwu_finish()
     end
     return check_jobx()
 end
-
 
 function xuexiTrigger()
     DeleteTriggerGroup("xuexi")
@@ -809,7 +888,7 @@ function xuexiCheck()
 end
 function xuexiStart()
     EnableTriggerGroup("xuexi", true)
-   
+
     tmp.xuexi = 1
 
     if master.id and locl.item and locl.item[score.master] and

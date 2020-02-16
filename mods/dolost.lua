@@ -135,7 +135,7 @@ function qu_armor_list()
 	 wait.make(function()
 	exe('dlist')
 	 repeat 
-	 local l,w=wait.regexp('^[> ]*©§\\s+(.+)\\s+\\S+\\s+\.+Ìì\\s+©§$|^[> ]*©»©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¿$')
+	 local l,w=wait.regexp('^[> ]*©§\\s+(.+)\\s+\\S+\\s+.+Ìì\\s+©§$|^[> ]*©»©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¿$')
 	 table.insert(armor_list,string.lower(Trim(w[1])))
 	 until string.find(l,'©»©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¿')
 	 tprint(armor_list)

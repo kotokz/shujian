@@ -398,7 +398,8 @@ function walk_wait()
             cntr1 = countR(15)
         end
     else
-            create_timer_s('walkWait',0.1,'walk_goon')
+            -- create_timer_s('walkWait',0.1,'walk_goon')
+        walk_goon()
     end
 end
 
@@ -895,7 +896,9 @@ function path_start()
     if string.find(l_road,'#') then
        local _,_,func,params = string.find(l_road,"^#(%a%w*)%s*(.-)$")
        if func then
-		return _G[func](params)
+            return _G[func](params)
+       else
+            messageShow('Function 不存在，可能是地图问题:'.. func)
 		end 
     else
 		exe(l_road)
@@ -1060,18 +1063,24 @@ function searchPre()
 	starttime=os.clock() --测试计算时间
 	newrooms = {}
 	if job.room and job.area then SN_rooms=getRooms(job.room, job.area) end
-      if #SN_rooms>1 and locl.room==job.room then         
-                print('找到'..#SN_rooms..'个同名房间')
-                local Firstroom=getNearRoom({road.id},SN_rooms)
-                table.insert(newrooms,Firstroom)
-                for _,v in pairs(SN_rooms) do 
-                        if v~=Firstroom then                         
-                           table.insert(newrooms,v)
-                        end
-                end        
+
+    if SN_rooms~=nil and #SN_rooms>1 and locl.room==job.room then         
+        print('找到'..#SN_rooms..'个同名房间')
+        local Firstroom=getNearRoom({road.id},SN_rooms)
+        table.insert(newrooms,Firstroom)
+        for _,v in pairs(SN_rooms) do 
+                if v~=Firstroom then                         
+                    table.insert(newrooms,v)
+                end
+        end        
         DFS()                
         newrooms = {}
-      end
+    elseif SN_rooms == nil then
+        room = job.room or ""
+        area = job.area or ""
+        print("没找到路径：job.room ="..room .. "job.area="..area)
+        
+    end
 	
 	if job.name~='dolost' and job.name~='hubiao' then
 	   starttime=os.clock() --测试计算时间
@@ -1080,8 +1089,6 @@ function searchPre()
        end        
        DFS()
 	end
-	
-	      
 	
 	
 end
@@ -3434,134 +3441,6 @@ function outHeiwOver()
     walk_wait()
 end
 
---[[function goXtj()
-    DeleteTriggerGroup("goxtj")
-    create_trigger_t('goxtj1',"^(> )*树林\\s*\\-",'','goXtjShulin')
-    create_trigger_t('goxtj2',"^(> )*山路\\s*\\-",'','goXtjShanlu')
-    SetTriggerOption("goxtj1","group","goxtj")
-    SetTriggerOption("goxtj2","group","goxtj")
-    EnableTriggerGroup("goxtj",false)
-
-    exe('n')
-    locate()
-    check_halt(goXtjCheck)
-end
-function goXtjCheck()
-    if locl.room~="树林" then
-       return goXtjOver11()
-    end
-    tmp.goxtj=0
-    EnableTriggerGroup("goxtj",true)
-    exe('l east;l south;l west;l north')
-end
-function goXtjShulin()
-    if not tmp.goxtj then tmp.goxtj=0 end
-    tmp.goxtj = tmp.goxtj + 1
-    if tmp.goxtj>3 then
-       EnableTriggerGroup("goxtj",false)
-       checkWait(goXtjGo,1)
-    end
-end
-function goXtjShanlu()
-    EnableTriggerGroup("goxtj",false)
-    if not tmp.goxtj then tmp.goxtj=0 end
-    if tmp.goxtj==1 then
-       exe('s')
-    end
-    exe('n')
-    locate()
-    checkWait(goXtjCheck,1)
-end
-function goXtjGo()
-    local l_set={'e','s','w','n'}
-    local l_cnt=math.random(1,table.getn(l_set))
-    exe(l_set[l_cnt])
-    locate()
-    check_halt(goXtjCheck)
-end
-function goXtjOver11()
-	EnableTriggerGroup("goxtj",false)
-    DeleteTriggerGroup("goxtj")
-	if flag.find==1 then return end
-    exe('n')
-	checkWait(goXtjOver1,0.2)
-end
-function goXtjOver1()
-	if flag.find==1 then return end
-    exe('nu')
-	checkWait(goXtjOver2,0.2)
-end
-function goXtjOver2()
-	if flag.find==1 then return end
-    exe('nu')
-	checkWait(goXtjOver3,0.2)
-end
-function goXtjOver3()
-	if flag.find==1 then return end
-    exe('e')
-	checkWait(goXtjOver4,0.2)
-end
-function goXtjOver4()
-	if flag.find==1 then return end
-    exe('w;nw')
-	checkWait(goXtjOver,0.04)
-end
-function goXtjOver()
-    EnableTriggerGroup("goxtj",false)
-    DeleteTriggerGroup("goxtj")
-    walk_wait()
-end
-function outXtj()
-    DeleteTriggerGroup("outxtj")
-    create_trigger_t('outxtj1',"^(> )*树林\\s*\\-",'','outXtjShulin')
-    create_trigger_t('outxtj2',"^(> )*山路\\s*\\-",'','outXtjShanlu')
-    SetTriggerOption("outxtj1","group","outxtj")
-    SetTriggerOption("outxtj2","group","outxtj")
-    EnableTriggerGroup("outxtj",false)
-
-    exe('s')
-    locate()
-    check_halt(outXtjCheck)
-end
-function outXtjCheck()
-    if locl.room~="树林" then
-       return outXtjOver()
-    end
-    
-    tmp.outxtj=0
-    EnableTriggerGroup("outxtj",true)
-    exe('l east;l south;l west;l north')
-end
-function outXtjShulin()
-    if not tmp.outxtj then tmp.outxtj=0 end
-    tmp.outxtj = tmp.outxtj + 1
-    if tmp.outxtj>3 then
-       EnableTriggerGroup("outxtj",false)
-       checkWait(outXtjGo,1.5)
-    end
-end
-function outXtjShanlu()
-    EnableTriggerGroup("outxtj",false)
-    if not tmp.outxtj then tmp.outxtj=0 end
-    if tmp.outxtj>1 then
-       exe('n')	
-    end
-    exe('s')	
-    locate()
-    checkWait(outXtjCheck,1)
-end
-function outXtjGo()
-    local l_set={'e','s','w','n'}
-    local l_cnt=math.random(1,table.getn(l_set))
-    exe(l_set[l_cnt])
-    locate()
-    check_halt(outXtjCheck)
-end
-function outXtjOver()
-    EnableTriggerGroup("outxtj",false)
-    DeleteTriggerGroup("outxtj")
-    walk_wait()
-end]]
 function goXtj()
    exe('n')
    if flag.find==1 then return end

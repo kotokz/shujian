@@ -323,7 +323,7 @@ function songxin_consider(n, l, w)
     end
     messageShow('ËÍÐÅÈÎÎñ£ºÈÎÎñÄ¿±ê¡¾' .. job.target ..
                     '¡¿£¬¿ªÊ¼Ç°Íù¡¾' .. job.where .. '¡¿¡£')
-    if string.find(job.where, 'ºûµû¹È') then return hudiegu() end
+    -- if string.find(job.where, 'ºûµû¹È') then return hudiegu() end
     return go(songxin_find_go, job.area, job.room)
 end
 function songxin_find()
@@ -715,9 +715,9 @@ function songxin2_sendto()
             print(locl.room, locl.area, job.room, job.area)
             return songxin_find_go()
         else
-            if string.find(job.where, 'ºûµû¹È') then
-                return hudiegu()
-            end
+            -- if string.find(job.where, 'ºûµû¹È') then
+            --     return hudiegu()
+            -- end
             return go(songxin_find_go, job.area, job.room)
         end
     else
@@ -857,7 +857,7 @@ function songxin2_find_begin()
                         '¡¿ÈÝÒ×ËÀ£¬Ö±ËÍ¡£')
         return songxin2_sendto()
     else
-        if string.find(job.where, 'ºûµû¹È') then return hudiegu() end
+        -- if string.find(job.where, 'ºûµû¹È') then return hudiegu() end
         return go(songxin_find_npc, job.area, job.room)
     end
 end

@@ -1,0 +1,2588 @@
+﻿[
+    {
+        "name": "普通百姓",
+        "key": "ptb",
+        "users": [
+            {
+                "name": "与子偕老",
+                "key": "yzxl"
+            },
+            {
+                "name": "夙妲岚",
+                "key": "sdl"
+            },
+            {
+                "name": "踏星风",
+                "key": "txf"
+            },
+            {
+                "name": "啪啪啪",
+                "key": "ppp"
+            },
+            {
+                "name": "萧芫",
+                "key": "xy"
+            },
+            {
+                "name": "舒乎",
+                "key": "sf"
+            },
+            {
+                "name": "曹彬",
+                "key": "cb"
+            },
+            {
+                "name": "立川理惠",
+                "key": "lclh"
+            },
+            {
+                "name": "承宣使",
+                "key": "cxs"
+            },
+            {
+                "name": "绯雨",
+                "key": "fy"
+            },
+            {
+                "name": "大力",
+                "key": "dl"
+            },
+            {
+                "name": "马里兰",
+                "key": "mll"
+            },
+            {
+                "name": "潜龙勿用",
+                "key": "qlwy"
+            },
+            {
+                "name": "内华达",
+                "key": "wgxj"
+            },
+            {
+                "name": "船夫二",
+                "key": "cfe"
+            },
+            {
+                "name": "菊花",
+                "key": "jh"
+            },
+            {
+                "name": "女朋友一",
+                "key": "npyy"
+            },
+            {
+                "name": "小炒肉",
+                "key": "xcr"
+            },
+            {
+                "name": "实数",
+                "key": "ss"
+            },
+            {
+                "name": "新泽西",
+                "key": "xzx"
+            },
+            {
+                "name": "黄河一号",
+                "key": "hhyh"
+            },
+            {
+                "name": "有理数",
+                "key": "yls"
+            },
+            {
+                "name": "俄勒冈",
+                "key": "elg"
+            },
+            {
+                "name": "纤夫一",
+                "key": "qfy"
+            },
+            {
+                "name": "澜沧西",
+                "key": "lcx"
+            },
+            {
+                "name": "小米",
+                "key": "xm"
+            },
+            {
+                "name": "纤夫二",
+                "key": "qfe"
+            },
+            {
+                "name": "船夫一",
+                "key": "cfy"
+            },
+            {
+                "name": "鱼肚白",
+                "key": "ydb"
+            },
+            {
+                "name": "黄河二号",
+                "key": "hheh"
+            },
+            {
+                "name": "黄河三号",
+                "key": "hhsh"
+            },
+            {
+                "name": "纤夫三",
+                "key": "qfs"
+            },
+            {
+                "name": "消息队列",
+                "key": "xxdl"
+            },
+            {
+                "name": "船夫八",
+                "key": "cfb"
+            },
+            {
+                "name": "自然数",
+                "key": "zrs"
+            },
+            {
+                "name": "无理数",
+                "key": "wls"
+            },
+            {
+                "name": "长江北",
+                "key": "cjb"
+            },
+            {
+                "name": "纤夫四",
+                "key": "qfs"
+            },
+            {
+                "name": "复数",
+                "key": "fs"
+            },
+            {
+                "name": "虚数",
+                "key": "xs"
+            },
+            {
+                "name": "澜沧东",
+                "key": "lcd"
+            },
+            {
+                "name": "长江南",
+                "key": "cjn"
+            },
+            {
+                "name": "复数",
+                "key": "fs"
+            },
+            {
+                "name": "黄河四号",
+                "key": "hhsh"
+            },
+            {
+                "name": "序数",
+                "key": "xs"
+            },
+            {
+                "name": "澜沧西",
+                "key": "lcx"
+            },
+            {
+                "name": "船夫六",
+                "key": "cfl"
+            },
+            {
+                "name": "相反数",
+                "key": "xfs"
+            },
+            {
+                "name": "船夫七",
+                "key": "cfq"
+            },
+            {
+                "name": "野菊花",
+                "key": "yjh"
+            },
+            {
+                "name": "播报员",
+                "key": "bby"
+            },
+            {
+                "name": "船夫五",
+                "key": "cfw"
+            },
+            {
+                "name": "长江北",
+                "key": "cjb"
+            },
+            {
+                "name": "船夫三",
+                "key": "cfs"
+            },
+            {
+                "name": "长江南",
+                "key": "cjn"
+            },
+            {
+                "name": "轩辕",
+                "key": "xy"
+            },
+            {
+                "name": "纵横",
+                "key": "zh"
+            },
+            {
+                "name": "星宿子",
+                "key": "xxz"
+            },
+            {
+                "name": "丹妮莉丝",
+                "key": "dnls"
+            }
+        ]
+    },
+    {
+        "name": "大轮寺",
+        "key": "dls",
+        "users": [
+            {
+                "name": "心云",
+                "key": "xy"
+            },
+            {
+                "name": "朽木",
+                "key": "xm"
+            },
+            {
+                "name": "阿肥",
+                "key": "af"
+            },
+            {
+                "name": "石达客",
+                "key": "sdk"
+            },
+            {
+                "name": "减肥的猪",
+                "key": "jfdz"
+            },
+            {
+                "name": "阿修罗",
+                "key": "axl"
+            },
+            {
+                "name": "心云",
+                "key": "xy"
+            },
+            {
+                "name": "内客省使",
+                "key": "nkss"
+            },
+            {
+                "name": "大猩猩",
+                "key": "dxx"
+            },
+            {
+                "name": "神魂",
+                "key": "sh"
+            },
+            {
+                "name": "炎某某",
+                "key": "ymm"
+            },
+            {
+                "name": "碧莲",
+                "key": "bl"
+            },
+            {
+                "name": "朱雀",
+                "key": "zq"
+            },
+            {
+                "name": "孔宣",
+                "key": "kx"
+            },
+            {
+                "name": "王大锤",
+                "key": "wdc"
+            },
+            {
+                "name": "软剑",
+                "key": "rj"
+            },
+            {
+                "name": "奥格瑞姆",
+                "key": "ogrm"
+            },
+            {
+                "name": "云曦",
+                "key": "yx"
+            },
+            {
+                "name": "太虚",
+                "key": "tx"
+            },
+            {
+                "name": "笨蛋",
+                "key": "bd"
+            },
+            {
+                "name": "威德金刚",
+                "key": "wdjg"
+            },
+            {
+                "name": "米其林",
+                "key": "mql"
+            },
+            {
+                "name": "叶流云",
+                "key": "yly"
+            }
+        ]
+    },
+    {
+        "name": "峨嵋",
+        "key": "em",
+        "users": [
+            {
+                "name": "灭波",
+                "key": "mb"
+            },
+            {
+                "name": "灭器",
+                "key": "mq"
+            },
+            {
+                "name": "灭器",
+                "key": "mq"
+            },
+            {
+                "name": "裘晚秋",
+                "key": "qwq"
+            },
+            {
+                "name": "灭瑰",
+                "key": "mg"
+            },
+            {
+                "name": "灭霸",
+                "key": "mb"
+            },
+            {
+                "name": "这里有坑",
+                "key": "zlyk"
+            },
+            {
+                "name": "终南夜雨",
+                "key": "znyy"
+            },
+            {
+                "name": "灭几",
+                "key": "mj"
+            },
+            {
+                "name": "灭尚",
+                "key": "ms"
+            },
+            {
+                "name": "灭凇",
+                "key": "ms"
+            },
+            {
+                "name": "老中医",
+                "key": "lzy"
+            },
+            {
+                "name": "如雪",
+                "key": "rx"
+            },
+            {
+                "name": "灭夏",
+                "key": "mx"
+            },
+            {
+                "name": "灭黑",
+                "key": "mh"
+            },
+            {
+                "name": "灭寂",
+                "key": "mj"
+            },
+            {
+                "name": "灭虚",
+                "key": "mx"
+            },
+            {
+                "name": "顾某某",
+                "key": "gmm"
+            },
+            {
+                "name": "灭梦",
+                "key": "mm"
+            },
+            {
+                "name": "灭嫣",
+                "key": "my"
+            },
+            {
+                "name": "冰激凌凌",
+                "key": "bjll"
+            },
+            {
+                "name": "灭口",
+                "key": "mk"
+            },
+            {
+                "name": "崽崽",
+                "key": "zz"
+            },
+            {
+                "name": "慕容二狗",
+                "key": "eg"
+            }
+        ]
+    },
+    {
+        "name": "慕容",
+        "key": "mr",
+        "users": [
+            {
+                "name": "慕容十一",
+                "key": "sy"
+            },
+            {
+                "name": "慕容五月",
+                "key": "wy"
+            },
+            {
+                "name": "慕容无耻",
+                "key": "wc"
+            },
+            {
+                "name": "慕容五月",
+                "key": "wy"
+            },
+            {
+                "name": "慕容容春",
+                "key": "rc"
+            },
+            {
+                "name": "路人乙",
+                "key": "lry"
+            },
+            {
+                "name": "慕容潇潇",
+                "key": "mrxx"
+            },
+            {
+                "name": "慕容乖乖",
+                "key": "gg"
+            },
+            {
+                "name": "慕容天天",
+                "key": "ttt"
+            },
+            {
+                "name": "慕容中月",
+                "key": "zy"
+            },
+            {
+                "name": "慕容浆糊",
+                "key": "jh"
+            },
+            {
+                "name": "慕容八号",
+                "key": "bh"
+            },
+            {
+                "name": "慕容浆糊",
+                "key": "mrjh"
+            },
+            {
+                "name": "慕容青书",
+                "key": "qs"
+            },
+            {
+                "name": "慕容宝贝",
+                "key": "bb"
+            },
+            {
+                "name": "慕容英英",
+                "key": "yy"
+            },
+            {
+                "name": "慕容兰风",
+                "key": "lf"
+            },
+            {
+                "name": "慕容宝宝",
+                "key": "bb"
+            },
+            {
+                "name": "慕容三号",
+                "key": "sh"
+            },
+            {
+                "name": "慕容散花",
+                "key": "sh"
+            },
+            {
+                "name": "慕容九号",
+                "key": "jh"
+            },
+            {
+                "name": "慕容一会",
+                "key": "yh"
+            },
+            {
+                "name": "慕容魅魑",
+                "key": "cm"
+            },
+            {
+                "name": "慕容红秀",
+                "key": "hx"
+            },
+            {
+                "name": "慕容黑衣",
+                "key": "hy"
+            },
+            {
+                "name": "慕容蓝静",
+                "key": "lj"
+            },
+            {
+                "name": "慕容残阳",
+                "key": "cy"
+            },
+            {
+                "name": "慕容五号",
+                "key": "wh"
+            },
+            {
+                "name": "慕容丹妹",
+                "key": "dm"
+            },
+            {
+                "name": "慕容四号",
+                "key": "sh"
+            },
+            {
+                "name": "慕容二号",
+                "key": "eh"
+            },
+            {
+                "name": "慕容十二",
+                "key": "se"
+            },
+            {
+                "name": "慕容尼玛",
+                "key": "nm"
+            },
+            {
+                "name": "慕容一号",
+                "key": "yh"
+            },
+            {
+                "name": "慕容六号",
+                "key": "lh"
+            },
+            {
+                "name": "慕容屁股",
+                "key": "pg"
+            },
+            {
+                "name": "慕容星月",
+                "key": "xy"
+            },
+            {
+                "name": "梅路艾姆",
+                "key": "mlam"
+            },
+            {
+                "name": "慕容小芸",
+                "key": "xy"
+            },
+            {
+                "name": "慕容君子",
+                "key": "jz"
+            },
+            {
+                "name": "慕容屠戮",
+                "key": "tl"
+            },
+            {
+                "name": "李沉舟",
+                "key": "lcz"
+            },
+            {
+                "name": "慕疯容癫",
+                "key": "fd"
+            },
+            {
+                "name": "慕容如一",
+                "key": "ry"
+            },
+            {
+                "name": "慕容无忌",
+                "key": "wj"
+            },
+            {
+                "name": "青蛙填崖",
+                "key": "qwty"
+            },
+            {
+                "name": "慕容天鹰",
+                "key": "ty"
+            },
+            {
+                "name": "慕容十号",
+                "key": "sh"
+            }
+        ]
+    },
+    {
+        "name": "古墓派",
+        "key": "gm",
+        "users": [
+            {
+                "name": "幻象",
+                "key": "hx"
+            },
+            {
+                "name": "鹦鹉",
+                "key": "yw"
+            },
+            {
+                "name": "星月缘聚",
+                "key": "xyyj"
+            },
+            {
+                "name": "韦胜",
+                "key": "ws"
+            },
+            {
+                "name": "笑摩戈",
+                "key": "xmg"
+            },
+            {
+                "name": "管萍",
+                "key": "gp"
+            },
+            {
+                "name": "白发魔女",
+                "key": "bfmn"
+            },
+            {
+                "name": "黄红",
+                "key": "hh"
+            },
+            {
+                "name": "灵蝶",
+                "key": "ld"
+            },
+            {
+                "name": "阿芸",
+                "key": "ay"
+            },
+            {
+                "name": "珈儿",
+                "key": "ge"
+            },
+            {
+                "name": "拿督",
+                "key": "nd"
+            },
+            {
+                "name": "孽缘",
+                "key": "ny"
+            },
+            {
+                "name": "小狗",
+                "key": "xg"
+            },
+            {
+                "name": "小猫",
+                "key": "xm"
+            },
+            {
+                "name": "龙仙儿",
+                "key": "lxe"
+            },
+            {
+                "name": "南宫伊雪",
+                "key": "ngyx"
+            },
+            {
+                "name": "妲己",
+                "key": "dj"
+            },
+            {
+                "name": "阿雄",
+                "key": "ax"
+            },
+            {
+                "name": "阿雅",
+                "key": "ay"
+            },
+            {
+                "name": "景福殿使",
+                "key": "jfds"
+            },
+            {
+                "name": "笑笑",
+                "key": "xxx"
+            },
+            {
+                "name": "果味",
+                "key": "gw"
+            },
+            {
+                "name": "冰伶",
+                "key": "bl"
+            },
+            {
+                "name": "白火",
+                "key": "bh"
+            },
+            {
+                "name": "苍月影",
+                "key": "cyy"
+            },
+            {
+                "name": "梆子老太",
+                "key": "bzlt"
+            },
+            {
+                "name": "飞扬",
+                "key": "fy"
+            },
+            {
+                "name": "冰雪",
+                "key": "bx"
+            },
+            {
+                "name": "苏姗娜",
+                "key": "ssn"
+            },
+            {
+                "name": "离珠",
+                "key": "lz"
+            },
+            {
+                "name": "龙小芸",
+                "key": "lxy"
+            },
+            {
+                "name": "浅田古古",
+                "key": "qtgg"
+            },
+            {
+                "name": "盘丝",
+                "key": "ps"
+            },
+            {
+                "name": "小美妮",
+                "key": "xmn"
+            },
+            {
+                "name": "倪姗姗",
+                "key": "nss"
+            },
+            {
+                "name": "飞舞",
+                "key": "fw"
+            },
+            {
+                "name": "京香",
+                "key": "jx"
+            },
+            {
+                "name": "纯熙",
+                "key": "cx"
+            },
+            {
+                "name": "琴瑛",
+                "key": "qy"
+            },
+            {
+                "name": "萨曼莎",
+                "key": "sms"
+            },
+            {
+                "name": "莫愁",
+                "key": "mc"
+            },
+            {
+                "name": "新闻联播",
+                "key": "xwlb"
+            },
+            {
+                "name": "荧光",
+                "key": "yg"
+            },
+            {
+                "name": "冬至",
+                "key": "dz"
+            },
+            {
+                "name": "云若",
+                "key": "yr"
+            },
+            {
+                "name": "米笑",
+                "key": "mx"
+            },
+            {
+                "name": "邢缺",
+                "key": "xq"
+            },
+            {
+                "name": "任一",
+                "key": "ry"
+            },
+            {
+                "name": "钱姗姗",
+                "key": "qss"
+            },
+            {
+                "name": "奥特慢",
+                "key": "atm"
+            },
+            {
+                "name": "伊娃",
+                "key": "yw"
+            },
+            {
+                "name": "白富美",
+                "key": "bfm"
+            },
+            {
+                "name": "龙小女",
+                "key": "lxn"
+            },
+            {
+                "name": "萌蛋",
+                "key": "md"
+            },
+            {
+                "name": "无聊蜀黍",
+                "key": "wlsl"
+            },
+            {
+                "name": "飞雪",
+                "key": "fx"
+            },
+            {
+                "name": "修撒拉",
+                "key": "xsl"
+            },
+            {
+                "name": "聂人王",
+                "key": "nrw"
+            },
+            {
+                "name": "云逍",
+                "key": "yx"
+            },
+            {
+                "name": "天聋地哑",
+                "key": "tldy"
+            },
+            {
+                "name": "梅眉魅妹",
+                "key": "mmmm"
+            }
+        ]
+    },
+    {
+        "name": "华山派",
+        "key": "hs",
+        "users": [
+            {
+                "name": "全福",
+                "key": "qf"
+            },
+            {
+                "name": "风轻扬",
+                "key": "fqy"
+            },
+            {
+                "name": "嫣然",
+                "key": "yr"
+            },
+            {
+                "name": "风二中",
+                "key": "fez"
+            },
+            {
+                "name": "青衣",
+                "key": "qy"
+            },
+            {
+                "name": "三江水",
+                "key": "sjs"
+            },
+            {
+                "name": "放辣椒",
+                "key": "flj"
+            },
+            {
+                "name": "古利特",
+                "key": "glt"
+            },
+            {
+                "name": "唐肥",
+                "key": "tf"
+            },
+            {
+                "name": "令狐国冲",
+                "key": "lhgc"
+            },
+            {
+                "name": "小优",
+                "key": "xyy"
+            },
+            {
+                "name": "迷猾",
+                "key": "mh"
+            },
+            {
+                "name": "小秋风",
+                "key": "xqf"
+            },
+            {
+                "name": "剑十三",
+                "key": "jss"
+            },
+            {
+                "name": "独角兽",
+                "key": "djs"
+            },
+            {
+                "name": "汉森",
+                "key": "hss"
+            },
+            {
+                "name": "基尔加丹",
+                "key": "jejd"
+            },
+            {
+                "name": "鸟儿",
+                "key": "ne"
+            },
+            {
+                "name": "凌傲云",
+                "key": "lay"
+            },
+            {
+                "name": "华山弃徒",
+                "key": "hsqt"
+            },
+            {
+                "name": "月女不捡",
+                "key": "ynbj"
+            },
+            {
+                "name": "慕容毒毒",
+                "key": "dd"
+            },
+            {
+                "name": "小师妹",
+                "key": "xsm"
+            },
+            {
+                "name": "情殇",
+                "key": "qs"
+            },
+            {
+                "name": "撒旦",
+                "key": "sd"
+            },
+            {
+                "name": "多吃蔬菜",
+                "key": "dcsc"
+            },
+            {
+                "name": "室火猪",
+                "key": "shz"
+            },
+            {
+                "name": "危月燕",
+                "key": "wyy"
+            },
+            {
+                "name": "傲雪",
+                "key": "ax"
+            },
+            {
+                "name": "十二月",
+                "key": "sey"
+            },
+            {
+                "name": "相由心生",
+                "key": "xyxs"
+            },
+            {
+                "name": "影子",
+                "key": "yz"
+            },
+            {
+                "name": "龙石头",
+                "key": "lst"
+            },
+            {
+                "name": "仙缘",
+                "key": "xyy"
+            },
+            {
+                "name": "孑孑子",
+                "key": "jjz"
+            },
+            {
+                "name": "氢气球",
+                "key": "qqq"
+            },
+            {
+                "name": "紫霞仙子",
+                "key": "zxxz"
+            },
+            {
+                "name": "德云翼",
+                "key": "dyy"
+            },
+            {
+                "name": "随寓而安",
+                "key": "syea"
+            },
+            {
+                "name": "金刚",
+                "key": "jg"
+            },
+            {
+                "name": "极易兮兮",
+                "key": "jyxx"
+            }
+        ]
+    },
+    {
+        "name": "嵩山派",
+        "key": "ss",
+        "users": [
+            {
+                "name": "董双成",
+                "key": "dsc"
+            },
+            {
+                "name": "沐千雪",
+                "key": "mqx"
+            },
+            {
+                "name": "靡颂",
+                "key": "ms"
+            },
+            {
+                "name": "凇凇",
+                "key": "sss"
+            },
+            {
+                "name": "玉娇珑",
+                "key": "yjl"
+            },
+            {
+                "name": "左手仙缘",
+                "key": "zsxy"
+            },
+            {
+                "name": "野百合",
+                "key": "ybh"
+            },
+            {
+                "name": "不二",
+                "key": "be"
+            },
+            {
+                "name": "虚怀若谷",
+                "key": "xhrg"
+            },
+            {
+                "name": "欢乐",
+                "key": "hl"
+            },
+            {
+                "name": "新人",
+                "key": "xr"
+            },
+            {
+                "name": "铃香音色",
+                "key": "lxys"
+            },
+            {
+                "name": "宋寒山",
+                "key": "shs"
+            },
+            {
+                "name": "凤鸾",
+                "key": "fl"
+            },
+            {
+                "name": "七次郎",
+                "key": "qcl"
+            },
+            {
+                "name": "上官筱儿",
+                "key": "sgxe"
+            },
+            {
+                "name": "鲁小胖",
+                "key": "lxp"
+            },
+            {
+                "name": "欧冶子",
+                "key": "oyz"
+            }
+        ]
+    },
+    {
+        "name": "昆仑派",
+        "key": "kl",
+        "users": [
+            {
+                "name": "紫衣",
+                "key": "zy"
+            },
+            {
+                "name": "紫衣",
+                "key": "zy"
+            },
+            {
+                "name": "紫衣",
+                "key": "zy"
+            },
+            {
+                "name": "晓佳",
+                "key": "xj"
+            },
+            {
+                "name": "东方若灵",
+                "key": "dfrl"
+            },
+            {
+                "name": "映雪",
+                "key": "yx"
+            },
+            {
+                "name": "神奇",
+                "key": "sq"
+            },
+            {
+                "name": "荭荭",
+                "key": "hh"
+            },
+            {
+                "name": "黄颖",
+                "key": "hy"
+            },
+            {
+                "name": "冰羽寻",
+                "key": "byx"
+            },
+            {
+                "name": "纳兰嫣然",
+                "key": "nlyr"
+            },
+            {
+                "name": "糸琨",
+                "key": "mk"
+            },
+            {
+                "name": "苦苦",
+                "key": "kk"
+            },
+            {
+                "name": "青衫",
+                "key": "qs"
+            },
+            {
+                "name": "女马白勺",
+                "key": "nmbs"
+            },
+            {
+                "name": "温柔",
+                "key": "wr"
+            },
+            {
+                "name": "中年女子",
+                "key": "znnz"
+            },
+            {
+                "name": "飞燕",
+                "key": "fy"
+            },
+            {
+                "name": "老军医",
+                "key": "ljy"
+            },
+            {
+                "name": "阿丽塔",
+                "key": "alt"
+            },
+            {
+                "name": "飞狐",
+                "key": "fh"
+            },
+            {
+                "name": "无忌",
+                "key": "wj"
+            },
+            {
+                "name": "慕容小金",
+                "key": "xj"
+            },
+            {
+                "name": "小芸",
+                "key": "xyy"
+            },
+            {
+                "name": "璇玑",
+                "key": "xj"
+            },
+            {
+                "name": "云妮儿",
+                "key": "yn"
+            },
+            {
+                "name": "连天",
+                "key": "lt"
+            },
+            {
+                "name": "忐忐忑忑",
+                "key": "tttt"
+            }
+        ]
+    },
+    {
+        "name": "明教",
+        "key": "mj",
+        "users": [
+            {
+                "name": "野狼",
+                "key": "yl"
+            },
+            {
+                "name": "望天",
+                "key": "wt"
+            },
+            {
+                "name": "野狼",
+                "key": "yl"
+            },
+            {
+                "name": "寒霜",
+                "key": "hss"
+            },
+            {
+                "name": "花弄影",
+                "key": "hny"
+            },
+            {
+                "name": "金庸",
+                "key": "jy"
+            },
+            {
+                "name": "小雅",
+                "key": "xy"
+            },
+            {
+                "name": "萝敏荻",
+                "key": "lmd"
+            },
+            {
+                "name": "农夫三拳",
+                "key": "nfsq"
+            },
+            {
+                "name": "正颀",
+                "key": "zq"
+            },
+            {
+                "name": "天残脚",
+                "key": "tcj"
+            },
+            {
+                "name": "老墨迹",
+                "key": "lmj"
+            },
+            {
+                "name": "袭人",
+                "key": "xr"
+            },
+            {
+                "name": "少侠",
+                "key": "sx"
+            },
+            {
+                "name": "我就是我",
+                "key": "wjsw"
+            }
+        ]
+    },
+    {
+        "name": "少林派",
+        "key": "sl",
+        "users": [
+            {
+                "name": "渡黑",
+                "key": "dh"
+            },
+            {
+                "name": "渡羲",
+                "key": "dx"
+            },
+            {
+                "name": "渡黑",
+                "key": "dh"
+            },
+            {
+                "name": "渡王",
+                "key": "dw"
+            },
+            {
+                "name": "渡天",
+                "key": "dt"
+            },
+            {
+                "name": "渡角",
+                "key": "dj"
+            },
+            {
+                "name": "渡诃",
+                "key": "dh"
+            },
+            {
+                "name": "渡年",
+                "key": "dn"
+            },
+            {
+                "name": "渡黄",
+                "key": "dh"
+            },
+            {
+                "name": "渡帝",
+                "key": "dd"
+            },
+            {
+                "name": "渡煞",
+                "key": "ds"
+            },
+            {
+                "name": "渡绝",
+                "key": "dj"
+            },
+            {
+                "name": "渡欢",
+                "key": "dh"
+            },
+            {
+                "name": "渡人",
+                "key": "dr"
+            },
+            {
+                "name": "鬼鲛",
+                "key": "gj"
+            },
+            {
+                "name": "渡空",
+                "key": "dk"
+            },
+            {
+                "name": "渡为",
+                "key": "dw"
+            },
+            {
+                "name": "渡筲",
+                "key": "ds"
+            },
+            {
+                "name": "渡都",
+                "key": "dd"
+            },
+            {
+                "name": "渡血",
+                "key": "dx"
+            },
+            {
+                "name": "渡来",
+                "key": "dll"
+            },
+            {
+                "name": "公仔面",
+                "key": "gzm"
+            },
+            {
+                "name": "渡宝",
+                "key": "db"
+            },
+            {
+                "name": "渡石",
+                "key": "ds"
+            },
+            {
+                "name": "渡雪",
+                "key": "dx"
+            },
+            {
+                "name": "摩诃萨邪",
+                "key": "mhsy"
+            }
+        ]
+    },
+    {
+        "name": "桃花岛",
+        "key": "thd",
+        "users": [
+            {
+                "name": "七彩虹",
+                "key": "qch"
+            },
+            {
+                "name": "醉清风",
+                "key": "zqf"
+            },
+            {
+                "name": "瑶光风",
+                "key": "ygf"
+            },
+            {
+                "name": "剑一风",
+                "key": "jyf"
+            },
+            {
+                "name": "天姬风",
+                "key": "tjf"
+            },
+            {
+                "name": "白玉风",
+                "key": "byf"
+            },
+            {
+                "name": "大西风",
+                "key": "dxf"
+            },
+            {
+                "name": "焚琴风",
+                "key": "fqf"
+            },
+            {
+                "name": "七条风",
+                "key": "qtf"
+            },
+            {
+                "name": "桃花风",
+                "key": "thf"
+            },
+            {
+                "name": "天堂风",
+                "key": "ttf"
+            },
+            {
+                "name": "白玉京",
+                "key": "byj"
+            },
+            {
+                "name": "白癜风",
+                "key": "bdf"
+            },
+            {
+                "name": "紫狐风",
+                "key": "zhf"
+            },
+            {
+                "name": "张叁风",
+                "key": "zsf"
+            },
+            {
+                "name": "超牛风",
+                "key": "cnf"
+            },
+            {
+                "name": "三点风",
+                "key": "sdf"
+            },
+            {
+                "name": "欧米风",
+                "key": "omf"
+            },
+            {
+                "name": "琉璃风",
+                "key": "llf"
+            },
+            {
+                "name": "龙威风",
+                "key": "lwf"
+            },
+            {
+                "name": "杰门风",
+                "key": "jmf"
+            },
+            {
+                "name": "秋山风",
+                "key": "qsf"
+            },
+            {
+                "name": "听风风",
+                "key": "tff"
+            },
+            {
+                "name": "西北风",
+                "key": "xbf"
+            },
+            {
+                "name": "蓉儿风",
+                "key": "ref"
+            },
+            {
+                "name": "芷若风",
+                "key": "zrf"
+            },
+            {
+                "name": "美霖风",
+                "key": "mlf"
+            },
+            {
+                "name": "独角风",
+                "key": "djf"
+            },
+            {
+                "name": "玄机风",
+                "key": "xjf"
+            },
+            {
+                "name": "兮兮风",
+                "key": "xxf"
+            },
+            {
+                "name": "劲秋风",
+                "key": "jqf"
+            },
+            {
+                "name": "花落雨",
+                "key": "hly"
+            },
+            {
+                "name": "欧米风",
+                "key": "omf"
+            },
+            {
+                "name": "老蛤风",
+                "key": "lhf"
+            },
+            {
+                "name": "王二风",
+                "key": "wef"
+            },
+            {
+                "name": "小妖风",
+                "key": "xyf"
+            },
+            {
+                "name": "子渝风",
+                "key": "zyf"
+            },
+            {
+                "name": "扶摇风",
+                "key": "fyf"
+            },
+            {
+                "name": "玲珑风",
+                "key": "llf"
+            },
+            {
+                "name": "风妖风",
+                "key": "fyf"
+            },
+            {
+                "name": "虎胆风",
+                "key": "hdf"
+            },
+            {
+                "name": "铁锈风",
+                "key": "txf"
+            },
+            {
+                "name": "黄鹂风",
+                "key": "hlf"
+            },
+            {
+                "name": "欧克风",
+                "key": "okf"
+            },
+            {
+                "name": "星寒风",
+                "key": "xhf"
+            },
+            {
+                "name": "小老风",
+                "key": "xlf"
+            },
+            {
+                "name": "袂袂风",
+                "key": "mmf"
+            },
+            {
+                "name": "徐凤风",
+                "key": "xff"
+            },
+            {
+                "name": "无双风",
+                "key": "wsf"
+            },
+            {
+                "name": "波比风",
+                "key": "bbf"
+            },
+            {
+                "name": "笑秋风",
+                "key": "xqf"
+            },
+            {
+                "name": "流川风",
+                "key": "lcf"
+            },
+            {
+                "name": "云雨风",
+                "key": "yyf"
+            },
+            {
+                "name": "蒹葭风",
+                "key": "jjf"
+            },
+            {
+                "name": "糖醋里脊",
+                "key": "tclj"
+            },
+            {
+                "name": "慕容风",
+                "key": "mrf"
+            },
+            {
+                "name": "无法风",
+                "key": "wff"
+            },
+            {
+                "name": "风小小",
+                "key": "fxx"
+            },
+            {
+                "name": "慕容姗姗",
+                "key": "mrss"
+            },
+            {
+                "name": "花倾风",
+                "key": "hqf"
+            },
+            {
+                "name": "蝴蝶风",
+                "key": "hdf"
+            },
+            {
+                "name": "蜘蛛风",
+                "key": "zzf"
+            },
+            {
+                "name": "铃兰风",
+                "key": "llf"
+            },
+            {
+                "name": "绿肥红瘦",
+                "key": "lfhs"
+            },
+            {
+                "name": "邢曦风",
+                "key": "xxf"
+            },
+            {
+                "name": "玉临风",
+                "key": "ylf"
+            },
+            {
+                "name": "语嫣风",
+                "key": "yyf"
+            },
+            {
+                "name": "任平生",
+                "key": "rps"
+            }
+        ]
+    },
+    {
+        "name": "天龙寺",
+        "key": "tls",
+        "users": [
+            {
+                "name": "本玉",
+                "key": "by"
+            },
+            {
+                "name": "本墟",
+                "key": "bx"
+            },
+            {
+                "name": "本墟",
+                "key": "bx"
+            },
+            {
+                "name": "本主",
+                "key": "bz"
+            },
+            {
+                "name": "本龙",
+                "key": "bl"
+            },
+            {
+                "name": "本帝",
+                "key": "bd"
+            },
+            {
+                "name": "段秋月",
+                "key": "dqy"
+            },
+            {
+                "name": "解放军",
+                "key": "jfj"
+            },
+            {
+                "name": "本度",
+                "key": "bd"
+            },
+            {
+                "name": "小山界",
+                "key": "xsj"
+            },
+            {
+                "name": "本个",
+                "key": "bg"
+            },
+            {
+                "name": "本粟",
+                "key": "bs"
+            },
+            {
+                "name": "本慧",
+                "key": "bh"
+            },
+            {
+                "name": "本棋",
+                "key": "bq"
+            },
+            {
+                "name": "本委",
+                "key": "bw"
+            },
+            {
+                "name": "本巴",
+                "key": "bb"
+            },
+            {
+                "name": "本二",
+                "key": "be"
+            },
+            {
+                "name": "本三",
+                "key": "bs"
+            },
+            {
+                "name": "本四",
+                "key": "bs"
+            },
+            {
+                "name": "本武",
+                "key": "bw"
+            },
+            {
+                "name": "段巴黎",
+                "key": "bl"
+            },
+            {
+                "name": "本陨",
+                "key": "by"
+            },
+            {
+                "name": "本克",
+                "key": "bk"
+            },
+            {
+                "name": "又来月",
+                "key": "yly"
+            },
+            {
+                "name": "段本飞",
+                "key": "dbf"
+            },
+            {
+                "name": "本罪",
+                "key": "bz"
+            },
+            {
+                "name": "笔记本",
+                "key": "bjb"
+            },
+            {
+                "name": "本城",
+                "key": "bc"
+            },
+            {
+                "name": "玄藏",
+                "key": "xz"
+            },
+            {
+                "name": "本辰",
+                "key": "bc"
+            },
+            {
+                "name": "本达",
+                "key": "bd"
+            },
+            {
+                "name": "本雁",
+                "key": "by"
+            },
+            {
+                "name": "本大",
+                "key": "bd"
+            },
+            {
+                "name": "叶孤诚",
+                "key": "ygc"
+            },
+            {
+                "name": "段思平",
+                "key": "dsp"
+            },
+            {
+                "name": "本翁",
+                "key": "bw"
+            },
+            {
+                "name": "本鹰",
+                "key": "by"
+            },
+            {
+                "name": "本风",
+                "key": "bf"
+            },
+            {
+                "name": "本漫",
+                "key": "bm"
+            },
+            {
+                "name": "本华",
+                "key": "bh"
+            },
+            {
+                "name": "本海",
+                "key": "bh"
+            },
+            {
+                "name": "本了",
+                "key": "bl"
+            },
+            {
+                "name": "本漠",
+                "key": "bm"
+            },
+            {
+                "name": "本赐",
+                "key": "bc"
+            },
+            {
+                "name": "本紫",
+                "key": "bz"
+            },
+            {
+                "name": "本涯",
+                "key": "by"
+            },
+            {
+                "name": "本妖",
+                "key": "by"
+            },
+            {
+                "name": "本陨",
+                "key": "bs"
+            },
+            {
+                "name": "本高",
+                "key": "bg"
+            },
+            {
+                "name": "本子",
+                "key": "bz"
+            },
+            {
+                "name": "大象无形",
+                "key": "dxwx"
+            },
+            {
+                "name": "本年",
+                "key": "bn"
+            },
+            {
+                "name": "段子手",
+                "key": "dzs"
+            },
+            {
+                "name": "本飞",
+                "key": "bf"
+            },
+            {
+                "name": "本星",
+                "key": "bx"
+            },
+            {
+                "name": "本凤",
+                "key": "bf"
+            },
+            {
+                "name": "本人",
+                "key": "br"
+            },
+            {
+                "name": "本哥",
+                "key": "bg"
+            },
+            {
+                "name": "於菟",
+                "key": "wt"
+            },
+            {
+                "name": "本喳",
+                "key": "bz"
+            },
+            {
+                "name": "爱心无限",
+                "key": "axwx"
+            },
+            {
+                "name": "李青",
+                "key": "lq"
+            },
+            {
+                "name": "本敌",
+                "key": "bd"
+            }
+        ]
+    },
+    {
+        "name": "武当派",
+        "key": "wd",
+        "users": [
+            {
+                "name": "萧雨",
+                "key": "xy"
+            },
+            {
+                "name": "萧雨",
+                "key": "xy"
+            },
+            {
+                "name": "唐三",
+                "key": "ts"
+            },
+            {
+                "name": "铎儿",
+                "key": "de"
+            },
+            {
+                "name": "天命",
+                "key": "tm"
+            },
+            {
+                "name": "武当之花",
+                "key": "wdzh"
+            },
+            {
+                "name": "三丰",
+                "key": "sf"
+            },
+            {
+                "name": "天命星辰",
+                "key": "tmxc"
+            },
+            {
+                "name": "笑看风云",
+                "key": "xkfy"
+            },
+            {
+                "name": "冷战",
+                "key": "lz"
+            },
+            {
+                "name": "陆某某",
+                "key": "xy"
+            },
+            {
+                "name": "弟子红玉",
+                "key": "dzhy"
+            },
+            {
+                "name": "紫电",
+                "key": "zd"
+            },
+            {
+                "name": "灰烬使者",
+                "key": "hjsz"
+            },
+            {
+                "name": "雪拥蓝关",
+                "key": "xylg"
+            },
+            {
+                "name": "惊鸿",
+                "key": "jh"
+            },
+            {
+                "name": "关中",
+                "key": "gz"
+            },
+            {
+                "name": "谭谭",
+                "key": "tt"
+            },
+            {
+                "name": "岁月如流",
+                "key": "syrl"
+            },
+            {
+                "name": "番茄",
+                "key": "fq"
+            },
+            {
+                "name": "一粒金丹",
+                "key": "yljd"
+            },
+            {
+                "name": "空气",
+                "key": "kq"
+            },
+            {
+                "name": "玫瑰",
+                "key": "mg"
+            },
+            {
+                "name": "怒海狂澜",
+                "key": "nhkl"
+            },
+            {
+                "name": "张菌煲",
+                "key": "zjb"
+            },
+            {
+                "name": "巴顿",
+                "key": "bd"
+            },
+            {
+                "name": "上官天一",
+                "key": "sgty"
+            },
+            {
+                "name": "公孙胜",
+                "key": "gss"
+            },
+            {
+                "name": "宋江",
+                "key": "sj"
+            },
+            {
+                "name": "壁水宿",
+                "key": "bsx"
+            },
+            {
+                "name": "光盘",
+                "key": "gp"
+            },
+            {
+                "name": "小翡翠",
+                "key": "xfc"
+            },
+            {
+                "name": "苍月",
+                "key": "cy"
+            },
+            {
+                "name": "什么",
+                "key": "sm"
+            },
+            {
+                "name": "阳神",
+                "key": "ys"
+            },
+            {
+                "name": "任惊鸿",
+                "key": "rjh"
+            },
+            {
+                "name": "极品家丁",
+                "key": "jpjd"
+            },
+            {
+                "name": "王者荣耀",
+                "key": "wzry"
+            },
+            {
+                "name": "原单精仿",
+                "key": "ydjf"
+            },
+            {
+                "name": "无名",
+                "key": "wm"
+            },
+            {
+                "name": "朵儿",
+                "key": "de"
+            },
+            {
+                "name": "夙兴",
+                "key": "sx"
+            },
+            {
+                "name": "云潇",
+                "key": "yx"
+            },
+            {
+                "name": "金泰妍",
+                "key": "jty"
+            },
+            {
+                "name": "透顶无聊",
+                "key": "tdwl"
+            },
+            {
+                "name": "大仙儿",
+                "key": "dx"
+            },
+            {
+                "name": "万达影院",
+                "key": "wdyy"
+            },
+            {
+                "name": "一剑开天",
+                "key": "yjkt"
+            },
+            {
+                "name": "武当天鹰",
+                "key": "wdty"
+            },
+            {
+                "name": "德神元就",
+                "key": "dsyj"
+            },
+            {
+                "name": "全家桶",
+                "key": "qjt"
+            },
+            {
+                "name": "慕容师师",
+                "key": "mrss"
+            }
+        ]
+    },
+    {
+        "name": "星宿派",
+        "key": "xx",
+        "users": [
+            {
+                "name": "阴兵捌号",
+                "key": "yybh"
+            },
+            {
+                "name": "雪山飞狐",
+                "key": "xsfh"
+            },
+            {
+                "name": "雪山飞狐",
+                "key": "xsfh"
+            },
+            {
+                "name": "丁香",
+                "key": "dx"
+            },
+            {
+                "name": "青云",
+                "key": "qy"
+            },
+            {
+                "name": "关胜",
+                "key": "gs"
+            },
+            {
+                "name": "落日",
+                "key": "lr"
+            },
+            {
+                "name": "呼延灼",
+                "key": "hyz"
+            },
+            {
+                "name": "椰子君",
+                "key": "yzj"
+            },
+            {
+                "name": "阴兵柒号",
+                "key": "yyqh"
+            },
+            {
+                "name": "阴兵陆号",
+                "key": "yylh"
+            },
+            {
+                "name": "阴兵拾号",
+                "key": "yysh"
+            },
+            {
+                "name": "阴兵伍号",
+                "key": "yywh"
+            },
+            {
+                "name": "阴兵玖号",
+                "key": "yyjh"
+            },
+            {
+                "name": "阴兵肆号",
+                "key": "yysh"
+            },
+            {
+                "name": "阴兵叁号",
+                "key": "yysh"
+            },
+            {
+                "name": "阴兵贰号",
+                "key": "yyeh"
+            },
+            {
+                "name": "阴兵壹号",
+                "key": "yyyh"
+            },
+            {
+                "name": "打不过",
+                "key": "dbg"
+            },
+            {
+                "name": "蝎子",
+                "key": "xz"
+            },
+            {
+                "name": "华为",
+                "key": "hw"
+            },
+            {
+                "name": "百合",
+                "key": "bh"
+            },
+            {
+                "name": "那拉星渊",
+                "key": "nlxy"
+            },
+            {
+                "name": "火须子",
+                "key": "hxz"
+            },
+            {
+                "name": "红玻璃",
+                "key": "hbl"
+            },
+            {
+                "name": "长安山",
+                "key": "cas"
+            },
+            {
+                "name": "颖子",
+                "key": "yz"
+            },
+            {
+                "name": "垃圾虫",
+                "key": "ljc"
+            },
+            {
+                "name": "神荼",
+                "key": "st"
+            },
+            {
+                "name": "行尸走肉",
+                "key": "xszr"
+            },
+            {
+                "name": "方觉晓",
+                "key": "fjx"
+            },
+            {
+                "name": "丁南北",
+                "key": "dnb"
+            },
+            {
+                "name": "神木王鼎",
+                "key": "smwd"
+            }
+        ]
+    },
+    {
+        "name": "神龙教",
+        "key": "slj",
+        "users": [
+            {
+                "name": "踏歌而行",
+                "key": "tgex"
+            },
+            {
+                "name": "无悔",
+                "key": "wh"
+            },
+            {
+                "name": "无悔",
+                "key": "wh"
+            },
+            {
+                "name": "无悔",
+                "key": "wh"
+            },
+            {
+                "name": "杨贵妃",
+                "key": "ygf"
+            },
+            {
+                "name": "谜珑",
+                "key": "ml"
+            },
+            {
+                "name": "楚风",
+                "key": "cf"
+            },
+            {
+                "name": "极品飞车",
+                "key": "jpfc"
+            },
+            {
+                "name": "西子",
+                "key": "xz"
+            },
+            {
+                "name": "十字路口",
+                "key": "szlk"
+            },
+            {
+                "name": "马前卒",
+                "key": "mqz"
+            },
+            {
+                "name": "电风扇",
+                "key": "dfs"
+            },
+            {
+                "name": "一把龙泉",
+                "key": "yblq"
+            },
+            {
+                "name": "神龙弟子",
+                "key": "sldz"
+            },
+            {
+                "name": "雪球",
+                "key": "xq"
+            },
+            {
+                "name": "一捆绳子",
+                "key": "yksz"
+            },
+            {
+                "name": "妲一炮",
+                "key": "dyp"
+            },
+            {
+                "name": "白晶晶",
+                "key": "bjj"
+            }
+        ]
+    },
+    {
+        "name": "铁掌帮",
+        "key": "tz",
+        "users": [
+            {
+                "name": "渔霸",
+                "key": "yb"
+            },
+            {
+                "name": "宇都宫",
+                "key": "ydg"
+            },
+            {
+                "name": "迷障",
+                "key": "mz"
+            },
+            {
+                "name": "壹丸",
+                "key": "yw"
+            },
+            {
+                "name": "裘少云",
+                "key": "qsy"
+            },
+            {
+                "name": "渔霸",
+                "key": "yb"
+            },
+            {
+                "name": "铁三",
+                "key": "ts"
+            },
+            {
+                "name": "真无",
+                "key": "zw"
+            },
+            {
+                "name": "问道",
+                "key": "wd"
+            },
+            {
+                "name": "茨蒂",
+                "key": "cd"
+            },
+            {
+                "name": "某某",
+                "key": "mm"
+            },
+            {
+                "name": "洗头鱼",
+                "key": "xty"
+            },
+            {
+                "name": "要有光",
+                "key": "yyg"
+            },
+            {
+                "name": "圣诞快乐",
+                "key": "sdkl"
+            },
+            {
+                "name": "野人",
+                "key": "yr"
+            },
+            {
+                "name": "袍哥人家",
+                "key": "pgrj"
+            },
+            {
+                "name": "风信子",
+                "key": "fxz"
+            },
+            {
+                "name": "大山贼",
+                "key": "dsz"
+            },
+            {
+                "name": "阴帝",
+                "key": "yd"
+            },
+            {
+                "name": "地主老财",
+                "key": "dzlc"
+            },
+            {
+                "name": "至尊宝",
+                "key": "zzb"
+            },
+            {
+                "name": "醒言",
+                "key": "xy"
+            }
+        ]
+    },
+    {
+        "name": "丐帮",
+        "key": "gb",
+        "users": [
+            {
+                "name": "霍去病",
+                "key": "hqb"
+            },
+            {
+                "name": "小叫花子",
+                "key": "xjhz"
+            },
+            {
+                "name": "小叫花子",
+                "key": "xjhz"
+            },
+            {
+                "name": "小叫花子",
+                "key": "xjhz"
+            },
+            {
+                "name": "洪七",
+                "key": "hq"
+            },
+            {
+                "name": "合一",
+                "key": "hy"
+            },
+            {
+                "name": "听雨",
+                "key": "ty"
+            },
+            {
+                "name": "田中瞳",
+                "key": "tzt"
+            },
+            {
+                "name": "醚赅",
+                "key": "mg"
+            },
+            {
+                "name": "天外飞仙",
+                "key": "twfx"
+            },
+            {
+                "name": "加姆",
+                "key": "jm"
+            },
+            {
+                "name": "萨尔",
+                "key": "se"
+            },
+            {
+                "name": "大多数的",
+                "key": "dds"
+            },
+            {
+                "name": "蓉儿",
+                "key": "re"
+            },
+            {
+                "name": "青丘白浅",
+                "key": "qqbq"
+            },
+            {
+                "name": "邢睿",
+                "key": "xr"
+            },
+            {
+                "name": "西德尼",
+                "key": "xdn"
+            },
+            {
+                "name": "大胸弟",
+                "key": "dxd"
+            },
+            {
+                "name": "斯堪尼亚",
+                "key": "skny"
+            },
+            {
+                "name": "红莲",
+                "key": "hl"
+            },
+            {
+                "name": "美猴王",
+                "key": "mhw"
+            }
+        ]
+    }
+]

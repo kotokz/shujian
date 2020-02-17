@@ -89,9 +89,9 @@ function exe(cmd)
     run(cmd)		
 end
 
-cmd_limit=30
+cmd_limit=100
 walkecho=true
-
+-- SetSpeedWalkDelay(math.floor(1000/cmd_limit))
 function run(str)
 	if ((str=="")or(str==nil)) then return end
 	SetSpeedWalkDelay(math.floor(1000/cmd_limit))
@@ -137,7 +137,7 @@ function locate_trigger()
     DeleteTriggerGroup("locate_unknown")
     create_trigger_t('locate_unknown1','^(> )*设定环境变量：look\\s*\\=\\s*\\"YES\\"\\n>\\s*(\\D*)\\s*\\ -\\s*','','local_unknown_room')
     create_trigger_t('locate2','^(> )*【你现在正处于(\\D*)】\\n(\\D*)\\s*\\-\\s*','','local_area')
-    create_trigger_t('locate3',"^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$",'','local_exit')
+     -- create_trigger_t('locate3',"^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$",'','local_exit')
     create_trigger_t('locate4',"^(\\D*) = (\\D*)$",'','local_id')
     -- create_trigger_t('locate5','^(> )*你把 "action" 设定为 "正在定位" 成功完成。$','','local_start')
     create_trigger_t('locate6',"^(> )*现在是\\D*年\\D*月\\D*日(\\D*)时",'','local_time')
@@ -150,8 +150,8 @@ function locate_trigger()
     SetTriggerOption("locate2","lines_to_match","7")
     EnableTrigger("locate2",true)
     --SetTriggerOption("locate_unknown1","group","locate_unknown")
-    --SetTriggerOption("locate2","group","locate")
-    SetTriggerOption("locate3","group","locate")
+    SetTriggerOption("locate2","group","locate")
+    -- SetTriggerOption("locate3","group","locate")
     SetTriggerOption("locate4","group","locate")
     -- SetTriggerOption("locate5","group","locate")
     SetTriggerOption("locate6","group","locate")
@@ -200,6 +200,7 @@ local_area=function(n,l,w)
     _, i = string.find(r_r,'[\n]')
     locl.room = (string.sub(room_relation, 1-i))
     exe('unset look')
+    print("确定目前区域为："..locl.area..locl.room)
     locl.where=locl.area..locl.room
     locl.room_relation = (string.gsub(room_relation,'[\n]',''))
     print(locl.room_relation)
@@ -353,96 +354,82 @@ exit_set=function(exit)
 	
     return l_set    
 end
-locate=function()
+locate=function(thread)
     wait.make(function()
+        localget=0 
         locate_trigger()
-        localget=0
-        while true do
-            exe('alias action 正在定位')
+        local_start()   
+        local l, w
+        while true do           
             exe('id here')
             exe('set look;l;time')
-            local l, w = wait.regexp('^(> )*你把 "action" 设定为 "正在定位" 成功完成。$',2)
+            -- exe('alias action 正在定位')
+            l, w = wait.regexp('^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$',2)
             if l ~= nil then break end
         end
-        local_start()
+        local_exit(nil, l, w)
+        if thread then
+            coroutine.resume(thread)
+        end
     end)
 end
 fastLocate=function()
     wait.make(function()
-        locate_trigger()
+        localget=0
         EnableTrigger("locate5",true)
-        while true do
-            exe('alias action 正在定位')
+        locate_trigger()
+        local_start()   
+        local l, w
+        while true do           
+            exe('id here')
             exe('set look;l')
-            local l, w = wait.regexp('^(> )*你把 "action" 设定为 "正在定位" 成功完成。$',1)
+            -- exe('alias action 正在定位')
+            l, w = wait.regexp('^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$',2)
             if l ~= nil then break end
         end
-        local_start()
+        local_exit(nil, l, w)
     end)
 end
 function walk_trigger()
-    DeleteTriggerGroup("walk")
-    create_trigger_t('walk1','^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$','','walk_goon')
-    SetTriggerOption("walk1","group","walk")
-    EnableTriggerGroup("walk",false)
+    -- DeleteTriggerGroup("walk")
+    -- create_trigger_t('walk1','^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$','','walk_goon')
+    -- SetTriggerOption("walk1","group","walk")
+    -- EnableTriggerGroup("walk",false)
 end
 function walk_wait()
-    flag.walkwait=true
-    EnableTriggerGroup("walk",true)
-    EnableTrigger("hp12",true)
-    if tmp.find then
-        create_timer_s('walkWait',0.2,'walkTimer')
-        if cntr1() > 0 then
-            exe('alias action 正在赶路中')
+    wait.make(function()
+        EnableTrigger("hp12",true)
+        if tmp.find then
+            wait.time(0.2)
+            if cntr1() > 0 then
+                walk_goon()
+            else
+                cntr1 = countR(15)
+                walk_goon()
+            end
         else
-            cntr1 = countR(15)
+            walk_goon()
         end
+    end)
+end
+
+walk_hook_thread = nil
+
+function walk_goon(func)
+    EnableTrigger("hp12",false)
+    EnableTrigger("hp12",true)    
+    wait_busy()    
+
+    if walk_hook_thread then
+        print("resume suspended walk")
+        local tmp_thread = walk_hook_thread
+        walk_hook_thread =nil
+        coroutine.resume(tmp_thread)
     else
-            -- create_timer_s('walkWait',0.1,'walk_goon')
-        walk_goon()
-    end
-end
-
-
--- function walk_wait()
---     EnableTrigger("hp12",true)
---     if tmp.find then
---         if cntr1() > 0 then
---             walk_goon()
---         else
---             cntr1 = countR(15)
---         end
---     else
---         walk_goon()
---     end
--- end
-
--- function walk_goon()
--- 	EnableTrigger("hp12",false)
--- 	if tmp.find then
--- 	   return searchFunc()
--- 	end
--- 	EnableTrigger("hp12",true)
---     exe('alias action 正在赶路中')
--- end
-
-function walkTimer()
-    if flag.walkwait then
         exe('alias action 正在赶路中')
-    end
+    end    
 end
-function walk_goon()
-    flag.walkwait=false
-    EnableTriggerGroup("walk",false)
-    EnableTimer('walkwait',false)
-	EnableTrigger("hp12",false)
-	if tmp.find then
-	   return searchFunc()
-	end
-	EnableTrigger("hp12",true)
-    -- create_timer_s('roadWait',road.wait,'path_start')
-    return path_start()
-end
+
 function goto(where)
    dis_all()
    local l_dest={}
@@ -473,7 +460,7 @@ function await_go(area, room, sId)
 end
 
 function go(job,area,room,sId)
-	--map.rooms["sld/lgxroom"].ways["#outSld"]="huanghe/huanghe8"
+    --map.rooms["sld/lgxroom"].ways["#outSld"]="huanghe/huanghe8"
 	flag.search=0
     tmp.go_to = nil
     sour.id=sId
@@ -508,13 +495,13 @@ function go(job,area,room,sId)
 end
 go_locate=function()
 	EnableTriggerGroup("gpstest",true)
-	EnableTrigger("hp12",true)
-	locate()
-	if locl.where=="大雪山入幽口" or locl.where=="华山正气堂" then
-		path_consider()
-	else
-    checkWait(path_consider,0.5)
-	end
+    EnableTrigger("hp12",true)
+    wait.make(function()        
+        locate(coroutine.running())
+        coroutine.yield()
+        path_consider()
+    end)
+
 end
 function goContinue()
     return go(road.act)
@@ -694,7 +681,14 @@ function path_consider()
     end
     path_create()
     road.i=0
-    return check_halt(path_start)
+    wait.make(function()
+        -- if cmd_limit == 30 then
+        --     wait.time(0.5)
+        -- end
+        wait_busy()
+        path_start()
+    end)
+
 end
 function path_cal()
     local l_sour,l_dest,l_path,l_distance
@@ -830,82 +824,54 @@ function path_create()
         end
     end        
 end
--- function path_start()
---     EnableTrigger("hp12",false)
---     EnableTimer("roadWait",false)
---     DeleteTimer("roadWait",false)
---     if flag.find==1 then return end 
---     -- local l_road
---     -- road.i=road.i + 1
---     -- road.i = 0
---     wait.make(function()
---         for i,step in ipairs(road.detail) do    
---             road.i= i  
---             print("开始第".. i .. "步")
---             print("步骤:" .. step )
---             EnableTrigger("hp12",false)
---             if step and string.find(step,'ta corpse') then
---                 DeleteTriggerGroup('eyu')
---                 create_trigger_t('eyu1','^>*\\s*鳄鱼\\(E yu\\)$','','jqgeyu')
---                 create_trigger_t('eyu2','^>*\\s*鳄鱼\\(E yu\\) <昏迷不醒>$','','jqgeyu')
---                 create_trigger_t('eyu3','^>*\\s*鳄鱼的尸体\\(Corpse\\)$','','jqgeyu')
---                 create_trigger_t('eyu4','^>*\\s*鳄鱼神志迷糊，脚下一个不稳，倒在地上昏了过去。$','','jqgeyu')
---                 create_trigger_t('eyu5','^>*\\s*鳄鱼一见你从水中浮出，都张开血盆大口，朝你游了过来。$','','jqgeyu')
---                 create_trigger_t('eyu6','^>*\\s*鳄鱼潭 - $','','jqgeyu')
---                 for i = 1,6 do SetTriggerOption("eyu" .. i,"group","eyu") end
---                 create_timer_s('jqgeyu',30,'jqgeyuwait')
---             end	        
---             if string.find(step,'#') then
---                 local _,_,func,params = string.find(step,"^#(%a%w*)%s*(.-)$")
---                 if func then
---                     _G[func](params)
---                 end 
---             else
---                 exe(step)
---                 walk_wait()
---             end
---             while true do
---                 local l, w = wait.regexp('^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$',1)            
---                 if l ~= nil then break end
---             end             
---         end
---         locate_finish='go_confirm'
---         return locate()
---     end)
--- end
-
 
 function path_start()
     EnableTrigger("hp12",false)
     EnableTimer("roadWait",false)
     DeleteTimer("roadWait",false)
-    if flag.find==1 then return end
-	if flag.wait==1 then return end
-	if locl.room=="鳄鱼潭" then
-	exe('ta corpse')
-	end
-    local l_road
-    road.i=road.i + 1
     if flag.find==1 then return end 
-    if road.i>table.getn(road.detail) then
-	   locate_finish='go_confirm'
-       return locate()
-    end
-    l_road=road.detail[road.i]
-
-    if string.find(l_road,'#') then
-       local _,_,func,params = string.find(l_road,"^#(%a%w*)%s*(.-)$")
-       if func then
-            return _G[func](params)
-       else
-            messageShow('Function 不存在，可能是地图问题:'.. func)
-		end 
-    else
-		exe(l_road)
-        return walk_wait()
-    end
+    wait.make(function()
+        local steps_done = 0
+        for i,step in ipairs(road.detail) do    
+            road.i= i  
+            print("开始第".. i .. "步")
+            print("步骤:" .. step )
+            local step_set=utils.split(step,';') 
+            steps_done = steps_done + table.getn(step_set)
+            if steps_done > 50 then
+                print("步数过长，休息")
+                cmd_limit=30
+                wait.time(0.5)
+                steps_done = 0
+            end    
+            EnableTrigger("hp12",false)
+            if locl.room=="鳄鱼潭" then
+                exe('ta corpse')
+            end
+            walk_hook_thread = coroutine.running()
+            if string.find(step,'#') then
+                local _,_,func,params = string.find(step,"^#(%a%w*)%s*(.-)$")
+                if func then
+                    _G[func](params)
+                else
+                    messageShow('Function 不存在，可能是地图问题:'.. func)
+                end 
+            else
+                exe(step)
+                walk_wait()
+            end
+            print("suspend till walk wait finish")
+            coroutine.yield()
+            print("walk continue")
+        end
+        if cmd_limit < 100 then
+            cmd_limit=100
+            print("走路结束，恢复100delay")
+        end
+        locate_finish='go_confirm'
+        return locate()
+    end)
 end
-
 
 function go_confirm()
 	locate_finish=0
@@ -1180,84 +1146,77 @@ function search()
     searchPre()
 	cntr1 = countR(15)
     exe('look;halt')
-	tmpsearch=3
+	-- tmpsearch=3
     return check_halt(searchStart,1)
 end
+
 function searchStart()
     EnableTriggerGroup("wipe",true) 
-	flag.search=1
-	--Note("run searchStart")
-    if flag.find==1 then return end
+    flag.search=1
     if flag.wait==1 then return end
-    if table.getn(road.rooms)==0 then
-       return find_nobody()
-    end
-    local path, length = map:getPath(road.id, road.rooms[1])
-    road.id = road.rooms[1]
-    table.remove(road.rooms,1)
-	
-	if type(path)~="string" then
-	   --Note(road.id)
-	   --Note(path)
-	   return searchStart()
-	end
-	if string.find(path,'#') or job.name~='huashan' then
-	       return searchFunc(path)
-    else
-		exe(string.sub(string.gsub(path, "halt;", ""),1,-2))
-		_,tmpnum=string.gsub(path, ";", " ")
-		tmpsearch=tmpsearch+tmpnum
-		--print("n="..tmpsearch)
-		if tmpsearch>20 then
-			tmpsearch=3
-			--print("apath:"..path)
-			-- wait.make(function()
-			-- 	wait.time(road.wait)
-			-- 	searchStart()
-            -- end)
-            searchStart()
-			--return walk_wait()
-		else
-			tmpsearch=tmpsearch+1
-            searchStart()
-		end
-    end
 
-end
-function searchFunc(path)
-	--Note("run searchFunc")
-    if flag.find==1 then return end
-    if flag.wait==1 then return end
-    road.pathset = road.pathset or {}
-    if path then
-       road.pathset=utils.split(path,";")
-	   for i=1,table.getn(road.pathset) do
-	       for p=1, table.getn(road.pathset) do
-		       if isNil(road.pathset[p]) or road.pathset[p]=="halt" then
-			      table.remove(road.pathset,p)
-				  break
-			   end
-		   end
-	   end
-	end
-	if table.getn(road.pathset)==0 then
-	   return searchStart()
-	end
-        if string.find(road.pathset[1],'#') then
-	       local _,_,func,params = string.find(road.pathset[1],"^#(%a%w*)%s*(.-)$")
-	       if func then
-	          table.remove(road.pathset,1)
-	          return _G[func](params)
-	       else
-	          exe(road.pathset[1])
-	          table.remove(road.pathset,1)
-			  return walk_wait()
-	       end
-	   else
-	      exe(road.pathset[1])
-	      table.remove(road.pathset,1)
-		  return walk_wait()
-	   end
+    wait.make(function()
+        cmd_limit =30
+        for i,id in ipairs(road.rooms) do          
+            if flag.find == 1 then 
+                print("找到目标，停止搜索")
+                return 
+            end  
+            local path, length = map:getPath(road.id, id)
+            road.id = id
+            if type(path) =="string" then
+                walk_hook_thread = coroutine.running()
+                if string.find(path,'#') or job.name~='huashan' then
+                    road.pathset = road.pathset or {}
+                    if path then
+                       road.pathset=utils.split(path,";")
+                       for i=1,table.getn(road.pathset) do
+                           for p=1, table.getn(road.pathset) do
+                               if isNil(road.pathset[p]) or road.pathset[p]=="halt" then
+                                  table.remove(road.pathset,p)
+                                  break
+                               end
+                           end
+                       end
+                    end
+                    if road.pathset and table.getn(road.pathset) > 0 then
+                        for i,steps in ipairs(road.pathset) do
+                            walk_hook_thread = coroutine.running()
+                            if flag.find == 1 then 
+                                print("找到目标，停止搜索")
+                                return 
+                            end  
+                            if string.find(road.pathset[1],'#') then
+                                local _,_,func,params = string.find(steps,"^#(%a%w*)%s*(.-)$")
+                                if func then
+                                   _G[func](params)
+                                else
+                                   exe(steps)
+                                   walk_wait()
+                                end
+                            else
+                               exe(steps)
+                               walk_wait()
+                            end
+                            print("suspend till walk wait finish")
+                            coroutine.yield()
+                            print("walk continue")
+                        end                        
+                    end
+                else
+                    exe(string.sub(string.gsub(path, "halt;", ""),1,-2)) 
+                    walk_wait()                   
+                end
+                walk_hook_thread=nil
+            else
+                Note(road.id)
+                Note(path)
+            end
+        end
+        cmd_limit =100
+        return find_nobody()
+    end)
+
 end
 
 function searchWait()
@@ -1373,7 +1332,7 @@ function thread_resume(thread)
     end
 end
 function walkBusy()
-    return check_halt(walk_wait)
+    return check_halt(walk_wait,0.2)
 end
 --------------------------------华山松树林-------------------------------------
 hssslgo=function()
@@ -5850,7 +5809,7 @@ function inmz()
  exe('yun qi;dazuo '..hp.dazuo)
  end
  function eyu_finish()
- checkWait(locate,2)
+    locate()
  exe('halt;drop corpse;ta corpse')
  end
  shikuyin3=function()

@@ -607,7 +607,7 @@ huashan_get_con1 = function()
     EnableTimer('walkWait2', false)
     EnableTriggerGroup("huashan_fight", false)
     EnableTriggerGroup("huashan_find", false)
-    checkWait(huashan_cut, 3)
+    checkWait(huashan_cut,1)
 end
 huashan_cut1 = function()
     exe('get corpse')

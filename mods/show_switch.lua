@@ -896,8 +896,10 @@ win_beinang = "beinang" .. GetPluginID ()
 windowinfo_beinang = movewindow.install (win_beinang, miniwin.pos_bottom_right, 0)
 win_beinang_show = 1
 flag_win_beinang = 1
- 
-
+win_status = "status" .. GetPluginID ()
+windowinfo_status = movewindow.install (win_status, miniwin.pos_top_cente, 0) 
+win_status_show = 1
+flag_win_status = 1
 function mouseup (flags, hotspotid)
 --  print(hotspotid)
   if hotspotid and hotspotid=='skills' then
@@ -923,6 +925,324 @@ function show_skills(n,l,w)
    draw_skillswindow()
   end)
 end
+function draw_statuswindow()
+
+
+
+	if not flag_win_status or flag_win_status~=1 then
+	 if win_skills then
+		   WindowShow (win_status, false)
+		end
+		return
+	 end
+	  local _basic ={}
+	 local _status_ch = {}
+ 
+ 
+	 WINDOW_HEIGHT = 180--每增加一行 加15
+	 WINDOW_WIDTH = 430
+ 
+	WindowCreate(win_status, 
+				 windowinfo_status.window_left, 
+				 windowinfo_status.window_top, 
+				 WINDOW_WIDTH,    
+				 WINDOW_HEIGHT,  
+				 windowinfo_status.window_mode, 
+				 windowinfo_status.window_flags,
+				 0x000010)
+ 
+		 WindowFont (win_status, "f1", FONT_NAME1, FONT_SIZE_12)
+	 WindowFont (win_status, "f2", FONT_NAME2, FONT_SIZE_11)
+	 WindowFont (win_status, "f3", FONT_NAME1, FONT_SIZE_12, true)
+	 WindowFont (win_status, "f4", FONT_NAME3, FONT_SIZE_11, true)
+	 WindowFont (win_status, "f5", FONT_NAME1, FONT_SIZE_11)
+ 
+ font_height = WindowFontInfo (win_status, "f1", 1)
+ 
+ movewindow.save_state (win_status)          
+ 
+	
+	 WindowCircleOp (win_status, miniwin.circle_round_rectangle, 0, 2, WINDOW_WIDTH-2, WINDOW_HEIGHT, 0xc0c0c0, 0, 1,0, 0, 9, 9) 
+   
+	 local head_width   = (WINDOW_WIDTH - WindowTextWidth (win_status, "f1", "状态信息"))/2
+ 
+ if win_status_show == 0 then
+   WindowAddHotspot(win_status, "status",  
+					0, 0, 0, 0, 
+					"", -- mouseover (do nothing)
+					"", -- cancelmouseover (do nothing)
+					"", -- mousedown
+					"", -- cancelmousedown (do nothing)
+					"mouseup", -- mouseup (do nothing)
+					"点击关闭开启",    -- hint text if they hover over it              
+					0, 0)
+ 
+	 WindowText (win_status, "f5", 
+				 "状态信息",   -- text
+				 5, 9, 0, 0,        -- rectangle
+				 ColourNameToRGB ("yellow"), -- colour
+				 false)              -- not Unicode
+ 
+ else
+   WindowLine (win_status, 0, font_height + 15,WINDOW_WIDTH-2,font_height + 15,0xc0c0c0, 0,1)
+   movewindow.add_drag_handler (win_status, 0, 0, 0, font_height + 15, miniwin.cursor_hand)
+   WindowAddHotspot(win_status, "status",  
+					0, font_height + 15, 0, 0, 
+					"", -- mouseover (do nothing)
+					"", -- cancelmouseover (do nothing)
+					"", -- mousedown
+					"", -- cancelmousedown (do nothing)
+					"mouseup", -- mouseup (do nothing)
+					"点击关闭开启",    -- hint text if they hover over it              
+					0, 0)
+ 
+	 WindowText (win_status, "f5", 
+				 "状态信息",   -- text
+				 head_width, 9, 0, 0,        -- rectangle
+				 ColourNameToRGB ("yellow"), -- colour
+				 false)       
+ 
+ end
+ 
+ 
+ 
+ 
+ 
+   
+   local qi="气血:"
+  if hp.qixue_max~=nil and hp.qixue~=nil then
+		 local qixue=hp.qixue or 10
+	 local maxqi=hp.qixue_max or 10
+ 
+	 local hurtq=hp.qixue_per or 100
+ 
+ 
+	 local hurtqi=qixue*hurtq/maxqi
+	 
+ 
+	 local rq=math.floor(hurtqi/10) or 5
+	 
+ 
+	 if hurtqi>95 then
+		 qi="气血:"..string.rep("■",10)..qixue..'/'..maxqi
+	 elseif hurtqi>49 then
+		 qi="气血:"..string.rep("■",rq)..""..string.rep("□",10-rq)..qixue..'/'..maxqi
+	 elseif hurtqi>9 then
+		 qi="气血:"..string.rep("■",rq)..""..string.rep("□",10-rq)..qixue..'/'..maxqi
+	 else
+		 qi="气血:"..string.rep("■",1)..""..string.rep("□",9)..qixue..'/'..maxqi
+	 end
+ end
+ 
+ 
+ local jing="精血:"
+  if hp.jingxue_max~=nil and hp.jingxue~=nil then
+	 local jingxue=hp.jingxue or 10
+	 local maxjing=hp.jingxue_max or 10
+	 local hurtj=hp.jingxue_per or 100
+ 
+	 local hurtjing=jingxue*hurtj/maxjing
+	 local rj=math.floor(hurtj/10) or 5
+	  
+	 if hurtj>95 then
+		 jing="精血:"..string.rep("■",10)..jingxue..'/'..maxjing
+	 elseif hurtj>49 then
+		 jing="精血:"..string.rep("■",rj)..""..string.rep("□",10-rj)..jingxue..'/'..maxjing
+	 elseif hurtj>9 then
+		 jing="精血:"..string.rep("■",rj)..""..string.rep("□",10-rj)..jingxue..'/'..maxjing
+	 else
+		 jing="精血:"..string.rep("■",1)..""..string.rep("□",9)..jingxue..'/'..maxjing
+	 end
+ 
+ 
+ end
+ local nl="内力:"
+ if hp.neili_max~=nil and hp.neili~=nil then
+	 local neili=hp.neili or 100
+	 local maxneili=hp.neili_max or 100
+	 local hurtneili=neili*100/maxneili
+	 
+	 local rn=math.floor(hurtneili/10) or 5
+	  
+	 if hurtneili>95 then
+		 nl="内力:"..string.rep("■",10)..neili..'/'..maxneili
+	 elseif hurtneili>49 then
+		 nl="内力:"..string.rep("■",rn)..""..string.rep("□",10-rn)..neili..'/'..maxneili
+	 elseif hurtneili>9 then
+		 nl="内力:"..string.rep("■",rn)..""..string.rep("□",10-rn)..neili..'/'..maxneili
+	 else
+		 nl="内力:"..string.rep("■",1)..""..string.rep("□",9)..neili..'/'..maxneili
+	 end
+ 
+ end
+ local jl="精力:"
+ if hp.jingli_max~=nil and hp.jingli~=nil then
+ 
+		 local jingli=hp.jingli or 100
+	 local maxjingli=hp.jingli_max or 100
+	 local hurtjingli=jingli*100/maxjingli
+	 
+	 local rjl=math.floor(hurtjingli/10) or 5
+	 
+	 if hurtjingli>95 then
+		 jl="精力:"..string.rep("■",10)..jingli..'/'..maxjingli
+	 elseif hurtjingli>49 then
+		 jl="精力:"..string.rep("■",rjl)..""..string.rep("□",10-rjl)..jingli..'/'..maxjingli
+	 elseif hurtjingli>9 then
+		 jl="精力:"..string.rep("■",rjl)..""..string.rep("□",10-rjl)..jingli..'/'..maxjingli
+	 else
+		 jl="精力:"..string.rep("■",1)..""..string.rep("□",9)..jingli..'/'..maxjingli
+	 end
+ end 
+ WindowText (win_status, "f1", qi, 5, 30, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ WindowText (win_status, "f1", jing, 5, 45, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ WindowText (win_status, "f1", nl, 220, 30, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ WindowText (win_status, "f1", jl, 220, 45, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ local mygold="存款:"
+ 
+ if score.gold~=nil then
+ mygold="存款:"..score.gold
+ end
+ 
+ WindowText (win_status, "f1",mygold , 220, 60, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ 
+		  
+ local shicheng="师承:"
+ if score.party~=nil then
+ shicheng="师承:"..score.party..""..score.master
+ end
+ 
+ WindowText (win_status, "f1",shicheng , 5, 75, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ local lixiang="理相:"
+ 
+ if score.xiangyun~=nil then
+ lixiang="理相:"..score.xiangyun
+ end
+	 
+ WindowText (win_status, "f1",lixiang , 220, 75, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ 
+ 
+ 
+ 
+ local xm="姓名:"
+ if score.name~=nil then
+ xm="姓名:"..score.name.."("..score.id..")"
+ end
+ WindowText (win_status, "f1",xm , 5, 60, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ 
+ local sw="声望:"..score.sw
+ if score.sw~=nil then
+ sw="声望:"..score.sw
+ end
+ WindowText (win_status, "f1",sw , 5, 90, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ 
+ 
+ local expp="经验:"..hp.exp
+ if hp.exp~=nil then
+ expp="经验:"..hp.exp
+ end
+ 
+ WindowText (win_status, "f1",expp , 220, 90, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ 
+ 
+ local tbb="通宝:"..score.tb
+ if score.tb~=nil then
+ tbb="通宝:"..score.tb
+ end
+ WindowText (win_status, "f1",tbb , 5, 105, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ local ybb="元宝:"
+ if score.yb~=nil then
+ ybb="元宝:"..score.yb
+ end
+ WindowText (win_status, "f1",ybb , 220, 105, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ local jjbb="竞技币:"
+ if score.jjb~=nil then
+ jjbb="竞技币:"..score.jjb
+ end
+ WindowText (win_status, "f1",jjbb , 5, 120, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ local djjj="等级:"..score.dj
+ if score.dj~=nil then
+ djjj="等级:"..score.dj
+ end
+ WindowText (win_status, "f1",djjj , 220, 120, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ local swww="死亡:"
+ if score.sww~=nil then
+ swww="死亡:"..score.sww
+ end
+ WindowText (win_status, "f1",swww , 5, 135, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+ 
+ local dzzz="打造:"..score.dz
+ if score.dj~=nil then
+ dzzz="打造:"..score.dz
+ end
+ WindowText (win_status, "f1",dzzz , 220, 135, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ 
+		 local zt="状态:"
+ if score.zt~=nil then
+ zt="状态:"..score.zt
+ end
+ WindowText (win_status, "f1",zt , 5, 150, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+ local loc="定位:"
+ if score.loc~=nil then
+ loc="定位:"..score.loc
+ end
+ WindowText (win_status, "f1",loc , 5, 165, 0, 0,        -- rectangle
+				 ColourNameToRGB ("cyan"), -- colour
+				 false) 
+				   
+ 
+ if flag_win_status and flag_win_status==1 then
+	 WindowShow (win_status, true)
+ else
+	 WindowShow (win_status, false)
+ end
+ end
 function draw_skillswindow()
     if not flag_win_skills or flag_win_skills~=1 then
        if win_skills then

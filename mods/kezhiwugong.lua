@@ -1467,6 +1467,7 @@ function kezhiwugonghubo()
 end
 function fight_busy() flag.busy = true end
 function pk_pfm_set()
+    pk_valuecmd = pk_valuecmd or pk_valuecmd1
     if score.party == 'Ã“ª®µ∫' then
         kezhi_order = {}
         kezhi_order = kezhi_order_thd

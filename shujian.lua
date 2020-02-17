@@ -2073,7 +2073,7 @@ function check_cash_cun()
         if l_cnt > 0 then exe('cun ' .. l_cnt .. ' cash') end
     end
     checkBags()
-    return checkWait(check_gold_check, 3)
+    return checkWait(check_gold_check)
 end
 function check_silver_qu()
     local l_cnt = Bag["°×Òø"].cnt - 50
@@ -2338,7 +2338,7 @@ function checkWeaponBuy()
         if tmp.weapon and weaponStoreId[tmp.weapon] then
             exe('list;buy ' .. weaponStoreId[tmp.weapon])
             checkBags()
-            return checkWait(checkWeaponI, 3)
+            return checkWait(checkWeaponI)
         else
             return check_heal()
         end
@@ -3668,7 +3668,7 @@ function kedian_sleep()
     else
         exe('up;enter;sleep')
     end
-    checkWait(locate, 3)
+    locate()
     walk_wait()
 end
 function check_rope() go(get_rope, '»ªÉ½', 'ÇÞÊÒ') end

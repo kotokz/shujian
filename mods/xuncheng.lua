@@ -93,6 +93,7 @@ function xuncheng_go()
     -- end
     exe('hp')
     job.name = "Ñ²³Ç"
+    cmd_limit = 30
     wait.make(function()
         for key, step in ipairs(xuncheng) do
             wait_busy()
@@ -100,6 +101,7 @@ function xuncheng_go()
             wait.time(1.5)
             exe('yun jing')
         end
+        cmd_limit = 50
         xuncheng_task()
     end)
 end

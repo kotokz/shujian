@@ -143,8 +143,9 @@ function chats_log(logs, color, bcolor)
     -- if not flag.log or flag.log=="no" then return end
 
     if score.id then
-        logs = '¡¾' .. score.id .. '¡¿' .. logs
         score.zt = logs
+        draw_statuswindow()
+        logs = '¡¾' .. score.id .. '¡¿' .. logs
     end
 
     if flag.log and flag.log == "yes" then
@@ -171,6 +172,7 @@ function chats_log(logs, color, bcolor)
             c_text = 'darkviolet'
         end
         if job.name == 'huashan' then c_text = 'hotpink' end
+        if job.name == 'dolost' then c_text = 'hotpink' end
         if color ~= nil then c_text = color end
 
         if w then
@@ -200,8 +202,11 @@ function chats_locate(logs, color)
 
     if color ~= nil then c_text = color end
 
-    if score.id then logs = '¡¾' .. score.id .. '¡¿' .. logs end
-
+    if score.id then
+        score.loc = logs
+        draw_statuswindow()
+        logs = '¡¾' .. score.id .. '¡¿' .. logs
+    end
     -- if not found, try to open it
     if first_time and not w then
         local filename = GetInfo(67) .. locate_world .. ".mcl"

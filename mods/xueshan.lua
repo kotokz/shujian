@@ -263,6 +263,7 @@ function job_xueshan()
     exe('set po ÕÆ')
     flag.idle = nil
     wait.make(function()
+        wait.time(1)
         wait_busy()
         exe('ask bao xiang about job')
         DeleteTimer("walkWait4")

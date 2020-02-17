@@ -346,7 +346,8 @@ function wudangConsider(n, l, w)
     end
     if string.find(job.where, '地下黑拳市') or
         string.find(job.where, '武当后山院门') or
-        string.find(job.where, '武当山后山小院') then
+        string.find(job.where, '武当山后山小院') or
+        string.find(job.where, '绝情谷石窟') then
         messageShow('武当任务②：任务地点【' .. job.where ..
                         '】不可到达，任务放弃。')
         return check_halt(wudangFindFail)
@@ -589,9 +590,36 @@ function wudangKillAct()
     end)
     kezhiwugong()
     kezhiwugongAddTarget(job.target, job.id)
-
+    -- wd flood后kill命令出不来的workaround by joyce@tj
+    addxml.trigger {
+        custom_colour = "2",
+        enabled = "y",
+        group = "wudang_fight",
+        match = "^(> )*你对着" .. job.target ..
+            "(大喝一声：|喝道：|猛吼一声：|吼道：)",
+        name = "wudang_fight_wdkill",
+        regexp = "y",
+        script = "wdkill_timer_stop",
+        sequence = "100"
+    }
+    create_timer_s('wdkill', 1.0, 'wdkill')
+    create_trigger_t('wudangFight5', "^(> )*加油！加油！", '',
+                     'wdkill_timer_stop')
 end
-
+function wdkill() -- wd flood后kill命令出不来的workaround by joyce@tj
+    exe('unset no_kill_ap;yield no')
+    exe('set wimpycmd pfmpfm\\hp')
+    -- exe('set wimpycmd pppp1\\hp')
+    exe('follow ' .. job.id)
+    exe('kill ' .. job.id)
+end
+function wdkill_timer_stop() -- wd flood后kill命令出不来的workaround by joyce@tj
+    DeleteTimer('wdkill')
+    DeleteTimer("walkWaitX")
+    EnableTrigger("wudang_fight_wdkill", false)
+    EnableTrigger("wudangFight5", false)
+    quick_locate = 1
+end
 function wudangBack(n, l, w)
     EnableTriggerGroup("wipe", false)
     wdgostart = 0

@@ -412,7 +412,8 @@ huashan_find = function(n, l, w)
     end
     if string.find(job.where, '地下黑拳市') or
         string.find(job.where, '曼佗罗山庄') or
-        string.find(job.where, '武当山小院') then
+        string.find(job.where, '武当山小院') or
+        string.find(job.where, '绝情谷石窟') then
         messageShow('华山任务②：任务地点【' .. job.where ..
                         '】不可到达，任务放弃。')
         return check_halt(huashanFindFail)
@@ -525,6 +526,32 @@ huashan_fight = function(n, l, w)
     SetTriggerOption("huashan_fight3", "group", "huashan_fight")
     SetTriggerOption("huashan_fight4", "group", "huashan_fight")
 
+    -- hs flood后kill命令出不来的workaround by joyce@tj
+    addxml.trigger {
+        custom_colour = "2",
+        enabled = "y",
+        group = "huashan_fight",
+        match = "^(> )*你对着" .. job.target ..
+            "(大喝一声：|喝道：|猛吼一声：|吼道：)",
+        name = "huashan_fight_hskill",
+        regexp = "y",
+        script = "hskill_timer_stop",
+        sequence = "100"
+    }
+    create_timer_s('hskill', 0.4, 'hskill')
+end
+function hskill() -- hs flood后kill命令出不来的workaround by joyce@tj
+    exe('unset no_kill_ap;yield no')
+    exe('set wimpycmd pfmpfm\\hp')
+    exe('follow ' .. job.id)
+    exe('kick ' .. job.id)
+    exe('kill ' .. job.id)
+    -- exe('set wimpy 100')
+end
+function hskill_timer_stop() -- hs flood后kill命令出不来的workaround by joyce@tj
+    DeleteTimer('hskill')
+    EnableTrigger("huashan_fight_hskill", false)
+    quick_locate = 1
 end
 
 huashan_faint = function()
@@ -607,7 +634,7 @@ huashan_get_con1 = function()
     EnableTimer('walkWait2', false)
     EnableTriggerGroup("huashan_fight", false)
     EnableTriggerGroup("huashan_find", false)
-    checkWait(huashan_cut,1)
+    checkWait(huashan_cut, 1)
 end
 huashan_cut1 = function()
     exe('get corpse')

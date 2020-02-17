@@ -435,8 +435,6 @@ function walk_goon(func)
         local tmp_thread = walk_hook_thread
         walk_hook_thread =nil
         coroutine.resume(tmp_thread)
-    else
-        exe('alias action 正在赶路中')
     end    
 end
 
@@ -1167,7 +1165,7 @@ function searchStart()
     if flag.wait==1 then return end
 
     wait.make(function()
-        cmd_limit =throttled_cmd_limit
+        -- cmd_limit =throttled_cmd_limit
         for i,id in ipairs(road.rooms) do          
             if flag.find == 1 then 
                 print("找到目标，停止搜索")
@@ -1224,7 +1222,7 @@ function searchStart()
                 Note(path)
             end
         end
-        cmd_limit =max_cmd_limit
+        -- cmd_limit =max_cmd_limit
         return find_nobody()
     end)
 

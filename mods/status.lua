@@ -726,6 +726,7 @@ function lingwu_goon()
     flag.idle = nil
     local skill_max = hp.pot_max - 100
     wait.make(function()
+        cmd_limit = throttled_cmd_limit
         for i, skill in pairs(skillsLingwu) do
             if not skills[skill] or skills[skill].lvl == 0 or skills[skill].lvl >=
                 skill_max then
@@ -758,6 +759,7 @@ function lingwu_goon()
         xxpot = hp.pot_max
         -- return check_bei(lingwu_finish)
         wait_busy()
+        cmd_limit = max_cmd_limit
         return lingwu_finish()
     end)
 end

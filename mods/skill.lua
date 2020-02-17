@@ -749,7 +749,7 @@ function job_lianstart()
         for i = 1, 15 do
             if hp.neili > hp.neili_max / 6 * 5 then exe('sxlian') end
             exe('cha;hp')
-            wait.time(0.5)
+            wait.time(1)
         end
     end)
 end

@@ -89,7 +89,9 @@ function exe(cmd)
     run(cmd)		
 end
 
-cmd_limit=100
+max_cmd_limit=100
+throttled_cmd_limit=30
+cmd_limit=max_cmd_limit
 walkecho=true
 -- SetSpeedWalkDelay(math.floor(1000/cmd_limit))
 function run(str)
@@ -142,7 +144,7 @@ function locate_trigger()
     -- create_trigger_t('locate5','^(> )*你把 "action" 设定为 "正在定位" 成功完成。$','','local_start')
     create_trigger_t('locate6',"^(> )*现在是\\D*年\\D*月\\D*日(\\D*)时",'','local_time')
     create_trigger_t('server_time','^您参与游戏的主机北京时间是\\s*星期(\\D*)\\s*\\d*-\\D*-\\s*\\d*\\s*(\\d*):(\\d*):','','local_time_cal')
-    create_trigger_t('locate7',"^( )*这里没有任何明显的出路。$",'','local_exitt')
+    -- create_trigger_t('locate7',"^( )*这里没有任何明显的出路。$",'','local_exitt')
     SetTriggerOption("locate_unknown1","multi_line","y")
     SetTriggerOption("locate_unknown1","lines_to_match","7")
     EnableTrigger("locate_unknown1",true)
@@ -155,7 +157,7 @@ function locate_trigger()
     SetTriggerOption("locate4","group","locate")
     -- SetTriggerOption("locate5","group","locate")
     SetTriggerOption("locate6","group","locate")
-	SetTriggerOption("locate7","group","locate")
+	-- SetTriggerOption("locate7","group","locate")
     EnableTriggerGroup("locate",false)    
     EnableTriggerGroup("locate_unknown",false)  
 end
@@ -364,10 +366,14 @@ locate=function(thread)
             exe('id here')
             exe('set look;l;time')
             -- exe('alias action 正在定位')
-            l, w = wait.regexp('^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$',2)
+            l, w = wait.regexp('^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。|^( )*这里没有任何明显的出路',2)
             if l ~= nil then break end
         end
-        local_exit(nil, l, w)
+        if l:find("出口") then
+            local_exit(nil, l, w)
+        else
+            local_exitt(nil, l, w)
+        end
         if thread then
             coroutine.resume(thread)
         end
@@ -384,10 +390,14 @@ fastLocate=function()
             exe('id here')
             exe('set look;l')
             -- exe('alias action 正在定位')
-            l, w = wait.regexp('^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$',2)
+            l, w = wait.regexp('^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。|^( )*这里没有任何明显的出路',2)
             if l ~= nil then break end
         end
-        local_exit(nil, l, w)
+        if l:find("出口") then
+            local_exit(nil, l, w)
+        else
+            local_exitt(nil, l, w)
+        end
     end)
 end
 function walk_trigger()
@@ -572,10 +582,11 @@ function path_consider()
         end
         
         
-        if locl.room_relation=='南疆沙漠吐谷浑伏俟城南疆沙漠↖｜↗南疆沙漠---南疆沙漠---南疆沙漠↙｜↘南疆沙漠南疆沙漠南疆沙漠南疆沙漠' then  	
-               exe('look;hp;drink jiudai;n;n;n;n;n;n;n;n;n;n')   				
-                   return njsm_check()
-               end
+        if locl.room_relation=='南疆沙漠吐谷浑伏俟城南疆沙漠↖｜↗南疆沙漠---南疆沙漠---南疆沙漠↙｜↘南疆沙漠南疆沙漠南疆沙漠南疆沙漠' then  
+            chats_locate('进入南疆地图，尝试出来')
+            exe('look;hp;drink jiudai;n;n;n;n;n;n;n;n;n;n')   				
+            return njsm_check()
+        end
        if locl.room_relation=='清水温泉' then        
                         exe('look;hp;drink jiudai;ne')        
                    return walk_wait()
@@ -840,7 +851,7 @@ function path_start()
             steps_done = steps_done + table.getn(step_set)
             if steps_done > 50 then
                 print("步数过长，休息")
-                cmd_limit=30
+                cmd_limit=throttled_cmd_limit
                 wait.time(0.5)
                 steps_done = 0
             end    
@@ -864,8 +875,8 @@ function path_start()
             coroutine.yield()
             print("walk continue")
         end
-        if cmd_limit < 100 then
-            cmd_limit=100
+        if cmd_limit < max_cmd_limit then
+            cmd_limit=max_cmd_limit
             print("走路结束，恢复100delay")
         end
         locate_finish='go_confirm'
@@ -1156,7 +1167,7 @@ function searchStart()
     if flag.wait==1 then return end
 
     wait.make(function()
-        cmd_limit =30
+        cmd_limit =throttled_cmd_limit
         for i,id in ipairs(road.rooms) do          
             if flag.find == 1 then 
                 print("找到目标，停止搜索")
@@ -1213,7 +1224,7 @@ function searchStart()
                 Note(path)
             end
         end
-        cmd_limit =100
+        cmd_limit =max_cmd_limit
         return find_nobody()
     end)
 

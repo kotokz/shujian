@@ -93,7 +93,7 @@ function xuncheng_go()
     -- end
     exe('hp')
     job.name = "Ñ²³Ç"
-    cmd_limit = 30
+    cmd_limit = throttled_cmd_limit
     wait.make(function()
         for key, step in ipairs(xuncheng) do
             wait_busy()

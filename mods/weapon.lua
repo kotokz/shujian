@@ -172,18 +172,19 @@ weapon_wield = function()
         weaponKind[skillEnable[perform.skill]] then
         if weapon.first and Bag[weapon.first] then
             exe('wield ' .. Bag[weapon.first].fullid)
-        end
-        for p in pairs(Bag) do
-            if Bag[p].kind and Bag[p].kind == skillEnable[perform.skill] and
-                perform.skill ~= "yuxiao-jian" then
-                if not weapon.first or weapon.first ~= p then
-                    exe('wield ' .. Bag[p].fullid)
+        else
+            for p in pairs(Bag) do
+                if Bag[p].kind and Bag[p].kind == skillEnable[perform.skill] and
+                    perform.skill ~= "yuxiao-jian" then
+                    if not weapon.first or weapon.first ~= p then
+                        exe('wield ' .. Bag[p].fullid)
+                    end
                 end
-            end
-            if Bag[p].kind and Bag[p].kind == "xiao" and perform.skill ==
-                "yuxiao-jian" then
-                if not weapon.first or weapon.first ~= p then
-                    exe('wield ' .. Bag[p].fullid)
+                if Bag[p].kind and Bag[p].kind == "xiao" and perform.skill ==
+                    "yuxiao-jian" then
+                    if not weapon.first or weapon.first ~= p then
+                        exe('wield ' .. Bag[p].fullid)
+                    end
                 end
             end
         end
@@ -214,7 +215,7 @@ weapon_unwield = function()
             end
         end
     end
-    ungeta()
+    -- ungeta()
     checkWield()
 end
 weaponUnWalk = function()
@@ -222,21 +223,30 @@ weaponUnWalk = function()
     return walk_wait()
 end
 weaponWieldCut = function()
+    weapon_unwield()
     for p in pairs(Bag) do
         if Bag[p].kind and weaponKind[Bag[p].kind] and weaponKind[Bag[p].kind] ==
             "cut" then
-            if not (Bag[p].kind == "xiao" and weaponUsave[p]) then
-                for q in pairs(Bag) do
-                    if Bag[q].kind == "xiao" and weaponUsave[q] then
-                        exe('unwield ' .. Bag[q].fullid)
-                    end
-                end
-                exe('wield ' .. Bag[p].fullid)
-            end
+            exe('wield ' .. Bag[p].fullid)
+            -- if not (Bag[p].kind == "xiao" and weaponUsave[p]) then
+            --     for q in pairs(Bag) do
+            --         if Bag[q].kind == "xiao" and weaponUsave[q] then
+            --             exe('unwield ' .. Bag[q].fullid)
+            --         end
+            --     end
+            --     exe('wield ' .. Bag[p].fullid)
+            -- end
         end
     end
-    exe('wield mu jian')
+    -- exe('wield mu jian')
     -- exe('uweapon shape lianyu sword;wield lianyu')
+    checkWield()
+end
+
+function weaponWieldLearn()
+    weapon_unwield()
+    local leweapon = GetVariable("learnweapon")
+    exe('wield ' .. leweapon)
     checkWield()
 end
 weaponUcheck = function()
@@ -362,16 +372,24 @@ weaponRepairDo = function()
         weapon_unwield()
         bqxl = bqxl + 1
         exe('wield tie chui')
+        checkWield()
         local cannotRepair = false
         local l, w = nil
         if tmp.uweapon and Bag[tmp.uweapon] then
-            repeat
+            while true do
                 exe('uweapon shape ' .. Bag[tmp.uweapon].fullid)
                 exe('repair ' .. Bag[tmp.uweapon].fullid)
                 l, w = wait.regexp(
-                           '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！)',
+                           '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！|你必须装备铁锤才能来维修兵器)',
                            2)
-            until l ~= nil
+                if l and l:find("必须装备铁锤才能来维修") then
+                    checkBags(weapon_unwield)
+                    exe('wield tie chui')
+                    wait_busy()
+                elseif l then
+                    break
+                end
+            end
             if l:find('恢复了它的原貌') or l:find('无需修理') then
                 weaponUsave[tmp.uweapon] = true
                 tmp.uweapon = nil

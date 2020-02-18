@@ -692,9 +692,6 @@ function path_consider()
     path_create()
     road.i=0
     wait.make(function()
-        -- if cmd_limit == 30 then
-        --     wait.time(0.5)
-        -- end
         wait_busy()
         path_start()
     end)
@@ -740,7 +737,9 @@ function path_cal()
     road.id = l_dest
     l_path=map:getPath(l_sour,l_dest)
     if not l_path then
-       Note('GetPath Error!')
+        l_sour = l_sour or ""
+        l_dest = l_dest or ""
+       Note('GetPath Error!l_sour='..l_sour..",l_dest="..l_dest)
        return false
     end
 
@@ -2420,7 +2419,8 @@ function Toghz()
     exe("get axe;wield axe;wield jian;wield dao;kan guanmu;drop axe")
 	if score.party and score.party=='∂Î·“≈…' and score.master=='π¬∫Ë◊”' then
 		exe("ed;yue qiaobi")
-	end
+    end
+    checkWield()
     return walk_wait()
 end
 ---------by fqyy test Œ‰µ±∫Û…Ω√©Œ›---------------
@@ -3192,6 +3192,7 @@ sld_unwield=function()
            exe('unwield '.. Bag[p].fullid ..' '..i)
        end
     end
+    checkWield()
   end
 end
 sld_weaponWieldCut=function()
@@ -3206,6 +3207,7 @@ sld_weaponWieldCut=function()
           exe('wield '.. Bag[p].fullid )
        end
     end
+    checkWield()
   end
 end
 function toSld()
@@ -3223,6 +3225,7 @@ function toSld()
 	    end
         exe('get cu shengzi')
         exe('drop cu shengzi 2')
+        checkWield()
         return check_halt(toSldTrigger)
 	else
 		return go_locate()
@@ -4063,7 +4066,8 @@ function yuRenBoat()
 end
 function huaboat()
 	   exe('wield tie jiang')
-	   exe('hua boat')
+       exe('hua boat')
+       checkWield()
 end
 function yuRenTiao()
     DeleteTimer("yrb")
@@ -4080,7 +4084,8 @@ function yuRenOver()
 	DeleteTriggerGroup("yrz")
 	DeleteTriggerGroup("yrj")
 	DeleteTriggerGroup("yren")
-	DeleteTriggerGroup("yrAsk")
+    DeleteTriggerGroup("yrAsk")
+    checkWield()
 	return walk_wait()
 end
 

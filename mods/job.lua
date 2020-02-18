@@ -2292,7 +2292,7 @@ gaibangCutAct = function()
     weapon_unwield()
     weaponWieldCut()
     for i = 1, 3 do
-        exe('unwield puti ')
+        -- exe('unwield puti ')
         exe('qie corpse ' .. i)
     end
     exe('alias action Cut')

@@ -284,6 +284,7 @@ function huashan_fangqi()
     local weapon = Bag[weapon.first]
 
     if weapon and weapon.fullid then exe('wield ' .. weapon.fullid) end
+    checkWield()
     return check_halt(check_food)
 end
 function huashan_busy()

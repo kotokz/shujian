@@ -3475,9 +3475,7 @@ function dzxy_goon()
         return dzxy_finish()
     end
     EnableTriggerGroup("dzxy", true)
-    local leweapon = GetVariable("learnweapon")
-    exe('wield ' .. leweapon)
-
+    weaponWieldLearn()
     if not skills["douzhuan-xingyi"] or skills["douzhuan-xingyi"].lvl == 0 or
         skills["douzhuan-xingyi"].lvl >= hp.pot_max - 100 then
         messageShow(
@@ -3520,8 +3518,8 @@ function dzxy_finish()
     DeleteTriggerGroup("dzxy")
     exe('cha;hp')
     weapon_unwield()
-    local leweapon = GetVariable("learnweapon")
-    exe('unwield ' .. leweapon)
+    -- local leweapon = GetVariable("learnweapon")
+    -- exe('unwield ' .. leweapon)
     exe('jump down')
     return go(xueshan_finish_ask, '大雪山', '入幽口')
 end
@@ -4171,9 +4169,7 @@ function taojiao_dny()
     dnyTrigger()
     if locl.id[score.master] then
         EnableTriggerGroup("qk_dny", true)
-        weapon_unwield()
-        local leweapon = GetVariable("learnweapon")
-        exe('wield ' .. leweapon)
+        weaponWieldLearn()
         DoAfter(0.5, 'alias action 讨教大挪移中')
     else
         ColourNote("white", "blue", "师傅不在家！过一会儿再来吧！")
@@ -4193,9 +4189,7 @@ function taojiao_over()
     messageShow('讨教乾坤大挪移完毕！')
     EnableTriggerGroup("qk_dny", false)
     DeleteTriggerGroup("qk_dny")
-    weapon_unwield()
-    local leweapon = GetVariable("learnweapon")
-    exe('cha;unwield ' .. leweapon)
+    weaponWieldLearn()
     dis_all()
     return check_busy(check_food)
 end

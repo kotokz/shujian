@@ -3525,8 +3525,20 @@ function dzxy_finish()
 end
 -----自动练功机器人----
 function dazuo_lianxi_auto()
-    tmp_lxskill =
-        'bei none;unwield sword;unwield sword 2;uweapon shape lianyu sword;unwield xiao;'
+
+    tmp_lxskill = 'bei none;'
+    for p in pairs(Bag) do
+        if Bag[p].kind and (not itemWield or itemWield[p]) then
+            local _, l_cnt = isInBags(Bag[p].fullid)
+            for i = 1, l_cnt do
+                tmp_lxskill =
+                    tmp_lxskill .. 'unwield ' .. Bag[p].fullid .. ' ' .. i ..
+                        ';'
+            end
+        end
+    end
+
+    tmp_lxskill = 'bei none;unwield sword;unwield sword 2;unwield xiao;'
     lianxi_times = GetVariable('mycishu')
     for p in pairs(skills) do
         if (skillEnable[p] and skills[p].lvl < hp.pot_max - 100) or
@@ -3618,7 +3630,10 @@ function dazuo_lianxi_auto()
             end
         end
     end
-    tmp_lxskill = tmp_lxskill .. 'hp;unset 积蓄;bei finger'
+    if weapon.first and Bag[weapon.first] then
+        tmp_lxskill = tmp_lxskill .. 'wield ' .. Bag[weapon.first].fullid .. ';'
+    end
+    tmp_lxskill = tmp_lxskill .. 'hp;unset 积蓄;bei finger;i'
 end
 function set_sxlian()
     dazuo_lianxi_auto()

@@ -3190,10 +3190,10 @@ sld_unwield=function()
        local _,l_cnt = isInBags(Bag[p].fullid)
        for i = 1,l_cnt do
            exe('unwield '.. Bag[p].fullid ..' '..i)
-       end
+        end
     end
-    checkWield()
   end
+  checkWield()
 end
 sld_weaponWieldCut=function()
     for p in pairs(Bag) do
@@ -3261,12 +3261,12 @@ function toSldChop()
      DeleteTriggerGroup("mufabusy")
  end
  function sld_need_weapon()
-   wait.make(function()
-             wait.time(1)
-             weapon_unwield()
-             sld_weaponWieldCut()
-             return check_bei(toSldChop)
-           end)
+    wait.make(function()
+        wait.time(1)
+        weapon_unwield()
+        sld_weaponWieldCut()
+        return check_bei(toSldChop)
+    end)
  end
  function wait_mufa()
    wait.make(function()
@@ -3315,8 +3315,8 @@ function toSldChop()
      end)
  end
  function toSldDkCheck()
-      print("toSldDkCheck")
-      locate_finish=0
+    print("toSldDkCheck")
+    locate_finish=0
      toSldDelTrigger()
      if locl.room=="¶É¿Ú" then
         return toSldOver()

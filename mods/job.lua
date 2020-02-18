@@ -2289,7 +2289,6 @@ end
 gaibangCutAct = function()
     EnableTriggerGroup("gaibangCut", true)
     exe('halt;i')
-    weapon_unwield()
     weaponWieldCut()
     for i = 1, 3 do
         -- exe('unwield puti ')

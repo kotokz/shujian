@@ -584,6 +584,7 @@ huashan_cut = function()
     fight.time.e = os.time()
     fight.time.over = fight.time.e - fight.time.b
     hstongji_thistime = fight.time.over
+    checkWield()
     if hsjob2 == 1 then
         -- 开始统计次数
         hstongjilasttime_l_2 = hstongji_thistime
@@ -624,9 +625,6 @@ huashan_cut = function()
         end
         create_timer_st('walkWait2', 1.0, 'huashan_cut_act1')
     else
-        -- for i=1,5 do
-        -- exe('get ling pai from corpse '..i)
-        -- end
         exe('get corpse')
         create_timer_st('walkWait2', 1.0, 'huashan_cut_act1')
     end
@@ -641,22 +639,9 @@ huashan_cut1 = function()
     exe('get corpse')
     for i = 1, 5 do exe('get ling pai from corpse ' .. i) end
 end
---[[huashan_cut_act=function()
-    DeleteTimer('perform')
-    weapon_unwield()
-    weaponWieldCut()
-    for i=1,5 do
-       exe('halt;get ling pai from corpse '..i)
-       exe('qie corpse '..i)
-    end
-	if fqyytmp.goArmorD==1 then
-       return	
-    end
-	checkBags()
-end]]
 huashan_cut_act = function()
     tmp.cnt = 0
-    weapon_unwield()
+    -- weapon_unwield()
     weaponWieldCut()
     -- wipe_kill=0
     wait.make(function()

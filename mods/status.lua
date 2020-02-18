@@ -674,7 +674,7 @@ function lingwu()
     return check_busy(lingwu_go)
 end
 function lingwu_go()
-    exe('nick 少林领悟达摩院后殿')
+    -- exe('nick 少林领悟达摩院后殿')
     messageShow('去少林领悟')
     jifaAll()
     go(lingwu_unwield, '嵩山少林', '达摩院')
@@ -837,7 +837,7 @@ function checkxue()
 end
 
 function xuexi()
-    exe('nick 回门派学习')
+    -- exe('nick 回门派学习')
     messageShow('回门派学习')
     master = {}
 
@@ -1145,7 +1145,7 @@ function check_xuexi()
     -- end
 end
 function literate()
-    exe('nick 学习读书写字')
+    -- exe('nick 学习读书写字')
     messageShow('学习读书写字！')
     DeleteTemporaryTriggers()
     if hp.exp < 151000 then
@@ -1233,7 +1233,7 @@ function litxuexiSleepOver()
     checkWait(checkPrepare, 3)
 end
 function duanzao()
-    exe('nick 学习锻造')
+    -- exe('nick 学习锻造')
     DeleteTemporaryTriggers()
     if hp.exp < 151000 then
         master.times = 3
@@ -1287,7 +1287,7 @@ function duanzaoBack()
 end
 
 function zhizao()
-    exe('nick 学习织造')
+    -- exe('nick 学习织造')
     DeleteTemporaryTriggers()
     if hp.exp < 151000 then
         master.times = 3

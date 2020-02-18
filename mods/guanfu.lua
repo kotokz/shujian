@@ -144,7 +144,7 @@ function guanfu_go()
     EnableTriggerGroup("guanfuAccept", false)
     EnableTriggerGroup("guanfu_npc", false)
     -- job.wdtime=os.time() + 8*60
-    exe('nick 官府任务' .. job.where)
+    -- exe('nick 官府任务' .. job.where)
     exe('set no_kill_ap')
     DeleteTriggerGroup("guanfuFind")
     create_trigger_t('guanfuFind1',

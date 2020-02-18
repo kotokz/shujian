@@ -2832,7 +2832,7 @@ function sldsmConsiderK(n, l, w)
         return check_pot(1)
     end
     check_bei(sldsmFind)
-    exe('nick 神龙任务' .. job.where)
+    -- exe('nick 神龙任务' .. job.where)
     messageShow(
         '神龙任务：开始前往【' .. job.where .. '】索命【' ..
             job.target .. '】！')
@@ -2862,7 +2862,7 @@ function sldsmConsiderZ(n, l, w)
         return check_pot(1)
     end
     check_bei(sldsmFind)
-    exe('nick 神龙任务' .. job.where)
+    -- exe('nick 神龙任务' .. job.where)
     messageShow(
         '神龙任务：开始前往【' .. job.where .. '】招魂【' ..
             job.target .. '】！')
@@ -3172,7 +3172,7 @@ function songshanConsider(n, l, w)
         return songshanFangqi()
     end
     check_bei(songshanFind)
-    exe('nick 嵩山任务在' .. job.where)
+    -- exe('nick 嵩山任务在' .. job.where)
     if job.type and job.type == "qing" then
         messageShow(
             '嵩山任务：开始前往【' .. job.where .. '】请【' ..

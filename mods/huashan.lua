@@ -299,7 +299,7 @@ function huashan_busy_dazuo()
 end
 function huashan_npc()
     EnableTimer('walkWait4', false)
-    exe('nick 华山任务中')
+    -- exe('nick 华山任务中')
     job.time.b = os.time()
     EnableTriggerGroup("huashan_accept", false)
     job.last = "huashan"

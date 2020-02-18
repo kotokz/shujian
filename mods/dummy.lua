@@ -73,7 +73,7 @@ function dummyfind()
                         '】不能到达，任务放弃。', 'red')
         return check_bei(dummyover)
     end
-    exe('nick 大米在' .. job.where4)
+    -- exe('nick 大米在' .. job.where4)
     exe('set env_msg')
     messageShow('杀大米任务：开始前往【' .. job.where4 .. '】！',
                 'red')

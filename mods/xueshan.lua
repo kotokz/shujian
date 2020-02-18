@@ -328,7 +328,7 @@ function xueshan_fangqi_go()
 end
 function xueshan_fangqi()
     nobusy = 0
-    exe('nick 雪山任务放弃;unset no_kill_ap')
+    exe('unset no_kill_ap')
     xueshan_triggerClose()
     flag.idle = nil
     EnableTriggerGroup("xueshan_finish", false)
@@ -502,7 +502,7 @@ function xueshan_consider(n, l, w)
                         '】不可到达，任务放弃。', 'blue')
         return check_halt(xueshan_fangqi)
     end
-    exe('nick 美女在' .. job.where)
+    -- exe('nick 美女在' .. job.where)
     xueshan_find()
 
     messageShow('雪山任务：开始前往【' .. job.where ..

@@ -1636,7 +1636,7 @@ function check_heal()
     tmp = {}
     jobTriggerDel()
     job.name = 'heal'
-    exe('nick 赶路中')
+    -- exe('nick 赶路中')
     if score.party and score.party == "神龙教" then
         exe('yun shougong ' .. score.id)
     end
@@ -1957,7 +1957,8 @@ function check_food()
     -- if job.zuhe["wudang"] then wait_kill='yes' end
 
     if flag.xuncheng_start then return xunCheng() end
-    exe('nick 去武当吃喝;remove all;wear all')
+    -- exe('nick 去武当吃喝;remove all;wear all')
+    exe('remove all;wear all')
     exe('hp;unset no_kill_ap;yield no')
     score.zt = '去武当吃喝'
     wait.make(function()
@@ -3429,17 +3430,17 @@ function dzxy()
     if dzxy_level == 3 then return check_busy(dzxy3_go) end
 end
 function dzxy1_go()
-    exe('nick 燕子坞碧水厅领悟')
+    -- exe('nick 燕子坞碧水厅领悟')
     messageShow('任务监控：去慕容领悟字画去了！', 'white')
     go(dzxy1_unwield, '燕子坞', '碧水厅')
 end
 function dzxy2_go()
-    exe('nick 燕子坞还施水阁领悟')
+    -- exe('nick 燕子坞还施水阁领悟')
     messageShow('任务监控：去慕容领悟秘籍去了！', 'white')
     go(dzxy2_unwield, '燕子坞', '还施水阁')
 end
 function dzxy3_go()
-    exe('nick 燕子坞观星台领悟')
+    -- exe('nick 燕子坞观星台领悟')
     messageShow('任务监控：去慕容看星星去了！', 'white')
     go(dzxy3_unwield, '燕子坞', '观星台')
 end
@@ -4163,7 +4164,7 @@ function dnyTrigger()
     EnableTriggerGroup("qk_dny", false)
 end
 function check_dny()
-    exe('nick 讨教乾坤大挪移')
+    -- exe('nick 讨教乾坤大挪移')
     return go(taojiao_dny, "mingjiao/sht", '')
 end
 function taojiao_dny()

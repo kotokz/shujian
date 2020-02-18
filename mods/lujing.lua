@@ -138,7 +138,7 @@ function locate_trigger()
     DeleteTriggerGroup("locate")
     DeleteTriggerGroup("locate_unknown")
     create_trigger_t('locate_unknown1','^(> )*设定环境变量：look\\s*\\=\\s*\\"YES\\"\\n>\\s*(\\D*)\\s*\\ -\\s*','','local_unknown_room')
-    create_trigger_t('locate2','^(> )*【你现在正处于(\\D*)】\\n(\\D*)\\s*\\-\\s*','','local_area')
+    create_trigger_t('locate2','^(> )*【你现在正处于(\\D*)】\\n(\\D*)\\s*\\-\\s*','','local_area')    
      -- create_trigger_t('locate3',"^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$",'','local_exit')
     create_trigger_t('locate4',"^(\\D*) = (\\D*)$",'','local_id')
     -- create_trigger_t('locate5','^(> )*你把 "action" 设定为 "正在定位" 成功完成。$','','local_start')
@@ -153,7 +153,7 @@ function locate_trigger()
     EnableTrigger("locate2",true)
     --SetTriggerOption("locate_unknown1","group","locate_unknown")
     SetTriggerOption("locate2","group","locate")
-    -- SetTriggerOption("locate3","group","locate")
+    SetTriggerOption("locate3","group","locate")
     SetTriggerOption("locate4","group","locate")
     -- SetTriggerOption("locate5","group","locate")
     SetTriggerOption("locate6","group","locate")
@@ -194,6 +194,7 @@ local_room=function(n,l,w)
     locl.where=locl.area..locl.room
 	print(locl.where,locl.area,locl.room)
 end
+
 local_area=function(n,l,w)
     locl.area=w[2]
     local s=w[3]
@@ -843,8 +844,6 @@ function path_start()
         local steps_done = 0
         for i,step in ipairs(road.detail) do    
             road.i= i  
-            print("开始第".. i .. "步")
-            print("步骤:" .. step )
             local step_set=utils.split(step,';') 
             steps_done = steps_done + table.getn(step_set)
             if steps_done > 50 then
@@ -869,13 +868,10 @@ function path_start()
                 exe(step)
                 walk_wait()
             end
-            print("suspend till walk wait finish")
             coroutine.yield()
-            print("walk continue")
         end
         if cmd_limit < max_cmd_limit then
             cmd_limit=max_cmd_limit
-            print("走路结束，恢复100delay")
         end
         locate_finish='go_confirm'
         return locate()
@@ -1166,6 +1162,11 @@ function searchStart()
 
     wait.make(function()
         -- cmd_limit =throttled_cmd_limit
+        if job.area == '伊犁城' then
+            cmd_limit =throttled_cmd_limit
+        else 
+            cmd_limit =35
+        end
         for i,id in ipairs(road.rooms) do          
             if flag.find == 1 then 
                 print("找到目标，停止搜索")
@@ -1174,6 +1175,7 @@ function searchStart()
             local path, length = map:getPath(road.id, id)
             road.id = id
             if type(path) =="string" then
+                print("第"..i.."区域:"..path)
                 walk_hook_thread = coroutine.running()
                 if string.find(path,'#') or job.name~='huashan' then
                     road.pathset = road.pathset or {}
@@ -1195,9 +1197,10 @@ function searchStart()
                                 print("找到目标，停止搜索")
                                 return 
                             end  
-                            if string.find(road.pathset[1],'#') then
+                            if string.find(steps,'#') then
                                 local _,_,func,params = string.find(steps,"^#(%a%w*)%s*(.-)$")
                                 if func then
+                                    print("search execute:"..func)
                                    _G[func](params)
                                 else
                                    exe(steps)
@@ -1207,14 +1210,17 @@ function searchStart()
                                exe(steps)
                                walk_wait()
                             end
-                            print("suspend till walk wait finish")
+                            print("suspend till search wait finish")
                             coroutine.yield()
                             print("walk continue")
                         end                        
                     end
                 else
                     exe(string.sub(string.gsub(path, "halt;", ""),1,-2)) 
-                    walk_wait()                   
+                    walk_wait()    
+                    print("suspend till search wait finish-2")
+                    coroutine.yield()
+                    print("walk continue")               
                 end
                 walk_hook_thread=nil
             else
@@ -1222,7 +1228,7 @@ function searchStart()
                 Note(path)
             end
         end
-        -- cmd_limit =max_cmd_limit
+        cmd_limit =max_cmd_limit
         return find_nobody()
     end)
 

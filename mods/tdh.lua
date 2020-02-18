@@ -266,7 +266,7 @@ function tdh_consider(n, l, w)
     messageShow('天地会任务：开始前往【' .. job.where3 ..
                     '】，寻找叫【' .. job.target3 ..
                     '】的革命同志！')
-    exe('nick 天地会在' .. job.where3)
+    -- exe('nick 天地会在' .. job.where3)
     exe('set po 掌')
     return check_bei(tdh_find)
 end
@@ -452,7 +452,7 @@ function tdhConOk()
                         '】不可到达，任务放弃。')
         return check_bei(tdh_fangqi_go)
     end
-    exe('nick 天地会在' .. job.where2)
+    -- exe('nick 天地会在' .. job.where2)
     exe('set env_msg')
     messageShow('天地会任务：开始前往【' .. job.where2 ..
                     '】，寻找叫【' .. job.target2 ..
@@ -856,7 +856,7 @@ function tdhseback()
                         '】不可到达，任务放弃。')
         return check_bei(tdh_fangqi_go)
     end
-    exe('nick 天地会在' .. job.where2)
+    -- exe('nick 天地会在' .. job.where2)
     exe('set env_msg')
     messageShow('天地会任务：革命同志掉队了！重新前往【' ..
                     job.where2 .. '】，寻找革命同志！')

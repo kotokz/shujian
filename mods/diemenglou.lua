@@ -183,7 +183,7 @@ function dmlTriggersRemove()
 end
 function dmlPkTriggersRemove()
     pkList = {}
-    exe('nick none')
+    -- exe('nick none')
     DeleteTriggerGroup('dmlPk')
 end
 
@@ -328,7 +328,7 @@ function dmlHpCheck2()
     end
 end
 function dmlHeal()
-    exe('nick 柳宗镇正厅与薛神医论道')
+    -- exe('nick 柳宗镇正厅与薛神医论道')
     tmp.xueSkills = {}
     tmp.xueCount = 1
     for p in pairs(skills) do
@@ -412,7 +412,8 @@ end
 function dekedml()
     weapon_unwield()
     exe(GetVariable("performpre"))
-    exe('yun qi;nick 蝶梦楼查询目标中')
+    -- exe('yun qi;nick 蝶梦楼查询目标中')
+    exe('yun qi')
     return checkTop(dmlCheckToplist)
 end
 function dmlDazuo()
@@ -1101,8 +1102,8 @@ function dmlFight(n, l, w)
     exe('pkpfm')
     exe('set wimpy 100;yield no')
     exe('look ' .. npc_id)
-    exe('nick 蝶梦楼战斗中')
-    exe('say 那么，来一场酣畅淋漓的战斗吧！')
+    -- exe('nick 蝶梦楼战斗中')
+    -- exe('say 那么，来一场酣畅淋漓的战斗吧！')
     kezhiwugong()
     kezhiwugongAddTarget(npc_name, npc_id)
 end
@@ -1166,7 +1167,7 @@ function dmlOver()
         messageShow(
             '蝶梦楼全自动模块：本日蝶梦楼可挑战次数为零，模块退出.........',
             'lime')
-        exe('nick none')
+        -- exe('nick none')
         if GetVariable("dmlPkFlag") == 'yes' and table.getn(pkList) > 0 then
             exe('unset pk_give_up')
             return dmlPkFunc()
@@ -1214,7 +1215,8 @@ function dmlPkNeili()
     if hp.neili < hp.neili_max * 1.5 then
         return dmlPkDazuo()
     else
-        exe('yun qi;nick 华山正气堂堵人中')
+        -- exe('yun qi;nick 华山正气堂堵人中')
+        exe('yun qi')
         return dmlPkWait()
     end
 end

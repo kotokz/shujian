@@ -163,7 +163,7 @@ function job_huashan()
         wait_busy()
         exe('ask yue buqun about job')
         DeleteTimer("walkWait4")
-        create_timer_s('walkWait4', 1.0, 'huashan_ask_test')
+        create_timer_s('walkWait4', 3.0, 'huashan_ask_test')
     end)
 end
 huashan_ask_test = function() exe('ask yue buqun about job') end
@@ -281,10 +281,8 @@ function huashan_fangqi()
     huashan_triggerDel()
     job.last = "huashan"
     hsjob2 = 0
-    local weapon = Bag[weapon.first]
 
-    if weapon and weapon.fullid then exe('wield ' .. weapon.fullid) end
-    checkWield()
+    weapon_wield()
     return check_halt(check_food)
 end
 function huashan_busy()

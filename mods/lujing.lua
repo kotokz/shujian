@@ -535,10 +535,12 @@ function path_consider()
     if dest.id == nil then
        dest.rooms=getRooms(dest.room,dest.area)
     end
+    dest.area = dest.area or ""
+    dest.room = dest.room or ""
     if sour.id ~= nil then
-       chats_locate('定位系统：从【'.. sour.id ..'】出发!')
+       chats_locate('定位系统：从【'.. sour.id ..'】出发!目的地【'.. dest.area .. dest.room ..'】')
     else
-       chats_locate('定位系统：从【'.. sour.area .. sour.room ..'】出发!')
+       chats_locate('定位系统：从【'.. sour.area .. sour.room ..'】出发! 目的地【'.. dest.area .. dest.room ..'】')
        if sour.room=="观星台" then
         exe('jump down')
        end

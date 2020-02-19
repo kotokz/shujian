@@ -224,22 +224,18 @@ weaponUnWalk = function()
 end
 weaponWieldCut = function()
     weapon_unwield()
-    for p in pairs(Bag) do
-        if Bag[p].kind and weaponKind[Bag[p].kind] and weaponKind[Bag[p].kind] ==
-            "cut" then
-            exe('wield ' .. Bag[p].fullid)
-            -- if not (Bag[p].kind == "xiao" and weaponUsave[p]) then
-            --     for q in pairs(Bag) do
-            --         if Bag[q].kind == "xiao" and weaponUsave[q] then
-            --             exe('unwield ' .. Bag[q].fullid)
-            --         end
-            --     end
-            --     exe('wield ' .. Bag[p].fullid)
-            -- end
+    local first = weapon.first
+    if first and Bag[first] and Bag[first].kind and weaponKind[Bag[first].kind] and
+        weaponKind[Bag[first].kind] == "cut" then
+        exe('wield ' .. Bag[first].fullid)
+    else
+        for p in pairs(Bag) do
+            if Bag[p].kind and weaponKind[Bag[p].kind] and
+                weaponKind[Bag[p].kind] == "cut" then
+                exe('wield ' .. Bag[p].fullid)
+            end
         end
     end
-    -- exe('wield mu jian')
-    -- exe('uweapon shape lianyu sword;wield lianyu')
     checkWield()
 end
 

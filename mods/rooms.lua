@@ -597,9 +597,7 @@ function SjMap:getPath(from, to, try)
         local fromRoom = map.rooms[from]
         local toRoom = map.rooms[to]
         if parentInfo == nil then
-            if not try then
-                -- Note("从：" .. fromRoom .. " 至：" .. toRoom .. "，无法到达。")
-            end
+            -- Note("从：" .. fromRoom .. " 至：" .. toRoom .. "，无法到达。")
             return false
         end
         local parent = parentInfo.parent

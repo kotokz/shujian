@@ -110,7 +110,48 @@ function run(str)
     end
 end
 
+t_cmds = {}
+function get_first_sec()
+    local tkeys = {}
+    for k in pairs(t_cmds) do table.insert(tkeys, k) end
+    table.sort(tkeys)
+    return tkeys[1]
+end
+
+function tablelength(T)
+    local count = 0
+    for _ in pairs(T) do count = count + 1 end
+    return count
+end
+
+
+function moving_sum()
+    local time = os.time()    
+    t_cmds[time] = t_cmds[time] or 0
+    t_cmds[time] = t_cmds[time] + 1
+    if tablelength(t_cmds) >= 4 then 
+        local sum = 0        
+        for k,v in pairs(t_cmds) do 
+            if k > time -3 then
+              sum=sum+v 
+            end
+        end 
+        print("previous 3 seconds cmd count="..sum)
+        if cmd_limit == max_cmd_limit and sum >= 50 then
+            print("start throttling")
+            cmd_limit = throttled_cmd_limit
+        elseif cmd_limit == throttled_cmd_limit and sum < 30 then
+            print("full speed")
+            cmd_limit = max_cmd_limit
+        end       
+        if tablelength(t_cmds) > 4 then
+            t_cmds[get_first_sec()]= nil
+        end
+    end
+end
+
 function add_cmd_to_queue(cmd) 
+    moving_sum()
     if cmd ~=nil and cmd:sub(1, 1)=='#' then
         cmd = cmd:sub(2)
         Queue(EvaluateSpeedwalk(cmd),false)
@@ -848,8 +889,8 @@ function path_start()
             local step_set=utils.split(step,';') 
             steps_done = steps_done + table.getn(step_set)
             if steps_done > 50 then
-                print("步数过长，休息")
-                cmd_limit=throttled_cmd_limit
+                -- print("步数过长，休息")
+                -- cmd_limit=throttled_cmd_limit
                 wait.time(0.5)
                 steps_done = 0
             end    
@@ -871,9 +912,9 @@ function path_start()
             end
             coroutine.yield()
         end
-        if cmd_limit < max_cmd_limit then
-            cmd_limit=max_cmd_limit
-        end
+        -- if cmd_limit < max_cmd_limit then
+        --     cmd_limit=max_cmd_limit
+        -- end
         locate_finish='go_confirm'
         return locate()
     end)
@@ -1163,11 +1204,11 @@ function searchStart()
 
     wait.make(function()
         -- cmd_limit =throttled_cmd_limit
-        if job.area == '伊犁城' then
-            cmd_limit =throttled_cmd_limit
-        else 
-            cmd_limit =35
-        end
+        -- if job.area == '伊犁城' then
+        --     cmd_limit =throttled_cmd_limit
+        -- else 
+        --     cmd_limit =35
+        -- end
         for i,id in ipairs(road.rooms) do          
             if flag.find == 1 then 
                 print("找到目标，停止搜索")
@@ -1229,7 +1270,7 @@ function searchStart()
                 Note(path)
             end
         end
-        cmd_limit =max_cmd_limit
+        -- cmd_limit =max_cmd_limit
         return find_nobody()
     end)
 
@@ -3197,21 +3238,23 @@ sld_unwield=function()
   end
   checkWield()
 end
-sld_weaponWieldCut=function()
+sld_weaponWieldCut = function()
     for p in pairs(Bag) do
-      if Bag[p].kind and weaponKind[Bag[p].kind] and weaponKind[Bag[p].kind]=="cut" then
-       if not (Bag[p].kind == "xiao" and weaponUsave[p]) then
-          for q in pairs(Bag) do
-              if Bag[q].kind == "xiao" and weaponUsave[q] then
-               exe('unwield '.. Bag[q].fullid )
+        if Bag[p].kind and weaponKind[Bag[p].kind] and weaponKind[Bag[p].kind] ==
+            "cut" then
+            if not (Bag[p].kind == "xiao" and weaponUsave[p]) then
+                for q in pairs(Bag) do
+                    if Bag[q].kind == "xiao" and weaponUsave[q] then
+                        exe('unwield ' .. Bag[q].fullid)
+                    end
+                end
+                exe('wield ' .. Bag[p].fullid)
             end
-          end
-          exe('wield '.. Bag[p].fullid )
-       end
+        end
     end
     checkWield()
-  end
 end
+
 function toSld()
     locate()
 	wait.make(function()

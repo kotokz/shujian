@@ -713,7 +713,7 @@ end
 function lingwu_goon()
     if locl.room ~= "达摩院后殿" then return lingwu_finish() end
     EnableTriggerGroup("lingwu", true)
-
+    tmp.lingwustart = true
     if hp.neili < 1000 then
         if hp.exp > 20000000 or score.gender == '无' then
             exe('eat ' .. drug.neili)
@@ -739,8 +739,8 @@ function lingwu_goon()
                                '.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)',
                                1)
                     if l == nil then
-                        -- 可能昏迷了，超时返回
-                        break
+                        -- 可能昏迷了或者flood，超时返回,
+
                     elseif l:find('内力不够') then
                         exe('eat ' .. drug.neili)
                         exe('eat ' .. drug.neili2 .. ';yun jing')
@@ -777,6 +777,7 @@ function lingwu_next() tmp.lingwunext = true end
 
 function lingwu_finish()
     tmp.stop = true
+    tmp.lingwustart = false
     messageShow('少林领悟完成')
     local skill = skillsLingwu[tmp.lingwu]
     EnableTriggerGroup("lingwu", false)

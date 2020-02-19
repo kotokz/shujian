@@ -136,11 +136,10 @@ function moving_sum()
               sum=sum+v 
             end
         end 
-        print("previous 3 seconds cmd count="..sum)
         if cmd_limit == max_cmd_limit and sum >= 50 then
             print("start throttling")
             cmd_limit = throttled_cmd_limit
-        elseif cmd_limit == throttled_cmd_limit and sum < 30 then
+        elseif cmd_limit == throttled_cmd_limit and sum < 30 and tmp.lingwustart == false then
             print("full speed")
             cmd_limit = max_cmd_limit
         end       
@@ -1252,17 +1251,17 @@ function searchStart()
                                exe(steps)
                                walk_wait()
                             end
-                            print("suspend till search wait finish")
+                            -- print("suspend till search wait finish")
                             coroutine.yield()
-                            print("walk continue")
+                            -- print("walk continue")
                         end                        
                     end
                 else
                     exe(string.sub(string.gsub(path, "halt;", ""),1,-2)) 
                     walk_wait()    
-                    print("suspend till search wait finish-2")
+                    -- print("suspend till search wait finish-2")
                     coroutine.yield()
-                    print("walk continue")               
+                    -- print("walk continue")               
                 end
                 walk_hook_thread=nil
             else

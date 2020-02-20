@@ -39,6 +39,8 @@ loadmod "sj_egg"
 loadmod "lostletter"
 loadmod "taohuazhen"
 
+test = test or function() print("initial behavior, does nothing") end
+
 -- 创建一个普通别名
 function create_alias(a_name, a_match, a_response)
     return AddAlias(a_name, a_match, a_response, alias_flag.Enabled +
@@ -2957,9 +2959,7 @@ function dnyTrigger()
     for i = 1, 4 do SetTriggerOption("qk_dny" .. i, "group", "qk_dny") end
     EnableTriggerGroup("qk_dny", false)
 end
-function check_dny()
-    return go(taojiao_dny, "mingjiao/sht", '')
-end
+function check_dny() return go(taojiao_dny, "mingjiao/sht", '') end
 function taojiao_dny()
     dnyTrigger()
     if locl.id[score.master] then

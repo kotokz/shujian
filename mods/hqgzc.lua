@@ -356,11 +356,7 @@ function hqgzcFind()
                 EnableTriggerGroup("hqgzcTrade", false)
                 cooking.findtimes[i] = cooking.findtimes[i] + 1
                 flag.times = cooking.findtimes[i]
-                -- exe('unset wimpy;jifa all;set wimpycmd pfmpfm\\hp')
                 job.zctime = os.time() + 8 * 60
-                -- exe('nick 做菜在' .. job.where)
-                -- exe('set no_kill_ap')
-                -- pfmjineng()
                 messageShow(
                     '做菜任务：前往任务地点【' .. job.where ..
                         '】，准备寻找【' .. dest.area .. dest.room ..
@@ -370,7 +366,6 @@ function hqgzcFind()
             end
         end
     end
-    -- exe('nick 做菜在洪七公')
     return check_bei(hqgzcBack)
 end
 function hqgzcFindAct()
@@ -459,7 +454,6 @@ function hqgzcFangqiGo()
     go(hqgzcFangqi, '丐帮', '后院')
 end
 function hqgzcFangqi()
-    -- exe('nick 做菜任务放弃')
     exe('unset no_kill_ap')
     dis_all()
     hqgzcTrigger()

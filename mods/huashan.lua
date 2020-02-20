@@ -298,13 +298,11 @@ function huashan_busy_dazuo()
 end
 function huashan_npc()
     EnableTimer('walkWait4', false)
-    -- exe('nick 华山任务中')
     job.time.b = os.time()
     EnableTriggerGroup("huashan_accept", false)
     job.last = "huashan"
     if hsjob2 < 1 then
         hstongji_lq = hstongji_lq + 1
-        -- job.time.b = os.time()
         messageShow('华山任务：开始任务。')
         locate_finish = 'huashan_npc_go'
         return check_busy(locate)
@@ -467,6 +465,7 @@ function huashan_debug_fight()
     exe('look')
 end
 function huashanFindAct()
+    EnableTimer('hskill', false)
     DeleteTimer('hskill')
     EnableTriggerGroup("beinang", false)
     EnableTriggerGroup("huashan_find", true)

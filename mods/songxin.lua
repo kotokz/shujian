@@ -224,7 +224,6 @@ function songxin_busy_dazuo()
 end
 function songxin_fangqi()
     DeleteTimer("walkWait4")
-    -- exe('nick 送信任务放弃')
     dis_all()
     flag.idle = nil
     EnableTriggerGroup("songxin_accept", false)
@@ -286,7 +285,6 @@ function songxin_consider(n, l, w)
         return check_halt(songxin_fangqi)
     end
 
-    -- exe('nick 送信一' .. job.where)
     songxin_find()
     -------------------- 
     -- job.area,job.room = locateroom(job.target)
@@ -777,7 +775,6 @@ function songxin2_consider()
         return songxin2_refuse()
     end
 
-    -- exe('nick 送信二' .. job.where)
     job.room, job.area = getAddr(job.where)
     dest.room = job.room
     dest.area = job.area
@@ -895,7 +892,6 @@ function sx2over()
     messageShow('靠！送信2的killer提前来把信抢走了！杀了你！')
     print('靠！送信2的killer把提前来信抢走了！杀了你！')
     print('sx2杀手等级:' .. sx2joblevel)
-    -- exe('nick 送信二' .. job.where)
     job.room, job.area = getAddr(job.where)
     dest.room = job.room
     dest.area = job.area

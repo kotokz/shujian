@@ -154,7 +154,6 @@ function thz_start()
     quest_name = ''
     quest_learned = ''
     thz_triggers_remove()
-    -- exe('nick 去陪周伯通玩了')
     EnableTriggerGroup('fight', false)
     EnableTimer('idle', false)
     thz_triggers()

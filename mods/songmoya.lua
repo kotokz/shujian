@@ -245,7 +245,6 @@ function gbluYpt()
     EnableTriggerGroup("gbluAccept", false)
     job.time.b = os.time()
     job.last = "songmoya"
-    -- exe('nick 颂摩崖任务进行中')
     go(gbluSmyWait, "星宿海", "颂摩崖")
     messageShow('报效国家：开始前往【星宿海颂摩崖】！')
 end

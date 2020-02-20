@@ -380,9 +380,7 @@ function wudangFindGo()
     dest.room = job.room
     dest.area = job.area
     job.wdtime = os.time() + 8 * 60
-    -- exe('nick 武当任务' .. job.where)
     exe('set no_kill_ap')
-    -- pfmjineng()
     setLocateRoomID = 'wudang/sanqing'
     if not job.room or not path_cal() or
         string.find(job.where, '绝情谷石窟') then
@@ -425,7 +423,6 @@ function wudangFangqiGo()
 end
 function wudangFangqi()
     wdtongji_fangqi = wdtongji_fangqi + 1
-    -- exe('nick 武当任务放弃')
     exe('unset no_kill_ap')
     locate_finish = 0
     fastLocate()

@@ -472,7 +472,7 @@ function walk_goon(func)
     wait_busy()    
 
     if walk_hook_thread then
-        print("resume suspended walk")
+        -- print("resume suspended walk")
         local tmp_thread = walk_hook_thread
         walk_hook_thread =nil
         coroutine.resume(tmp_thread)
@@ -500,11 +500,11 @@ end
 function await_go(area, room, sId) 
     local self = coroutine.running()
     local async_continue = function(...)       
-        print("async resume")
+        -- print("async resume")
         coroutine.resume(self, ...)
     end
     go(async_continue,area,room,sId)
-    print("async yield")
+    -- print("async yield")
     return coroutine.yield()
 end
 
@@ -1202,12 +1202,6 @@ function searchStart()
     if flag.wait==1 then return end
 
     wait.make(function()
-        -- cmd_limit =throttled_cmd_limit
-        -- if job.area == 'ÒÁÀç³Ç' then
-        --     cmd_limit =throttled_cmd_limit
-        -- else 
-        --     cmd_limit =35
-        -- end
         for i,id in ipairs(road.rooms) do          
             if flag.find == 1 then 
                 print("ÕÒµ½Ä¿±ê£¬Í£Ö¹ËÑË÷")
@@ -1251,17 +1245,11 @@ function searchStart()
                                exe(steps)
                                walk_wait()
                             end
-                            -- print("suspend till search wait finish")
                             coroutine.yield()
-                            -- print("walk continue")
                         end                        
                     end
                 else
-                    exe(string.sub(string.gsub(path, "halt;", ""),1,-2)) 
-                    walk_wait()    
-                    -- print("suspend till search wait finish-2")
-                    coroutine.yield()
-                    -- print("walk continue")               
+                    exe(string.sub(string.gsub(path, "halt;", ""),1,-2))             
                 end
                 walk_hook_thread=nil
             else

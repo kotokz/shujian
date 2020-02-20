@@ -33,7 +33,7 @@ local kezhi_valuecmd = { -- mush的变量名称，对应武功使用哪种克制
     ["无"] = 'pwu'
 }
 
-pk_valuecmd = {}
+pk_valuecmd = nil
 pk_valuecmd1 = { -- mush的pk变量名称，对应武功使用哪种克制
     ["正"] = 'zpk_pmiao', -- p版mush请改pmiao
     ["奇"] = 'zpk_pxian', -- p版mush请改pxian
@@ -1474,12 +1474,10 @@ function pk_pfm_set()
     end
     if job.name == 'pk' or job.name == 'guanfu' or job.name == 'diemenglou' or
         job.name == 'hubiao' then
-        pk_valuecmd = {}
         pk_valuecmd = pk_valuecmd1
         return
     end
     if job.name == 'songmoya' then
-        pk_valuecmd = {}
         pk_valuecmd = pk_valuecmd3
         return
     end

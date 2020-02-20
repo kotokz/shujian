@@ -166,13 +166,11 @@ function clbConsider(n, l, w)
                         '】不可到达，任务放弃。')
         return check_halt(clbFangqi)
     end
-    -- exe('nick 长乐帮' .. job.where)
     messageShow('长乐帮任务：开始前往【' .. job.where .. '】！')
     return check_halt(clbFind)
 end
 function clbFangqiGo() go(clbFangqi, '长乐帮', '小厅') end
 function clbFangqi()
-    -- exe('nick 长乐帮任务放弃')
     flag.idle = nil
     clb2 = false
     EnableTriggerGroup("clbAsk", true)
@@ -382,7 +380,6 @@ function clb2_relocate()
                         '】不可到达，任务放弃。', 'red')
         return check_bei(clbBack)
     end
-    -- exe('nick 长乐帮在' .. job.where)
     exe('set env_msg')
     messageShow('长乐帮任务⑵：开始前往【' .. job.where .. '】！')
     return check_bei(clbFind)

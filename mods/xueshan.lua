@@ -502,7 +502,6 @@ function xueshan_consider(n, l, w)
                         '】不可到达，任务放弃。', 'blue')
         return check_halt(xueshan_fangqi)
     end
-    -- exe('nick 美女在' .. job.where)
     xueshan_find()
 
     messageShow('雪山任务：开始前往【' .. job.where ..

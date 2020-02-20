@@ -2287,7 +2287,7 @@ Room {
         ["#duHhe"] = "changan/road3"
     },
     lengths = {
-        ["#duHhe"] = "if road.huanghe2 then return 10000 else return false end"
+        ["#duHhe"] = 10000,
     },
     nolooks = {["enter"] = true, ["#duHhe"] = true},
     room_relative = "陕晋渡口｜↘土路黄土高原陕晋渡口"
@@ -2297,7 +2297,7 @@ Room {
     name = "陕晋渡口",
     ways = {["north"] = "changan/northroad9", ["#duHhe"] = "changan/road2"},
     lengths = {
-        ["#duHhe"] = "if road.huanghe2 then return 10000 else return false end"
+        ["#duHhe"] = 10000,
     },
     nolooks = {["enter"] = true, ["#duHhe"] = true},
     room_relative = "大道｜陕晋渡口陕晋渡口"

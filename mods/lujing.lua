@@ -132,14 +132,18 @@ function moving_sum()
     if tablelength(t_cmds) >= 4 then 
         local sum = 0        
         for k,v in pairs(t_cmds) do 
-            if k > time -3 then
+            if k > time - 3 then
               sum=sum+v 
             end
         end 
         if sum >= 50 and not cmd_throttling then
             print("start throttling")
-            cmd_throttling = true
-            SetSpeedWalkDelay(math.floor(1000/30))
+            cmd_throttling = true            
+            if t_cmds[time] >=50 then
+                SetSpeedWalkDelay(math.floor(1000/10))
+            else
+                SetSpeedWalkDelay(math.floor(1000/30))
+            end
         elseif cmd_throttling and sum < 30 and (tmp.lingwustart == nil or tmp.lingwustart == false) then
             print("full speed")
             cmd_throttling = false
@@ -481,7 +485,7 @@ function walk_goon(func)
     end    
 end
 
-function goto(where)
+function go_to(where)
    dis_all()
    local l_dest={}
    sour.id = nil
@@ -4572,31 +4576,31 @@ end
 
 goto_set={}
 goto_set.lzdk=function()
-    return goto('兰州城大渡口')
+    return go_to('兰州城大渡口')
 end
 goto_set.xy=function()
-    return goto('襄阳城当铺')
+    return go_to('襄阳城当铺')
 end
 goto_set.sl=function()
-    return goto('嵩山少林大雄宝殿')
+    return go_to('嵩山少林大雄宝殿')
 end
 goto_set.xs=function()
-    return goto('大雪山入幽口')
+    return go_to('大雪山入幽口')
 end
 goto_set.hs=function()
-    return goto('华山正气堂')
+    return go_to('华山正气堂')
 end
 goto_set.yz=function()
-    return goto('扬州城当铺')
+    return go_to('扬州城当铺')
 end
 goto_set.wd=function()
-    return goto('武当山三清殿')
+    return go_to('武当山三清殿')
 end
 goto_set.thd=function()
-    return goto('桃花岛积翠亭')
+    return go_to('桃花岛积翠亭')
 end
 goto_set.dl=function()
-    return goto('大理城药铺')
+    return go_to('大理城药铺')
 end
 
 wxbGo=function()
@@ -4609,7 +4613,7 @@ wxbAsk=function()
 end
 wxbGoto=function(n,l,w)
     DeleteTemporaryTriggers()
-    return goto(w[1])
+    return go_to(w[1])
 end
 
 function thdJiaohui()
@@ -5991,7 +5995,7 @@ function inmz()
     local l_dest={}
     sour.id = nil
     dest.id = nil
-    tmp.goto = true
+    tmp.go_to = true
     where = Trim(where)
     
     l_dest.area,l_dest.room = locateroom(where)

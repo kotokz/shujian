@@ -1081,7 +1081,7 @@
    send_to="12"
    sequence="100"
   >
-  <send>goto("%1")</send>
+  <send>go_to("%1")</send>
   </alias>
   <alias
    name="csgo"

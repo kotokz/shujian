@@ -817,34 +817,34 @@ function goll()
 		
 			
 			if string.find(jiangnan_area,ll.area) then 
-				return goto('长江北岸')
+				return go_to('长江北岸')
 			end
 			if string.find(cjn_area,ll.room) then
-			  return goto('长江北岸')
+			  return go_to('长江北岸')
 			end
 			if string.find(ll.area,'神龙岛') then 
-				return goto('黄河入海口')
+				return go_to('黄河入海口')
 			end
 			if string.find(ll.area,'明教') or string.find(ll.area,'回疆') or string.find(ll.area,'天山') or string.find(ll.area,'伊犁') or string.find(ll.area,'大草原') or string.find(ll.area,'星宿') or string.find(ll.area,'昆仑') then 
-				return goto('兰州大渡口')
+				return go_to('兰州大渡口')
 			end
 			if string.find(ll.area,'塘沽') or string.find(ll.area,'沧州') then
-				return goto('黄河流域大渡口')
+				return go_to('黄河流域大渡口')
 			end
 			if string.find(ll.area,'恒山') or string.find(ll.area,'黑木崖') or string.find(ll.area,'平定州') then 
-				return goto('陕晋渡口')
+				return go_to('陕晋渡口')
 			end
 			if string.find(ll.area,'桃源县') then 
-				return goto('桃源县茅屋')
+				return go_to('桃源县茅屋')
 			end
 			if string.find(ll.area,'绝情谷') then 
-				return goto('绝情谷小溪边')
+				return go_to('绝情谷小溪边')
 			end
 			if string.find(ll.area,'兰州城') then
-				return goto(lostletter_locate)
+				return go_to(lostletter_locate)
 			end
 			if string.find(zhongyuan_area,ll.area) then
-				return goto(lostletter_locate)
+				return go_to(lostletter_locate)
 			end
 	end
 end	
@@ -866,7 +866,7 @@ function goll_always()
 
 			end
 		
-				return goto(lostletter_locate)
+				return go_to(lostletter_locate)
 		
 			
 	end

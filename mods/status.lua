@@ -723,7 +723,7 @@ function lingwu_goon()
     flag.idle = nil
     local skill_max = hp.pot_max - 100
     wait.make(function()
-        cmd_limit = throttled_cmd_limit
+        SetSpeedWalkDelay(math.floor(1000 / 30))
         for i, skill in pairs(skillsLingwu) do
             if not skills[skill] or skills[skill].lvl == 0 or skills[skill].lvl >=
                 skill_max then
@@ -756,7 +756,7 @@ function lingwu_goon()
         xxpot = hp.pot_max
         -- return check_bei(lingwu_finish)
         wait_busy()
-        cmd_limit = max_cmd_limit
+        SetSpeedWalkDelay(0)
         return lingwu_finish()
     end)
 end
@@ -782,7 +782,8 @@ function lingwu_finish()
     DeleteTriggerGroup("lingwu")
     exe('cha')
     flag.lingwu = 0
-    if tmp.lingwu ~= nil and tmp.lingwu > 1 and tmp.lingwu <= table.getn(skillsLingwu) then
+    if tmp.lingwu ~= nil and tmp.lingwu > 1 and tmp.lingwu <=
+        table.getn(skillsLingwu) then
         table.remove(skillsLingwu, tmp.lingwu)
         table.insert(skillsLingwu, 1, skill)
     end

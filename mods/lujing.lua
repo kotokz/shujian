@@ -89,14 +89,14 @@ function exe(cmd)
     run(cmd)		
 end
 
-max_cmd_limit=100
-throttled_cmd_limit=30
-cmd_limit=max_cmd_limit
+-- max_cmd_limit=30
+cmd_throttling = false
 walkecho=true
+SetSpeedWalkDelay(0)
 -- SetSpeedWalkDelay(math.floor(1000/cmd_limit))
 function run(str)
 	if ((str=="")or(str==nil)) then return end
-	SetSpeedWalkDelay(math.floor(1000/cmd_limit))
+
 	_cmds={}
     if string.find(str,';') then
         _cmds=utils.split(str,';')
@@ -136,12 +136,14 @@ function moving_sum()
               sum=sum+v 
             end
         end 
-        if cmd_limit == max_cmd_limit and sum >= 50 then
+        if sum >= 50 and not cmd_throttling then
             print("start throttling")
-            cmd_limit = throttled_cmd_limit
-        elseif cmd_limit == throttled_cmd_limit and sum < 30 and tmp.lingwustart == false then
+            cmd_throttling = true
+            SetSpeedWalkDelay(math.floor(1000/30))
+        elseif cmd_throttling and sum < 30 and (tmp.lingwustart == nil or tmp.lingwustart == false) then
             print("full speed")
-            cmd_limit = max_cmd_limit
+            cmd_throttling = false
+            SetSpeedWalkDelay(0)
         end       
         if tablelength(t_cmds) > 4 then
             t_cmds[get_first_sec()]= nil
@@ -887,12 +889,6 @@ function path_start()
             road.i= i  
             local step_set=utils.split(step,';') 
             steps_done = steps_done + table.getn(step_set)
-            if steps_done > 50 then
-                -- print("步数过长，休息")
-                -- cmd_limit=throttled_cmd_limit
-                wait.time(0.5)
-                steps_done = 0
-            end    
             EnableTrigger("hp12",false)
             if locl.room=="鳄鱼潭" then
                 exe('ta corpse')
@@ -911,9 +907,6 @@ function path_start()
             end
             coroutine.yield()
         end
-        -- if cmd_limit < max_cmd_limit then
-        --     cmd_limit=max_cmd_limit
-        -- end
         locate_finish='go_confirm'
         return locate()
     end)

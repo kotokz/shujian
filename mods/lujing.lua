@@ -471,6 +471,7 @@ function walk_goon(func)
 
         wait_busy()
         if tmp.find then
+            if flag.wait == 1 then wait.time(1) end
             EnableTrigger("hp12", false)
         else
             EnableTrigger("hp12", true)

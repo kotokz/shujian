@@ -2341,7 +2341,7 @@ function wudang_eat()
     end
 end
 function check_food_over()
-    if (kuang_cur and kuang_cur > 2000) or (kuang_cur1 and kuang_cur1 > 2000) then
+    if ((kuang_cur and kuang_cur > 100000) or (kuang_cur1 and kuang_cur1 > 100000)) and condition.busy and condition.busy > 30 then
         return Ronglian()
     end
     return check_heal()

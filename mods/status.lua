@@ -449,10 +449,6 @@ function hp_trigger()
     create_trigger_t('hp31',
                      "^\\D*你把钱交给船家，船家领你上了一条小舟",
                      '', 'job_lianstart')
-    create_trigger_t('hp71',
-                     "^(> )*【活动公告】书剑永恒天玑站砸金蛋活动开始了！",
-                     '', 'egg_huodong')
-    SetTriggerOption("hp71", "group", "hp")
     SetTriggerOption("hp24", "group", "hp")
     SetTriggerOption("hp25", "group", "hp")
     SetTriggerOption("hp26", "group", "hp")
@@ -756,7 +752,7 @@ function lingwu_goon()
         xxpot = hp.pot_max
         -- return check_bei(lingwu_finish)
         wait_busy()
-        SetSpeedWalkDelay(0)
+        -- SetSpeedWalkDelay(0)  --no need to set it back just set the flag and let queue auto determinate
         return lingwu_finish()
     end)
 end

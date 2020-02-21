@@ -2311,7 +2311,7 @@ function dazuo_lianxi_auto()
 
     tmp_lxskill = 'bei none;'
     for p in pairs(Bag) do
-        if Bag[p].kind and (not itemWield or itemWield[p]) then
+        if Bag[p].kind then
             local _, l_cnt = isInBags(Bag[p].fullid)
             for i = 1, l_cnt do
                 tmp_lxskill =
@@ -2320,8 +2320,6 @@ function dazuo_lianxi_auto()
             end
         end
     end
-
-    tmp_lxskill = 'bei none;unwield sword;unwield sword 2;unwield xiao;'
     lianxi_times = GetVariable('mycishu')
     for p in pairs(skills) do
         if (skillEnable[p] and skills[p].lvl < hp.pot_max - 100) or
@@ -2362,11 +2360,12 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "sword" then
                 tmp_lxskill = tmp_lxskill .. 'jifa sword ' .. p ..
-                                  ';wield sword;lian sword ' .. lianxi_times ..
-                                  ';unwield sword;yun jingli;'
+                                  ';wield sword;uweapon shape sword sword;lian sword ' ..
+                                  lianxi_times .. ';unwield sword;yun jingli;'
             end
             if skillEnable[p] == "whip" then
-                tmp_lxskill = tmp_lxskill .. 'wield whip;lian whip ' ..
+                tmp_lxskill = tmp_lxskill ..
+                                  'wield whip;uweapon shape whip whip;lian whip ' ..
                                   lianxi_times .. ';unwield whip;yun jingli;'
             end
             if skillEnable[p] == "axe" then
@@ -2384,8 +2383,8 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "blade" then
                 tmp_lxskill = tmp_lxskill .. 'jifa blade ' .. p ..
-                                  ';wield blade;lian blade ' .. lianxi_times ..
-                                  ';unwield blade;yun jingli;'
+                                  ';wield blade;uweapon shape blade blade;lian blade ' ..
+                                  lianxi_times .. ';unwield blade;yun jingli;'
             end
             if skillEnable[p] == "stick" then
                 tmp_lxskill = tmp_lxskill .. 'wield stick;lian stick ' ..
@@ -2400,7 +2399,8 @@ function dazuo_lianxi_auto()
                                   lianxi_times .. ';unwield club;yun jingli;'
             end
             if skillEnable[p] == "hammer" then
-                tmp_lxskill = tmp_lxskill .. 'wield hammer;lian hammer ' ..
+                tmp_lxskill = tmp_lxskill ..
+                                  'wield hammer;uweapon shape hammer hammer;lian hammer ' ..
                                   lianxi_times .. ';unwield hammer;yun jingli;'
             end
             if skillEnable[p] == "hook" then
@@ -2408,7 +2408,8 @@ function dazuo_lianxi_auto()
                                   lianxi_times .. ';unwield hook;yun jingli;'
             end
             if skillEnable[p] == "dagger" then
-                tmp_lxskill = tmp_lxskill .. 'wield dagger;lian dagger ' ..
+                tmp_lxskill = tmp_lxskill ..
+                                  'wield dagger;uweapon shape dagger dagger;lian dagger ' ..
                                   lianxi_times .. ';unwield dagger;yun jingli;'
             end
         end

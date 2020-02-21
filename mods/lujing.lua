@@ -431,41 +431,58 @@ fastLocate = function()
     end)
 end
 function walk_trigger()
-    -- DeleteTriggerGroup("walk")
-    -- create_trigger_t('walk1','^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$','','walk_goon')
-    -- SetTriggerOption("walk1","group","walk")
-    -- EnableTriggerGroup("walk",false)
+    DeleteTriggerGroup("walk")
+    create_trigger_t('walk1',
+                     '^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$',
+                     '', 'walk_goon')
+    SetTriggerOption("walk1", "group", "walk")
+    EnableTriggerGroup("walk", false)
 end
 function walk_wait()
     wait.make(function()
+        flag.walkwait = true
+        EnableTriggerGroup("walk", true)
         EnableTrigger("hp12", true)
+        create_timer_s('walkWait', 0.4, 'walkTimer')
         if tmp.find then
-            wait.time(0.2)
-            if cntr1() > 0 then
-                walk_goon()
-            else
-                cntr1 = countR(15)
-                walk_goon()
-            end
+            -- if cntr1() > 0 then
+            --     exe('alias action 正在赶路中')
+            -- else
+            --     wait.time(0.2)
+            --     cntr1 = countR(15)
+            --     exe('alias action 正在赶路中')
+            -- end
+            exe('alias action 正在赶路中')
         else
-            walk_goon()
+            return walk_goon()
         end
     end)
 end
-
+function walkTimer()
+    if flag.walkwait then exe('alias action 正在赶路中') end
+end
 walk_hook_thread = nil
 
 function walk_goon(func)
-    EnableTrigger("hp12", false)
-    EnableTrigger("hp12", true)
-    wait_busy()
+    wait.make(function()
+        flag.walkwait = false
+        EnableTriggerGroup("walk", false)
+        EnableTimer('walkwait', false)
 
-    if walk_hook_thread then
-        -- print("resume suspended walk")
-        local tmp_thread = walk_hook_thread
-        walk_hook_thread = nil
-        coroutine.resume(tmp_thread)
-    end
+        wait_busy()
+        if tmp.find then
+            EnableTrigger("hp12", false)
+        else
+            EnableTrigger("hp12", true)
+        end
+
+        if walk_hook_thread then
+            -- print("resume suspended walk")
+            local tmp_thread = walk_hook_thread
+            walk_hook_thread = nil
+            coroutine.resume(tmp_thread)
+        end
+    end)
 end
 
 function go_to(where)
@@ -1064,7 +1081,7 @@ function searchPre()
     -- print(road.id)
     local p_room = map.rooms[road.id].name
     local p_dest = getLookCity(road.id)
-    local l_distance = 8
+    local l_distance = 6
     --[[if job.name and (job.name=="clb" or job.name=='tdh' or job.name=='tmonk') and flag.times==1 then
 	   l_distance = 2
 	end]]
@@ -3348,8 +3365,8 @@ function toSldTrigger()
     create_trigger_t('mufabusy2',
                      '^(> )*只见(\\D*)轻轻一跃，已坐在木筏上。',
                      '', 'mufaok')
-    create_trigger_t('mufabusy3', '^(> )*你好象没有武器，拿手砍？',
-                     '', 'sld_need_weapon')
+    create_trigger_t('mufabusy3', '^(> )*你好象没有武器', '',
+                     'sld_need_weapon')
     create_trigger_t('mufabusy4', '^(> )*你要绑什么？', '', 'wait_mufa')
     create_trigger_t('mufabusy5', '^(> )*什么？', '', 'wait_mufa')
     create_trigger_t('mufabusy6',
@@ -4843,7 +4860,8 @@ function locateroom(where)
     return false
 end
 bohuacong = function()
-    exe('tell zhou 开门;whisper startd 开门')
+    exe(
+        'opendoor;whisper startd 开门;tell mentonga 开门;tell mentongb 开门')
     return bohuacong11()
 end
 bohuacong11 = function()

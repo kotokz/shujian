@@ -702,7 +702,7 @@ function wudangFinish()
     nobusy = 0
     locate_finish = 0
     job.lost = 0
-
+    flag.times = 1
     wdgostart = 0
     job.last = 'wudang'
     kezhiwugongclose()

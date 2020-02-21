@@ -373,7 +373,8 @@ weaponRepairDo = function()
         local l, w = nil
         if tmp.uweapon and Bag[tmp.uweapon] then
             while true do
-                exe('uweapon shape ' .. Bag[tmp.uweapon].fullid)
+                exe('uweapon shape ' .. Bag[tmp.uweapon].kind .. ' ' ..
+                        Bag[tmp.uweapon].kind)
                 exe('repair ' .. Bag[tmp.uweapon].fullid)
                 l, w = wait.regexp(
                            '^(> )*.*(总算大致恢复了它的原貌|无需修理|您了解不多，无法修理|你带的零钱不够了|你的精神状态不佳|你的铁锤坏掉了！|你必须装备铁锤才能来维修兵器)',

@@ -415,7 +415,10 @@ end
 function songxin_act_set()
     EnableTrigger("hp12", false)
     if tmp.cnt then tmp.cnt = tmp.cnt + 1 end
-    if not tmp.cnt or tmp.cnt > 20 then return check_heal() end
+    if not tmp.cnt or tmp.cnt > 20 then
+        DeleteTimer('songxin')
+        return check_heal()
+    end
     exe('halt;songxin ' .. sxjob.id .. ' ' .. sxjob.cnt)
 end
 function songxin_add()

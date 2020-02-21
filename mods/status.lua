@@ -1638,7 +1638,7 @@ function checkBags(func)
     Bag["Ã¶·ÉïÚ"].id = {}
     Bag["Ã¶·ÉïÚ"].cnt = 0
     tmp.bags = func
-    weaponUsave = {}
+    weaponUsave = weaponUsave or {}
     exe('id')
     checkWield()
     exe('look bei nang')
@@ -2341,9 +2341,9 @@ function wudang_eat()
     end
 end
 function check_food_over()
-    if ((kuang_cur and kuang_cur > 100000) or (kuang_cur1 and kuang_cur1 > 100000)) and condition.busy and condition.busy > 30 then
-        return Ronglian()
-    end
+    if ((kuang_cur and kuang_cur > 100000) or
+        (kuang_cur1 and kuang_cur1 > 100000)) and condition.busy and
+        condition.busy > 30 then return Ronglian() end
     return check_heal()
 end
 

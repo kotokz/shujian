@@ -2369,10 +2369,11 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "sword" then
                 if shenqi_id then
-                    tmp_lxskill = tmp_lxskill .. 'jifa sword ' .. p ..
-                                      ';wield sword;uweapon shape ' .. shenqi_id ..
-                                      ' sword;lian sword ' .. lianxi_times ..
-                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                    tmp_lxskill =
+                        tmp_lxskill .. 'jifa sword ' .. p .. ';wield ' ..
+                            shenqi_id .. ';uweapon shape ' .. shenqi_id ..
+                            ' sword;lian sword ' .. lianxi_times .. ';unwield ' ..
+                            shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill .. 'jifa sword ' .. p ..
                                       ';wield sword;uweapon shape sword sword;lian sword ' ..
@@ -2382,10 +2383,10 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "whip" then
                 if shenqi_id then
-                    tmp_lxskill = tmp_lxskill .. 'wield whip;uweapon shape ' ..
-                                      shenqi_id .. ' whip;lian whip ' ..
-                                      lianxi_times .. ';unwield ' .. shenqi_id ..
-                                      ';yun jingli;'
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' whip;lian whip ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill ..
                                       'wield whip;uweapon shape whip whip;lian whip ' ..
@@ -2414,10 +2415,10 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "throwing" then
                 if shenqi_id then
-                    tmp_lxskill = tmp_lxskill .. 'wield coin;uweapon shape ' ..
-                                      shenqi_id .. ' coin;lian throwing ' ..
-                                      lianxi_times .. ';unwield ' .. shenqi_id ..
-                                      ';yun jingli;'
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' coin;lian throwing ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill .. 'wield coin;lian throwing ' ..
                                       lianxi_times ..
@@ -2427,10 +2428,11 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "blade" then
                 if shenqi_id then
-                    tmp_lxskill = tmp_lxskill .. 'jifa blade ' .. p ..
-                                      ';wield blade;uweapon shape ' .. shenqi_id ..
-                                      ' blade;lian blade ' .. lianxi_times ..
-                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                    tmp_lxskill =
+                        tmp_lxskill .. 'jifa blade ' .. p .. ';wield ' ..
+                            shenqi_id .. ';uweapon shape ' .. shenqi_id ..
+                            ' blade;lian blade ' .. lianxi_times .. ';unwield ' ..
+                            shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill .. 'jifa blade ' .. p ..
                                       ';wield blade;uweapon shape blade blade;lian blade ' ..
@@ -2440,10 +2442,10 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "stick" then
                 if shenqi_id then
-                    tmp_lxskill = tmp_lxskill .. 'wield stick;uweapon shape ' ..
-                                      shenqi_id .. ' stick;lian stick ' ..
-                                      lianxi_times .. ';unwield ' .. shenqi_id ..
-                                      ';yun jingli;'
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' stick;lian stick ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill ..
                                       'wield stick;uweapon shape stick stick;lian stick ' ..
@@ -2454,10 +2456,10 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "staff" then
                 if shenqi_id then
-                    tmp_lxskill = tmp_lxskill .. 'wield staff;uweapon shape ' ..
-                                      shenqi_id .. ' staff;lian staff ' ..
-                                      lianxi_times .. ';unwield ' .. shenqi_id ..
-                                      ';yun jingli;'
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' staff;lian staff ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill ..
                                       'wield staff;uweapon shape staff staff;lian staff ' ..
@@ -2468,10 +2470,10 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "club" then
                 if shenqi_id then
-                    tmp_lxskill = tmp_lxskill .. 'wield club;uweapon shape ' ..
-                                      shenqi_id .. ' club;lian club ' ..
-                                      lianxi_times .. ';unwield ' .. shenqi_id ..
-                                      ';yun jingli;'
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' club;lian club ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill ..
                                       'wield club;uweapon shape club club;lian club ' ..
@@ -2482,10 +2484,10 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "hammer" then
                 if shenqi_id then
-                    tmp_lxskill =
-                        tmp_lxskill .. 'wield hammer;uweapon shape ' ..
-                            shenqi_id .. ' hammer;lian hammer ' .. lianxi_times ..
-                            ';unwield ' .. shenqi_id .. ';yun jingli;'
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' hammer;lian hammer ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill ..
                                       'wield hammer;uweapon shape hammer hammer;lian hammer ' ..
@@ -2496,10 +2498,10 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "hook" then
                 if shenqi_id then
-                    tmp_lxskill = tmp_lxskill .. 'wield hook;uweapon shape ' ..
-                                      shenqi_id .. ' hook;lian hook ' ..
-                                      lianxi_times .. ';unwield ' .. shenqi_id ..
-                                      ';yun jingli;'
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' hook;lian hook ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill ..
                                       'wield hook;uweapon shape hook hook;lian hook ' ..
@@ -2510,10 +2512,10 @@ function dazuo_lianxi_auto()
             end
             if skillEnable[p] == "dagger" then
                 if shenqi_id then
-                    tmp_lxskill =
-                        tmp_lxskill .. 'wield dagger;uweapon shape ' ..
-                            shenqi_id .. ' dagger;lian dagger ' .. lianxi_times ..
-                            ';unwield ' .. shenqi_id .. ';yun jingli;'
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' dagger;lian dagger ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
                 else
                     tmp_lxskill = tmp_lxskill ..
                                       'wield dagger;uweapon shape dagger dagger;lian dagger ' ..

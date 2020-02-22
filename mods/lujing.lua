@@ -3358,7 +3358,7 @@ function toSldCheck()
 end
 function toSldHua()
     print("toSldHua")
-    sld_unwield()
+    weapon_unwield()
     exe('hua mufa')
     if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian') end
     exe('cha;hp')

@@ -436,7 +436,7 @@ function huashan_find_again()
     go("华山", "正气堂")
     flag.wait = 0
     wait.make(function()
-        wait.time(1.0)
+        wait.time(0.5)
         dis_all()
         EnableTriggerGroup("huashan_find", true)
         if string.find(job.where, '蝴蝶谷') then return hudiegu() end

@@ -453,6 +453,247 @@ fight_trigger = function()
     --    EnableTrigger("fight4",false)
     job_exp_trigger()
 end
+
+function wuxingzhenFinish() return check_heal() end
+
+function checkPrepare()
+    EnableTriggerGroup("poison", false)
+    DeleteTriggerGroup("poison")
+
+    if g_stop_flag == true then
+        print("任务结束，游戏暂停")
+        g_stop_flag = false
+        return disAll()
+    end
+    drugPrepare = drugPrepare or {}
+    exe('hp')
+    if hp.exp < 150000 then return checkPrepareOver() end
+    if hp.food < 40 or hp.water < 40 then return check_food() end
+    if hp.jingxue_per < 90 or hp.qixue_per < 60 then return check_heal() end
+    if Bag["镣铐"] then return tiaoshui() end
+
+    if Bag and Bag["白银"] and Bag["白银"].cnt and
+        (Bag["白银"].cnt > 100 or Bag["白银"].cnt < 50) then
+        return check_gold()
+    end
+    if (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt <
+        count.gold_max and score.gold > count.gold_max) or
+        (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt >
+            count.gold_max * 4) then return check_gold() end
+    if score.gold and score.gold > 100 and nxw_cur < 5 and
+        drugPrepare["内息丸"] then return checkNxw() end
+    if score.gold and score.gold > 100 and cbw_cur < 5 and
+        drugPrepare["川贝内息丸"] then return checkNxw() end
+
+    if score.gold and score.gold > 100 and hqd_cur < 5 and
+        drugPrepare["黄芪内息丹"] then return checkNxw() end
+
+    if score.gold and score.gold > 100 and cty_cur < 5 and
+        drugPrepare["蝉蜕金疮药"] then return checkHxd() end
+
+    --[[if job.zuhe["wudang"] and job.zuhe["xueshan"] and job.last=="wudang" and (not Bag["邪气丸"] or Bag["邪气丸"].cnt<2) then
+       return checkXqw()
+	end
+	
+	if job.zuhe["wudang"] and job.zuhe["xueshan"] and job.last=="wudang" and (not Bag["正气丹"] or Bag["正气丹"].cnt<2) then
+       return checkZqd()
+	end
+	
+	if job.zuhe["huashan"] and job.zuhe["xueshan"] and job.last=="huashan" and (not Bag["邪气丸"] or Bag["邪气丸"].cnt<2) then
+       return checkXqw()
+	end
+	
+	if job.zuhe["huashan"] and job.zuhe["xueshan"] and job.last=="huashan" and (not Bag["正气丹"] or Bag["正气丹"].cnt<2) then
+       return checkZqd()
+	end]]
+
+    if not flag.item then
+        if score.party and score.party == "峨嵋派" and not Bag["腰带"] then
+            return check_item()
+        end
+        if score.party == "少林派" and not Bag["护腰"] and
+            not Bag["护腕"] then return check_item() end
+    end
+    if locl.weekday == '四' and locl.hour == 8 then
+        print(
+            '避开周四服务器重启高峰，错后火折和酒袋购买时间一小时！')
+    else
+        if not Bag["火折"] and drugPrepare["火折"] then
+            return checkFire()
+        end
+
+        if not Bag["牛皮酒袋"] and drugPrepare["牛皮酒袋"] then
+            return checkJiudai()
+        end
+    end
+    if score.gold and score.gold > 100 and hxd_cur < 3 and
+        drugPrepare["活血疗精丹"] then return checkLjd() end
+
+    if score.tb and score.tb > 100 and dhd_cur < 1 and drugPrepare["大还丹"] then
+        return checkdhd()
+    end
+
+    for p in pairs(weaponPrepare) do
+        if weaponStore[p] and not Bag[p] and Bag["黄金"].cnt > 3 then
+            return checkWeapon(p)
+        end
+        if weaponFunc[p] and not Bag[p] then
+            return _G[weaponFuncName[p]]()
+        end
+        if weaponPrepare["飞镖"] and Bag["枚飞镖"].cnt < 100 then
+            return checkWeapon("飞镖")
+        end
+    end
+    local l_cut = false
+    for p in pairs(Bag) do
+        if weaponKind[Bag[p].kind] and weaponKind[Bag[p].kind] == "cut" then
+            l_cut = true
+        end
+    end
+    if not l_cut and not Bag["木剑"] then
+        weaponPrepare["木剑"] = true
+        return checkWeapon("木剑")
+    end
+
+    if Bag["韦兰之锤"] then return checkHammer() end
+
+    for p in pairs(Bag) do
+        if Bag[p] and itemSave[p] then return checkYu(p) end
+        if Bag[p].id and Bag[p].id["yu"] and string.find(p, "玉") then
+            return checkYu(p)
+        end
+        if Bag[p].id and Bag[p].id["jintie chui"] and
+            string.find(p, "金铁锤") then return checkYu(p) end
+        if Bag[p].id and Bag[p].id["shentie chui"] and
+            string.find(p, "神铁锤") then return checkYu(p) end
+    end
+    exe('wear all')
+
+    if needjinchai == 1 then return go(getchai, "扬州城", "杂货铺") end
+
+    if xuezhu_require == 1 then
+        if GetVariable("xuezhu_status") ~= nil and GetVariable("xuezhu_status") ==
+            '2' then
+            SetVariable("xuezhu_status", "0") -- 重启之后初始化自动抓雪蛛变量为0
+        end
+        if GetVariable("xuezhu_status") ~= nil and GetVariable("xuezhu_status") ==
+            '1' then
+            SetVariable("xuezhu_status", "-1") -- 如果上周要了真丹，未给雪蛛，重启之后初始化自动抓雪蛛变量为-1
+        end
+        xuezhu_require = 0
+    end
+
+    local x = check_xuezhu_status()
+    if x == '0' then return getxuezhu0() end
+    if x == '-1' or x == '1' then return getxuezhu1() end
+
+    if Bag and Bag["野菊花"] and not Bag["铜钥匙"] then
+        return go(get_key, '扬州城', '小盘古')
+    end
+    --[[if Bag and not Bag["铜钥匙"] then
+	   return check_key()
+	end
+	if Bag and not Bag["绳子"] then
+	   return check_rope()
+	end]]
+
+    return checkPrepareOver()
+end
+function checkPrepareOver()
+    if lostletter == 1 and needdolost == 1 then return letterLost() end
+    condition.busy = 0
+    vippoison = 0
+    exe('score;cond')
+    if wudang_checkfood == 1 or (condition.busy and condition.busy > 10) or
+        needxuexi == 1 then
+        return check_xuexi()
+    else
+        if needxuexi ~= 1 then messageShow('不需要学习') end
+        return check_job()
+    end
+end
+function getchai()
+    wait.make(function()
+        wait.time(1)
+        exe('qu jin chai')
+        needjinchai = 0
+        return check_busy(getshengzi, 3)
+    end)
+end
+function getshengzi()
+    exe('qu sheng zi')
+    return check_busy(getshengzi1, 3)
+end
+function getshengzi1()
+    exe('qu cu shengzi')
+    return check_busy(getfire, 3)
+end
+function getfire()
+    exe('qu fire')
+    return check_busy(getjuhua, 3)
+end
+function getjuhua()
+    exe('qu ye juhua')
+    return check_busy(askfuli, 3)
+end
+function askfuli()
+    DeleteTriggerGroup("vipfuli")
+    create_trigger_t('askfuli1',
+                     '^(> )*当铺老板为你在钱庄中存入(\\D*)锭黄金。',
+                     '', 'vip_gold')
+    create_trigger_t('askfuli2',
+                     '^(> )*你的帐号增加了(\\D*)个通宝。', '',
+                     'vip_tongbao')
+    create_trigger_t('askfuli3', '^(> )*你增加了(\\D*)点内力修为。',
+                     '', 'vip_neili')
+    SetTriggerOption("askfuli1", "group", "vipfuli")
+    SetTriggerOption("askfuli2", "group", "vipfuli")
+    SetTriggerOption("askfuli3", "group", "vipfuli")
+    return go(askfuli1, "扬州城", "当铺")
+end
+function askfuli1()
+    wait.make(function()
+        wait.time(1)
+        exe('ask laoban about 会员福利')
+        return check_busy(askfuli2)
+    end)
+end
+function askfuli2()
+    exe('ask laoban about 会员基金')
+    wait.make(function()
+        wait.time(2)
+        return check_busy(checkPrepare)
+    end)
+end
+function vip_gold(n, l, w)
+    EnableTriggerGroup("vipfuli", false)
+    DeleteTriggerGroup("vipfuli")
+    messageShow(
+        '每周会员福利：   当铺老板为你在钱庄中存入【' ..
+            w[2] .. '】锭黄金。', 'gold', 'black')
+end
+function vip_tongbao(n, l, w)
+    messageShow('每周会员福利：   你的帐号增加了【' .. w[2] ..
+                    '】个通宝。', 'red', 'black')
+end
+function vip_neili(n, l, w)
+    messageShow('每周会员福利：   你增加了【' .. w[2] ..
+                    '】点内力修为。', 'blue', 'black')
+end
+function vip_get_rope()
+    wait.make(function()
+        wait.time(3)
+        exe('qu sheng zi')
+        return check_busy(check_jobx, 3)
+    end)
+end
+function vip_get_juhua()
+    wait.make(function()
+        wait.time(3)
+        exe('qu ye juhua')
+        return check_busy(check_jobx, 3)
+    end)
+end
 function hp_heqi_check(n, l, w)
     heqi = tonumber(w[1])
     print("heqi=" .. heqi)

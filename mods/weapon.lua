@@ -384,10 +384,10 @@ weaponRepairDo = function()
             while true do
                 if shenqi_id then
                     exe('uweapon shape ' .. shenqi_id .. ' ' ..
-                    Bag[tmp.uweapon].kind)
+                            Bag[tmp.uweapon].kind)
                 else
                     exe('uweapon shape ' .. Bag[tmp.uweapon].kind .. ' ' ..
-                    Bag[tmp.uweapon].kind)
+                            Bag[tmp.uweapon].kind)
                 end
                 exe('repair ' .. Bag[tmp.uweapon].fullid)
                 l, w = wait.regexp(
@@ -662,4 +662,73 @@ armorRepairOver = function()
     DeleteTimer("repair")
     DeleteTriggerGroup("repair")
     return check_halt(check_jobx)
+end
+
+function dazaoWeapon()
+    tmp.dazuo = 0
+    local l_dazuo = 0
+    local l_dazuotype = ""
+    l_result = utils.inputbox("你需要打造的次数是", "dazaoNUM",
+                              GetVariable("dazaoNUM"), "宋体", "12")
+    if not isNil(l_result) then l_dazuo = tonumber(l_result) end
+    l_result = utils.inputbox("你需要打造的类型", "dazuoType",
+                              GetVariable("dazuoType"), "宋体", "12")
+    if not isNil(l_result) then l_dazuotype = l_result end
+    wait.make(function()
+        local count = 0
+        while count < l_dazuo do
+            while true do
+                exe('ask shi about weilan;da ' .. l_dazuotype)
+                local l, w = wait.regexp(
+                                 '^(> )*.*(韦兰铁匠给了你一把|我正忙着呢)')
+                if l ~= nil and l:find("韦兰铁匠给了你一把") then
+                    break
+                else
+                    time.wait(0.4)
+                end
+            end
+            wait_busy()
+            count = count + 1
+            print("打造完第" .. count .. "把，总共需要打造:" ..
+                      l_dazuo .. "把")
+        end
+        print("打造完毕")
+    end)
+end
+
+function weapon_lost()
+    DeleteTriggerGroup("weapon_lose")
+    create_trigger_t('weapon_lose1',
+                     "^>*\\s*哈士奇一转眼就跑没影儿了，一会给你叼来了一柄(\\D*)，然后不知道跑哪去了。",
+                     '', 'weapon_found')
+    create_trigger_t('weapon_lose2',
+                     "^>*\\s*哈士奇呆呆地瞪着你，好象很不高兴的样子。",
+                     '', 'weapon_no_found')
+    create_trigger_t('weapon_lose3',
+                     "^>*\\s*你的状态不稳定，请稍候。", '',
+                     'weapon_no_found')
+    SetTriggerOption("weapon_lose1", "group", "weapon_lose")
+    SetTriggerOption("weapon_lose2", "group", "weapon_lose")
+    SetTriggerOption("weapon_lose3", "group", "weapon_lose")
+    EnableTriggerGroup("weapon_lose", true)
+    return go(weapon_lost_get, '扬州城', '当铺')
+end
+
+function weapon_lost_get()
+    exe('duihuan husky')
+    exe('save')
+end
+function weapon_no_found()
+    check_halt(BQuit)
+    exe('drink jiudai')
+end
+function weapon_found()
+    EnableTriggerGroup("weapon_lose", false)
+    scrLog()
+    messageShow('武器丢失，兑换哈士奇找回！', 'red')
+    return check_busy(weapon_found_get)
+end
+function weapon_found_get()
+    exe('get all')
+    return check_halt(check_food)
 end

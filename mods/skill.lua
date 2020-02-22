@@ -753,3 +753,225 @@ function job_lianstart()
         end
     end)
 end
+
+function dazuo_lianxi_auto()
+
+    tmp_lxskill = 'bei none;'
+    for p in pairs(Bag) do
+        if Bag[p].kind then
+            local _, l_cnt = isInBags(Bag[p].fullid)
+            for i = 1, l_cnt do
+                tmp_lxskill =
+                    tmp_lxskill .. 'unwield ' .. Bag[p].fullid .. ' ' .. i ..
+                        ';'
+            end
+        end
+    end
+    lianxi_times = GetVariable('mycishu')
+    local shenqi_id = GetVariable('myshenqi_id')
+    for p in pairs(skills) do
+        if (skillEnable[p] and skills[p].lvl < hp.pot_max - 100) or
+            (skillEnable[p] and skills[p].lvl == hp.pot_max - 100 and
+                skills[p].pot < (skills[p].lvl + 1) ^ 2) then
+            if skillEnable[p] == "force" then
+                tmp_lxskill = tmp_lxskill .. 'lian force ' .. lianxi_times ..
+                                  ';'
+            end
+            if skillEnable[p] == "dodge" then
+                tmp_lxskill = tmp_lxskill .. 'jifa dodge ' .. p ..
+                                  ';lian dodge ' .. lianxi_times ..
+                                  ';yun jingli;'
+            end
+            if skillEnable[p] == "finger" then
+                tmp_lxskill = tmp_lxskill .. 'jifa finger ' .. p ..
+                                  ';lian finger ' .. lianxi_times ..
+                                  ';yun jingli;'
+            end
+            if skillEnable[p] == "cuff" then
+                tmp_lxskill =
+                    tmp_lxskill .. 'jifa cuff ' .. p .. ';lian cuff ' ..
+                        lianxi_times .. ';yun jingli;'
+            end
+            if skillEnable[p] == "strike" then
+                tmp_lxskill = tmp_lxskill .. 'jifa strike ' .. p ..
+                                  ';lian strike ' .. lianxi_times ..
+                                  ';yun jingli;'
+            end
+            if skillEnable[p] == "hand" then
+                tmp_lxskill =
+                    tmp_lxskill .. 'jifa hand ' .. p .. ';lian hand ' ..
+                        lianxi_times .. ';yun jingli;'
+            end
+            if skillEnable[p] == "leg" then
+                tmp_lxskill = tmp_lxskill .. 'lian leg ' .. lianxi_times ..
+                                  ';yun jingli;'
+            end
+            if skillEnable[p] == "sword" then
+                if shenqi_id then
+                    tmp_lxskill =
+                        tmp_lxskill .. 'jifa sword ' .. p .. ';wield ' ..
+                            shenqi_id .. ';uweapon shape ' .. shenqi_id ..
+                            ' sword;lian sword ' .. lianxi_times .. ';unwield ' ..
+                            shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill .. 'jifa sword ' .. p ..
+                                      ';wield sword;uweapon shape sword sword;lian sword ' ..
+                                      lianxi_times ..
+                                      ';unwield sword;yun jingli;'
+                end
+            end
+            if skillEnable[p] == "whip" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' whip;lian whip ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill ..
+                                      'wield whip;uweapon shape whip whip;lian whip ' ..
+                                      lianxi_times ..
+                                      ';unwield whip;yun jingli;'
+                end
+
+            end
+            if skillEnable[p] == "axe" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield axe;uweapon shape ' ..
+                                      shenqi_id .. ' axe;lian axe ' ..
+                                      lianxi_times .. ';unwield ' .. shenqi_id ..
+                                      ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill ..
+                                      'wield axe;uweapon shape axe axe;lian axe ' ..
+                                      lianxi_times .. ';unwield axe;yun jingli;'
+                end
+
+            end
+            if skillEnable[p] == "claw" then
+                tmp_lxskill =
+                    tmp_lxskill .. 'jifa claw ' .. p .. ';lian claw ' ..
+                        lianxi_times .. ';yun jingli;'
+            end
+            if skillEnable[p] == "throwing" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' coin;lian throwing ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill .. 'wield coin;lian throwing ' ..
+                                      lianxi_times ..
+                                      ';unwield coin;yun jingli;'
+                end
+
+            end
+            if skillEnable[p] == "blade" then
+                if shenqi_id then
+                    tmp_lxskill =
+                        tmp_lxskill .. 'jifa blade ' .. p .. ';wield ' ..
+                            shenqi_id .. ';uweapon shape ' .. shenqi_id ..
+                            ' blade;lian blade ' .. lianxi_times .. ';unwield ' ..
+                            shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill .. 'jifa blade ' .. p ..
+                                      ';wield blade;uweapon shape blade blade;lian blade ' ..
+                                      lianxi_times ..
+                                      ';unwield blade;yun jingli;'
+                end
+            end
+            if skillEnable[p] == "stick" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' stick;lian stick ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill ..
+                                      'wield stick;uweapon shape stick stick;lian stick ' ..
+                                      lianxi_times ..
+                                      ';unwield stick;yun jingli;'
+                end
+
+            end
+            if skillEnable[p] == "staff" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' staff;lian staff ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill ..
+                                      'wield staff;uweapon shape staff staff;lian staff ' ..
+                                      lianxi_times ..
+                                      ';unwield staff;yun jingli;'
+                end
+
+            end
+            if skillEnable[p] == "club" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' club;lian club ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill ..
+                                      'wield club;uweapon shape club club;lian club ' ..
+                                      lianxi_times ..
+                                      ';unwield club;yun jingli;'
+                end
+
+            end
+            if skillEnable[p] == "hammer" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' hammer;lian hammer ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill ..
+                                      'wield hammer;uweapon shape hammer hammer;lian hammer ' ..
+                                      lianxi_times ..
+                                      ';unwield hammer;yun jingli;'
+                end
+
+            end
+            if skillEnable[p] == "hook" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' hook;lian hook ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill ..
+                                      'wield hook;uweapon shape hook hook;lian hook ' ..
+                                      lianxi_times ..
+                                      ';unwield hook;yun jingli;'
+                end
+
+            end
+            if skillEnable[p] == "dagger" then
+                if shenqi_id then
+                    tmp_lxskill = tmp_lxskill .. 'wield ' .. shenqi_id ..
+                                      ';uweapon shape ' .. shenqi_id ..
+                                      ' dagger;lian dagger ' .. lianxi_times ..
+                                      ';unwield ' .. shenqi_id .. ';yun jingli;'
+                else
+                    tmp_lxskill = tmp_lxskill ..
+                                      'wield dagger;uweapon shape dagger dagger;lian dagger ' ..
+                                      lianxi_times ..
+                                      ';unwield dagger;yun jingli;'
+                end
+
+            end
+        end
+    end
+    if weapon.first and Bag[weapon.first] then
+        tmp_lxskill = tmp_lxskill .. 'wield ' .. Bag[weapon.first].fullid .. ';'
+    end
+    tmp_lxskill = tmp_lxskill .. 'hp;unset Л§аю;bei finger;i'
+end
+function set_sxlian()
+    dazuo_lianxi_auto()
+    create_alias('sx1lian', 'sx1lian', 'alias sxlian ' .. tmp_lxskill)
+    Execute('sx1lian')
+end

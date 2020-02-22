@@ -44,6 +44,17 @@ score.dj = 0
 score.dz = 0
 score.zt = ''
 
+skills = {}
+-- if hp.exp>800000 then
+skillsLingwu = {
+    'force', 'finger', 'parry', 'dodge', 'strike', 'blade', 'cuff', 'claw',
+    'hand', 'leg', 'whip', 'club', 'sword', 'stick', 'hammer', 'dagger',
+    'brush', 'throwing', 'spear', 'staff', 'axe'
+}
+-- else
+-- skillsLingwu={'finger','parry','dodge','strike','blade','cuff','claw','hand','leg','whip','club','sword','stick','hammer','dagger','brush','throwing','spear','staff','axe'}
+-- end	
+
 -- 船夫系列
 Chuanfu = {
     chuanfuEnable = false,
@@ -298,6 +309,51 @@ hpheqi = function()
                      'hp_heqi_check')
     SetTriggerOption("hpheqi1", "group", "hpheqi")
     EnableTriggerGroup("hpheqi", false)
+end
+
+function checkDebug()
+    messageShow('您中毒了!')
+    vippoison = 1
+    exe('look bei nang;hp')
+    if job.name == 'songmoya' then
+        Execute('set wimpycmd halt\\down\\hp')
+        job.name = 'poison'
+        return check_halt(fangqiypt)
+    end
+    if hxd_cur > 0 then
+        create_timer_s('eatdan', 3, 'hpEat')
+    else
+        dis_all()
+        return check_halt(check_xue)
+    end
+end
+function hpEat() exe('eat huoxue dan') end
+function hpeatOver(n, l, w)
+    local l = w[2]
+    if string.find(l,
+                   "敷上一副蝉蜕金疮药，顿时感觉伤势好了不少") then
+        cty_cur = cty_cur - 1
+    end
+    if string.find(l,
+                   "服下一颗内息丸，顿时觉得内力充沛了不少") then
+        nxw_cur = nxw_cur - 1
+    end
+    if string.find(l, "服下一颗川贝内息丸，顿时感觉内力充沛") then
+        cbw_cur = cbw_cur - 1
+    end
+    if string.find(l,
+                   "服下一颗黄芪内息丹，顿时感觉空虚的丹田充盈了不少") then
+        hqd_cur = hqd_cur - 1
+    end
+    if string.find(l,
+                   "服下一颗活血疗精丹，顿时感觉精血不再流失") then
+        DeleteTimer("eatdan")
+        hxd_cur = hxd_cur - 1
+    end
+    if string.find(l, "吃下一颗大还丹顿时伤势痊愈气血充盈") then
+        messageShow('吃大还丹了！')
+        dhd_cur = dhd_cur - 1
+    end
 end
 
 hp_dazuo_count = function()
@@ -2993,3 +3049,27 @@ function checkWeaponOver() return checkPrepare() end
 function checkCodeError() return dis_all() end
 
 function checkRefresh() job.time["refresh"] = os.time() % 900 end
+
+function kedian_sleep()
+    if locl.area == '长安城' then
+        exe('up;n;sleep')
+    else
+        exe('up;enter;sleep')
+    end
+    locate()
+    walk_wait()
+end
+function check_rope() go(get_rope, '华山', '寝室') end
+function get_rope()
+    exe('tell rope 交货')
+    check_busy(checkPrepareOver)
+end
+function check_key() go(get_juhua, '扬州城', '个园') end
+function get_juhua()
+    exe('tell daisy 交货')
+    go(get_key, '扬州城', '小盘古')
+end
+function get_key()
+    exe('give juyou ye juhua')
+    check_busy(checkPrepareOver)
+end

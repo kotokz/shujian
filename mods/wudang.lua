@@ -26,8 +26,12 @@ function wudangTrigger()
                      'wudangAsk')
     create_trigger_t('wudangAsk2', "^(> )*这里没有这个人。$", '',
                      'wudangNobody')
+    create_trigger_t('wudangAsk3',
+                     "^你觉得有点什么不对劲, 可是你却说不上来",
+                     '', 'wudangStart')
     SetTriggerOption("wudangAsk1", "group", "wudangAsk")
     SetTriggerOption("wudangAsk2", "group", "wudangAsk")
+    SetTriggerOption("wudangAsk3", "group", "wudangAsk")
     EnableTriggerGroup("wudangAsk", false)
     DeleteTriggerGroup("wudangAccept")
     create_trigger_t('wudangAccept1',
@@ -136,10 +140,10 @@ jobFindFail["wudang"] = "wudangFindFail"
 function wudangFindAgain()
     wdgostart = 1
     EnableTriggerGroup("wudangFind", true)
-    if flag.times == 3 and job.area == '华山村' then
+    if flag.times == 3 and dest.area == '华山村' then
         return go(wudangFindAct, '华山村', '菜地')
     end
-    if flag.times == 2 and dest.area == '襄阳城' and dest.room ==
+    if flag.times == 3 and dest.area == '襄阳城' and dest.room ==
         '山间空地' then
         return go(wudangFindAct, '襄阳郊外', '瀑布')
     end
@@ -147,9 +151,7 @@ function wudangFindAgain()
         (dest.room == "紫杉林" or string.find(dest.room, "字门")) then
         return go(wudangFindAct, '明教', '练武场')
     end
-    if flag.times == 3 and job.area == '扬州城' and
-        (job.room == '南门' or job.room == '南大街' or job.room ==
-            '长江北岸') then
+    if flag.times == 3 and job.area == '扬州城' and job.room == '南门' then
         return go(wudangFindAct, '扬州城', '长江南岸')
     end
     if flag.times == 3 and job.area == '兰州城' and job.room == '西城门' then
@@ -170,16 +172,16 @@ function wudangFindAgain()
 end
 function wudangFindFail()
     EnableTriggerGroup("wudangFight", false)
-    return check_busy(wdFindFail)
+    return go(wudangFangqi, "武当山", "三清殿")
 end
 faintFunc = faintFunc or {}
 faintFunc["wudang"] = "wudangFindAgain"
 function wudangFaint() return wudangFindFail() end
-function wdFindFail()
-    locate_finish = 0
-    fastLocate()
-    go(wudangFangqi, "武当山", "三清殿")
-end
+-- function wdFindFail()
+--     locate_finish = 0
+--     fastLocate()
+--     go(wudangFangqi, "武当山", "三清殿")
+-- end
 function wudanglevel(n, l, w)
     job.level = w[2]
     -- messageShow('WD job level:【'..job.level..'】')
@@ -198,6 +200,7 @@ function wudangNobody()
 end
 job.list["wudang"] = "武当杀恶贼"
 function wudang()
+    if hp.shen < 0 then return turnShen('+') end
     wudangTrigger()
     job.level = nil
     job.lost = 0
@@ -344,14 +347,6 @@ function wudangConsider(n, l, w)
     if string.find(job.where, "苏州城闺房") and not Bag["铜钥匙"] then
         job.where = "苏州城翰林府院"
     end
-    if string.find(job.where, '地下黑拳市') or
-        string.find(job.where, '武当后山院门') or
-        string.find(job.where, '武当山后山小院') or
-        string.find(job.where, '绝情谷石窟') then
-        messageShow('武当任务②：任务地点【' .. job.where ..
-                        '】不可到达，任务放弃。')
-        return check_halt(wudangFindFail)
-    end
     if (string.find(job.where, "瘦西湖酒馆") or
         string.find(job.where, "瘦西湖雅楼") or
         string.find(job.where, "珠宝店")) then
@@ -381,6 +376,7 @@ function wudangFindGo()
     dest.area = job.area
     job.wdtime = os.time() + 8 * 60
     exe('set no_kill_ap')
+    pfmjineng()
     setLocateRoomID = 'wudang/sanqing'
     if not job.room or not path_cal() or
         string.find(job.where, '绝情谷石窟') then
@@ -414,8 +410,6 @@ function wudangHuajing_GoAgain()
     return check_busy(wudangFind)
 end
 function wudangFangqiGo()
-    locate_finish = 0
-    fastLocate()
     DeleteTimer("wudang")
     messageShow('被武当任务NPC打晕了，任务放弃！')
     geta()
@@ -424,23 +418,26 @@ end
 function wudangFangqi()
     wdtongji_fangqi = wdtongji_fangqi + 1
     exe('unset no_kill_ap')
-    locate_finish = 0
-    fastLocate()
     dis_all()
     kezhiwugongclose()
     flag.idle = nil
     job.level = nil
     job.lost = 0
     nobusy = 0
-    EnableTriggerGroup("wudangAccept", false)
+    EnableTriggerGroup("wudangAccept", true)
     check_bei(wudangFangqiAsk)
 end
 function wudangFangqiAsk()
     EnableTriggerGroup("wudangAsk", true)
     exe('ask song yuanqiao about 放弃')
     setLocateRoomID = 'wudang/sanqing'
+    DeleteTimer("walkWait4")
+    create_timer_s('walkWait4', 1.0, 'wudangFangqiAsk1')
 end
-
+function wudangFangqiAsk1()
+    exe('ask song yuanqiao about 放弃')
+    exe('unset no_kill_ap')
+end
 function wudangFind()
     wdgostart = 1
     DeleteTriggerGroup("wudangFind")
@@ -464,7 +461,7 @@ function wudangFind()
     -- exe('kezhiwugongpfm')
     if score.id == 'kkfromch' then exe('set 兰花手 蝶舞式') end
     exe('unset wimpy;set wimpycmd pfmpfm\\hp')
-    -- if string.find(job.where, '蝴蝶谷') then return hudiegu() end
+    if string.find(job.where, '蝴蝶谷') then return hudiegu() end
     go(wudangFindAct, job.area, job.room)
 end
 function wudangdebugFind()
@@ -521,9 +518,9 @@ function wudangFindKill()
     EnableTriggerGroup("wudangdebug", true)
     EnableTrigger("wudangFind1", true)
     exe('look')
-    -- create_timer_s('walkWaitX', 1.0, 'wd_look_again')
+    create_timer_s('walkWaitX', 1.0, 'wd_look_again')
 end
--- function wd_look_again() exe('look') end
+function wd_look_again() exe('look') end
 function wudangTarget(n, l, w)
     EnableTriggerGroup("wudangFind", false)
     dis_all()
@@ -533,21 +530,21 @@ function wudangTarget(n, l, w)
     EnableTrigger("hpheqi1", true)
     job.id = string.lower(w[1])
     job.killer[job.target] = job.id
+    SetSpeedWalkDelay(math.floor(1000 / 30))
+    DiscardQueue()
     exe('follow ' .. job.id)
-    exe('unset no_kill_ap')
     wudangKillAct()
     create_timer_s('wudang', 5, 'wudangMove')
 end
 function wudangMove()
     if job.id then
+        exe('follow ' .. job.id)
         exe('kick ' .. job.id)
         exe('kill ' .. job.id)
     end
 end
 function wudangLost(n, l, w)
     wdgostart = 0
-    locate_finish = 0
-    fastLocate()
     job.lost = job.lost + 1
     if job.lost > 3 then
         job.lost = 0
@@ -578,6 +575,7 @@ function wudangKillAct()
     fight.time.b = os.time()
     flag.robber = true
     exe('set wimpy 100;yield no')
+    exe('unset no_kill_ap')
     exe('kill ' .. job.id)
     exe('set wimpycmd pfmpfm\\hp')
     -- exe('set wimpycmd pppp1\\hp')
@@ -654,8 +652,8 @@ function wudangBackGet()
     wudangCk = 0
     flag.wipe = 0
     dis_all()
-    weapon_unwield()
-    bqcheck()
+    -- weapon_unwield()
+    -- bqcheck()
     EnableTriggerGroup("wudangFinish", true)
     -- return go(wudangFinishWait,'武当山','三清殿')
     EnableTrigger("bags6", true) -- 启动检查失落信笺触发器。

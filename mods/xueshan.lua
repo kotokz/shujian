@@ -539,7 +539,6 @@ function xueshan_find()
     -- exe('jifa all;unset wimpy;set wimpycmd pfmpfm\\hp')
     exe('kezhiwugongpfm;set wimpy 100;set wimpycmd pfmpfm\\hp;yield no')
     exe('set no_kill_ap')
-    if score.id == 'kkfromch' then exe('set ¿ºª® ÷ µ˚ŒË Ω') end
     check_halt(xueshan_find_go)
 end
 function xueshan_find_go()
@@ -573,6 +572,8 @@ function xueshan_add(n, l, w)
     EnableTimer('walkWait4', false)
     DeleteTimer("walkWait4")
     if w[1] == score.name then
+        SetSpeedWalkDelay(math.floor(1000 / 30))
+        DiscardQueue()
         exe('follow beauty ' .. job.cnt)
         DeleteTimer("walkWait4")
         create_timer_s('walkWait4', 1.0, 'xueshan_add1')

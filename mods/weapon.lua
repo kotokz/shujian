@@ -224,17 +224,25 @@ weaponUnWalk = function()
 end
 weaponWieldCut = function()
     weapon_unwield()
+    local found = false
     local first = weapon.first
     if first and Bag[first] and Bag[first].kind and weaponKind[Bag[first].kind] and
         weaponKind[Bag[first].kind] == "cut" then
+        found = true
         exe('wield ' .. Bag[first].fullid)
     else
         for p in pairs(Bag) do
             if Bag[p].kind and weaponKind[Bag[p].kind] and
                 weaponKind[Bag[p].kind] == "cut" then
+                found = true
                 exe('wield ' .. Bag[p].fullid)
             end
         end
+    end
+    if not found then
+        local weapon = GetVariable("myweapon")
+        print("°ü¹ü¿ÕµÄ£¿£¿")
+        if weapon then exe('wield ' .. weapon) end
     end
     checkWield()
 end

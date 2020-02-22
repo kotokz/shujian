@@ -2782,7 +2782,7 @@ function xuezhuFight()
     wait.make(function()
         wait.time(3)
         weapon_unwield()
-        exe('unset wimpy;wield mu jian;jiali 100;hit xue zhu')
+        exe('unset wimpy;jiali 100;hit xue zhu')
     end)
 end
 function getxuezhu() exe('get xue zhu') end

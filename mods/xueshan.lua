@@ -572,7 +572,7 @@ function xueshan_add(n, l, w)
     EnableTimer('walkWait4', false)
     DeleteTimer("walkWait4")
     if w[1] == score.name then
-        SetSpeedWalkDelay(math.floor(1000 / 30))
+        -- SetSpeedWalkDelay(math.floor(1000 / 30))
         DiscardQueue()
         exe('follow beauty ' .. job.cnt)
         DeleteTimer("walkWait4")

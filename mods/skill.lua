@@ -758,7 +758,7 @@ function dazuo_lianxi_auto()
 
     local noneed = GetVariable('noneedlian') or ""
     for p in pairs(skills) do
-        if not noneed:find(p) and skillEnable[p] and (skills[p].lvl < hp.pot_max - 100 or
+        if noneed:find(p,1,true) == nil and skillEnable[p] and (skills[p].lvl < hp.pot_max - 100 or
             (skills[p].lvl == hp.pot_max - 100 and  skills[p].pot < (skills[p].lvl ^ 2))) then
             if skillEnable[p] == "force" then
                 tmp_lxskill = tmp_lxskill .. 'lian force ' .. lianxi_times ..

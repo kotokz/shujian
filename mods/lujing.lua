@@ -86,8 +86,12 @@ function exe(cmd)
 end
 
 -- max_cmd_limit=30
-cmd_throttling = false
-walkecho = true
+CMD = {
+    cmd_throttling = false,
+    walkecho = true
+}
+-- cmd_throttling = false
+-- walkecho = true
 SetSpeedWalkDelay(0)
 -- SetSpeedWalkDelay(math.floor(1000/cmd_limit))
 function run(str)
@@ -98,11 +102,11 @@ function run(str)
         _cmds = utils.split(str, ';')
         for i, cmd in pairs(_cmds) do
             add_cmd_to_queue(cmd)
-            if walkecho == true then Note(cmd) end
+            if CMD.walkecho == true then Note(cmd) end
         end
     else
         add_cmd_to_queue(str)
-        if walkecho == true then Note(str) end
+        if CMD.walkecho == true then Note(str) end
     end
 end
 
@@ -121,9 +125,11 @@ function tablelength(T)
 end
 
 function resumeSpeedWalk()
-    cmd_throttling = false
+    CMD.cmd_throttling = false
     print("full speed")
     SetSpeedWalkDelay(0)
+    EnableTimer('SpeekWalkResume', false)
+    DeleteTimer("SpeekWalkResume")
 end
 
 function moving_sum()
@@ -135,16 +141,18 @@ function moving_sum()
         for k, v in pairs(t_cmds) do
             if k > time - 3 then sum = sum + v end
         end
-        if sum >= 75 and not cmd_throttling then
+        if sum >= 110 and not CMD.cmd_throttling and not tmp.lingwustart then
             print("start throttling")
-            cmd_throttling = true
+            CMD.cmd_throttling = true
             SetSpeedWalkDelay(1)
-            create_timer_st("SpeekWalkResume", 1, "resumeSpeedWalk")
-        elseif cmd_throttling and sum < 60 and
-            (tmp.lingwustart == nil or tmp.lingwustart == false) then
+            create_timer_s("SpeekWalkResume", 1, "resumeSpeedWalk")
+        -- elseif cmd_throttling and sum < 60 and
+        --     (tmp.lingwustart == nil or tmp.lingwustart == false) then
             -- print("full speed")
             -- cmd_throttling = false
             -- SetSpeedWalkDelay(0)
+        -- elseif sum > 80 then
+            -- print("cmd reaching limit:"..sum .. " throttle state:"..(CMD.cmd_throttling and 'true' or 'false'))
         end
         if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
     end
@@ -2972,7 +2980,7 @@ end
 
 function boatInLian()
     if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian') end
-    exe('hp;cha')
+    exe('hp')
 end
 function CboatWait()
     DeleteTimer('boat')
@@ -3380,10 +3388,10 @@ function toSldCheck()
 end
 function toSldHua()
     print("toSldHua")
-    weapon_unwield()
-    exe('hua mufa')
+    -- weapon_unwield()
     if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian') end
-    exe('cha;hp')
+    exe('hp')
+    exe('hua mufa')
     wait.make(function()
         wait.time(3)
         return toSldDukou()

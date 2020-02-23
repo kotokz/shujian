@@ -1,22 +1,22 @@
------------è‡ªåŠ¨æŠ“é›ªè››byæ¡ƒèŠ±å²›æ— æ³•é£2019.3.16----------
+-----------×Ô¶¯×¥Ñ©ÖëbyÌÒ»¨µºÎŞ·¨·ç2019.3.16----------
 function check_xuezhu_status()
     local xuezhu_status = GetVariable("xuezhu_status")
     if xuezhu_status == nil then
         messageShow(
-            'æœªæ‰¾åˆ°é›ªè››å˜é‡ï¼šxuezhu_statusï¼Œè¯·å°½å¿«è®¾ç½®ï¼',
+            'Î´ÕÒµ½Ñ©Öë±äÁ¿£ºxuezhu_status£¬Çë¾¡¿ìÉèÖÃ£¡',
             'white', 'black')
     elseif xuezhu_status == "0" then
         messageShow(
-            'æœ¬å‘¨è¿˜æœªæŠ“åˆ°é›ªè››ï¼Œå¯åŠ¨è‡ªåŠ¨æŠ“é›ªè››æœºå™¨äººï¼Œå‰å¾€æŠ“é›ªè››ï¼',
+            '±¾ÖÜ»¹Î´×¥µ½Ñ©Öë£¬Æô¶¯×Ô¶¯×¥Ñ©Öë»úÆ÷ÈË£¬Ç°Íù×¥Ñ©Öë£¡',
             'white', 'black')
         return xuezhu_status
     elseif xuezhu_status == "1" then
-        messageShow('å·²é—®ç¨‹çµç´ è¦äº†çœŸä¸¹ï¼Œç°åœ¨å‰å¾€æŠ“é›ªè››ï¼',
+        messageShow('ÒÑÎÊ³ÌÁéËØÒªÁËÕæµ¤£¬ÏÖÔÚÇ°Íù×¥Ñ©Öë£¡',
                     'white', 'black')
         return xuezhu_status
     elseif xuezhu_status == "-1" then
         messageShow(
-            'ç¨‹çµç´ ç»™äº†å‡ä¸¹ï¼Œå°è´±äººï¼æ€’ï¼ï¼ï¼ç°åœ¨å‰å¾€æŠ“é›ªè››ï¼',
+            '³ÌÁéËØ¸øÁË¼Ùµ¤£¬Ğ¡¼úÈË£¡Å­£¡£¡£¡ÏÖÔÚÇ°Íù×¥Ñ©Öë£¡',
             'white', 'black')
         return xuezhu_status
     end
@@ -24,24 +24,24 @@ end
 function xuezhuTrigger()
     DeleteTriggerGroup("xuezhuAsk")
     create_trigger_t('xuezhuAsk1',
-                     "^(> )*ä½ å‘ç¨‹çµç´ æ‰“å¬æœ‰å…³ã€äº”æ¯’æ•™ã€çš„æ¶ˆæ¯",
+                     "^(> )*ÄãÏò³ÌÁéËØ´òÌıÓĞ¹Ø¡ºÎå¶¾½Ì¡»µÄÏûÏ¢",
                      '', 'xuezhuAsk')
-    create_trigger_t('xuezhuAsk2', "^(> )*è¿™é‡Œæ²¡æœ‰è¿™ä¸ªäººã€‚$", '',
+    create_trigger_t('xuezhuAsk2', "^(> )*ÕâÀïÃ»ÓĞÕâ¸öÈË¡£$", '',
                      'xuezhuNobody')
     SetTriggerOption("xuezhuAsk1", "group", "xuezhuAsk")
     SetTriggerOption("xuezhuAsk2", "group", "xuezhuAsk")
     EnableTriggerGroup("xuezhuAsk", false)
     DeleteTriggerGroup("xuezhuAccept")
     create_trigger_t('xuezhuAccept1',
-                     "^(> )*ç¨‹çµç´ è¯´é“ï¼šã€Œäº”æ¯’æ•™çš„ç¦åœ°ç§æ»¡äº†å„ç§å¥‡èŠ±å¼‚è‰ï¼Œå…¶ä¸­å¤§éƒ¨åˆ†å…·æœ‰å·¨æ¯’\\D*",
+                     "^(> )*³ÌÁéËØËµµÀ£º¡¸Îå¶¾½ÌµÄ½ûµØÖÖÂúÁË¸÷ÖÖÆæ»¨Òì²İ£¬ÆäÖĞ´ó²¿·Ö¾ßÓĞ¾Ş¶¾\\D*",
                      '', 'xuezhuAccept')
     create_trigger_t('xuezhuAccept2',
-                     "^(> )*ä½ è·å¾—ä¸€é¢—ä¹é›ªç¢§äº‘ä¸¹ã€‚$", '', 'eatDan')
+                     "^(> )*Äã»ñµÃÒ»¿Å¾ÅÑ©±ÌÔÆµ¤¡£$", '', 'eatDan')
     create_trigger_t('xuezhuAccept3',
-                     "^(> )*ä½ æŠŠä¸€é¢—ä¹é›ªç¢§äº‘ä¸¹ï¼Œè½»è½»å’¬ç¢å«è¿›å˜´é‡Œï¼Œé¡¿è§‰ç¥æ˜æ„æœ—ï¼Œè„¸è‰²çº¢æ¶¦ã€‚$",
+                     "^(> )*Äã°ÑÒ»¿Å¾ÅÑ©±ÌÔÆµ¤£¬ÇáÇáÒ§Ëéº¬½ø×ìÀï£¬¶Ù¾õÉñÃ÷ÒâÀÊ£¬Á³É«ºìÈó¡£$",
                      '', 'xuezhu_go')
     create_trigger_t('xuezhuAccept4',
-                     "^(> )*ç¨‹çµç´ è¯´é“ï¼šã€Œä½ ä¸Šæ¬¡ç­”åº”æˆ‘çš„äº‹æƒ…è¿˜æ²¡åš\\D*",
+                     "^(> )*³ÌÁéËØËµµÀ£º¡¸ÄãÉÏ´Î´ğÓ¦ÎÒµÄÊÂÇé»¹Ã»×ö\\D*",
                      '', 'fakeDan')
     SetTriggerOption("xuezhuAccept1", "group", "xuezhuAccept")
     SetTriggerOption("xuezhuAccept2", "group", "xuezhuAccept")
@@ -50,24 +50,24 @@ function xuezhuTrigger()
     EnableTriggerGroup("xuezhuAccept", false)
     DeleteTriggerGroup("xuezhuFight")
     create_trigger_t('xuezhuFight1',
-                     '^(> )*ä½ æ™ƒåŠ¨äº†åŠå¤©ï¼Œå‘ç°ä»€éº½ä¹Ÿæ²¡æœ‰ã€‚', '',
+                     '^(> )*Äã»Î¶¯ÁË°ëÌì£¬·¢ÏÖÊ²÷áÒ²Ã»ÓĞ¡£', '',
                      'xuezhuFail')
     create_trigger_t('xuezhuFight2',
-                     '^(> )*ä½ è½»è½»æ‘‡æ™ƒæ ‘è—¤ï¼Œå¿½ç„¶æ‰ä¸‹ä¸€åªé›ªè››ã€‚',
+                     '^(> )*ÄãÇáÇáÒ¡»ÎÊ÷ÌÙ£¬ºöÈ»µôÏÂÒ»Ö»Ñ©Öë¡£',
                      '', 'xuezhuFight')
     create_trigger_t('xuezhuFight3',
-                     "^(> )*é›ªè››ç¥å¿—è¿·ç³Šï¼Œè„šä¸‹ä¸€ä¸ªä¸ç¨³ï¼Œå€’åœ¨åœ°ä¸Šæ˜äº†è¿‡å»ã€‚",
+                     "^(> )*Ñ©ÖëÉñÖ¾ÃÔºı£¬½ÅÏÂÒ»¸ö²»ÎÈ£¬µ¹ÔÚµØÉÏ»èÁË¹ıÈ¥¡£",
                      '', 'getxuezhu')
     create_trigger_t('xuezhuFight4',
-                     "^(> )*ä½ å°†é›ªè››æ‰¶äº†èµ·æ¥èƒŒåœ¨èƒŒä¸Šã€‚", '',
+                     "^(> )*Äã½«Ñ©Öë·öÁËÆğÀ´±³ÔÚ±³ÉÏ¡£", '',
                      'givecheng')
     create_trigger_t('xuezhuFight5',
-                     "^(> )*é›ªè››ã€Œå•ªã€çš„ä¸€å£°å€’åœ¨åœ°ä¸Šï¼ŒæŒ£æ‰ç€æŠ½åŠ¨äº†å‡ ä¸‹å°±æ­»äº†ã€‚",
+                     "^(> )*Ñ©Öë¡¸Å¾¡¹µÄÒ»Éùµ¹ÔÚµØÉÏ£¬ÕõÔú×Å³é¶¯ÁË¼¸ÏÂ¾ÍËÀÁË¡£",
                      '', 'xuezhuFail')
     create_trigger_t('xuezhuFight6',
-                     "^(> )*(ä½ é™„è¿‘æ²¡æœ‰è¿™æ ·ä¸œè¥¿ã€‚|é›ªè››çªç„¶è¹¿åˆ°åœ°ä¸Šä¸è§äº†ã€‚)",
+                     "^(> )*(Äã¸½½üÃ»ÓĞÕâÑù¶«Î÷¡£|Ñ©ÖëÍ»È»´Úµ½µØÉÏ²»¼ûÁË¡£)",
                      '', 'xuezhuFail')
-    -- create_trigger_t('xuezhuFight6',"^(> )*é›ªè››çªç„¶è¹¿åˆ°åœ°ä¸Šä¸è§äº†ã€‚",'','xuezhuFail')
+    -- create_trigger_t('xuezhuFight6',"^(> )*Ñ©ÖëÍ»È»´Úµ½µØÉÏ²»¼ûÁË¡£",'','xuezhuFail')
     SetTriggerOption("xuezhuFight1", "group", "xuezhuFight")
     SetTriggerOption("xuezhuFight2", "group", "xuezhuFight")
     SetTriggerOption("xuezhuFight3", "group", "xuezhuFight")
@@ -77,7 +77,7 @@ function xuezhuTrigger()
     EnableTriggerGroup("xuezhuFight", false)
     DeleteTriggerGroup("xuezhuFinish")
     create_trigger_t('xuezhuFinish1',
-                     '^(> )*ç¨‹çµç´ è¯´é“ï¼šã€Œä½ æœç„¶è¨€è€Œæœ‰ä¿¡ï¼Œä¸‹æ¬¡ä½ è¦å†å»äº”æ¯’æ•™æ¥æ‰¾æˆ‘å§ã€‚ã€',
+                     '^(> )*³ÌÁéËØËµµÀ£º¡¸Äã¹ûÈ»ÑÔ¶øÓĞĞÅ£¬ÏÂ´ÎÄãÒªÔÙÈ¥Îå¶¾½ÌÀ´ÕÒÎÒ°É¡£¡¹',
                      '', 'xuezhuFinish')
     SetTriggerOption("xuezhuFinish1", "group", "xuezhuFinish")
     EnableTriggerGroup("xuezhuFinish", false)
@@ -92,12 +92,12 @@ end
 function getxuezhu0()
     xuezhuTrigger()
     if inwdj == 0 then
-        messageShow('æŠ“é›ªè››ï¼šè‹—ç–†åœ°å›¾ä¸å¯åˆ°è¾¾ï¼Œä»»åŠ¡æ”¾å¼ƒã€‚',
+        messageShow('×¥Ñ©Öë£ºÃç½®µØÍ¼²»¿Éµ½´ï£¬ÈÎÎñ·ÅÆú¡£',
                     "Plum")
         SetVariable("xuezhu_status", "2")
         return check_halt(checkPrepare)
     end
-    go(askcheng, 'è‹—ç–†', 'è¯ç‹å±…')
+    go(askcheng, 'Ãç½®', 'Ò©Íõ¾Ó')
 end
 function getxuezhu1()
     xuezhuTrigger()
@@ -106,10 +106,10 @@ end
 function askcheng()
     EnableTriggerGroup("xuezhuAsk", true)
     EnableTriggerGroup("xuezhuAccept", true)
-    exe('ask cheng about äº”æ¯’æ•™')
+    exe('ask cheng about Îå¶¾½Ì')
     create_timer_s('walkWait4', 3.0, 'askcheng1')
 end
-function askcheng1() exe('ask cheng about äº”æ¯’æ•™') end
+function askcheng1() exe('ask cheng about Îå¶¾½Ì') end
 function xuezhuAsk()
     EnableTimer('walkWait4', false)
     DeleteTimer("walkWait4")
@@ -140,21 +140,21 @@ end
 function xuezhu_go()
     EnableTimer('walkWait4', false)
     DeleteTimer("walkWait4")
-    if not Bag["ç«æŠ˜"] and drugPrepare["ç«æŠ˜"] then
-        if locl.weekday == 'å››' and locl.hour == 8 then
+    if not Bag["»ğÕÛ"] and drugPrepare["»ğÕÛ"] then
+        if locl.weekday == 'ËÄ' and locl.hour == 8 then
             return checkPrepareOver()
         else
             return checkFire()
         end
     end
     if inwdj == 0 then
-        messageShow('æŠ“é›ªè››ï¼šè‹—ç–†å±±æ´ä¸å¯åˆ°è¾¾ï¼Œä»»åŠ¡æ”¾å¼ƒã€‚',
+        messageShow('×¥Ñ©Öë£ºÃç½®É½¶´²»¿Éµ½´ï£¬ÈÎÎñ·ÅÆú¡£',
                     "Plum")
         SetVariable("xuezhu_status", "2")
         return check_halt(checkPrepare)
     end
     EnableTriggerGroup("xuezhuAccept", false)
-    go(yaoshuteng, 'è‹—ç–†', 'å±±æ´')
+    go(yaoshuteng, 'Ãç½®', 'É½¶´')
 end
 function yaoshuteng()
     EnableTriggerGroup("xuezhuFight", true)
@@ -164,18 +164,18 @@ end
 function yaoshuteng1() exe('fang dfly;dian fire;yao shuteng') end
 function xuezhuFail()
     xuezhuTriDel()
-    messageShow('é›ªè››ä¸åœ¨ï¼Œä¸€ä¼šå†æ¥æŠ“ï¼', 'white', 'black')
+    messageShow('Ñ©Öë²»ÔÚ£¬Ò»»áÔÙÀ´×¥£¡', 'white', 'black')
     return checkPrepareOver()
 end
 --[[function xuezhuFail1()
 	xuezhuTriDel()
-	messageShow('é›ªè››è¢«ä½ æ‰“æ­»äº†ï¼Œè¯·æŸ¥çœ‹logï¼','white','black')
+	messageShow('Ñ©Öë±»Äã´òËÀÁË£¬Çë²é¿´log£¡','white','black')
 	scrLog()
 	return checkPrepareOver()
 end
 function xuezhuFail2()
 	xuezhuTriDel()
-	messageShow('é›ªè››è‡ªå·±è·‘äº†æˆ–è¢«äººæŠ“èµ°äº†ï¼Œè¯·æŸ¥çœ‹logï¼','white','black')
+	messageShow('Ñ©Öë×Ô¼ºÅÜÁË»ò±»ÈË×¥×ßÁË£¬Çë²é¿´log£¡','white','black')
 	scrLog()
 	return checkPrepareOver()
 end]]
@@ -191,7 +191,7 @@ end
 function getxuezhu() exe('get xue zhu') end
 function givecheng()
     EnableTriggerGroup("xuezhuFinish", true)
-    go(givexuezhu, 'è‹—ç–†', 'è¯ç‹å±…')
+    go(givexuezhu, 'Ãç½®', 'Ò©Íõ¾Ó')
 end
 function givexuezhu()
     exe('give cheng xue zhu')
@@ -203,13 +203,13 @@ function xuezhuFinish()
     if x == '-1' then SetVariable("xuezhu_status", "0") end
     if x == '1' then
         SetVariable("xuezhu_status", "2")
-        messageShow('æœ¬å‘¨å·²æˆåŠŸæŠ“åˆ°é›ªè››ï¼Œè¯·å®‰å¿ƒæ¸¸æˆï¼ï¼š)',
+        messageShow('±¾ÖÜÒÑ³É¹¦×¥µ½Ñ©Öë£¬Çë°²ĞÄÓÎÏ·£¡£º)',
                     'red', 'black')
     end
     xuezhuTriDel()
     return checkPrepareOver()
 end
------------è‡ªåŠ¨æŠ“é›ªè››byæ¡ƒèŠ±å²›æ— æ³•é£2019.3.16----------
+-----------×Ô¶¯×¥Ñ©ÖëbyÌÒ»¨µºÎŞ·¨·ç2019.3.16----------
 function reboot_before_cun()
     flag.cun = true
     wait.make(function()

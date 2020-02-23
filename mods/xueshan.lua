@@ -595,7 +595,9 @@ function xueshan_goon()
         print("run " .. XsBugRoom[locl.area .. locl.room])
         return _G[XsBugRoom[locl.area .. locl.room]]()
     else
-        return walk_wait()
+        -- 就在附近，原地搜索
+        -- return walk_wait()
+        return find()
     end
 end
 function xueshan_fight()

@@ -193,6 +193,7 @@ function main()
     hpheqi()
     -- ain
     Openfpk()
+    checkBags()
     map.rooms["sld/lgxroom"].ways["#outSld"] = "huanghe/huanghe8"
     exe(
         'down;alias askk ask $*;stand;halt;uweapon;score;cha;hp;jifa all;jiali max;unset no_kill_ap;cond;pfmset')

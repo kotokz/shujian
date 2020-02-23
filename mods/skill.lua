@@ -740,20 +740,6 @@ function pk_cut_corpse2()
     return exe('heng corpse')
 end
 
-function job_lianstart()
-    EnableTimer('walkWait111', false)
-    lian_times = 0
-    wait.make(function()
-        exe('hp;cha')
-        wait.time(1)
-        for i = 1, 15 do
-            if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian') end
-            exe('cha;hp')
-            wait.time(1)
-        end
-    end)
-end
-
 function dazuo_lianxi_auto()
 
     tmp_lxskill = 'bei none;'
@@ -769,10 +755,11 @@ function dazuo_lianxi_auto()
     end
     lianxi_times = GetVariable('mycishu')
     local shenqi_id = GetVariable('myshenqi_id')
+
+    local noneed = GetVariable('noneedlian') or ""
     for p in pairs(skills) do
-        if (skillEnable[p] and skills[p].lvl < hp.pot_max - 100) or
-            (skillEnable[p] and skills[p].lvl == hp.pot_max - 100 and
-                skills[p].pot < (skills[p].lvl + 1) ^ 2) then
+        if not noneed:find(p) and skillEnable[p] and (skills[p].lvl < hp.pot_max - 100 or
+            (skills[p].lvl == hp.pot_max - 100 and  skills[p].pot < (skills[p].lvl ^ 2))) then
             if skillEnable[p] == "force" then
                 tmp_lxskill = tmp_lxskill .. 'lian force ' .. lianxi_times ..
                                   ';'

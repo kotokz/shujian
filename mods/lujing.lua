@@ -1267,7 +1267,7 @@ function searchStart()
             local path, length = map:getPath(road.id, id)
             road.id = id
             if type(path) == "string" then
-                print("第" .. i .. "区域:" .. path)
+                -- print("第" .. i .. "区域:" .. path)
                 walk_hook_thread = coroutine.running()
                 if string.find(path, '#') or job.name ~= 'huashan' then
                     road.pathset = road.pathset or {}
@@ -2939,7 +2939,7 @@ function Outsldsk()
 end
 ------------------------------------------
 function boatYell()
-    exe("yell boat;;enter")
+    exe("yell boat;enter")
     locate()
     tmp.cnt = 0
     DeleteTimer('boat')
@@ -2963,9 +2963,16 @@ function boatInCheck()
     end
 end
 function boatWait()
+    print("进入船里")
     DeleteTimer('boat')
+    create_timer_s('boatLian', 2, 'boatInLian')
     boatOutTrigger()
     create_timer_s('boat', 20, 'boatCheck')
+end
+
+function boatInLian()
+    if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian') end
+    exe('hp;cha')
 end
 function CboatWait()
     DeleteTimer('boat')
@@ -3015,6 +3022,8 @@ end
 function boatOut()
     EnableTimer('boat', false)
     DeleteTimer('boat')
+    EnableTimer('boatLian', false)
+    DeleteTimer('boatLian')
     exe("out")
     walk_wait()
 end

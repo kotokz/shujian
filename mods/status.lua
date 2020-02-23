@@ -539,9 +539,6 @@ function hp_trigger()
                      '', 'dolost_hitlog_open')
     create_trigger_t('hp30', '^.*据说' .. score.name .. '被.*打傻了!', '',
                      'dolost_hitlog_close')
-    create_trigger_t('hp31',
-                     "^\\D*你把钱交给船家，船家领你上了一条小舟",
-                     '', 'job_lianstart')
     create_trigger_t('hp33', "^(> )*\\D*告诉你：长江渡船出发时间",
                      '', 'check_cjdk')
     create_trigger_t('hp34',
@@ -600,7 +597,6 @@ function hp_trigger()
     SetTriggerOption("hp28", "group", "hp")
     SetTriggerOption("hp29", "group", "hp")
     SetTriggerOption("hp30", "group", "hp")
-    SetTriggerOption("hp31", "group", "hp")
     -- SetTriggerOption("hp32", "group", "hp")
     SetTriggerOption("hp33", "group", "hp")
     SetTriggerOption("hp34", "group", "hp")

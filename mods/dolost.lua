@@ -99,6 +99,26 @@ function lostp_get(n, l, w)
     -- messageShow('失落的信笺任务：开始前往【'..ll_place..'】寻找玩家！')
     DoAfterSpecial(0.2, 'llgo', 10)
 end
+
+---------------------测试goto----------------
+function gogo(where)
+    local l_dest = {}
+    sour.id = nil
+    dest.id = nil
+    tmp.go_to = true
+    where = Trim(where)
+
+    l_dest.area, l_dest.room = locateroom(where)
+
+    if l_dest.area then
+        return go(test, l_dest.area, l_dest.room)
+    else
+        return ColourNote("red", "blue",
+                          "找不到或无法到达此(地点|人物)：" ..
+                              where)
+    end
+
+end
 function lost_goto()
     create_timer_s('walkWait4', 10.0, 'sx_look')
     if ll_place == nil then return Note('空地方你让我去个P!') end

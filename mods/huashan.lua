@@ -581,7 +581,7 @@ huashan_cut = function()
                          '】,华山2共计【' .. hstongji_2 ..
                          '】次.平均用时【' .. hstongji_pingjun ..
                          '】秒', 'aqua')
-        return check_halt(huashan_cut_act)
+        -- return check_halt(huashan_cut_act)
     else
         -- 开始统计次数
         hstongjilasttime_l_2 = hstongji_thistime
@@ -594,7 +594,7 @@ huashan_cut = function()
                          '】,华山1共计【' .. hstongji_1 ..
                          '】次.平均用时【' .. hstongji_pingjun ..
                          '】秒', 'aqua')
-        return check_halt(huashan_cut_act)
+        -- return check_halt(huashan_cut_act)
     end
     -- return check_halt(huashan_cut_act)
     tmp.cnt = 0

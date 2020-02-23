@@ -1,52 +1,52 @@
--- åˆ›å»ºä¸€ä¸ªæ™®é€šåˆ«å
+-- ´´½¨Ò»¸öÆÕÍ¨±ğÃû
 function create_alias(a_name, a_match, a_response)
     return AddAlias(a_name, a_match, a_response, alias_flag.Enabled +
                         alias_flag.Replace + alias_flag.RegularExpression, '')
 end
--- åˆ›å»ºä¸€ä¸ªè„šæœ¬åˆ«å
+-- ´´½¨Ò»¸ö½Å±¾±ğÃû
 function create_alias_s(a_name, a_match, a_function)
     return AddAlias(a_name, a_match, '',
                     alias_flag.Enabled + alias_flag.Replace, a_function)
 end
--- åˆ›å»ºä¸€ä¸ªåˆ†å®šæ—¶å™¨
+-- ´´½¨Ò»¸ö·Ö¶¨Ê±Æ÷
 function create_timer_m(t_name, t_min, t_function)
     return AddTimer(t_name, 0, t_min, 0, '', timer_flag.Enabled +
                         timer_flag.ActiveWhenClosed + timer_flag.Replace,
                     t_function)
 end
--- åˆ›å»ºä¸€ä¸ªç§’å®šæ—¶å™¨
+-- ´´½¨Ò»¸öÃë¶¨Ê±Æ÷
 function create_timer_s(t_name, t_second, t_function)
     return AddTimer(t_name, 0, 0, t_second, '', timer_flag.Enabled +
                         timer_flag.ActiveWhenClosed + timer_flag.Replace,
                     t_function)
 end
--- åˆ›å»ºä¸€ä¸ªä¸€æ¬¡æ€§ç§’å®šæ—¶å™¨
+-- ´´½¨Ò»¸öÒ»´ÎĞÔÃë¶¨Ê±Æ÷
 function create_timer_st(t_name, t_second, t_function)
     return AddTimer(t_name, 0, 0, t_second, '',
                     timer_flag.Enabled + timer_flag.ActiveWhenClosed +
                         timer_flag.Replace + timer_flag.OneShot, t_function)
 end
--- åˆ›å»ºä¸€ä¸ªè§¦å‘å™¨ 
+-- ´´½¨Ò»¸ö´¥·¢Æ÷ 
 function create_trigger_t(t_name, t_match, t_response, t_function)
     return AddTrigger(t_name, t_match, t_response, trigger_flag.Enabled +
                           trigger_flag.RegularExpression + trigger_flag.Replace,
                       -1, 0, "", t_function)
 end
--- åˆ›å»ºä¸€ä¸ªä¸´æ—¶çš„è§¦å‘å™¨ 
+-- ´´½¨Ò»¸öÁÙÊ±µÄ´¥·¢Æ÷ 
 function create_trigger_f(t_name, t_match, t_response, t_function)
     return AddTrigger(t_name, t_match, t_response,
                       trigger_flag.Enabled + trigger_flag.RegularExpression +
                           trigger_flag.Replace + trigger_flag.Temporary, -1, 0,
                       "", t_function)
 end
--- åˆ›å»ºä¸€ä¸ªä¸´æ—¶çš„ä¸€æ¬¡æ€§è§¦å‘å™¨ 
+-- ´´½¨Ò»¸öÁÙÊ±µÄÒ»´ÎĞÔ´¥·¢Æ÷ 
 function create_trigger(t_name, t_match, t_response, t_function)
     return AddTrigger(t_name, t_match, t_response,
                       trigger_flag.Enabled + trigger_flag.RegularExpression +
                           trigger_flag.Replace + trigger_flag.Temporary +
                           trigger_flag.OneShot, -1, 0, "", t_function)
 end
--- åˆ›å»ºä¸€ä¸ªexè§¦å‘å™¨ 
+-- ´´½¨Ò»¸öex´¥·¢Æ÷ 
 function create_triggerex_t(t_name, t_match, t_response, t_function)
     return AddTriggerEx(t_name, t_match, t_response, trigger_flag.Enabled +
                             trigger_flag.RegularExpression +
@@ -62,21 +62,21 @@ function create_triggerex_lvl(t_name, t_match, t_response, t_function, lvl)
                             trigger_flag.RegularExpression +
                             trigger_flag.Replace, -1, 0, "", t_function, 12, lvl)
 end
--- åˆ›å»ºä¸€ä¸ªä¸´æ—¶çš„è§¦å‘å™¨ 
+-- ´´½¨Ò»¸öÁÙÊ±µÄ´¥·¢Æ÷ 
 function create_triggerex_f(t_name, t_match, t_response, t_function)
     return AddTriggerEx(t_name, t_match, t_response,
                         trigger_flag.Enabled + trigger_flag.RegularExpression +
                             trigger_flag.Replace + trigger_flag.Temporary, -1,
                         0, "", t_function, 12, 100)
 end
--- åˆ›å»ºä¸€ä¸ªä¸´æ—¶çš„ä¸€æ¬¡æ€§è§¦å‘å™¨ 
+-- ´´½¨Ò»¸öÁÙÊ±µÄÒ»´ÎĞÔ´¥·¢Æ÷ 
 function create_triggerex(t_name, t_match, t_response, t_function)
     return AddTriggerEx(t_name, t_match, t_response,
                         trigger_flag.Enabled + trigger_flag.RegularExpression +
                             trigger_flag.Replace + trigger_flag.Temporary +
                             trigger_flag.OneShot, -1, 0, "", t_function, 12, 100)
 end
--- åˆ›å»ºä¸€ä¸ªä¸´æ—¶çš„ä¸€æ¬¡æ€§å®šæ—¶å™¨
+-- ´´½¨Ò»¸öÁÙÊ±µÄÒ»´ÎĞÔ¶¨Ê±Æ÷
 function create_timer(t_name, t_time, t_com, t_function)
     return AddTimer(t_name, 0, 0, t_time, t_com,
                     timer_flag.Enabled + timer_flag.OneShot +
@@ -102,25 +102,25 @@ end
 function idle_set()
     if job.name == 'ptbx' then return exe('praise ptbx') end
     if job.name == 'songmoya' then
-        print('æ­£åœ¨é¢‚æ‘©å´–ä»»åŠ¡ä¸­ï¼Œå½“å‰æ­»äº¡æ¬¡æ•°ã€' .. smydie ..
-                  'ã€‘æ¬¡ï¼è®¾å®šæ€æ­»æ­¦å£«ç»„æ•°ä¸Šé™ä¸ºã€' .. smyteam ..
-                  'ã€‘ç»„ã€‚è¿›è¡Œç»„æ•°ä¸ºç¬¬ã€' .. yptteam .. 'ã€‘ç»„ã€‚')
+        print('ÕıÔÚËÌÄ¦ÑÂÈÎÎñÖĞ£¬µ±Ç°ËÀÍö´ÎÊı¡¾' .. smydie ..
+                  '¡¿´Î£¡Éè¶¨É±ËÀÎäÊ¿×éÊıÉÏÏŞÎª¡¾' .. smyteam ..
+                  '¡¿×é¡£½øĞĞ×éÊıÎªµÚ¡¾' .. yptteam .. '¡¿×é¡£')
         exe('flatter')
         return
     end
     if job.name == 'husong' then
         exe('aq')
-        print('æ­£åœ¨æŠ¤é€ä»»åŠ¡ä¸­')
+        print('ÕıÔÚ»¤ËÍÈÎÎñÖĞ')
         return
     end
     if job.name == 'refine' then
         exe('admire2')
-        print('æ­£åœ¨æç»ƒçŸ¿çŸ³ä¸­')
+        print('ÕıÔÚÌáÁ·¿óÊ¯ÖĞ')
         return
     end
     if job.name == 'hubiao' then
         exe('admire2')
-        print('æ­£åœ¨æŠ¤é•–ä¸­')
+        print('ÕıÔÚ»¤ïÚÖĞ')
         return
     end
     print(flag.idle)
@@ -131,7 +131,7 @@ function idle_set()
         DeleteTimer("walkWait10")
         DeleteTimer("walkWait9")
         if dest.area == nil then return end
-        if dest.area == 'é“æŒå±±' or dest.area == 'è‹—ç–†' then
+        if dest.area == 'ÌúÕÆÉ½' or dest.area == 'Ãç½®' then
             locate()
             if locl.room ~= job.room then
                 return walk_wait()
@@ -161,14 +161,14 @@ function idle_set()
         end
     end
     if flag.idle < 12 then
-        chats_log("ROBOT å¯èƒ½å·²å‘å‘†" .. flag.idle / 2 .. "åˆ†é’Ÿ!",
+        chats_log("ROBOT ¿ÉÄÜÒÑ·¢´ô" .. flag.idle / 2 .. "·ÖÖÓ!",
                   "deepskyblue")
         return
     end
     scrLog()
     dis_all()
-    chats_locate('å®šä½ç³»ç»Ÿï¼šå‘å‘†6åˆ†é’Ÿåï¼Œäºã€' .. locl.area ..
-                     locl.room .. 'ã€‘é‡æ–°å¯åŠ¨ç³»ç»Ÿï¼', 'red')
+    chats_locate('¶¨Î»ÏµÍ³£º·¢´ô6·ÖÖÓºó£¬ÓÚ¡¾' .. locl.area ..
+                     locl.room .. '¡¿ÖØĞÂÆô¶¯ÏµÍ³£¡', 'red')
     Disconnect()
     Connect()
 end
@@ -180,46 +180,46 @@ function shujian_set()
     local l_tmp
     local t
     l_result = utils.inputbox(
-                   "ä½ è¦å­¦ä¹ çš„SKILLS(æ ¼å¼ï¼šforce|shenyuan-gong|dodge|yanling-shenfa|sword|blade|parry)æ˜¯?",
-                   "xuexiskill", GetVariable("xuexiskill"), "å®‹ä½“", "12")
+                   "ÄãÒªÑ§Ï°µÄSKILLS(¸ñÊ½£ºforce|shenyuan-gong|dodge|yanling-shenfa|sword|blade|parry)ÊÇ?",
+                   "xuexiskill", GetVariable("xuexiskill"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("xuexiskill", l_result)
-        Note("å­¦ä¹ è®¾å®šå®Œæˆ")
+        Note("Ñ§Ï°Éè¶¨Íê³É")
         print(GetVariable("xuexiskill"))
     end
     l_result = utils.inputbox(
-                   "ä½ è¦é¢†æ‚Ÿçš„SKILLS(æ ¼å¼ï¼šforce|dodge|sword|blade|parry)æ˜¯?",
-                   "lingwuskills", GetVariable("lingwuskills"), "å®‹ä½“", "12")
+                   "ÄãÒªÁìÎòµÄSKILLS(¸ñÊ½£ºforce|dodge|sword|blade|parry)ÊÇ?",
+                   "lingwuskills", GetVariable("lingwuskills"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("lingwuskills", l_result)
-        Note("é¢†æ‚Ÿè®¾å®šå®Œæˆ")
+        Note("ÁìÎòÉè¶¨Íê³É")
         print(GetVariable("lingwuskills"))
     end
-    l_result = utils.inputbox("ä½ å­¦ä¹ é¢†æ‚Ÿæ—¶ä½¿ç”¨çš„åŠ æ‚Ÿæ€§æ­¦å™¨æ˜¯?",
+    l_result = utils.inputbox("ÄãÑ§Ï°ÁìÎòÊ±Ê¹ÓÃµÄ¼ÓÎòĞÔÎäÆ÷ÊÇ?",
                               "learnweapon", GetVariable("learnweapon"),
-                              "å®‹ä½“", "12")
+                              "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("learnweapon", l_result) end
     l_result = utils.inputbox(
-                   "ä½ æˆ˜æ–—ååˆ‡æ¢å†…åŠ›æ¢å¤æ­¦å™¨çš„æŒ‡ä»¤æ˜¯ï¼ˆä¾‹å¦‚ï¼šunwield xxx sword;wield xxx bladeï¼‰?",
-                   "recoveryweapon", GetVariable("recoveryweapon"), "å®‹ä½“",
+                   "ÄãÕ½¶·ºóÇĞ»»ÄÚÁ¦»Ö¸´ÎäÆ÷µÄÖ¸ÁîÊÇ£¨ÀıÈç£ºunwield xxx sword;wield xxx blade£©?",
+                   "recoveryweapon", GetVariable("recoveryweapon"), "ËÎÌå",
                    "12")
     if not isNil(l_result) then SetVariable("recoveryweapon", l_result) end
-    l_result = utils.inputbox("ä½ çš„è‹±æ–‡IDæ˜¯?", "ID", GetVariable("id"),
-                              "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÄãµÄÓ¢ÎÄIDÊÇ?", "ID", GetVariable("id"),
+                              "ËÎÌå", "12")
     if l_result ~= nil then
         SetVariable("id", l_result)
     else
         DeleteVariable("id")
     end
-    l_result = utils.inputbox("ä½ çš„å¯†ç æ˜¯?", "Passwd",
-                              GetVariable("passwd"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÄãµÄÃÜÂëÊÇ?", "Passwd",
+                              GetVariable("passwd"), "ËÎÌå", "12")
     if l_result ~= nil then
         SetVariable("passwd", l_result)
     else
         DeleteVariable("passwd")
     end
 
-    l_result = utils.msgbox("æ˜¯å¦æ‰“å¼€è®°å½•çª—å£?", "FlagLog", "yesno",
+    l_result = utils.msgbox("ÊÇ·ñ´ò¿ª¼ÇÂ¼´°¿Ú?", "FlagLog", "yesno",
                             "?", 1)
     if l_result and l_result == "yes" then
         flag.log = "yes"
@@ -228,7 +228,7 @@ function shujian_set()
     end
     SetVariable("flaglog", flag.log)
 
-    l_result = utils.msgbox("æ˜¯å¦è‡ªåŠ¨å­¦ä¹ åŠé¢†æ‚Ÿ", "XuexiLingwu",
+    l_result = utils.msgbox("ÊÇ·ñ×Ô¶¯Ñ§Ï°¼°ÁìÎò", "XuexiLingwu",
                             "yesno", "?", 1)
     if l_result and l_result == "yes" then
         flag.autoxuexi = 1
@@ -254,22 +254,22 @@ function shujian_set()
     Save()
 
     ColourNote("red", "blue",
-               "è¯·ä½¿ç”¨startå‘½ä»¤å¯åŠ¨æœºå™¨äººï¼Œstopå‘½ä»¤åœæ­¢æœºå™¨äººï¼Œisetè®¾ç½®æœºå™¨äººï¼")
+               "ÇëÊ¹ÓÃstartÃüÁîÆô¶¯»úÆ÷ÈË£¬stopÃüÁîÍ£Ö¹»úÆ÷ÈË£¬isetÉèÖÃ»úÆ÷ÈË£¡")
 end
 
 function masterSet()
     local l_result, l_tmp, t
-    if score.party ~= "æ™®é€šç™¾å§“" then
-        l_result = utils.inputbox("ä½ çš„å¸ˆå‚…çš„ç®€çŸ­IDæ˜¯?", "MasterId",
-                                  GetVariable("masterid"), "å®‹ä½“", "12")
+    if score.party ~= "ÆÕÍ¨°ÙĞÕ" then
+        l_result = utils.inputbox("ÄãµÄÊ¦¸µµÄ¼ò¶ÌIDÊÇ?", "MasterId",
+                                  GetVariable("masterid"), "ËÎÌå", "12")
         if not isNil(l_result) then
             SetVariable("masterid", l_result)
             master.id = l_result
         end
         if not score.master or not masterRoom[score.master] then
-            l_result = utils.inputbox("ä½ çš„å¸ˆå‚…çš„å±…ä½åœ°æ˜¯?",
+            l_result = utils.inputbox("ÄãµÄÊ¦¸µµÄ¾Ó×¡µØÊÇ?",
                                       "MasterRoom", GetVariable("masterroom"),
-                                      "å®‹ä½“", "12")
+                                      "ËÎÌå", "12")
             if l_result ~= nil then
                 SetVariable("masterroom", l_result)
                 master.room, master.area = getAddr(l_result)
@@ -288,7 +288,7 @@ function pfmSet()
     if countTab(t) == 1 then
         for p in pairs(t) do perform.force = p end
     elseif countTab(t) > 1 then
-        l_result = utils.listbox("ä½ ä½¿ç”¨çš„ç‰¹æ®Šå†…åŠŸæ˜¯", "ç‰¹æ®Šå†…åŠŸ",
+        l_result = utils.listbox("ÄãÊ¹ÓÃµÄÌØÊâÄÚ¹¦ÊÇ", "ÌØÊâÄÚ¹¦",
                                  t, GetVariable("performforce"))
         if isNil(l_result) then
             perform.force = nil
@@ -308,7 +308,7 @@ function pfmSet()
         end
     end
     if countTab(t) > 0 then
-        l_result = utils.listbox("ä½ å‡†å¤‡æˆ˜æ–—ä½¿ç”¨çš„åŠŸå¤«æ˜¯?",
+        l_result = utils.listbox("Äã×¼±¸Õ½¶·Ê¹ÓÃµÄ¹¦·òÊÇ?",
                                  "performSkill", t, GetVariable("performskill"))
         if not isNil(l_result) then
             SetVariable("performskill", l_result)
@@ -319,193 +319,193 @@ function pfmSet()
         end
     end
     l_result = utils.inputbox(
-                   "æˆ˜æ–—é»˜è®¤å‡†å¤‡PFM(æ ¼å¼ï¼šbei none;bei claw;jifa parry jiuyin-baiguzhua;perform sanjue)æ˜¯?",
-                   "PerformPre", GetVariable("performpre"), "å®‹ä½“", "12")
+                   "Õ½¶·Ä¬ÈÏ×¼±¸PFM(¸ñÊ½£ºbei none;bei claw;jifa parry jiuyin-baiguzhua;perform sanjue)ÊÇ?",
+                   "PerformPre", GetVariable("performpre"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("performpre", l_result)
         perform.pre = l_result
         l_pfm = perform.pre
         create_alias('pfmset', 'pfmset', 'alias pfmpfm ' .. l_pfm)
-        Note("é»˜è®¤PFM")
+        Note("Ä¬ÈÏPFM")
         Execute('pfmset')
     end
-    l_result = utils.inputbox("ä½ çš„ç©ºæ‰‹PFM(ä¸ä½¿ç”¨æ­¦å™¨çš„PFM)æ˜¯?",
-                              "pfmks", GetVariable("pfmks"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÄãµÄ¿ÕÊÖPFM(²»Ê¹ÓÃÎäÆ÷µÄPFM)ÊÇ?",
+                              "pfmks", GetVariable("pfmks"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pfmks", l_result)
         l_pfm = l_result
         create_alias('pfmks', 'pfmks', 'alias pfmpfm ' .. l_pfm)
-        Note("ç©ºæ‰‹PFM")
+        Note("¿ÕÊÖPFM")
         Execute('pfmks')
     end
     l_result = utils.inputbox(
-                   "é‡åˆ°æ…•å®¹å‰‘æ³•ç”¨çš„PFM(ä½¿ç”¨ä¸æ‹¿å‰‘å¯ä»¥å…‹åˆ¶æ…•å®¹çš„skills,æ…•å®¹å‰‘æ³•çš„å±æ€§ä¸ºï¼šé™©)æ˜¯?",
-                   "pfmmrjf", GetVariable("pfmmrjf"), "å®‹ä½“", "12")
+                   "Óöµ½Ä½Èİ½£·¨ÓÃµÄPFM(Ê¹ÓÃ²»ÄÃ½£¿ÉÒÔ¿ËÖÆÄ½ÈİµÄskills,Ä½Èİ½£·¨µÄÊôĞÔÎª£ºÏÕ)ÊÇ?",
+                   "pfmmrjf", GetVariable("pfmmrjf"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pfmmrjf", l_result)
         l_pfm = l_result
         create_alias('pfmmrjf', 'pfmmrjf', 'alias pfmpfm ' .. l_pfm)
-        Note("ä¸ç”¨å‰‘çš„PFM")
+        Note("²»ÓÃ½£µÄPFM")
         Execute('pfmmrjf')
     end
     l_result = utils.inputbox(
-                   "é‡åˆ°æ˜æ•™åœ£ç«ä»¤æ³•PFM(ä½¿ç”¨æ‹¿æ­¦å™¨å…‹åˆ¶æ˜æ•™çš„skillsï¼Œåœ£ç«ä»¤æ³•çš„å±æ€§ä¸ºï¼šå¥‡)æ˜¯?",
-                   "pfmshlf", GetVariable("pfmshlf"), "å®‹ä½“", "12")
+                   "Óöµ½Ã÷½ÌÊ¥»ğÁî·¨PFM(Ê¹ÓÃÄÃÎäÆ÷¿ËÖÆÃ÷½ÌµÄskills£¬Ê¥»ğÁî·¨µÄÊôĞÔÎª£ºÆæ)ÊÇ?",
+                   "pfmshlf", GetVariable("pfmshlf"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pfmshlf", l_result)
         l_pfm = l_result
         create_alias('pfmshlf', 'pfmshlf', 'alias pfmpfm ' .. l_pfm)
-        Note("å¸¦å…µå™¨PFM")
+        Note("´ø±øÆ÷PFM")
         Execute('pfmshlf')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„æ— å±æ€§PFM(ä½¿ç”¨æ— å±æ€§çš„skillsï¼Œç„é“å‰‘æ³•æ”¹å½’å±ä¸ºç©º)æ˜¯?",
-                   "pfmwu", GetVariable("pfmwu"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄÎŞÊôĞÔPFM(Ê¹ÓÃÎŞÊôĞÔµÄskills£¬ĞşÌú½£·¨¸Ä¹éÊôÎª¿Õ)ÊÇ?",
+                   "pfmwu", GetVariable("pfmwu"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pfmwu", l_result)
         l_pfm = l_result
         create_alias('pfmwu', 'pfmwu', 'alias pfmpfm ' .. l_pfm)
-        Note("æ— å±æ€§PFM")
+        Note("ÎŞÊôĞÔPFM")
         Execute('pfmwu')
     end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„å…‹åˆ¶æ— å±æ€§PFMæ˜¯?", "pwu",
-                              GetVariable("pwu"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄ¿ËÖÆÎŞÊôĞÔPFMÊÇ?", "pwu",
+                              GetVariable("pwu"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pwu", l_result)
         l_pfm = l_result
         create_alias('pwu', 'pwu', 'alias pfmpfm ' .. l_pfm)
-        Note("å…‹åˆ¶æ— å±æ€§PFM")
+        Note("¿ËÖÆÎŞÊôĞÔPFM")
         Execute('pwu')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„ç©ºå±æ€§PFM(ä½¿ç”¨ç©ºå±æ€§çš„skills)æ˜¯?",
-                   "pkong", GetVariable("pkong"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ¿ÕÊôĞÔPFM(Ê¹ÓÃ¿ÕÊôĞÔµÄskills)ÊÇ?",
+                   "pkong", GetVariable("pkong"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pkong", l_result)
         l_pfm = l_result
         create_alias('pkong', 'pkong', 'alias pfmpfm ' .. l_pfm)
-        Note("ç©ºå±æ€§PFM")
+        Note("¿ÕÊôĞÔPFM")
         Execute('pkong')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„æœ€å¤§åˆæ°”PFM(ä¸ç®¡æ­¦åŠŸå±æ€§)æ˜¯?",
-                   "pfmsanqing", GetVariable("pfmsanqing"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ×î´óºÏÆøPFM(²»¹ÜÎä¹¦ÊôĞÔ)ÊÇ?",
+                   "pfmsanqing", GetVariable("pfmsanqing"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pfmsanqing", l_result)
         l_pfm = l_result
         create_alias('pfmsanqing', 'pfmsanqing', 'alias pfmpfm ' .. l_pfm)
-        Note("æœ€å¤§åˆæ°”PFM")
+        Note("×î´óºÏÆøPFM")
         Execute('pfmsanqing')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„æ­£å±æ€§PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™ã€‚æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?         ã€è¢«å…‹åˆ¶å±æ€§ä¸ºï¼šé™©ã€‚å±æ€§å…‹åˆ¶æ•°å€¼ä¸ºï¼šæ­£130 åˆšç©º120 å¿«110 å¦™é™©æ— 100ã€‘æ— æ­£å±æ€§å¯æŒ‰åé¢çš„æ•°å€¼é«˜ä½æ¥å¡«å…¥å¯¹ä½ æœ‰å¯¹åº”å±æ€§çš„FPMï¼",
-                   "pzhen", GetVariable("pzhen"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄÕıÊôĞÔPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¡£¸ñÊ½£ºverify yunu-jianfa)ÊÇ?         ¡¾±»¿ËÖÆÊôĞÔÎª£ºÏÕ¡£ÊôĞÔ¿ËÖÆÊıÖµÎª£ºÕı130 ¸Õ¿Õ120 ¿ì110 ÃîÏÕÎŞ100¡¿ÎŞÕıÊôĞÔ¿É°´ºóÃæµÄÊıÖµ¸ßµÍÀ´ÌîÈë¶ÔÄãÓĞ¶ÔÓ¦ÊôĞÔµÄFPM£¡",
+                   "pzhen", GetVariable("pzhen"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pzhen", l_result)
         perform.zhen = l_result
         l_pfm = perform.zhen
         create_alias('pfmzhen', 'pfmzhen', 'alias pfmpfm ' .. l_pfm)
-        Note("æ­£å±æ€§PFM")
+        Note("ÕıÊôĞÔPFM")
         Execute('pfmzhen')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„å¥‡å±æ€§PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™ã€‚æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?         ã€è¢«å…‹åˆ¶å±æ€§ä¸ºï¼šå¦™ã€‚å±æ€§å…‹åˆ¶æ•°å€¼ä¸ºï¼šå¥‡130 æŸ”ç©º120 æ…¢110 æ— å¦™é™©100ã€‘æ— å¥‡å±æ€§å¯æŒ‰åé¢çš„æ•°å€¼é«˜ä½æ¥å¡«å…¥å¯¹ä½ æœ‰å¯¹åº”å±æ€§çš„FPMï¼",
-                   "pqi", GetVariable("pqi"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄÆæÊôĞÔPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¡£¸ñÊ½£ºverify yunu-jianfa)ÊÇ?         ¡¾±»¿ËÖÆÊôĞÔÎª£ºÃî¡£ÊôĞÔ¿ËÖÆÊıÖµÎª£ºÆæ130 Èá¿Õ120 Âı110 ÎŞÃîÏÕ100¡¿ÎŞÆæÊôĞÔ¿É°´ºóÃæµÄÊıÖµ¸ßµÍÀ´ÌîÈë¶ÔÄãÓĞ¶ÔÓ¦ÊôĞÔµÄFPM£¡",
+                   "pqi", GetVariable("pqi"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pqi", l_result)
         perform.qi = l_result
         l_pfm = perform.qi
         create_alias('pfmqi', 'pfmqi', 'alias pfmpfm ' .. l_pfm)
-        Note("å¥‡å±æ€§PFM")
+        Note("ÆæÊôĞÔPFM")
         Execute('pfmqi')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„åˆšå±æ€§PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™ã€‚æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?         ã€è¢«å…‹åˆ¶å±æ€§ä¸ºï¼šæ…¢ã€‚å±æ€§å…‹åˆ¶æ•°å€¼ä¸ºï¼šåˆš130 æ­£ç©º120 é™©110 æ…¢å¿«æ— 100ã€‘æ— åˆšå±æ€§å¯æŒ‰åé¢çš„æ•°å€¼é«˜ä½æ¥å¡«å…¥å¯¹ä½ æœ‰å¯¹åº”å±æ€§çš„FPMï¼",
-                   "pgang", GetVariable("pgang"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ¸ÕÊôĞÔPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¡£¸ñÊ½£ºverify yunu-jianfa)ÊÇ?         ¡¾±»¿ËÖÆÊôĞÔÎª£ºÂı¡£ÊôĞÔ¿ËÖÆÊıÖµÎª£º¸Õ130 Õı¿Õ120 ÏÕ110 Âı¿ìÎŞ100¡¿ÎŞ¸ÕÊôĞÔ¿É°´ºóÃæµÄÊıÖµ¸ßµÍÀ´ÌîÈë¶ÔÄãÓĞ¶ÔÓ¦ÊôĞÔµÄFPM£¡",
+                   "pgang", GetVariable("pgang"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pgang", l_result)
         perform.gang = l_result
         l_pfm = perform.gang
         create_alias('pfmgang', 'pfmgang', 'alias pfmpfm ' .. l_pfm)
-        Note("åˆšå±æ€§PFM")
+        Note("¸ÕÊôĞÔPFM")
         Execute('pfmgang')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„æŸ”å±æ€§PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™ã€‚æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?         ã€è¢«å…‹åˆ¶å±æ€§ä¸ºï¼šå¿«ã€‚å±æ€§å…‹åˆ¶æ•°å€¼ä¸ºï¼šæŸ”130 å¥‡ç©º120 å¦™110 å¿«æ…¢æ— 100ã€‘æ— æŸ”å±æ€§å¯æŒ‰åé¢çš„æ•°å€¼é«˜ä½æ¥å¡«å…¥å¯¹ä½ æœ‰å¯¹åº”å±æ€§çš„FPMï¼",
-                   "prou", GetVariable("prou"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄÈáÊôĞÔPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¡£¸ñÊ½£ºverify yunu-jianfa)ÊÇ?         ¡¾±»¿ËÖÆÊôĞÔÎª£º¿ì¡£ÊôĞÔ¿ËÖÆÊıÖµÎª£ºÈá130 Ææ¿Õ120 Ãî110 ¿ìÂıÎŞ100¡¿ÎŞÈáÊôĞÔ¿É°´ºóÃæµÄÊıÖµ¸ßµÍÀ´ÌîÈë¶ÔÄãÓĞ¶ÔÓ¦ÊôĞÔµÄFPM£¡",
+                   "prou", GetVariable("prou"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("prou", l_result)
         perform.rou = l_result
         l_pfm = perform.rou
         create_alias('pfmrou', 'pfmrou', 'alias pfmpfm ' .. l_pfm)
-        Note("æŸ”å±æ€§PFM")
+        Note("ÈáÊôĞÔPFM")
         Execute('pfmrou')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„å¿«å±æ€§PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™ã€‚æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?         ã€è¢«å…‹åˆ¶å±æ€§ä¸ºï¼šåˆšã€‚å±æ€§å…‹åˆ¶æ•°å€¼ä¸ºï¼šå¿«130 å¦™ç©º120 å¥‡110 æ— åˆšæŸ”100ã€‘æ— å¿«å±æ€§å¯æŒ‰åé¢çš„æ•°å€¼é«˜ä½æ¥å¡«å…¥å¯¹ä½ æœ‰å¯¹åº”å±æ€§çš„FPMï¼",
-                   "pkuai", GetVariable("pkuai"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ¿ìÊôĞÔPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¡£¸ñÊ½£ºverify yunu-jianfa)ÊÇ?         ¡¾±»¿ËÖÆÊôĞÔÎª£º¸Õ¡£ÊôĞÔ¿ËÖÆÊıÖµÎª£º¿ì130 Ãî¿Õ120 Ææ110 ÎŞ¸ÕÈá100¡¿ÎŞ¿ìÊôĞÔ¿É°´ºóÃæµÄÊıÖµ¸ßµÍÀ´ÌîÈë¶ÔÄãÓĞ¶ÔÓ¦ÊôĞÔµÄFPM£¡",
+                   "pkuai", GetVariable("pkuai"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pkuai", l_result)
         perform.kuai = l_result
         l_pfm = perform.kuai
         create_alias('pfmkuai', 'pfmkuai', 'alias pfmpfm ' .. l_pfm)
-        Note("å¿«å±æ€§PFM")
+        Note("¿ìÊôĞÔPFM")
         Execute('pfmkuai')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„æ…¢å±æ€§PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™ã€‚æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?         ã€è¢«å…‹åˆ¶å±æ€§ä¸ºï¼šæŸ”ã€‚å±æ€§å…‹åˆ¶æ•°å€¼ä¸ºï¼šæ…¢130 é™©ç©º120 æ­£110 æ— åˆšæŸ”100ã€‘æ— æ…¢å±æ€§å¯æŒ‰åé¢çš„æ•°å€¼é«˜ä½æ¥å¡«å…¥å¯¹ä½ æœ‰å¯¹åº”å±æ€§çš„FPMï¼",
-                   "pman", GetVariable("pman"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄÂıÊôĞÔPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¡£¸ñÊ½£ºverify yunu-jianfa)ÊÇ?         ¡¾±»¿ËÖÆÊôĞÔÎª£ºÈá¡£ÊôĞÔ¿ËÖÆÊıÖµÎª£ºÂı130 ÏÕ¿Õ120 Õı110 ÎŞ¸ÕÈá100¡¿ÎŞÂıÊôĞÔ¿É°´ºóÃæµÄÊıÖµ¸ßµÍÀ´ÌîÈë¶ÔÄãÓĞ¶ÔÓ¦ÊôĞÔµÄFPM£¡",
+                   "pman", GetVariable("pman"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pman", l_result)
         perform.man = l_result
         l_pfm = perform.man
         create_alias('pfmman', 'pfmman', 'alias pfmpfm ' .. l_pfm)
-        Note("æ…¢å±æ€§PFM")
+        Note("ÂıÊôĞÔPFM")
         Execute('pfmman')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„ç§’å±æ€§PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™ã€‚æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?         ã€è¢«å…‹åˆ¶å±æ€§ä¸ºï¼šæ­£ã€‚å±æ€§å…‹åˆ¶æ•°å€¼ä¸ºï¼šå¦™130 å¿«ç©º120 åˆš110 æ— æ­£å¥‡100ã€‘æ— å¦™å±æ€§å¯æŒ‰åé¢çš„æ•°å€¼é«˜ä½æ¥å¡«å…¥å¯¹ä½ æœ‰å¯¹åº”å±æ€§çš„FPMï¼",
-                   "pmiao", GetVariable("pmiao"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄÃëÊôĞÔPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¡£¸ñÊ½£ºverify yunu-jianfa)ÊÇ?         ¡¾±»¿ËÖÆÊôĞÔÎª£ºÕı¡£ÊôĞÔ¿ËÖÆÊıÖµÎª£ºÃî130 ¿ì¿Õ120 ¸Õ110 ÎŞÕıÆæ100¡¿ÎŞÃîÊôĞÔ¿É°´ºóÃæµÄÊıÖµ¸ßµÍÀ´ÌîÈë¶ÔÄãÓĞ¶ÔÓ¦ÊôĞÔµÄFPM£¡",
+                   "pmiao", GetVariable("pmiao"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pmiao", l_result)
         perform.miao = l_result
         l_pfm = perform.miao
         create_alias('pfmmiao', 'pfmmiao', 'alias pfmpfm ' .. l_pfm)
-        Note("å¦™å±æ€§PFM")
+        Note("ÃîÊôĞÔPFM")
         Execute('pfmmiao')
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„é™©å±æ€§PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™ã€‚æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?         ã€è¢«å…‹åˆ¶å±æ€§ä¸ºï¼šå¥‡ã€‚å±æ€§å…‹åˆ¶æ•°å€¼ä¸ºï¼šé™©130 æ…¢ç©º120 æŸ”110 æ— æ­£å¥‡100ã€‘æ— é™©å±æ€§å¯æŒ‰åé¢çš„æ•°å€¼é«˜ä½æ¥å¡«å…¥å¯¹ä½ æœ‰å¯¹åº”å±æ€§çš„FPMï¼",
-                   "pxian", GetVariable("pxian"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄÏÕÊôĞÔPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¡£¸ñÊ½£ºverify yunu-jianfa)ÊÇ?         ¡¾±»¿ËÖÆÊôĞÔÎª£ºÆæ¡£ÊôĞÔ¿ËÖÆÊıÖµÎª£ºÏÕ130 Âı¿Õ120 Èá110 ÎŞÕıÆæ100¡¿ÎŞÏÕÊôĞÔ¿É°´ºóÃæµÄÊıÖµ¸ßµÍÀ´ÌîÈë¶ÔÄãÓĞ¶ÔÓ¦ÊôĞÔµÄFPM£¡",
+                   "pxian", GetVariable("pxian"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("pxian", l_result)
         perform.xian = l_result
         l_pfm = perform.xian
         create_alias('pfmxian', 'pfmxian', 'alias pfmpfm ' .. l_pfm)
-        Note("é™©å±æ€§PFM")
+        Note("ÏÕÊôĞÔPFM")
         Execute('pfmxian')
     end
     l_result = utils.inputbox(
-                   "ä½ FPKçš„PFM(ç”¨verify æ¥æŸ¥çœ‹ä½ çš„pfmçš„å±æ€§å†å¡«å†™æ ¼å¼ï¼šverify yunu-jianfa)æ˜¯?",
-                   "pkpfm", GetVariable("pkpfm"), "å®‹ä½“", "12")
+                   "ÄãFPKµÄPFM(ÓÃverify À´²é¿´ÄãµÄpfmµÄÊôĞÔÔÙÌîĞ´¸ñÊ½£ºverify yunu-jianfa)ÊÇ?",
+                   "pkpfm", GetVariable("pkpfm"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("pkpfm", l_result) end
-    l_result = utils.inputbox("ä½ ç»ƒåŠŸçš„æ¬¡æ•°æ˜¯ï¼Ÿ", "mycishu",
-                              GetVariable("mycishu"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÄãÁ·¹¦µÄ´ÎÊıÊÇ£¿", "mycishu",
+                              GetVariable("mycishu"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("mycishu", l_result)
         lianxi_times = l_result
     end
-    Note("ä½¿ç”¨é»˜è®¤PFM")
+    Note("Ê¹ÓÃÄ¬ÈÏPFM")
     Execute('pfmset')
 end
 
 function myUweapon()
-    l_result = utils.inputbox("ä½ éœ€è¦GETçš„ç¬¬ä¸€æŠŠæ­¦å™¨IDæ˜¯?",
-                              "myweapon", GetVariable("myweapon"), "å®‹ä½“",
+    l_result = utils.inputbox("ÄãĞèÒªGETµÄµÚÒ»°ÑÎäÆ÷IDÊÇ?",
+                              "myweapon", GetVariable("myweapon"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("myweapon", l_result) end
-    l_result = utils.inputbox("ä½ éœ€è¦GETçš„ç¬¬äºŒæŠŠæ­¦å™¨IDæ˜¯?",
-                              "muweapon", GetVariable("muweapon"), "å®‹ä½“",
+    l_result = utils.inputbox("ÄãĞèÒªGETµÄµÚ¶ş°ÑÎäÆ÷IDÊÇ?",
+                              "muweapon", GetVariable("muweapon"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("muweapon", l_result) end
 end
@@ -514,36 +514,36 @@ function jobSet()
     local l_result, l_tmp, t
 
     t = {
-        ["wudang"] = "æ­¦å½“å®‹è¿œæ¡¥",
-        ["huashan"] = "åå±±å²³ä¸ç¾¤",
-        ["gaibang"] = "ä¸å¸®å´é•¿è€",
-        ["songmoya"] = "é¢‚æ‘©å´–æŠ—æ•Œä»»åŠ¡",
-        ["zhuoshe"] = "ä¸å¸®æ‰è›‡",
-        ["songxin"] = "å¤§ç†é€ä¿¡",
-        ["songxin2"] = "å¤§ç†é€ä¿¡2",
-        ["xueshan"] = "é›ªå±±æŠ¢ç¾å¥³",
-        ["sldsm"] = "ç¥é¾™å²›å¸ˆé—¨",
-        ["songshan"] = "åµ©å±±å·¦å†·ç¦…",
-        --   ["hubiao"]  ="ç¦å·æŠ¤é•–",
-        ["tmonk"] = "å°‘æ—æ•™å’Œå°š",
-        ["clb"] = "é•¿ä¹å¸®ä»»åŠ¡1",
-        ["husong"] = "å°‘æ—æŠ¤é€",
-        ["hqgzc"] = "æ´ªä¸ƒå…¬åšèœ"
+        ["wudang"] = "Îäµ±ËÎÔ¶ÇÅ",
+        ["huashan"] = "»ªÉ½ÔÀ²»Èº",
+        ["gaibang"] = "Ø¤°ïÎâ³¤ÀÏ",
+        ["songmoya"] = "ËÌÄ¦ÑÂ¿¹µĞÈÎÎñ",
+        ["zhuoshe"] = "Ø¤°ï×½Éß",
+        ["songxin"] = "´óÀíËÍĞÅ",
+        ["songxin2"] = "´óÀíËÍĞÅ2",
+        ["xueshan"] = "Ñ©É½ÇÀÃÀÅ®",
+        ["sldsm"] = "ÉñÁúµºÊ¦ÃÅ",
+        ["songshan"] = "áÔÉ½×óÀäìø",
+        --   ["hubiao"]  ="¸£Öİ»¤ïÚ",
+        ["tmonk"] = "ÉÙÁÖ½ÌºÍÉĞ",
+        ["clb"] = "³¤ÀÖ°ïÈÎÎñ1",
+        ["husong"] = "ÉÙÁÖ»¤ËÍ",
+        ["hqgzc"] = "ºéÆß¹«×ö²Ë"
     }
 
     t = {}
 
     for p, q in pairs(job.list) do t[p] = q end
 
-    if score.party ~= "ä¸å¸®" then t["zhuoshe"] = nil end
-    if score.party ~= "ç¥é¾™æ•™" then t["sldsm"] = nil end
-    if score.party ~= "å°‘æ—æ´¾" or hp.exp > 2000000 or hp.exp < 300000 then
+    if score.party ~= "Ø¤°ï" then t["zhuoshe"] = nil end
+    if score.party ~= "ÉñÁú½Ì" then t["sldsm"] = nil end
+    if score.party ~= "ÉÙÁÖÅÉ" or hp.exp > 2000000 or hp.exp < 300000 then
         t["tmonk"] = nil
     end
-    if score.party ~= "å°‘æ—æ´¾" or hp.exp < 2000000 then t["husong"] = nil end
+    if score.party ~= "ÉÙÁÖÅÉ" or hp.exp < 2000000 then t["husong"] = nil end
     if hp.exp < 5000000 then t["songmoya"] = nil end
     if hp.shen < 0 then t["gaibang"] = nil end
-    if hp.shen < 0 and score.party == "åå±±æ´¾" then t["huashan"] = nil end
+    if hp.shen < 0 and score.party == "»ªÉ½ÅÉ" then t["huashan"] = nil end
     if hp.shen < 0 then t["wudang"] = nil end
     if hp.shen > 0 then t["songshan"] = nil end
 
@@ -553,8 +553,8 @@ function jobSet()
         tmp.zuhe = {}
         for _, p in pairs(tmp.job) do tmp.zuhe[p] = true end
     end
-    l_tmp = utils.multilistbox("ä½ çš„ä»»åŠ¡ç»„åˆ(è¯·æŒ‰CTRLå¤šé€‰)æ˜¯?",
-                               "ä»»åŠ¡ç»„åˆ", t, tmp.zuhe)
+    l_tmp = utils.multilistbox("ÄãµÄÈÎÎñ×éºÏ(Çë°´CTRL¶àÑ¡)ÊÇ?",
+                               "ÈÎÎñ×éºÏ", t, tmp.zuhe)
     l_result = nil
     for p in pairs(l_tmp) do
         job.zuhe[p] = true
@@ -571,8 +571,8 @@ function jobSet()
     t["husong"] = nil
     t["hubiao"] = nil
     if countTab(t) > 2 then
-        l_result = utils.listbox("ä½ ç¬¬ä¸€ä¼˜å…ˆå»çš„ä»»åŠ¡ï¼š",
-                                 "ä¼˜å…ˆä»»åŠ¡", t, GetVariable("jobfirst"))
+        l_result = utils.listbox("ÄãµÚÒ»ÓÅÏÈÈ¥µÄÈÎÎñ£º",
+                                 "ÓÅÏÈÈÎÎñ", t, GetVariable("jobfirst"))
         if l_result ~= nil then
             SetVariable("jobfirst", l_result)
             job.first = l_result
@@ -583,8 +583,8 @@ function jobSet()
         end
     end
     if countTab(t) > 1 and job.first then
-        l_result = utils.listbox("ä½ ç¬¬äºŒä¼˜å…ˆå»çš„ä»»åŠ¡ï¼š",
-                                 "ä¼˜å…ˆä»»åŠ¡", t, GetVariable("jobsecond"))
+        l_result = utils.listbox("ÄãµÚ¶şÓÅÏÈÈ¥µÄÈÎÎñ£º",
+                                 "ÓÅÏÈÈÎÎñ", t, GetVariable("jobsecond"))
         if l_result ~= nil then
             SetVariable("jobsecond", l_result)
             job.second = l_result
@@ -598,7 +598,7 @@ function jobSet()
         DeleteVariable("jobsecond")
     end
     if countTab(t) == 1 and job.second then
-        l_result = utils.listbox("ä½ ç¬¬ä¸‰ä¸ªå»çš„ä»»åŠ¡ï¼š", "ä¼˜å…ˆä»»åŠ¡",
+        l_result = utils.listbox("ÄãµÚÈı¸öÈ¥µÄÈÎÎñ£º", "ÓÅÏÈÈÎÎñ",
                                  t, GetVariable("jobthird"))
         if l_result ~= nil then
             SetVariable("jobthird", l_result)
@@ -617,8 +617,8 @@ function jobSet()
 
     if job.zuhe["songmoya"] then
         l_result = utils.inputbox(
-                       "è®¾ç½®ä¸€å“å ‚ä»»åŠ¡æ€åˆ°ç¬¬å‡ ç»„?(é»˜è®¤ä¸º7ç»„)ä½¿ç”¨é»˜è®¤ç»„æ•°è¯·ç©ºç™½ä¸è¦å¡«å†™ã€‚",
-                       "ypttab", GetVariable("ypttab"), "å®‹ä½“", "12")
+                       "ÉèÖÃÒ»Æ·ÌÃÈÎÎñÉ±µ½µÚ¼¸×é?(Ä¬ÈÏÎª7×é)Ê¹ÓÃÄ¬ÈÏ×éÊıÇë¿Õ°×²»ÒªÌîĞ´¡£",
+                       "ypttab", GetVariable("ypttab"), "ËÎÌå", "12")
         if not isNil(l_result) then
             SetVariable("ypttab", l_result)
             smyteam = tonumber(l_result)
@@ -626,8 +626,8 @@ function jobSet()
             smyteam = 16
         end
         l_result = utils.inputbox(
-                       "è®¾ç½®ä¸€å“å ‚ä»»åŠ¡æ­»äº¡å‡ æ¬¡ä¸å†ä¸ŠSMY!(é»˜è®¤ä¸º2æ¬¡)ä½¿ç”¨é»˜è®¤ç»„æ•°è¯·ç©ºç™½ä¸è¦å¡«å†™ã€‚",
-                       "yptdie", GetVariable("yptdie"), "å®‹ä½“", "12")
+                       "ÉèÖÃÒ»Æ·ÌÃÈÎÎñËÀÍö¼¸´Î²»ÔÙÉÏSMY!(Ä¬ÈÏÎª2´Î)Ê¹ÓÃÄ¬ÈÏ×éÊıÇë¿Õ°×²»ÒªÌîĞ´¡£",
+                       "yptdie", GetVariable("yptdie"), "ËÎÌå", "12")
         if not isNil(l_result) then
             SetVariable("yptdie", l_result)
             smyall = tonumber(l_result)
@@ -635,16 +635,16 @@ function jobSet()
             smyall = 2
         end
         l_result = utils.msgbox(
-                       "è®¾ç½®ä¸€å“å ‚ä»»åŠ¡æ˜¯å¦å¼€å¯åŒæ€!(é»˜è®¤ä¸ºnoä¸å¼€å¯)ã€‚",
-                       "åŒæ€", "yesno", "?", 1)
+                       "ÉèÖÃÒ»Æ·ÌÃÈÎÎñÊÇ·ñ¿ªÆôË«É±!(Ä¬ÈÏÎªno²»¿ªÆô)¡£",
+                       "Ë«É±", "yesno", "?", 1)
         if l_result and l_result == "yes" then
             double_kill = yes
         else
             double_kill = no
         end
         l_result = utils.inputbox(
-                       "è®¾ç½®ä¸€å“å ‚ä»»åŠ¡å‰ç½®BUFF!(Perform and Yunã€æ²¡æœ‰è¯·å¡«å†™none)ã€‚",
-                       "pfbuff", GetVariable("pfbuff"), "å®‹ä½“", "12")
+                       "ÉèÖÃÒ»Æ·ÌÃÈÎÎñÇ°ÖÃBUFF!(Perform and Yun¡¢Ã»ÓĞÇëÌîĞ´none)¡£",
+                       "pfbuff", GetVariable("pfbuff"), "ËÎÌå", "12")
         if not isNil(l_result) then
             SetVariable("pfbuff", l_result)
             perform.buff = l_result
@@ -656,8 +656,8 @@ function jobSet()
 
     if job.zuhe["tdh"] then
         l_result = utils.inputbox(
-                       "å¤©åœ°ä¼šä»»åŠ¡ä¸­é—´æ˜¯å¦æ‰“åº§ï¼Ÿ(1ä¸ºæ‰“åº§ 0ä¸ºä¸æ‰“åº§)",
-                       "tdhdazuo", GetVariable("tdhdazuo"), "å®‹ä½“", "12")
+                       "ÌìµØ»áÈÎÎñÖĞ¼äÊÇ·ñ´ò×ù£¿(1Îª´ò×ù 0Îª²»´ò×ù)",
+                       "tdhdazuo", GetVariable("tdhdazuo"), "ËÎÌå", "12")
         if not isNil(l_result) then
             SetVariable("tdhdazuo", l_result)
             tdhdz = l_result
@@ -667,9 +667,9 @@ function jobSet()
     end
 
     if job.zuhe["hqgzc"] then
-        l_result = utils.inputbox("æ‹¿Potè¿˜æ˜¯Goldï¼Ÿ(1ä¸ºPot 0ä¸ºGold)",
+        l_result = utils.inputbox("ÄÃPot»¹ÊÇGold£¿(1ÎªPot 0ÎªGold)",
                                   "hqgzcjiangli", GetVariable("hqgzcjiangli"),
-                                  "å®‹ä½“", "12")
+                                  "ËÎÌå", "12")
         if not isNil(l_result) then
             SetVariable("hqgzcjiangli", l_result)
             hqgzcjl = 0
@@ -681,12 +681,12 @@ function jobSet()
     if job.zuhe["hubiao"] or job.zuhe["haizhan"] then
         if GetVariable("teamname") then
             l_result = utils.inputbox(
-                           "ä½ ç»„é˜ŸæŠ¤é•–çš„é˜Ÿå‹(ä¸­æ–‡åç§°)æ˜¯?",
-                           "TeamName", GetVariable("teamname"), "å®‹ä½“", "12")
+                           "Äã×é¶Ó»¤ïÚµÄ¶ÓÓÑ(ÖĞÎÄÃû³Æ)ÊÇ?",
+                           "TeamName", GetVariable("teamname"), "ËÎÌå", "12")
         else
             l_result = utils.inputbox(
-                           "ä½ ç»„é˜ŸæŠ¤é•–çš„é˜Ÿå‹(ä¸­æ–‡åç§°)æ˜¯?",
-                           "TeamName", job.teamname, "å®‹ä½“", "12")
+                           "Äã×é¶Ó»¤ïÚµÄ¶ÓÓÑ(ÖĞÎÄÃû³Æ)ÊÇ?",
+                           "TeamName", job.teamname, "ËÎÌå", "12")
         end
         if not isNil(l_result) then
             SetVariable("teamname", l_result)
@@ -697,12 +697,12 @@ function jobSet()
         end
         if GetVariable("teamlead") then
             l_result = utils.inputbox(
-                           "ä½ ç»„é˜ŸæŠ¤é•–çš„é˜Ÿé•¿(ä¸­æ–‡åç§°)æ˜¯?",
-                           "TeamLead", GetVariable("teamlead"), "å®‹ä½“", "12")
+                           "Äã×é¶Ó»¤ïÚµÄ¶Ó³¤(ÖĞÎÄÃû³Æ)ÊÇ?",
+                           "TeamLead", GetVariable("teamlead"), "ËÎÌå", "12")
         else
             l_result = utils.inputbox(
-                           "ä½ ç»„é˜ŸæŠ¤é•–çš„é˜Ÿé•¿(ä¸­æ–‡åç§°)æ˜¯?",
-                           "TeamLead", job.teamlead, "å®‹ä½“", "12")
+                           "Äã×é¶Ó»¤ïÚµÄ¶Ó³¤(ÖĞÎÄÃû³Æ)ÊÇ?",
+                           "TeamLead", job.teamlead, "ËÎÌå", "12")
         end
         if not isNil(l_result) then
             SetVariable("teamlead", l_result)
@@ -718,14 +718,14 @@ end
 function drugSet()
     drugPrepare = {}
     local t = {
-        ["å†…æ¯ä¸¸"] = "å†…æ¯ä¸¸",
-        ["å·è´å†…æ¯ä¸¸"] = "å·è´å†…æ¯ä¸¸",
-        ["é»„èŠªå†…æ¯ä¸¹"] = "é»„èŠªå†…æ¯ä¸¹",
-        ["è‰èœ•é‡‘ç–®è¯"] = "è‰èœ•é‡‘ç–®è¯",
-        ["æ´»è¡€ç–—ç²¾ä¸¹"] = "æ´»è¡€ç–—ç²¾ä¸¹",
-        ["å¤§è¿˜ä¸¹"] = "å¤§è¿˜ä¸¹",
-        ["ç«æŠ˜"] = "ç«æŠ˜",
-        ["ç‰›çš®é…’è¢‹"] = "ç‰›çš®é…’è¢‹"
+        ["ÄÚÏ¢Íè"] = "ÄÚÏ¢Íè",
+        ["´¨±´ÄÚÏ¢Íè"] = "´¨±´ÄÚÏ¢Íè",
+        ["»ÆÜÎÄÚÏ¢µ¤"] = "»ÆÜÎÄÚÏ¢µ¤",
+        ["²õÍÉ½ğ´¯Ò©"] = "²õÍÉ½ğ´¯Ò©",
+        ["»îÑªÁÆ¾«µ¤"] = "»îÑªÁÆ¾«µ¤",
+        ["´ó»¹µ¤"] = "´ó»¹µ¤",
+        ["»ğÕÛ"] = "»ğÕÛ",
+        ["Å£Æ¤¾Æ´ü"] = "Å£Æ¤¾Æ´ü"
     }
     if GetVariable("drugprepare") then
         tmp.drug = utils.split(GetVariable("drugprepare"), '|')
@@ -733,8 +733,8 @@ function drugSet()
         for _, p in pairs(tmp.drug) do tmp.pre[p] = true end
     end
     local l_tmp = utils.multilistbox(
-                      "ä½ ä»»åŠ¡å‰å‡†å¤‡çš„ç‰©å“(è¯·æŒ‰CTRLå¤šé€‰)æ˜¯?",
-                      "ç‰©å“ç»„åˆ", t, tmp.pre)
+                      "ÄãÈÎÎñÇ°×¼±¸µÄÎïÆ·(Çë°´CTRL¶àÑ¡)ÊÇ?",
+                      "ÎïÆ·×éºÏ", t, tmp.pre)
     local l_result = nil
     for p in pairs(l_tmp) do
         drugPrepare[p] = true
@@ -829,12 +829,12 @@ end
 
 function g_stop()
     if job.name == nil or job.name == 'idle' then
-        print("æ¸¸æˆåœæ­¢")
+        print("ÓÎÏ·Í£Ö¹")
         disAll()
     else
         g_stop_flag = true
-        print("å½“å‰æ­£åœ¨ä»»åŠ¡ä¸­ï¼š" .. job.name ..
-                  ". å°†ä¼šåœ¨ä»»åŠ¡ç»“æŸååœæ­¢")
+        print("µ±Ç°ÕıÔÚÈÎÎñÖĞ£º" .. job.name ..
+                  ". ½«»áÔÚÈÎÎñ½áÊøºóÍ£Ö¹")
     end
 end
 function setAlias()
@@ -888,39 +888,39 @@ end
 
 function setdzxy()
     l_result = utils.msgbox(
-                   "æ…•å®¹æ–—è½¬æ˜Ÿç§»å­¦ä¹ è®¾ç½®(é»˜è®¤ä¸ºï¼šYes)ï¼Ÿ", "dzxy",
+                   "Ä½Èİ¶·×ªĞÇÒÆÑ§Ï°ÉèÖÃ(Ä¬ÈÏÎª£ºYes)£¿", "dzxy",
                    "yesno", "?", 1)
     if l_result and l_result == "yes" then
-        print('æˆ‘è¦å­¦ä¹ æ–—è½¬æ˜Ÿç§»')
+        print('ÎÒÒªÑ§Ï°¶·×ªĞÇÒÆ')
         need_dzxy = 'yes'
     else
         need_dzxy = 'no'
-        print('æˆ‘ä¸è¦å­¦ä¹ æ–—è½¬æ˜Ÿç§»')
+        print('ÎÒ²»ÒªÑ§Ï°¶·×ªĞÇÒÆ')
     end
 end
 function inWdj()
-    l_result = utils.msgbox("æ˜¯è¦è¿›è‹—ç–†äº”æ¯’æ•™å—ï¼Ÿ", "inwdj", "yesno",
+    l_result = utils.msgbox("ÊÇÒª½øÃç½®Îå¶¾½ÌÂğ£¿", "inwdj", "yesno",
                             "?", 1)
     if l_result and l_result == "yes" then
-        print('æˆ‘è¦è¿›è‹—ç–†äº”æ¯’æ•™')
+        print('ÎÒÒª½øÃç½®Îå¶¾½Ì')
         inwdj = 1
     else
         inwdj = 0
-        print('æˆ‘ä¸è¿›è‹—ç–†äº”æ¯’æ•™')
+        print('ÎÒ²»½øÃç½®Îå¶¾½Ì')
     end
 end
 function setLearn()
     l_result = utils.inputbox(
-                   "ä½ è¦å­¦ä¹ çš„SKILLS(æ ¼å¼ï¼šforce|shenyuan-gong|dodge|yanling-shenfa|sword|blade|parry)æ˜¯?",
-                   "xuexiskill", GetVariable("xuexiskill"), "å®‹ä½“", "12")
+                   "ÄãÒªÑ§Ï°µÄSKILLS(¸ñÊ½£ºforce|shenyuan-gong|dodge|yanling-shenfa|sword|blade|parry)ÊÇ?",
+                   "xuexiskill", GetVariable("xuexiskill"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("xuexiskill", l_result)
-        Note("å­¦ä¹ è®¾å®šå®Œæˆ")
+        Note("Ñ§Ï°Éè¶¨Íê³É")
         print(GetVariable("xuexiskill"))
     end
-    l_result = utils.inputbox("ä½ å­¦ä¹ æ—¶ä½¿ç”¨çš„åŠ æ‚Ÿæ€§æ­¦å™¨æ˜¯?",
+    l_result = utils.inputbox("ÄãÑ§Ï°Ê±Ê¹ÓÃµÄ¼ÓÎòĞÔÎäÆ÷ÊÇ?",
                               "learnweapon", GetVariable("learnweapon"),
-                              "å®‹ä½“", "12")
+                              "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("learnweapon", l_result)
         print(GetVariable("learnweapon"))
@@ -928,24 +928,24 @@ function setLearn()
 end
 function setLingwu()
     l_result = utils.inputbox(
-                   "ä½ è¦é¢†æ‚Ÿçš„SKILLS(æ ¼å¼ï¼šforce|dodge|sword|blade|parry)æ˜¯?",
-                   "lingwuskills", GetVariable("lingwuskills"), "å®‹ä½“", "12")
+                   "ÄãÒªÁìÎòµÄSKILLS(¸ñÊ½£ºforce|dodge|sword|blade|parry)ÊÇ?",
+                   "lingwuskills", GetVariable("lingwuskills"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("lingwuskills", l_result)
-        Note("é¢†æ‚Ÿè®¾å®šå®Œæˆ")
+        Note("ÁìÎòÉè¶¨Íê³É")
         print(GetVariable("lingwuskills"))
     end
-    l_result = utils.inputbox("ä½ é¢†æ‚Ÿæ—¶ä½¿ç”¨çš„åŠ æ‚Ÿæ€§æ­¦å™¨æ˜¯?",
+    l_result = utils.inputbox("ÄãÁìÎòÊ±Ê¹ÓÃµÄ¼ÓÎòĞÔÎäÆ÷ÊÇ?",
                               "learnweapon", GetVariable("learnweapon"),
-                              "å®‹ä½“", "12")
+                              "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("learnweapon", l_result)
         print(GetVariable("learnweapon"))
     end
 end
 function setLian()
-    l_result = utils.inputbox("ä½ ç»ƒåŠŸçš„æ¬¡æ•°æ˜¯ï¼Ÿ", "mycishu",
-                              GetVariable("mycishu"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÄãÁ·¹¦µÄ´ÎÊıÊÇ£¿", "mycishu",
+                              GetVariable("mycishu"), "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("mycishu", l_result)
         lianxi_times = l_result
@@ -953,12 +953,12 @@ function setLian()
 end
 
 function setShenQi()
-    l_result = utils.inputbox("ä½ çš„ç¥å™¨idæ˜¯ï¼Ÿ", "myshenqi_id",
-                              GetVariable("myshenqi_id"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÄãµÄÉñÆ÷idÊÇ£¿", "myshenqi_id",
+                              GetVariable("myshenqi_id"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("myshenqi_id", l_result) end
 end
 function set_autoxue()
-    l_result = utils.msgbox("æ˜¯å¦è‡ªåŠ¨å­¦ä¹ åŠé¢†æ‚Ÿ", "XuexiLingwu",
+    l_result = utils.msgbox("ÊÇ·ñ×Ô¶¯Ñ§Ï°¼°ÁìÎò", "XuexiLingwu",
                             "yesno", "?", 1)
     if l_result and l_result == "yes" then
         flag.autoxuexi = 1
@@ -968,8 +968,8 @@ function set_autoxue()
     SetVariable("flagautoxuexi", flag.autoxuexi)
 end
 function pk_start()
-    l_result = utils.inputbox("ä½ è¦PKçš„ç›®æ ‡æ˜¯ï¼ˆè‹±æ–‡IDï¼‰ï¼Ÿ",
-                              "PK-Target", GetVariable("pk_target"), "å®‹ä½“",
+    l_result = utils.inputbox("ÄãÒªPKµÄÄ¿±êÊÇ£¨Ó¢ÎÄID£©£¿",
+                              "PK-Target", GetVariable("pk_target"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("pk_target", l_result) end
     if l_result then create_timer_s('walkWait4', 0.4, 'pk_start1') end
@@ -980,205 +980,205 @@ function pk_start1()
     exe('kill ' .. GetVariable("pk_target"))
 end
 function setpk()
-    l_result = utils.inputbox("ä½ æ‰“ç®—æ†‹å¤šå°‘åˆæ°”ï¼Ÿ(ä¸å¡«é»˜è®¤240)",
+    l_result = utils.inputbox("Äã´òËã±ï¶àÉÙºÏÆø£¿(²»ÌîÄ¬ÈÏ240)",
                               "heqi_number", GetVariable("heqi_number"),
-                              "å®‹ä½“", "12")
+                              "ËÎÌå", "12")
     if not isNil(l_result) then
         SetVariable("heqi_number", l_result)
     else
         SetVariable("heqi_number", "240")
     end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„å…‹åˆ¶æ— å±æ€§PK-PFM(å…‹åˆ¶æ— )æ˜¯?",
-                   "zpk_pwu", GetVariable("zpk_pwu"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ¿ËÖÆÎŞÊôĞÔPK-PFM(¿ËÖÆÎŞ)ÊÇ?",
+                   "zpk_pwu", GetVariable("zpk_pwu"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("zpk_pwu", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„å…‹åˆ¶ç©ºå±æ€§PK-PFM(å…‹åˆ¶ç©º)æ˜¯?",
-                   "zpk_pkong", GetVariable("zpk_pkong"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ¿ËÖÆ¿ÕÊôĞÔPK-PFM(¿ËÖÆ¿Õ)ÊÇ?",
+                   "zpk_pkong", GetVariable("zpk_pkong"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("zpk_pkong", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„æ­£å±æ€§PK-PFMæ˜¯? (å…‹åˆ¶é™©)",
-                              "zpk_pzhen", GetVariable("zpk_pzhen"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÕıÊôĞÔPK-PFMÊÇ? (¿ËÖÆÏÕ)",
+                              "zpk_pzhen", GetVariable("zpk_pzhen"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("zpk_pzhen", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„å¥‡å±æ€§PK-PFM(å…‹åˆ¶å¦™)",
-                              "zpk_pqi", GetVariable("zpk_pqi"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÆæÊôĞÔPK-PFM(¿ËÖÆÃî)",
+                              "zpk_pqi", GetVariable("zpk_pqi"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("zpk_pqi", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„åˆšå±æ€§PK-PFM(å…‹åˆ¶æ…¢)",
-                              "zpk_pgang", GetVariable("zpk_pgang"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄ¸ÕÊôĞÔPK-PFM(¿ËÖÆÂı)",
+                              "zpk_pgang", GetVariable("zpk_pgang"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("zpk_pgang", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„æŸ”å±æ€§PK-PFM(å…‹åˆ¶å¿«)",
-                              "zpk_prou", GetVariable("zpk_prou"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÈáÊôĞÔPK-PFM(¿ËÖÆ¿ì)",
+                              "zpk_prou", GetVariable("zpk_prou"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("zpk_prou", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„å¿«å±æ€§PK-PFM(å…‹åˆ¶åˆš)",
-                              "zpk_pkuai", GetVariable("zpk_pkuai"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄ¿ìÊôĞÔPK-PFM(¿ËÖÆ¸Õ)",
+                              "zpk_pkuai", GetVariable("zpk_pkuai"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("zpk_pkuai", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„æ…¢å±æ€§PK-PFM(å…‹åˆ¶æŸ”)",
-                              "zpk_pman", GetVariable("zpk_pman"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÂıÊôĞÔPK-PFM(¿ËÖÆÈá)",
+                              "zpk_pman", GetVariable("zpk_pman"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("zpk_pman", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„ç§’å±æ€§PK-PFM(å…‹åˆ¶æ­£)",
-                              "zpk_pmiao", GetVariable("zpk_pmiao"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÃëÊôĞÔPK-PFM(¿ËÖÆÕı)",
+                              "zpk_pmiao", GetVariable("zpk_pmiao"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("zpk_pmiao", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„é™©å±æ€§PK-PFM(å…‹åˆ¶å¥‡)",
-                              "zpk_pxian", GetVariable("zpk_pxian"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÏÕÊôĞÔPK-PFM(¿ËÖÆÆæ)",
+                              "zpk_pxian", GetVariable("zpk_pxian"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("zpk_pxian", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„é»˜è®¤PK-PFM(èµ·æ‰‹pfmæˆ–æ— æ³•è¯†åˆ«å¯¹æ–¹æ­¦åŠŸçš„åº”å¯¹ï¼Œç±»ä¼¼pfmpfmè®¾å®š)æ˜¯?",
-                   "pkpfm", GetVariable("pkpfm"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄÄ¬ÈÏPK-PFM(ÆğÊÖpfm»òÎŞ·¨Ê¶±ğ¶Ô·½Îä¹¦µÄÓ¦¶Ô£¬ÀàËÆpfmpfmÉè¶¨)ÊÇ?",
+                   "pkpfm", GetVariable("pkpfm"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("pkpfm", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„PK-PFM(åªåŒ…å«pfmï¼Œä¸åŒ…å«wieldæ­¦å™¨æˆ–jifa)",
-                   "mypfm", GetVariable("mypfm"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄPK-PFM(Ö»°üº¬pfm£¬²»°üº¬wieldÎäÆ÷»òjifa)",
+                   "mypfm", GetVariable("mypfm"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("mypfm", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„PK-PFMéœ€è¦å¤šå°‘åˆæ°”é‡Šæ”¾ï¼ˆåªå¡«æ•°å­—ï¼‰ï¼Ÿ",
-                   "pk_pfm_heqi", GetVariable("pk_pfm_heqi"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄPK-PFMĞèÒª¶àÉÙºÏÆøÊÍ·Å£¨Ö»ÌîÊı×Ö£©£¿",
+                   "pk_pfm_heqi", GetVariable("pk_pfm_heqi"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("pk_pfm_heqi", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„buff-PFM(pkæ—¶ä½¿ç”¨çš„buffæŠ€èƒ½)",
-                              "mybuff", GetVariable("mybuff"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄbuff-PFM(pkÊ±Ê¹ÓÃµÄbuff¼¼ÄÜ)",
+                              "mybuff", GetVariable("mybuff"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("mybuff", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„buff-PFMéœ€è¦å¤šå°‘åˆæ°”é‡Šæ”¾ï¼ˆåªå¡«æ•°å­—ï¼‰ï¼Ÿ",
-                   "pk_buff_heqi", GetVariable("pk_buff_heqi"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄbuff-PFMĞèÒª¶àÉÙºÏÆøÊÍ·Å£¨Ö»ÌîÊı×Ö£©£¿",
+                   "pk_buff_heqi", GetVariable("pk_buff_heqi"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("pk_buff_heqi", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„debuff-PFM(pkæ—¶ä½¿ç”¨çš„debuffæŠ€èƒ½)",
-                   "mydebuff", GetVariable("mydebuff"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄdebuff-PFM(pkÊ±Ê¹ÓÃµÄdebuff¼¼ÄÜ)",
+                   "mydebuff", GetVariable("mydebuff"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("mydebuff", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„debuff-PFMéœ€è¦å¤šå°‘åˆæ°”é‡Šæ”¾ï¼ˆåªå¡«æ•°å­—ï¼‰ï¼Ÿ",
-                   "pk_debuff_heqi", GetVariable("pk_debuff_heqi"), "å®‹ä½“",
+                   "ÌîĞ´ÄãµÄdebuff-PFMĞèÒª¶àÉÙºÏÆøÊÍ·Å£¨Ö»ÌîÊı×Ö£©£¿",
+                   "pk_debuff_heqi", GetVariable("pk_debuff_heqi"), "ËÎÌå",
                    "12")
     if not isNil(l_result) then SetVariable("pk_debuff_heqi", l_result) end
 end
 function setsmy()
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„å…‹åˆ¶æ— å±æ€§PK-PFM(å…‹åˆ¶æ— )æ˜¯?",
-                   "smy_pwu", GetVariable("smy_pwu"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ¿ËÖÆÎŞÊôĞÔPK-PFM(¿ËÖÆÎŞ)ÊÇ?",
+                   "smy_pwu", GetVariable("smy_pwu"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("smy_pwu", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„å…‹åˆ¶ç©ºå±æ€§PK-PFM(å…‹åˆ¶ç©º)æ˜¯?",
-                   "smy_pkong", GetVariable("smy_pkong"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ¿ËÖÆ¿ÕÊôĞÔPK-PFM(¿ËÖÆ¿Õ)ÊÇ?",
+                   "smy_pkong", GetVariable("smy_pkong"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("smy_pkong", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„æ­£å±æ€§PK-PFMæ˜¯? (å…‹åˆ¶é™©)",
-                              "smy_pzhen", GetVariable("smy_pzhen"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÕıÊôĞÔPK-PFMÊÇ? (¿ËÖÆÏÕ)",
+                              "smy_pzhen", GetVariable("smy_pzhen"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("smy_pzhen", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„å¥‡å±æ€§PK-PFM(å…‹åˆ¶å¦™)",
-                              "smy_pqi", GetVariable("smy_pqi"), "å®‹ä½“", "12")
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÆæÊôĞÔPK-PFM(¿ËÖÆÃî)",
+                              "smy_pqi", GetVariable("smy_pqi"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("smy_pqi", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„åˆšå±æ€§PK-PFM(å…‹åˆ¶æ…¢)",
-                              "smy_pgang", GetVariable("smy_pgang"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄ¸ÕÊôĞÔPK-PFM(¿ËÖÆÂı)",
+                              "smy_pgang", GetVariable("smy_pgang"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("smy_pgang", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„æŸ”å±æ€§PK-PFM(å…‹åˆ¶å¿«)",
-                              "smy_prou", GetVariable("smy_prou"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÈáÊôĞÔPK-PFM(¿ËÖÆ¿ì)",
+                              "smy_prou", GetVariable("smy_prou"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("smy_prou", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„å¿«å±æ€§PK-PFM(å…‹åˆ¶åˆš)",
-                              "smy_pkuai", GetVariable("smy_pkuai"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄ¿ìÊôĞÔPK-PFM(¿ËÖÆ¸Õ)",
+                              "smy_pkuai", GetVariable("smy_pkuai"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("smy_pkuai", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„æ…¢å±æ€§PK-PFM(å…‹åˆ¶æŸ”)",
-                              "smy_pman", GetVariable("smy_pman"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÂıÊôĞÔPK-PFM(¿ËÖÆÈá)",
+                              "smy_pman", GetVariable("smy_pman"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("smy_pman", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„ç§’å±æ€§PK-PFM(å…‹åˆ¶æ­£)",
-                              "smy_pmiao", GetVariable("smy_pmiao"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÃëÊôĞÔPK-PFM(¿ËÖÆÕı)",
+                              "smy_pmiao", GetVariable("smy_pmiao"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("smy_pmiao", l_result) end
-    l_result = utils.inputbox("å¡«å†™ä½ çš„é™©å±æ€§PK-PFM(å…‹åˆ¶å¥‡)",
-                              "smy_pxian", GetVariable("smy_pxian"), "å®‹ä½“",
+    l_result = utils.inputbox("ÌîĞ´ÄãµÄÏÕÊôĞÔPK-PFM(¿ËÖÆÆæ)",
+                              "smy_pxian", GetVariable("smy_pxian"), "ËÎÌå",
                               "12")
     if not isNil(l_result) then SetVariable("smy_pxian", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„ä½åˆæ°”PFM(ä¾‹å¦‚ï¼šæ¡ƒèŠ±å²›çš„perform leg.fengwu)æ˜¯?",
-                   "smy_pfm1", GetVariable("smy_pfm1"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄµÍºÏÆøPFM(ÀıÈç£ºÌÒ»¨µºµÄperform leg.fengwu)ÊÇ?",
+                   "smy_pfm1", GetVariable("smy_pfm1"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("smy_pfm1", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„è¾…åŠ©PFM(ä¾‹å¦‚ï¼šæ¡ƒèŠ±å²›çš„perform sword.qimen)æ˜¯ï¼Ÿ",
-                   "smy_pfm2", GetVariable("smy_pfm2"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ¸¨ÖúPFM(ÀıÈç£ºÌÒ»¨µºµÄperform sword.qimen)ÊÇ£¿",
+                   "smy_pfm2", GetVariable("smy_pfm2"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("smy_pfm2", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„å¤§æ‹›PFM(åªåŒ…å«pfmï¼Œä¸åŒ…å«wieldæ­¦å™¨æˆ–jifaï¼Œä¾‹å¦‚ï¼šæ¡ƒèŠ±å²›çš„perform leg.kuangfeng)æ˜¯ï¼Ÿ",
-                   "smy_pfm3", GetVariable("smy_pfm3"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄ´óÕĞPFM(Ö»°üº¬pfm£¬²»°üº¬wieldÎäÆ÷»òjifa£¬ÀıÈç£ºÌÒ»¨µºµÄperform leg.kuangfeng)ÊÇ£¿",
+                   "smy_pfm3", GetVariable("smy_pfm3"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("smy_pfm3", l_result) end
     l_result = utils.inputbox(
-                   "å¡«å†™ä½ çš„buff-PFM(ä¸Šå±±æ—¶ä½¿ç”¨çš„buffæŠ€èƒ½ï¼Œä¾‹å¦‚ï¼šæ¡ƒèŠ±å²›çš„perform dodge.wuzhuan;perform finger.xinghe)æ˜¯ï¼Ÿ",
-                   "mybuff", GetVariable("smybuff"), "å®‹ä½“", "12")
+                   "ÌîĞ´ÄãµÄbuff-PFM(ÉÏÉ½Ê±Ê¹ÓÃµÄbuff¼¼ÄÜ£¬ÀıÈç£ºÌÒ»¨µºµÄperform dodge.wuzhuan;perform finger.xinghe)ÊÇ£¿",
+                   "mybuff", GetVariable("smybuff"), "ËÎÌå", "12")
     if not isNil(l_result) then SetVariable("smybuff", l_result) end
 end
 function setxcexp()
-    l_result = utils.msgbox("å·¡åŸåˆ°2M", "xcexp", "yesno", "?", 1)
+    l_result = utils.msgbox("Ñ²³Çµ½2M", "xcexp", "yesno", "?", 1)
     if l_result and l_result == "yes" then
-        print('å·¡åŸåˆ°2M')
+        print('Ñ²³Çµ½2M')
         xcexp = 1
     else
-        print('å·¡åŸåˆ°1M')
+        print('Ñ²³Çµ½1M')
         xcexp = 0
     end
 end
 function xuepot()
-    l_result = utils.msgbox("æ˜¯å¦å­¦ä¹ ", "xuexi", "yesno", "?", 1)
+    l_result = utils.msgbox("ÊÇ·ñÑ§Ï°", "xuexi", "yesno", "?", 1)
     if l_result and l_result == "yes" then
-        print('å­¦ä¹ å¼€å¯')
+        print('Ñ§Ï°¿ªÆô')
         needxuexi = 1
     else
         needxuexi = 0
-        print('å­¦ä¹ å…³é—­')
+        print('Ñ§Ï°¹Ø±Õ')
     end
 end
 
 drugBuy = {
-    ["å·è´å†…æ¯ä¸¸"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["é‚ªæ°”ä¸¸"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["æ­£æ°”ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["å…»ç²¾ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["è¡¥æ°”ä¸¸"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["ç»­ç²¾ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["å†…æ¯ä¸¸"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["è¡¥é£Ÿä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["è¡¥æ°´ä¸¸"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["é‡‘ç–®è¯"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["ç–—ç²¾ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["æ­£æ°”ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["é‚ªæ°”ä¸¸"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["å»¶å¹´å…»ç²¾ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["èŒ¯è‹“è¡¥æ°”ä¸¸"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["å½“å½’ç»­ç²¾ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["é»„èŠªå†…æ¯ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["è‰èœ•é‡‘ç–®è¯"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["æ´»è¡€ç–—ç²¾ä¸¹"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["è§£æ¯’ä¸¸"] = {"dali/yaopu", "zhiye/yaodian1"},
-    ["å¤§è¿˜ä¸¹"] = "city/dangpu",
-    ["ç«æŠ˜"] = {"xueshan/laifu", "suzhou/baodaiqiao"},
-    ["ç‰›çš®é…’è¢‹"] = {"city/xiaochidian"}
+    ["´¨±´ÄÚÏ¢Íè"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["Ğ°ÆøÍè"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["ÕıÆøµ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["Ñø¾«µ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["²¹ÆøÍè"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["Ğø¾«µ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["ÄÚÏ¢Íè"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["²¹Ê³µ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["²¹Ë®Íè"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["½ğ´¯Ò©"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["ÁÆ¾«µ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["ÕıÆøµ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["Ğ°ÆøÍè"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["ÑÓÄêÑø¾«µ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["ÜòÜß²¹ÆøÍè"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["µ±¹éĞø¾«µ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["»ÆÜÎÄÚÏ¢µ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["²õÍÉ½ğ´¯Ò©"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["»îÑªÁÆ¾«µ¤"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["½â¶¾Íè"] = {"dali/yaopu", "zhiye/yaodian1"},
+    ["´ó»¹µ¤"] = "city/dangpu",
+    ["»ğÕÛ"] = {"xueshan/laifu", "suzhou/baodaiqiao"},
+    ["Å£Æ¤¾Æ´ü"] = {"city/xiaochidian"}
 }
 
-drugPoison = {["ä¹èŠ±ç‰éœ²ä¸¸"] = true}
+drugPoison = {["¾Å»¨ÓñÂ¶Íè"] = true}
 
 -- ain
 
 local cun_hammer = tonumber(GetVariable("autocun_hammer"))
 if cun_hammer == 1 then
     itemSave = {
-        ["å€šå¤©åŒ æŠ€æ®‹ç¯‡"] = true,
-        ["å± é¾™åŒ æŠ€æ®‹ç¯‡"] = true,
-        ["éŸ¦å…°ä¹‹é”¤"] = true,
-        ["é‡‘é“é”¤"] = true,
-        ["ç¥é“é”¤"] = true
+        ["ÒĞÌì½³¼¼²ĞÆª"] = true,
+        ["ÍÀÁú½³¼¼²ĞÆª"] = true,
+        ["Î¤À¼Ö®´¸"] = true,
+        ["½ğÌú´¸"] = true,
+        ["ÉñÌú´¸"] = true
     }
 else
     itemSave = {
-        ["å€šå¤©åŒ æŠ€æ®‹ç¯‡"] = true,
-        ["å± é¾™åŒ æŠ€æ®‹ç¯‡"] = true,
-        ["éŸ¦å…°ä¹‹é”¤"] = true,
-        ["é‡‘é“é”¤"] = true,
-        ["ç¥é“é”¤"] = true
+        ["ÒĞÌì½³¼¼²ĞÆª"] = true,
+        ["ÍÀÁú½³¼¼²ĞÆª"] = true,
+        ["Î¤À¼Ö®´¸"] = true,
+        ["½ğÌú´¸"] = true,
+        ["ÉñÌú´¸"] = true
     }
 end

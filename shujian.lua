@@ -146,11 +146,9 @@ xuezhu_require = 0
 needjinchai = 0
 cmdck = 0
 check_steptest = 0
-_check_step_num = 0
 check_step_num = 0
 check_step_num1 = 0
 check_step_num2 = 0
-need_waittime = 0
 common_walk = 1
 check_step_time = os.clock()
 quick_locate = 0
@@ -846,7 +844,13 @@ function taojiao_over()
     return check_busy(check_food)
 end
 function fightoverweapon()
-    if GetVariable("recoveryweapon") then exe(GetVariable("recoveryweapon")) end
+    if GetVariable("recoveryweapon") then
+        exe(GetVariable("recoveryweapon"))
+        checkWield()
+    else
+        weapon_unwield()
+        weapon_wield()
+    end
 end
 ------扬州当铺兑换道具机器人 by如版.2019.11.09-----
 function duihuanSomething()

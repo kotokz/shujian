@@ -3,7 +3,7 @@ function wait_busy()
     while true do
         exe('bei bei bei')
         local l, w = wait.regexp(
-                         '^(> )*(ä½ ç°åœ¨å·²ç»ç»„åˆ|ä½ å·²å‡†å¤‡æœ‰ä¸€ç§æŠ€èƒ½äº†|ä½ è‡³å°‘ä¸ä¼šè¿™ä¸¤ç§æ‹³è„šæŠ€èƒ½çš„å…¶ä¸­ä¹‹ä¸€)',
+                         '^(> )*(ÄãÏÖÔÚÒÑ¾­×éºÏ|ÄãÒÑ×¼±¸ÓĞÒ»ÖÖ¼¼ÄÜÁË|ÄãÖÁÉÙ²»»áÕâÁ½ÖÖÈ­½Å¼¼ÄÜµÄÆäÖĞÖ®Ò»)',
                          1)
         if l ~= nil then
             EnableTrigger("hp12", false)
@@ -17,10 +17,10 @@ function check_busy(func, p_cmd)
     disWait()
     DeleteTriggerGroup("check_bei")
     create_trigger_t('check_bei1',
-                     "^(> )*(ä½ ç°åœ¨å·²ç»ç»„åˆ|ä½ å·²å‡†å¤‡æœ‰ä¸€ç§æŠ€èƒ½äº†|ä½ è‡³å°‘ä¸ä¼šè¿™ä¸¤ç§æ‹³è„šæŠ€èƒ½çš„å…¶ä¸­ä¹‹ä¸€)",
+                     "^(> )*(ÄãÏÖÔÚÒÑ¾­×éºÏ|ÄãÒÑ×¼±¸ÓĞÒ»ÖÖ¼¼ÄÜÁË|ÄãÖÁÉÙ²»»áÕâÁ½ÖÖÈ­½Å¼¼ÄÜµÄÆäÖĞÖ®Ò»)",
                      '', 'beiok')
     create_trigger_t('check_bei2',
-                     "^(> )*ä½ ç°åœ¨æ²¡æœ‰æ¿€å‘ä»»ä½•æœ‰æ•ˆç‰¹æ®ŠæŠ€èƒ½ã€‚",
+                     "^(> )*ÄãÏÖÔÚÃ»ÓĞ¼¤·¢ÈÎºÎÓĞĞ§ÌØÊâ¼¼ÄÜ¡£",
                      '', 'beinone')
     SetTriggerOption("check_bei1", "group", "check_bei")
     SetTriggerOption("check_bei2", "group", "check_bei")
@@ -56,9 +56,9 @@ function check_halt(func)
     disWait()
     DeleteTriggerGroup("check_halt")
     create_trigger_t('check_halt1',
-                     "^>*\\s*(ä½ ç°åœ¨ä¸å¿™ã€‚|ä½ èº«å½¢å‘åä¸€è·ƒï¼Œè·³å‡ºæˆ˜åœˆä¸æ‰“äº†ã€‚)",
+                     "^>*\\s*(ÄãÏÖÔÚ²»Ã¦¡£|ÄãÉíĞÎÏòºóÒ»Ô¾£¬Ìø³öÕ½È¦²»´òÁË¡£)",
                      '', 'haltok')
-    create_trigger_t('check_halt2', "^>*\\s*ä½ ç°åœ¨å¾ˆå¿™ï¼Œåœä¸ä¸‹æ¥ã€‚",
+    create_trigger_t('check_halt2', "^>*\\s*ÄãÏÖÔÚºÜÃ¦£¬Í£²»ÏÂÀ´¡£",
                      '', 'halterror')
     SetTriggerOption("check_halt1", "group", "check_halt")
     SetTriggerOption("check_halt2", "group", "check_halt")
@@ -74,7 +74,7 @@ function halterror()
         haltbusy = 0
         locate()
     end
-    if locl.room == "æ´—è±¡æ± è¾¹" then
+    if locl.room == "Ï´Ïó³Ø±ß" then
         EnableTimer('halt', false)
         wait.make(function()
             wait.time(5)
@@ -101,7 +101,7 @@ busyhook = test
 function check_bei(func, p_cmd)
     disWait()
     DeleteTriggerGroup("check_busy")
-    create_trigger_t('check_busy1', "^>*\\s*æ²¡æœ‰è¿™ä¸ªæŠ€èƒ½ç§ç±»ï¼Œç”¨", '',
+    create_trigger_t('check_busy1', "^>*\\s*Ã»ÓĞÕâ¸ö¼¼ÄÜÖÖÀà£¬ÓÃ", '',
                      'busyok')
     SetTriggerOption("check_busy1", "group", "check_busy")
     EnableTriggerGroup("check_busy", true)
@@ -129,7 +129,7 @@ function checkWait(func, sec)
     disWait()
     DeleteTriggerGroup("checkwait")
     create_trigger_t('checkwait1',
-                     '^(> )*ä½ æŠŠ "action" è®¾å®šä¸º "ç­‰å¾…ä¸€ä¸‹" æˆåŠŸå®Œæˆã€‚$',
+                     '^(> )*Äã°Ñ "action" Éè¶¨Îª "µÈ´ıÒ»ÏÂ" ³É¹¦Íê³É¡£$',
                      '', 'checkWaitOk')
     SetTriggerOption("checkwait1", "group", "checkwait")
     EnableTriggerGroup("checkwait", true)
@@ -140,7 +140,7 @@ function checkWait(func, sec)
 end
 function wait_timer_set()
     -- EnableTriggerGroup("checkwait",true)
-    exe('alias action ç­‰å¾…ä¸€ä¸‹')
+    exe('alias action µÈ´ıÒ»ÏÂ')
 end
 function checkWaitOk()
     EnableTriggerGroup("checkwait", false)
@@ -156,7 +156,7 @@ function checkNext(func)
     disWait()
     DeleteTriggerGroup("checknext")
     create_trigger_t('checknext1',
-                     '^(> )*ä½ æŠŠ "action" è®¾å®šä¸º "ç»§ç»­å‰è¿›" æˆåŠŸå®Œæˆã€‚$',
+                     '^(> )*Äã°Ñ "action" Éè¶¨Îª "¼ÌĞøÇ°½ø" ³É¹¦Íê³É¡£$',
                      '', 'checkNextOk')
     SetTriggerOption("checknext1", "group", "checknext")
     EnableTriggerGroup("checknext", true)
@@ -165,7 +165,7 @@ function checkNext(func)
     next_timer_set()
     return create_timer_s('nextimer', 0.5, 'next_timer_set')
 end
-function next_timer_set() exe('alias action ç»§ç»­å‰è¿›') end
+function next_timer_set() exe('alias action ¼ÌĞøÇ°½ø') end
 function checkNextOk()
     EnableTriggerGroup("checknext", false)
     EnableTrigger("hp12", false)
@@ -191,7 +191,7 @@ function resetWait()
             -- messageShow(v)
             if IsTimer(v) == 0 and GetTimerInfo(v, 6) and
                 tonumber(GetTimerInfo(v, 3)) < tonumber(GetTimerInfo(v, 13)) then
-                -- messageShow(v..' '..'è®¾å®šæ—¶é—´:'..GetTimerInfo(v, 3)..'ç§’ï¼Œä¸‹ä¸€æ¬¡æ—¶é—´:'..GetTimerInfo(v, 13)..'ç§’ã€‚')
+                -- messageShow(v..' '..'Éè¶¨Ê±¼ä:'..GetTimerInfo(v, 3)..'Ãë£¬ÏÂÒ»´ÎÊ±¼ä:'..GetTimerInfo(v, 13)..'Ãë¡£')
                 ResetTimers()
                 break
             end
@@ -202,26 +202,26 @@ end
 function trans(num)
     local words = {}
     local i = 0
-    num = string.gsub(num, "é›¶å", "10 ");
-    num = string.gsub(num, "é›¶", "");
-    num = string.gsub(num, "ä¸€", "1");
-    num = string.gsub(num, "äºŒ", "2");
-    num = string.gsub(num, "ä¸‰", "3");
-    num = string.gsub(num, "å››", "4");
-    num = string.gsub(num, "äº”", "5");
-    num = string.gsub(num, "å…­", "6");
-    num = string.gsub(num, "ä¸ƒ", "7");
-    num = string.gsub(num, "å…«", "8");
-    num = string.gsub(num, "ä¹", "9");
-    i = string.find(num, "å")
+    num = string.gsub(num, "ÁãÊ®", "10 ");
+    num = string.gsub(num, "Áã", "");
+    num = string.gsub(num, "Ò»", "1");
+    num = string.gsub(num, "¶ş", "2");
+    num = string.gsub(num, "Èı", "3");
+    num = string.gsub(num, "ËÄ", "4");
+    num = string.gsub(num, "Îå", "5");
+    num = string.gsub(num, "Áù", "6");
+    num = string.gsub(num, "Æß", "7");
+    num = string.gsub(num, "°Ë", "8");
+    num = string.gsub(num, "¾Å", "9");
+    i = string.find(num, "Ê®")
     if i == 1 then
-        num = string.gsub(num, "å", "10 ")
+        num = string.gsub(num, "Ê®", "10 ")
     else
-        num = string.gsub(num, "å", "0 ")
+        num = string.gsub(num, "Ê®", "0 ")
     end
-    num = string.gsub(num, "ç™¾", "00 ")
-    num = string.gsub(num, "åƒ", "000 ")
-    num = string.gsub(num, "ä¸‡", "0000 ")
+    num = string.gsub(num, "°Ù", "00 ")
+    num = string.gsub(num, "Ç§", "000 ")
+    num = string.gsub(num, "Íò", "0000 ")
     for w in string.gmatch(num, "(%w+)") do table.insert(words, w) end
     i = 0
     for p = 1, table.getn(words) do i = i + tonumber(words[p]) end

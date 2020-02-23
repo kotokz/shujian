@@ -1081,8 +1081,9 @@ function lingwu_goon()
         lingwudie = 1
         xxpot = hp.pot_max
         -- return check_bei(lingwu_finish)
+        -- wait.time(1)
         wait_busy()
-        -- SetSpeedWalkDelay(0)  --no need to set it back just set the flag and let queue auto determinate
+        SetSpeedWalkDelay(0)  
         return lingwu_finish()
     end)
 end

@@ -120,6 +120,12 @@ function tablelength(T)
     return count
 end
 
+function resumeSpeedWalk()
+    cmd_throttling = false
+    print("full speed")
+    SetSpeedWalkDelay(0)
+end
+
 function moving_sum()
     local time = os.time()
     t_cmds[time] = t_cmds[time] or 0
@@ -129,15 +135,16 @@ function moving_sum()
         for k, v in pairs(t_cmds) do
             if k > time - 3 then sum = sum + v end
         end
-        if sum >= 50 and not cmd_throttling then
+        if sum >= 75 and not cmd_throttling then
             print("start throttling")
             cmd_throttling = true
-            SetSpeedWalkDelay(math.floor(1000 / 30))
-        elseif cmd_throttling and sum < 30 and
+            SetSpeedWalkDelay(1)
+            create_timer_st("SpeekWalkResume", 1, "resumeSpeedWalk")
+        elseif cmd_throttling and sum < 60 and
             (tmp.lingwustart == nil or tmp.lingwustart == false) then
-            print("full speed")
-            cmd_throttling = false
-            SetSpeedWalkDelay(0)
+            -- print("full speed")
+            -- cmd_throttling = false
+            -- SetSpeedWalkDelay(0)
         end
         if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
     end
@@ -1603,9 +1610,15 @@ duHhe = function()
 end
 function duHhe_start()
     if string.find(locl.room, '渡') then
-        if ll_place and ll_place == '兰州大渡口' then return end
-        if ll_place and ll_place == '兰州城西夏渡口' then return end
-        if ll_place and ll_place == '长安城陕晋渡口' then return end
+        if job.name == 'dolost' then
+            if ll_place and ll_place == '兰州大渡口' then return end
+            if ll_place and ll_place == '兰州城西夏渡口' then
+                return
+            end
+            if ll_place and ll_place == '长安城陕晋渡口' then
+                return
+            end
+        end
         EnableTriggerGroup("duhe", true)
         if flag.duhe == 1 then
             exe('yell boat;duhe')
@@ -3257,7 +3270,7 @@ sld_unwield = function()
             end
         end
     end
-    exe('unwield wuji xiao')
+    checkWield()
 end
 sld_weaponWieldCut = function()
     for p in pairs(Bag) do
@@ -3273,7 +3286,7 @@ sld_weaponWieldCut = function()
             end
         end
     end
-    exe('wield lianyu sword;uweapon shape lianyu sword')
+    checkWield()
 end
 function toSld()
     if locl.where ~= '神龙岛海滩' then return toSldDkCheck() end

@@ -128,34 +128,25 @@ function resumeSpeedWalk()
     CMD.cmd_throttling = false
     print("full speed")
     SetSpeedWalkDelay(0)
-    EnableTimer('SpeekWalkResume', false)
-    DeleteTimer("SpeekWalkResume")
 end
 
 function moving_sum()
     local time = os.time()
     t_cmds[time] = t_cmds[time] or 0
     t_cmds[time] = t_cmds[time] + 1
-    if tablelength(t_cmds) >= 4 then
-        local sum = 0
-        for k, v in pairs(t_cmds) do
-            if k > time - 3 then sum = sum + v end
-        end
-        if sum >= 110 and not CMD.cmd_throttling and not tmp.lingwustart then
-            print("start throttling")
-            CMD.cmd_throttling = true
-            SetSpeedWalkDelay(1)
-            create_timer_s("SpeekWalkResume", 1, "resumeSpeedWalk")
-        -- elseif cmd_throttling and sum < 60 and
-        --     (tmp.lingwustart == nil or tmp.lingwustart == false) then
-            -- print("full speed")
-            -- cmd_throttling = false
-            -- SetSpeedWalkDelay(0)
-        -- elseif sum > 80 then
-            -- print("cmd reaching limit:"..sum .. " throttle state:"..(CMD.cmd_throttling and 'true' or 'false'))
-        end
-        if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
+    local sum = 0
+    for k, v in pairs(t_cmds) do
+        if k > time - 3 then sum = sum + v end
     end
+    if t_cmds[time] > 75 and not CMD.cmd_throttling and not tmp.lingwustart then
+        print("start throttling")
+        CMD.cmd_throttling = true   
+        SetSpeedWalkDelay(1)
+        DoAfterSpecial(1, 'resumeSpeedWalk()', 12)         
+    -- elseif sum > 80 then
+    --     print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
+    end
+    if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
 
 function add_cmd_to_queue(cmd)
@@ -418,7 +409,7 @@ locate = function(thread)
         if thread then coroutine.resume(thread) end
     end)
 end
-fastLocate = function()
+fastLocate = function(thread)
     wait.make(function()
         localget = 0
         EnableTrigger("locate5", true)
@@ -439,6 +430,7 @@ fastLocate = function()
         else
             local_exitt(nil, l, w)
         end
+        if thread then coroutine.resume(thread) end
     end)
 end
 function walk_trigger()
@@ -3399,10 +3391,10 @@ function toSldHua()
 end
 function toSldDukou()
     print("toSldDukou")
-    fastLocate()
-    wait.make(function()
-        wait.time(2)
-        return toSldDkCheck()
+    wait.make(function() 
+        fastLocate(coroutine.running())
+        coroutine.yield()
+        toSldDkCheck()
     end)
 end
 function toSldDkCheck()

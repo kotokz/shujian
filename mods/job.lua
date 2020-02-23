@@ -1460,6 +1460,9 @@ function prepareLianxi()
                 "任务监控：是三段斗转星移，而且是晚上，可以去看星星领悟斗转星移了！",
                 "white")
             return check_halt(checkdzxy)
+        elseif score.party=='明教' and skills['qiankun-danuoyi'].lvl>449 and skills['qiankun-danuoyi'].lvl<hp.pot_max-102 and hp.pot >= 1 then
+            messageShow("任务监控：去向小张同学学习大挪移！","white")
+            return check_halt(check_dny)        
         end
     end
     flag.jixu = 1

@@ -23,7 +23,7 @@ road.wipe_who = nil
 road.wipe_con = nil
 road.resume = nil
 road.wait = 0.12
-road.steps = 100
+road.steps = 50
 road.cmd = nil
 road.cmd_save = nil
 road.maze = nil
@@ -124,34 +124,41 @@ function tablelength(T)
     return count
 end
 
+function calculate_flood(offset)
+    if offset == nil then offset = 0 end
+    local sum = offset
+    local time = os.time()
+    for k, v in pairs(t_cmds) do
+        if k > time - 2 then sum = sum + v end
+    end
 
-function resumeSpeedWalk()
-    CMD.cmd_throttling = false
-    print("full speed")
-    SetSpeedWalkDelay(0)
+    local current = t_cmds[time] or 0
+
+    return sum > 110 or (current + offset) > 75
 end
 
-function moving_sum()
+function moving_sum(cmd)
+
+    local count = 1
+    if cmd:sub(1,1) == '#' then
+        count = tonumber(string.match(cmd, "%d+"))
+        print("cmd = ".. cmd .. " count="..count)
+    end
     local time = os.time()
     t_cmds[time] = t_cmds[time] or 0
-    t_cmds[time] = t_cmds[time] + 1
+    t_cmds[time] = t_cmds[time] + count
     local sum = 0
     for k, v in pairs(t_cmds) do
-        if k > time - 3 then sum = sum + v end
+        if k > time - 2 then sum = sum + v end
     end
-    if t_cmds[time] > 75 and not CMD.cmd_throttling and not tmp.lingwustart then
-        print("start throttling")
-        CMD.cmd_throttling = true 
-        SetSpeedWalkDelay(1)
-        DoAfterSpecial(1.5, 'resumeSpeedWalk()', 12)         
-    elseif sum > 80 then
+    if sum > 80 then
         print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
     end
     if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
 
 function add_cmd_to_queue(cmd)
-    -- moving_sum()
+    moving_sum(cmd)
     if cmd ~= nil and cmd:sub(1, 1) == '#' then
         cmd = cmd:sub(2)
         Queue(EvaluateSpeedwalk(cmd), false)
@@ -962,6 +969,11 @@ function path_start()
                                     func)
                 end
             else
+                local tmp = utils.split(step, ';')
+                if calculate_flood(#tmp) then
+                    print("wait 1 second as next step might flood")
+                    wait.time(1)
+                end
                 exe(step)
                 walk_wait()
             end
@@ -3378,17 +3390,19 @@ function mufaok(n, l, w)
 end
 function toSldCheck()
     print("toSldCheck")
-    if locl.room == "小木筏" or locl.room == "木筏" then
-        return toSldHua()
+	flag.idle = nil
+	if locl.room=="小木筏" or locl.room=="木筏" then
+	    if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian;hp') end
+	    locate_finish='toSldHua'
+       return check_busy(locate)
     else
-        return check_halt(toSld)
+       return check_halt(toSld)
     end
 end
 function toSldHua()
-    print("toSldHua")
-    -- weapon_unwield()
-    if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian') end
-    exe('hp')
+	print("toSldHua")
+	locate_finish=0
+    -- sld_unwield()
     exe('hua mufa')
     wait.make(function()
         wait.time(3)
@@ -3397,61 +3411,65 @@ function toSldHua()
 end
 function toSldDukou()
     print("toSldDukou")
-    wait.make(function() 
-        fastLocate(coroutine.running())
-        coroutine.yield()
-        toSldDkCheck()
+	wait.make(function()
+            wait.time(2)
+			locate_finish='toSldDkCheck'
+            return check_busy(locate)
     end)
 end
 function toSldDkCheck()
-    print("toSldDkCheck")
-    toSldDelTrigger()
-    if locl.room == "渡口" then
-        return toSldOver()
-    elseif locl.room == "小木筏" or locl.room == "木筏" then
-        return toSldHua()
-    elseif locl.area and locl.area == '神龙岛' and locl.room == '海滩' then
-        return toSld()
-    elseif locl.area and locl.area ~= '神龙岛' then
-        return walk_wait()
+     print("toSldDkCheck")
+	 locate_finish=0
+	toSldDelTrigger()
+	if locl.room=="渡口" then
+       return toSldOver()
+    elseif locl.room=="小木筏" or locl.room=="木筏" then
+        if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian;hp') end
+       return toSldHua()
+    elseif locl.area and locl.area=='神龙岛' and locl.room=='海滩' then
+       return toSld()
+    elseif locl.area and locl.area~='神龙岛' then
+       return walk_wait()
     end
 end
-function toSldOver() return walk_wait() end
+function toSldOver()
+    bqcheck()
+	exe('bei none')
+	beiUnarmed()
+    return walk_wait()
+end
 
 function outSld()
-    if score.party and score.party == "神龙教" then
-        exe('ask lu gaoxuan about ling pai')
+    if score.party and score.party=="神龙教" then
+       exe('ask lu gaoxuan about ling pai')
     else
-        exe('steal lingpai')
+       exe('steal lingpai')
     end
     check_busy(outSldGive)
 end
 function outSldGive()
-    wait.make(function()
-        wait.time(2)
-        if score.party == '神龙教' and job.name == 'huashan' then
-            exe('out;#3s;give ling pai to chuan fu;give ling pai 2 to chuan fu')
-            check_busy(outSldWait, 3)
-        else
-            exe('out;#3s;give ling pai to chuan fu')
-            check_busy(outSldWait, 3)
-        end
+    wait.make(function() 
+       wait.time(2)
+    exe('out;#3s;give ling pai to chuan fu')
+    check_busy(outSldWait,3)
     end)
 end
 function outSldWait()
-    wait.make(function()
-        wait.time(6)
-        locate()
-        check_busy(outSldCheck)
+    EnableTriggerGroup("outSldGive_test",false)
+    EnableTimer('walkWait4',false)
+    wait.make(function() 
+       wait.time(6)
+    locate_finish='outSldCheck'
+    return check_busy(locate)
     end)
 end
 function outSldCheck()
-    if locl.room == "渡口" then
-        exe('#3n;enter')
-        return outSld()
+    locate_finish=0
+    if locl.room=="渡口" then
+       return outSldGive_test()
     else
-        -- cntr1 = countR(20)
-        return walk_wait()
+	   --cntr1 = countR(20)
+       return walk_wait()
     end
 end
 function outSldBoat()

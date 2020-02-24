@@ -124,6 +124,7 @@ function tablelength(T)
     return count
 end
 
+
 function resumeSpeedWalk()
     CMD.cmd_throttling = false
     print("full speed")
@@ -140,17 +141,17 @@ function moving_sum()
     end
     if t_cmds[time] > 75 and not CMD.cmd_throttling and not tmp.lingwustart then
         print("start throttling")
-        CMD.cmd_throttling = true   
+        CMD.cmd_throttling = true 
         SetSpeedWalkDelay(1)
-        DoAfterSpecial(1, 'resumeSpeedWalk()', 12)         
-    -- elseif sum > 80 then
-    --     print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
+        DoAfterSpecial(1.5, 'resumeSpeedWalk()', 12)         
+    elseif sum > 80 then
+        print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
     end
     if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
 
 function add_cmd_to_queue(cmd)
-    moving_sum()
+    -- moving_sum()
     if cmd ~= nil and cmd:sub(1, 1) == '#' then
         cmd = cmd:sub(2)
         Queue(EvaluateSpeedwalk(cmd), false)
@@ -3298,17 +3299,22 @@ sld_weaponWieldCut = function()
     checkWield()
 end
 function toSld()
-    if locl.where ~= '神龙岛海滩' then return toSldDkCheck() end
-    -- sld_unwield()
-    -- sld_weaponWieldCut()
-    weaponWieldCut()
-    if not Bag["粗绳子"] then
-        exe('buy cu shengzi')
+    wait.make(function() 
+        fastLocate(coroutine.running())
+        coroutine.yield()
+            
+        if locl.where ~= '神龙岛海滩' then return toSldDkCheck() end
+        -- sld_unwield()
+        -- sld_weaponWieldCut()
+        weaponWieldCut()
+        if not Bag["粗绳子"] then
+            exe('buy cu shengzi')
+            exe('drop cu shengzi 2')
+        end
+        exe('get cu shengzi')
         exe('drop cu shengzi 2')
-    end
-    exe('get cu shengzi')
-    exe('drop cu shengzi 2')
-    return check_halt(toSldTrigger, 1.5)
+        return check_halt(toSldTrigger, 1.5)
+    end)
 end
 function toSldTrigger()
     DeleteTriggerGroup("mufabusy")

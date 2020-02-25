@@ -477,7 +477,7 @@ walk_hook_thread = nil
 function walk_goon(kill)
     if kill and kill == true then
         flag.find = 1
-        resume_walk_thread()
+        return resume_walk_thread("kill")
     end
     wait.make(function()
         flag.walkwait = false
@@ -496,12 +496,12 @@ function walk_goon(kill)
     end)
 end
 
-function resume_walk_thread()
+function resume_walk_thread(msg)
     if walk_hook_thread then
         -- print("resume suspended walk")
         local tmp_thread = walk_hook_thread
         walk_hook_thread = nil
-        coroutine.resume(tmp_thread)
+        coroutine.resume(tmp_thread,msg)
     end
 end
 
@@ -966,6 +966,11 @@ function path_start()
                 end
                 create_timer_s('jqgeyu', 30, 'jqgeyuwait')
             end
+
+            if walk_hook_thread then
+                coroutine.resume(walk_hook_thread,"kill")
+            end
+
             walk_hook_thread = coroutine.running()
             if string.find(step, '#') then
                 local _, _, func, params =
@@ -985,7 +990,11 @@ function path_start()
                 exe(step)
                 walk_wait()
             end
-            coroutine.yield()
+            local status = coroutine.yield()
+            if status and status == "kill" then
+                walk_hook_thread = nil
+                return
+            end
         end
         locate_finish = 'go_confirm'
         return locate()
@@ -1306,6 +1315,9 @@ function searchStart()
                     end
                     if road.pathset and table.getn(road.pathset) > 0 then
                         for i, steps in ipairs(road.pathset) do
+                            if walk_hook_thread then
+                                coroutine.resume(walk_hook_thread,"kill")
+                            end
                             walk_hook_thread = coroutine.running()
                             if flag.find == 1 then
                                 print("ÕÒµ½Ä¿±ê£¬Í£Ö¹ËÑË÷")
@@ -1325,7 +1337,11 @@ function searchStart()
                                 exe(steps)
                                 walk_wait()
                             end
-                            coroutine.yield()
+                            local status = coroutine.yield()
+                            if status and status == "kill" then
+                                walk_hook_thread = nil
+                                return
+                            end
                         end
                     end
                 else

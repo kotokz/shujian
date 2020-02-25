@@ -414,6 +414,11 @@ function songxin_send_act()
 end
 function songxin_act_set()
     EnableTrigger("hp12", false)
+    if job.name ~= 'songxin' then
+        EnableTriggerGroup("songxin_find", false)
+        DeleteTimer('songxin')
+        return
+    end
     if tmp.cnt then tmp.cnt = tmp.cnt + 1 end
     if not tmp.cnt or tmp.cnt > 20 then
         DeleteTimer('songxin')

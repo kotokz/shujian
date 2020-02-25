@@ -470,7 +470,6 @@ huashan_dadao = function()
 end
 huashan_fight = function(n, l, w)
     flag.wait = 1
-    -- flag.find = 1
     DiscardQueue()
     EnableTrigger("huashan_find2", false)
     job.id = string.lower(w[2])

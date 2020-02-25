@@ -485,8 +485,8 @@ function walk_goon(kill)
         EnableTimer('walkwait', false)
 
         wait_busy()
+        if flag.wait == 1 then return end
         if tmp.find then
-            if flag.wait == 1 then return end
             EnableTrigger("hp12", false)
         else
             EnableTrigger("hp12", true)

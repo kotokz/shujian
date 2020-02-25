@@ -459,7 +459,7 @@ function wudangFind()
     local tmppfm = GetVariable("pfmsanqing") -- 古墓派合气最高大招设置防止遇到kezhiwugong.lua识别不了的npc招式
     -- create_alias('kezhiwugongpfm','kezhiwugongpfm','alias pfmpfm '..tmppfm)
     -- exe('kezhiwugongpfm')
-    if score.id == 'kkfromch' then exe('set 兰花手 蝶舞式') end
+    -- if score.id == 'kkfromch' then exe('set 兰花手 蝶舞式') end
     exe('unset wimpy;set wimpycmd pfmpfm\\hp')
     if string.find(job.where, '蝴蝶谷') then return hudiegu() end
     go(wudangFindAct, job.area, job.room)

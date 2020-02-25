@@ -386,6 +386,8 @@ function xueshan_finish()
     EnableTriggerGroup("xueshan_sa", false)
     for i = 1, 3 do end
     flag.times = 1
+    flag.find = 1
+    walk_goon(true)    
     -- 检查地点是否去看星星 照搬 sx后的判断
     if score.party == "姑苏慕容" and need_dzxy == "yes" and
         string.find(jiangnan_area, locl.area) and hp.pot > 0 and hp.food > 50 and
@@ -596,8 +598,7 @@ function xueshan_goon()
         return _G[XsBugRoom[locl.area .. locl.room]]()
     else
         -- 就在附近，原地搜索
-        -- return walk_wait()
-        return find()
+        return walk_wait()
     end
 end
 function xueshan_fight()

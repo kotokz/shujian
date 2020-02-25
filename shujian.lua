@@ -284,6 +284,7 @@ function dis_all()
     busyhook = test
     waithook = test
     flag.find = 1
+    walk_goon(true)
     wdgostart = 0
     -- thread_resume(lookfor)
     idle()

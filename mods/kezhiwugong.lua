@@ -1341,9 +1341,11 @@ end
 function kezhiwugongSetPerform(tempatt, i, targetid)
     if job.name == 'diemenglou' or job.name == 'pk' or job.name == 'guanfu' or
         job.name == 'hubiao' then
-        create_alias('kezhiwugongpfm', 'kezhiwugongpfm', 'alias pppp' .. i ..
-                         ' ' .. GetVariable(pk_valuecmd[tempatt]))
-        Execute('kezhiwugongpfm')
+        if tempatt and pk_valuecmd[tempatt] then
+            create_alias('kezhiwugongpfm', 'kezhiwugongpfm', 'alias pppp' .. i ..
+                            ' ' .. GetVariable(pk_valuecmd[tempatt]))
+            Execute('kezhiwugongpfm')
+        end
         create_alias('mypfm_kezhi', 'mypfm_kezhi',
                      'alias mypfm ' .. GetVariable("mypfm") .. ' ' .. targetid)
         Execute('mypfm_kezhi')

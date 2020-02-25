@@ -502,24 +502,19 @@ huashan_fight = function(n, l, w)
                      'huashanFindFail')
     create_trigger_t('huashan_fight4', '^(> )*这里没有 ' .. job.id .. '。',
                      '', 'huashanFindAct')
+    create_trigger_t('huashan_fight5', "^(> )*你对着" .. job.target ..
+    "(大喝一声：|喝道：|猛吼一声：|吼道：)",
+                     '', 'hskill_timer_stop')
+    create_trigger_t('huashan_fight6', "^(> )*加油！加油",
+                                      '', 'hskill_timer_stop')
     -- create_trigger_t('huashan_fight4','^(> )*这里没有 '..job.id..'。','','huashanFindAgain')
     SetTriggerOption("huashan_fight1", "group", "huashan_fight")
     SetTriggerOption("huashan_fight2", "group", "huashan_fight")
     SetTriggerOption("huashan_fight3", "group", "huashan_fight")
     SetTriggerOption("huashan_fight4", "group", "huashan_fight")
+    SetTriggerOption("huashan_fight5", "group", "huashan_fight")
+    SetTriggerOption("huashan_fight6", "group", "huashan_fight")
 
-    -- hs flood后kill命令出不来的workaround by joyce@tj
-    addxml.trigger {
-        custom_colour = "2",
-        enabled = "y",
-        group = "huashan_fight",
-        match = "^(> )*你对着" .. job.target ..
-            "(大喝一声：|喝道：|猛吼一声：|吼道：)",
-        name = "huashan_fight_hskill",
-        regexp = "y",
-        script = "hskill_timer_stop",
-        sequence = "100"
-    }
     create_timer_s('hskill', 0.4, 'hskill')
 end
 function hskill() -- hs flood后kill命令出不来的workaround by joyce@tj
@@ -541,6 +536,7 @@ huashan_faint = function()
     exe('kill ' .. job.id)
 end
 huashan_cut = function()
+    DeleteTimer('hskill')
     EnableTriggerGroup("huashan_fight", false)
     EnableTriggerGroup("huashan_find", false)
     DeleteTriggerGroup("huashan_cut")

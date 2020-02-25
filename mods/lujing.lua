@@ -474,27 +474,35 @@ function walkTimer()
 end
 walk_hook_thread = nil
 
-function walk_goon(func)
+function walk_goon(kill)
+    if kill and kill == true then
+        flag.find = 1
+        resume_walk_thread()
+    end
     wait.make(function()
         flag.walkwait = false
         EnableTriggerGroup("walk", false)
         EnableTimer('walkwait', false)
 
-        wait_busy()
+
         if tmp.find then
-            if flag.wait == 1 then wait.time(1) end
+            if flag.wait == 1 then return end
             EnableTrigger("hp12", false)
         else
             EnableTrigger("hp12", true)
         end
-
-        if walk_hook_thread then
-            -- print("resume suspended walk")
-            local tmp_thread = walk_hook_thread
-            walk_hook_thread = nil
-            coroutine.resume(tmp_thread)
-        end
+        wait_busy()
+        resume_walk_thread()
     end)
+end
+
+function resume_walk_thread()
+    if walk_hook_thread then
+        -- print("resume suspended walk")
+        local tmp_thread = walk_hook_thread
+        walk_hook_thread = nil
+        coroutine.resume(tmp_thread)
+    end
 end
 
 function go_to(where)
@@ -3449,18 +3457,18 @@ function outSld()
 end
 function outSldGive()
     wait.make(function() 
-       wait.time(2)
-    exe('out;#3s;give ling pai to chuan fu')
-    check_busy(outSldWait,3)
+        wait.time(2)
+        exe('out;#3s;give ling pai to chuan fu')
+        check_busy(outSldWait,3)
     end)
 end
 function outSldWait()
     EnableTriggerGroup("outSldGive_test",false)
     EnableTimer('walkWait4',false)
     wait.make(function() 
-       wait.time(6)
-    locate_finish='outSldCheck'
-    return check_busy(locate)
+        wait.time(6)
+        locate_finish='outSldCheck'
+        return check_busy(locate)
     end)
 end
 function outSldCheck()
@@ -3472,6 +3480,23 @@ function outSldCheck()
        return walk_wait()
     end
 end
+
+outSldGive_test=function()
+    DeleteTriggerGroup("outSldGive_test")
+    create_trigger_t('outSldGive_test1','^(> )*你给船夫一块通行令牌。','','outSldWait')
+    SetTriggerOption("outSldGive_test1","group","outSldGive_test")
+    EnableTriggerGroup("outSldGive_test",true)
+    sld_lp()
+ end
+
+function sld_lp()
+    exe('give ling pai to chuan fu')
+    create_timer_s('walkWait4',1.0,'sld_duko_test')      
+end
+    sld_duko_test=function()
+    exe('give ling pai to chuan fu')
+end
+
 function outSldBoat()
     if cntr1() < 1 then return go(road.act) end
     exe('order 开船')

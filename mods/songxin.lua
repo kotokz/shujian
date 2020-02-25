@@ -331,7 +331,7 @@ function songxin_find()
     create_trigger_t('songxin_find2', '^>*\\s*你要送给谁', '',
                      'songxin_goon')
     create_trigger_t('songxin_find3',
-                     '^>*\\s*\\D*道：(这封信不是给我的，|你看清楚，)',
+                     '^>*\\s*\\D*道：(这封信不是给我的，|你看清楚)',
                      '', 'songxin_add')
     create_trigger_t('songxin_find4',
                      '^>*\\s*(这封信不是送给这个人的。|看清楚点，那是活人吗？！)',
@@ -362,7 +362,7 @@ function songxin_find_begin()
     create_alias('kezhiwugongpfm', 'kezhiwugongpfm', 'alias pfmpfm ' .. tmppfm)
     exe('jifa all;unset wimpy;set wimpycmd pfmpfm\\hp')
     exe('kezhiwugongpfm')
-    if score.id == 'kkfromch' then exe('set 兰花手 蝶舞式') end
+    -- if score.id == 'kkfromch' then exe('set 兰花手 蝶舞式') end
 
     if string.find(sxjob.ide, job.target) then
         messageShow('送信任务：任务目标【' .. job.target ..
@@ -440,8 +440,8 @@ function songxin_finish()
     chats_locate(
         '送信任务：任务目标是【' .. job.where .. '】的【' ..
             job.target .. '】！', 'red')
-    dis_all()
     flag.find = 1
+    dis_all()
     flag.times = 1
     locate()
     sxjob.sx2 = 0
@@ -462,7 +462,7 @@ end
 function songxin_killer()
     fight.time.b = os.time()
     sx1wait = 0
-    flag.find = 1
+    flag.find = 1    
     dis_all()
     EnableTrigger("hpheqi1", true)
     DeleteTriggerGroup("sx1lian")

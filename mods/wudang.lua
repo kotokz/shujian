@@ -512,6 +512,7 @@ function wudangFindAct()
                     job.target .. '¡¿£¡')
 end
 function wudangFindKill()
+    flag.wait = 1
     wdgostart = 0
     dis_all()
     flag.robber = true
@@ -532,6 +533,7 @@ function wudangTarget(n, l, w)
     job.killer[job.target] = job.id
     -- SetSpeedWalkDelay(math.floor(1000 / 30))
     DiscardQueue()
+    flag.wait = 1
     exe('follow ' .. job.id)
     wudangKillAct()
     create_timer_s('wudang', 5, 'wudangMove')

@@ -484,14 +484,14 @@ function walk_goon(kill)
         EnableTriggerGroup("walk", false)
         EnableTimer('walkwait', false)
 
-
+        wait_busy()
         if tmp.find then
             if flag.wait == 1 then return end
             EnableTrigger("hp12", false)
         else
             EnableTrigger("hp12", true)
         end
-        wait_busy()
+
         resume_walk_thread()
     end)
 end
@@ -979,8 +979,8 @@ function path_start()
             else
                 local tmp = utils.split(step, ';')
                 if calculate_flood(#tmp) then
-                    print("wait 1 second as next step might flood")
-                    wait.time(1)
+                    print("wait 1.5 second as next step might flood")
+                    wait.time(1.5)
                 end
                 exe(step)
                 walk_wait()
@@ -5079,7 +5079,13 @@ function go_hudiegu()
     return checkWait(goHudiegu, 1)
 end
 function goHudiegu() return go(hudieguStart, 'ºûµû¹È', 'Å£Åï') end
-function hudieguWalk() exe('nd;n;n;w;n;n;nd;n;w;n;yun jing;look') end
+function hudieguWalk() 
+    wait.make(function()
+        exe('nd;n;n;w;n;n;nd;n;w;n;yun jing;look') 
+        wait.time(0.5)
+    end)
+    
+end
 function hudieguStart() create_timer_s('hudieguWalk', 0.4, 'hudieguWalk') end
 function hudiegu() return go(go_hudiegu, 'ºûµû¹È', 'É½±Ú') end
 function hudieguOk()

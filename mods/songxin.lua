@@ -440,6 +440,8 @@ function songxin_finish()
     chats_locate(
         '送信任务：任务目标是【' .. job.where .. '】的【' ..
             job.target .. '】！', 'red')
+    EnableTriggerGroup("songxin_find", false)
+    DeleteTimer('songxin')
     flag.find = 1
     dis_all()
     flag.times = 1

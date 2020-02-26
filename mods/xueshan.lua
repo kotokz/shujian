@@ -243,6 +243,7 @@ function xsaskjob()
 end
 
 function master_ask(task)
+    EnableTriggerGroup("xueshan_accept", true)
     wait.make(function()
         wait_busy()
         local l,w
@@ -262,7 +263,6 @@ function job_xueshan()
     DeleteTriggerGroup("check_job")
     exe('set po ÕÆ')
     flag.idle = nil
-    EnableTriggerGroup("xueshan_accept", true)
     master_ask('job')
 end
 
@@ -338,7 +338,7 @@ function xueshan_shibai()
     return check_halt(xueshan_shibai_ask)
 end
 function xueshan_shibai_ask()
-    master_ask('·ÅÆú')
+    master_ask('Ê§°Ü')
     if job.where ~= nil and string.find(job.where, "ÏÀ¿Íµº") then
         mjlujingLog("ÏÀ¿Íµº")
     end

@@ -67,7 +67,8 @@ end
 function letterLost()
     job.name = 'dolost'
     sLetterlost()
-    go(letterLostBegin, "襄阳城", "当铺")
+    -- go(letterLostBegin, "襄阳城", "当铺")
+    letterLostBegin()
 end
 function letterLostBegin()
     if needvpearl == 1 and (condition.vpearl == 0 or not condition.vpearl) then

@@ -24,7 +24,6 @@ local XsBugRoom = {
 function xueshan_triggerClose()
     EnableTriggerGroup("xueshan_debug", false)
     EnableTriggerGroup("xueshan_find", false)
-    EnableTriggerGroup("xueshan_ask", false)
     EnableTriggerGroup("xueshan_accept", false)
     EnableTriggerGroup("xueshan_kill", false)
     EnableTriggerGroup("xueshan_guard", false)
@@ -40,14 +39,6 @@ end
 
 function xueshan_trigger()
     DeleteTriggerGroup("xueshan_find")
-    DeleteTriggerGroup("xueshan_ask")
-    create_trigger_t('xueshan_ask1', "^(> )*你向宝象打听有关", '',
-                     'xueshan_ask')
-    create_trigger_t('xueshan_ask2', "^(> )*这里没有这个人。$", '',
-                     'xueshan_nobody')
-    SetTriggerOption("xueshan_ask1", "group", "xueshan_ask")
-    SetTriggerOption("xueshan_ask2", "group", "xueshan_ask")
-    EnableTriggerGroup("xueshan_ask", false)
     DeleteTriggerGroup("xueshan_accept")
     create_trigger_t('xueshan_accept1',
                      "^(> )*(宝象说道：「这么简单的任务你怎么可以放弃呢！快去干！」|宝象说道：「你小子没完成，就想到老祖爷爷这里来骗吃骗喝啊？」)",
@@ -129,14 +120,6 @@ function xueshan_trigger()
     SetTriggerOption("xueshan_guard5", "group", "xueshan_guard")
     -- SetTriggerOption("xueshan_guard6","group","xueshan_guard")
     EnableTriggerGroup("xueshan_guard", false)
-    DeleteTriggerGroup("xueshan_f_ask")
-    create_trigger_t('xueshan_f_ask1', "^(> )*你向宝象打听有关", '',
-                     'xueshan_f_ask')
-    create_trigger_t('xueshan_f_ask2', "^(> )*这里没有这个人。$", '',
-                     'xueshan_f_nobody')
-    SetTriggerOption("xueshan_f_ask1", "group", "xueshan_f_ask")
-    SetTriggerOption("xueshan_f_ask2", "group", "xueshan_f_ask")
-    EnableTriggerGroup("xueshan_f_ask", false)
     DeleteTriggerGroup("xueshan_finish")
     create_trigger_t('xueshan_finish1',
                      "^(> )*宝象说道：「不错不错，今天又有事情干了",
@@ -183,12 +166,10 @@ end
 function xueshan_triggerDel()
     DeleteTriggerGroup("xueshan_debug")
     DeleteTriggerGroup("xueshan_find")
-    DeleteTriggerGroup("xueshan_ask")
     DeleteTriggerGroup("xueshan_accept")
     DeleteTriggerGroup("xueshan_kill")
     DeleteTriggerGroup("xueshan_guard")
     DeleteTriggerGroup("xueshan_judge")
-    DeleteTriggerGroup("xueshan_f_ask")
     DeleteTriggerGroup("xueshan_finish")
     DeleteTriggerGroup("xueshan_fight")
     DeleteTriggerGroup("xueshan_sa")
@@ -248,7 +229,10 @@ function xueshanFindFail()
 end
 function xueshan_start()
     DeleteTriggerGroup("xsbusydz")
-    return go(xsaskjob, '大雪山', '入幽口')
+    wait.make(function()
+        await_go('大雪山', '入幽口')
+        return xsaskjob()
+    end)
 end
 function xsaskjob()
     if newbie == 1 then
@@ -257,29 +241,31 @@ function xsaskjob()
         return job_xueshan()
     end
 end
+
+function master_ask(task)
+    wait.make(function()
+        wait_busy()
+        local l,w
+        repeat
+            exe('ask bao xiang about '..task)
+            l, w = wait.regexp('^(> )*(你向宝象打听|这里没有这个人)',1)
+        until l ~= nil
+    
+        if l:find("这里没有这个人") then
+            return xueshan_f_nobody()
+        else 
+            EnableTriggerGroup("xueshan_finish", true)
+        end
+    end)
+end
 function job_xueshan()
     DeleteTriggerGroup("check_job")
-    EnableTriggerGroup("xueshan_ask", true)
     exe('set po 掌')
     flag.idle = nil
-    wait.make(function()
-        wait.time(1)
-        wait_busy()
-        exe('ask bao xiang about job')
-        DeleteTimer("walkWait4")
-        create_timer_s('walkWait4', 2.0, 'job_xueshan_timer')
-    end)
-    -- exe('ask bao xiang about job')
-    -- DeleteTimer("walkWait4")
-    -- create_timer_s('walkWait4', 1.0, 'job_xueshan_timer')
-end
-function job_xueshan_timer() exe('ask bao xiang about job') end
-function xueshan_ask()
-    EnableTimer('walkWait4', false)
-    DeleteTimer("walkWait4")
-    EnableTriggerGroup("xueshan_ask", false)
     EnableTriggerGroup("xueshan_accept", true)
+    master_ask('job')
 end
+
 function xueshan_nobody()
     EnableTriggerGroup("xueshan_ask", false)
     return xueshan_start()
@@ -336,14 +322,9 @@ function xueshan_fangqi()
     return check_halt(xueshan_fangqi_ask)
 end
 function xueshan_fangqi_ask()
-    EnableTriggerGroup("xueshan_ask", true)
+    -- EnableTriggerGroup("xueshan_ask", true)
     messageShow('雪山任务：任务放弃!', 'blue')
-    exe('ask bao xiang about 放弃')
-    DeleteTimer("walkWait4")
-    create_timer_s('walkWait4', 1.0, 'xueshan_fangqi_ask1')
-end
-function xueshan_fangqi_ask1()
-    exe('ask bao xiang about 放弃')
+    master_ask('放弃')
     exe('unset no_kill_ap')
 end
 function xueshan_find_fangqi()
@@ -357,15 +338,11 @@ function xueshan_shibai()
     return check_halt(xueshan_shibai_ask)
 end
 function xueshan_shibai_ask()
-    EnableTriggerGroup("xueshan_ask", true)
-    exe('ask bao xiang about 失败')
-    DeleteTimer("walkWait4")
-    create_timer_s('walkWait4', 1.0, 'xueshan_shibai_ask1')
+    master_ask('放弃')
     if job.where ~= nil and string.find(job.where, "侠客岛") then
         mjlujingLog("侠客岛")
     end
 end
-function xueshan_shibai_ask1() exe('ask bao xiang about 失败') end
 function xueshan_fangqi_heal()
     EnableTimer('walkWait4', false)
     EnableTriggerGroup("xueshan_accept", false)
@@ -413,18 +390,11 @@ function xueshan_finish_error()
 end
 function xueshan_finish_ask()
     EnableTriggerGroup("xueshan_accept", false)
-    EnableTriggerGroup("xueshan_f_ask", true)
-    check_halt(xueshan_finish_ask1)
-    DeleteTimer("walkWait4")
-    create_timer_s('walkWait4', 1.0, 'xueshan_finish_ask1')
-end
-function xueshan_finish_ask1() exe('ask bao xiang about finish;unset no_kill_ap') end
-function xueshan_f_ask()
-    EnableTriggerGroup("xueshan_f_ask", false)
-    EnableTriggerGroup("xueshan_finish", true)
+    master_ask("finish")
+    exe('unset no_kill_ap')
 end
 function xueshan_f_nobody()
-    EnableTriggerGroup("xueshan_f_ask", false)
+    -- EnableTriggerGroup("xueshan_f_ask", false)
     xueshan_finish()
 end
 function xueshan_over()

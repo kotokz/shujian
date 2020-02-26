@@ -2,5 +2,11 @@
     "lua.targetVersion": "5.1",
     "Lua.diagnostics.globals": [
         "AddAlias"
-    ]
+    ],
+    "Lua.workspace.library": {
+        "../mods": true,
+        "../lib": [
+            "temp/*"
+        ]
+    }
 }

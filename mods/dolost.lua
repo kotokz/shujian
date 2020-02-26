@@ -133,7 +133,7 @@ function lost_goto()
         '黄河流域大渡口' then return gogo(ll_place) end
     dest.room, dest.area = getAddr(ll_place)
     if job.area and job.area == dest.area and job.room and job.room == dest.room then
-        l_distance = 2
+        -- l_distance = 2
         return go(find_dolost, job.area, job.room)
     else
         job.area = dest.area
@@ -164,8 +164,13 @@ function sendXXin()
 end
 function check_ll()
     locate_finish = 0
+    EnableTimer("sendTo", false)
+    DeleteTimer('sendTo')
+    EnableTimer("lookxin_again", false)
+    DeleteTimer('lookxin_again')
     EnableTimer('sendTo', false)
     EnableTimer('sx_look', false)
+    DeleteTriggerGroup("lostletter")
     dis_all()
     return checkJob()
 end

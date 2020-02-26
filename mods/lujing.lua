@@ -151,9 +151,9 @@ function moving_sum(cmd)
     for k, v in pairs(t_cmds) do
         if k > time - 2 then sum = sum + v end
     end
-    if sum > 80 then
-        print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
-    end
+    -- if sum > 80 then
+    --     print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
+    -- end
     if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
 
@@ -5090,17 +5090,13 @@ function hudieguTriggers()
 end
 function go_hudiegu()
     hudieguTriggers()
-    exe('tell mentonga 开门;tell mentongb 开门')
+    exe('opendoor;tell mentonga 开门;tell mentongb 开门')
     exe('whisper startd 开门')
     return checkWait(goHudiegu, 1)
 end
 function goHudiegu() return go(hudieguStart, '蝴蝶谷', '牛棚') end
-function hudieguWalk() 
-    wait.make(function()
-        exe('nd;n;n;w;n;n;nd;n;w;n;yun jing;look') 
-        wait.time(0.5)
-    end)
-    
+function hudieguWalk()
+    exe('nd;n;n;w;n;n;nd;n;w;n;yun jing;look')
 end
 function hudieguStart() create_timer_s('hudieguWalk', 0.4, 'hudieguWalk') end
 function hudiegu() return go(go_hudiegu, '蝴蝶谷', '山壁') end

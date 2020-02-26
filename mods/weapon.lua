@@ -267,7 +267,7 @@ weaponUcheck = function()
                                '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏|没有什么损坏)',
                                1)
                 until l ~= nil
-                if string.find(l, '没有什么损坏') then
+                if string.find(l, '没有什么损坏') or l:find('已经使用过一段时间') then
                     weaponUsave[p] = true
                 else
                     weaponUsave[p] = false
@@ -357,6 +357,7 @@ weaponRepairItem = function()
         messageShow('没有找到铁匠师傅,结束武器维修')
         return weaponRepairOver()
     end
+    exe('follow none')
     return weaponRepairDo()
 end
 -- weaponRepairGo =

@@ -492,11 +492,7 @@ function walkTimer()
 end
 walk_hook_thread = nil
 
-function walk_goon(kill)
-    if kill and kill == true then
-        flag.find = 1
-        return resume_walk_thread("kill")
-    end
+function walk_goon()
     wait.make(function()
         flag.walkwait = false
         EnableTriggerGroup("walk", false)

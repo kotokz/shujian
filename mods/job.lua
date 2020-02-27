@@ -4113,6 +4113,23 @@ function dieLog()
 
     file:close()
 end
+function jobbugLog()
+    local filename = GetInfo(67) .. "logs\\" .. score.id .. '任务BUG' ..
+                         os.date("%Y%m%d_%H时%M分%S秒") .. ".log"
+
+    local file = io.open(filename, "w")
+
+    local t = {}
+
+    for i = 1, GetLinesInBufferCount() do table.insert(t, GetLineInfo(i, 1)) end
+
+    local s = table.concat(t, "\n") .. "\n"
+
+    file:write(s)
+
+    file:close()
+end
+
 function jobfailLog()
     local filename = GetInfo(67) .. "logs\\" .. score.id .. '任务失败' ..
                          os.date("%Y%m%d_%H时%M分%S秒") .. ".log"

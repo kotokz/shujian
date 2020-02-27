@@ -361,10 +361,9 @@ function xueshan_finish()
     guard_id = 0
     EnableTriggerGroup("xueshan_accept", false)
     EnableTriggerGroup("xueshan_sa", false)
-    for i = 1, 3 do end
     flag.times = 1
     flag.find = 1
-    walk_goon(true)    
+    resume_walk_thread("kill")
     -- 检查地点是否去看星星 照搬 sx后的判断
     if score.party == "姑苏慕容" and need_dzxy == "yes" and
         string.find(jiangnan_area, locl.area) and hp.pot > 0 and hp.food > 50 and
@@ -567,7 +566,13 @@ function xueshan_goon()
         return _G[XsBugRoom[locl.area .. locl.room]]()
     else
         -- 就在附近，原地搜索
-        return walk_wait()
+        if walk_hook_thread then
+            return walk_wait()
+        else
+            jobbugLog()
+            messageShow('雪山任务：beauty不在，原路径不存在，可能是bug, area='..locl.area .." locl.room="..locl.room)
+            return find_nobody()
+        end
     end
 end
 function xueshan_fight()

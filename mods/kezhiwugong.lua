@@ -1341,10 +1341,13 @@ end
 function kezhiwugongSetPerform(tempatt, i, targetid)
     if job.name == 'diemenglou' or job.name == 'pk' or job.name == 'guanfu' or
         job.name == 'hubiao' then
-        if tempatt and pk_valuecmd[tempatt] then
+        local pfm = GetVariable(pk_valuecmd[tempatt])
+        if pfm then
             create_alias('kezhiwugongpfm', 'kezhiwugongpfm', 'alias pppp' .. i ..
-                            ' ' .. GetVariable(pk_valuecmd[tempatt]))
+                            ' ' .. pfm)
             Execute('kezhiwugongpfm')
+        elseif pk_valuecmd[tempatt] then
+            messageShow('找不到pfm设定：'..pk_valuecmd[tempatt])
         end
         create_alias('mypfm_kezhi', 'mypfm_kezhi',
                      'alias mypfm ' .. GetVariable("mypfm") .. ' ' .. targetid)

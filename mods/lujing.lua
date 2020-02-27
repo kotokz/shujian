@@ -22,8 +22,7 @@ road.wipe_id = nil
 road.wipe_who = nil
 road.wipe_con = nil
 road.resume = nil
-road.wait = 0.12
-road.steps = 50
+road.steps = 30
 road.cmd = nil
 road.cmd_save = nil
 road.maze = nil
@@ -79,10 +78,14 @@ local ItemGet = {
     ["ÍÀÁú½³¼¼²ÐÆª"] = true,
     ["ÒÐÌì½³¼¼²ÐÆª"] = true
 }
-function exe(cmd)
+function exe(cmd, queue)
     if GetConnectDuration() == 0 then return Connect() end
     if cmd == nil then cmd = 'look' end
-    run(cmd)
+    if queue then
+        run(cmd)
+    else
+        executeCmd(cmd)
+    end
 end
 
 -- max_cmd_limit=30
@@ -90,6 +93,21 @@ CMD = {
     cmd_throttling = false,
     walkecho = true
 }
+
+function executeCmd(cmds)
+    if ((cmds == "") or (cmds == nil)) then return end
+
+    Execute(cmds)
+    _cmds = {}
+    if string.find(cmds, ';') then
+        _cmds = utils.split(cmds, ';')
+        for i, cmd in pairs(_cmds) do
+            moving_sum(cmd)
+        end
+    else
+        moving_sum(cmds)
+    end
+end
 -- cmd_throttling = false
 -- walkecho = true
 SetSpeedWalkDelay(0)
@@ -134,7 +152,7 @@ function calculate_flood(offset)
 
     local current = t_cmds[time] or 0
 
-    return sum > 110 or (current + offset) > 75
+    return sum > 85 or (current + offset) > 75
 end
 
 function moving_sum(cmd)
@@ -151,9 +169,9 @@ function moving_sum(cmd)
     for k, v in pairs(t_cmds) do
         if k > time - 2 then sum = sum + v end
     end
-    -- if sum > 80 then
-    --     print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
-    -- end
+    if sum > 70 then
+        print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
+    end
     if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
 
@@ -962,6 +980,7 @@ function path_start()
             end
 
             walk_hook_thread = coroutine.running()
+            -- print("next step:"..step)
             if string.find(step, '#') then
                 local _, _, func, params =
                     string.find(step, "^#(%a%w*)%s*(.-)$")
@@ -973,9 +992,16 @@ function path_start()
                 end
             else
                 local tmp = utils.split(step, ';')
-                if calculate_flood(#tmp) then
-                    print("wait 1.5 second as next step might flood")
-                    wait.time(1.5)
+                if #tmp and calculate_flood(#tmp) then
+                    local lastSecondCmds = t_cmds[os.time()] or 0
+                    print("last second:".. lastSecondCmds.." next cmds:" .. #tmp)
+                    if lastSecondCmds > 50 then
+                        wait.time(1.5)
+                        print("wait 1.5 second as next step might flood")
+                    else
+                        wait.time(1)
+                        print("wait 1.5 second as next step might flood")
+                    end
                 end
                 exe(step)
                 walk_wait()
@@ -1459,7 +1485,10 @@ end
 function thread_resume(thread)
     if type(thread) == 'thread' then coroutine.resume(thread) end
 end
-function walkBusy() return check_halt(walk_wait, 0.2) end
+function walkBusy(time) 
+    local period = time or 0.2
+    return check_halt(walk_wait, period) 
+end
 --------------------------------»ªÉ½ËÉÊ÷ÁÖ-------------------------------------
 hssslgo = function()
     road.temp = 0
@@ -3264,7 +3293,7 @@ function PoutShangguan()
 end
 function ShangguanAsk()
     wait.make(function()
-        wait.time(1)
+        wait.time(1.5)
         if flag.find==1 then return end
         exe("sd;se;sd;sd;se;sd;se;sd;sd;s;s;s;sd;e;ask qianzhang about ÄÖ¹í")
         return GoShangguanQiuError()
@@ -3273,7 +3302,7 @@ end
 function GoShangguan() return check_halt(GoShangguanOk) end
 function GoShangguanOk()
     wait.make(function()
-	    wait.time(0.5)
+	    wait.time(2)
 	    exe("sd;sd;n;n;nw;w;w;e;nu;n;n;n;nu;nu;nw;nu;nw;nu;nu;nw;nu;move bei")
 	end)
 end

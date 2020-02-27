@@ -1058,7 +1058,7 @@ function lingwu_goon()
                 tmp.lingwunext = false
                 local l, w
                 while true do
-                    exe('#9(lingwu ' .. skill .. ');yun jing')
+                    exe('#9(lingwu ' .. skill .. ');yun jing', true)
                     l, w = wait.regexp(
                                '.*(你的内力不够|你深深吸了几口气，精神看起来好多了|你现在精神饱满|潜能已经用完了)',
                                1)
@@ -1066,8 +1066,8 @@ function lingwu_goon()
                         -- 可能昏迷了或者flood，超时返回,
 
                     elseif l:find('内力不够') then
-                        exe('eat ' .. drug.neili)
-                        exe('eat ' .. drug.neili2 .. ';yun jing')
+                        exe('eat ' .. drug.neili, true)
+                        exe('eat ' .. drug.neili2 .. ';yun jing', true)
                     elseif l:find('潜能已经用完了') then
                         return lingwu_finish()
                     elseif tmp.lingwunext then
@@ -1142,7 +1142,7 @@ function xuexiTrigger()
                      "^(> )*乾坤大挪移只能通过研习《乾坤大挪移心法》和领悟来提高",
                      '', 'taoJiaozhang')
     create_trigger_t('xuexi10',
-                     "^(> )*(你手里有兵器|空了手才能练|空手方能练习|你必须先找|空手时无法练|你使用的武器不对|必须空手|练\\D*空手|学\\D*空手|\\D*手里不能拿武器。)",
+                     "^(> )*(你手里有兵器|空了手才能练|空手方能练习|你必须先找|空手时无法练|你使用的武器不对|\\D*必须空手|练\\D*空手|学\\D*空手|\\D*手里不能拿武器。)",
                      '', 'xueWeapon')
     SetTriggerOption("xuexi1", "group", "xuexi")
     SetTriggerOption("xuexi2", "group", "xuexi")

@@ -97,9 +97,9 @@ function xuncheng_go()
     wait.make(function()
         for key, step in ipairs(xuncheng) do
             wait_busy()
-            exe(step)
+            exe(step, true)
             wait.time(1.5)
-            exe('yun jing')
+            exe('yun jing', true)
         end
         SetSpeedWalkDelay(0)
         xuncheng_task()

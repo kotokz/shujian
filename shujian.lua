@@ -274,7 +274,7 @@ function dis_all()
     EnableTriggerGroup("fight", true)
     EnableTriggerGroup("job_exp", true)
     EnableTrigger("hp12", false)
-    if lookxin == 1 and job.name == 'dolost' then sendXin() end
+    -- if lookxin == 1 and job.name == 'dolost' then sendXin() end
     -- ain
     EnableTrigger("pk1", true)
     EnableTrigger("pk2", true)

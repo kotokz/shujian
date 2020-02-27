@@ -28528,6 +28528,9 @@ Room {
 		["east"] = "tiezhang/hhyang-2",
 		["west"] = "tiezhang/hhyuan-3",
 	},
+	precmds = {
+		["north"] = "#walkBusy 0.5",
+	},
 }
 Room {
 	id = "tiezhang/hhyuan-3",
@@ -28726,6 +28729,9 @@ Room {
 	ways = {
 		["northup"] = "tiezhang/pingtai",
 		["southdown"] = "tiezhang/shanlu-3",
+	},
+	postcmds = {
+		["northup"] = "#walkBusy",
 	},
 	room_relative="山间平台↑山路↑山路山路",
 }
@@ -28958,10 +28964,10 @@ Room {
 		["west"] = "tiezhang/zoulang-2",
 	},
 	precmds = {
-		["east"] = "halt",
-		["north"] = "halt",
-		["southdown"] = "halt",
-		["west"] = "halt",
+		["east"] = "#walkBusy",
+		["north"] = "#walkBusy",
+		["southdown"] = "#walkBusy",
+		["west"] = "#walkBusy",
 	},
 	postcmds = {
 		["southdown"] = "halt",

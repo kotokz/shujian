@@ -15,7 +15,7 @@ road.where = 'ÏåÑô³Çµ±ÆÌ'
 road.test = {}
 road.detail = {}
 road.act = nil
-road.i = 0
+-- road.i = 0
 road.temp = 0
 road.find = 0
 road.wipe_id = nil
@@ -555,7 +555,7 @@ function go(job, area, room, sId)
     flag.find = 0
     flag.wait = 0
     road.act = job
-    road.i = 0
+    -- road.i = 0
     flag.dw = 1
     tmp.find = nil
     -- if sour.id ~= nil then
@@ -777,7 +777,7 @@ function path_consider()
         return false
     end
     path_create()
-    road.i = 0
+    -- road.i = 0
     wait.make(function()
         wait_busy()
         path_start()
@@ -933,11 +933,7 @@ function path_start()
     DeleteTimer("roadWait", false)
     if flag.find == 1 then return end
     wait.make(function()
-        local steps_done = 0
         for i, step in ipairs(road.detail) do
-            road.i = i
-            local step_set = utils.split(step, ';')
-            steps_done = steps_done + table.getn(step_set)
             EnableTrigger("hp12", false)
             if l_road and string.find(l_road, 'ta corpse') then
                 DeleteTriggerGroup('eyu')
@@ -3267,16 +3263,26 @@ function PoutShangguan()
     exe("move bei")
 end
 function ShangguanAsk()
-    exe("sd;se;sd;sd;se;sd;se;sd;sd;s;s;s;sd;e;ask qianzhang about ÄÖ¹í")
+    wait.make(function()
+        wait.time(1)
+        if flag.find==1 then return end
+        exe("sd;se;sd;sd;se;sd;se;sd;sd;s;s;s;sd;e;ask qianzhang about ÄÖ¹í")
+        return GoShangguanQiuError()
+    end)    
 end
 function GoShangguan() return check_halt(GoShangguanOk) end
 function GoShangguanOk()
-    exe("sd;sd;n;n;nw;w;w;e;nu;n;n;n;nu;nu;nw;nu;nw;nu;nu;nw;nu;move bei")
+    wait.make(function()
+	    wait.time(0.5)
+	    exe("sd;sd;n;n;nw;w;w;e;nu;n;n;n;nu;nu;nw;nu;nw;nu;nu;nw;nu;move bei")
+	end)
 end
 function GoShangguanQiuError()
     EnableTrigger("tiezhangsg4", false)
-    exe(
-        "se;ask qianzhang about ÄÖ¹í;nw;w;ask qianzhang about ÄÖ¹í;w;ask qianzhang about ÄÖ¹í;e;nu;ask qianzhang about ÄÖ¹í;sd;s;ask qianzhang about ÄÖ¹í;n;e")
+    wait.make(function()
+        wait.time(1.5)
+  exe("ask qianzhang about ÄÖ¹í;se;ask qianzhang about ÄÖ¹í;nw;w;ask qianzhang about ÄÖ¹í;w;ask qianzhang about ÄÖ¹í;e;nu;ask qianzhang about ÄÖ¹í;sd;s;ask qianzhang about ÄÖ¹í;n;e")
+  end)
 end
 function ShangguanOk()
     EnableTriggerGroup("tiezhangsg", false)

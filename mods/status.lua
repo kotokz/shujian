@@ -1142,7 +1142,7 @@ function xuexiTrigger()
                      "^(> )*乾坤大挪移只能通过研习《乾坤大挪移心法》和领悟来提高",
                      '', 'taoJiaozhang')
     create_trigger_t('xuexi10',
-                     "^(> )*(你手里有兵器|空了手才能练|空手方能练习|你必须先找|空手时无法练|你使用的武器不对|练\\D*空手|学\\D*空手|\\D*手里不能拿武器。)",
+                     "^(> )*(你手里有兵器|空了手才能练|空手方能练习|你必须先找|空手时无法练|你使用的武器不对|必须空手|练\\D*空手|学\\D*空手|\\D*手里不能拿武器。)",
                      '', 'xueWeapon')
     SetTriggerOption("xuexi1", "group", "xuexi")
     SetTriggerOption("xuexi2", "group", "xuexi")

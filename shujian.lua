@@ -151,7 +151,6 @@ check_step_num1 = 0
 check_step_num2 = 0
 common_walk = 1
 check_step_time = os.clock()
-quick_locate = 0
 g_stop_flag = false
 
 SMYID = { -- 武当失败开启上山的id

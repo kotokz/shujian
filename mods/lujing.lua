@@ -611,11 +611,9 @@ function path_consider()
                 return toSldHua()
             elseif locl.room == '泉水中' then
                 exe('tiao out;tiao out')
-                -- quick_locate=0
                 return checkWait(goContinue, 0.3)
             elseif locl.room == '水潭' then
                 exe('pa up')
-                -- quick_locate=0
                 return checkWait(goContinue, 0.3)
             else
                 if locl.room_relation == '九老洞九老洞' or
@@ -623,28 +621,23 @@ function path_consider()
                     "不知道哪里九老洞 不知道哪里 九老洞" then
                     exe(
                         'drop fire;leave;leave;leave;leave;leave;leave;out;ne;ed;ne;ed')
-                    -- quick_locate=0
                     return checkWait(goContinue, 0.3)
                 end
                 if locl.room_relation ==
                     '西湖边↙｜白堤柳浪闻莺西湖边' then
                     exe('sw')
-                    -- quick_locate=0
                     return checkWait(goContinue, 0.3)
                 end
                 if locl.room == '梅林' then
-                    quick_locate = 0
                     exe('n')
                     return mlOutt()
                 end
                 if locl.room == '渔船' then
                     exe('out;w;s;out;w;s;out;w;s')
-                    -- quick_locate=0
                     return checkWait(goContinue, 0.3)
                 end
                 if locl.area == '绝情谷' and locl.room == '石壁' then
                     exe('pa down;pa up')
-                    quick_locate = 0
                     return checkWait(goContinue, 0.2)
                 end
 
@@ -1509,7 +1502,6 @@ function hsssl()
 end
 hsssl_goon = function()
     locate_finish = 0
-    quick_locate = 1
     wait.make(function()
         wait.time(0.15)
         if flag.find == 1 then return end

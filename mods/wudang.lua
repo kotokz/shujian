@@ -614,7 +614,6 @@ function wdkill_timer_stop() -- wd flood后kill命令出不来的workaround by joyce@tj
     DeleteTimer("walkWaitX")
     EnableTrigger("wudang_fight_wdkill", false)
     EnableTrigger("wudangFight5", false)
-    quick_locate = 1
 end
 function wudangBack(n, l, w)
     EnableTriggerGroup("wipe", false)
@@ -710,7 +709,6 @@ function wudangFinish()
     button_lostletter() -- check_heal()里的挪到这里来。
     locl.room = '三清殿'
     room.id = 'wudang/sanqing'
-    quick_locate = 1
     if wudang_cs > 6 then
         wudang_cs = 0
         exe('score;ask song yuanqiao about 杂役')

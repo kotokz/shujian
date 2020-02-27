@@ -436,7 +436,6 @@ function hqgzcTradeOK()
     for key, value in pairs(cooking.target) do
         if job.target == value then cooking.flag[key] = nil end
     end
-    quick_locate = 1
     road.id = nil
     return check_bei(hqgzcFind)
 end

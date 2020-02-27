@@ -140,27 +140,24 @@ function hsaskjob()
     end
 end
 function job_huashan()
-    EnableTriggerGroup("huashan_ask", true)
-
     wait.make(function()
         wait_busy()
-        exe('ask yue buqun about job')
-        DeleteTimer("walkWait4")
-        create_timer_s('walkWait4', 3.0, 'huashan_ask_test')
+        local l,w
+        dis_all()
+        EnableTriggerGroup("huashan_accept", true)
+        repeat
+            exe('ask yue buqun about job')
+            l, w = wait.regexp('^(> )*(你向岳不群打听|这里没有这个人)',1)
+        until l ~= nil
+    
+        if l:find("这里没有这个人") then
+            EnableTriggerGroup("huashan_accept", false)
+            return huashan_nobody()
+        end
     end)
 end
-huashan_ask_test = function() exe('ask yue buqun about job') end
 function huashan_trigger()
     DeleteTriggerGroup("huashan_find")
-    DeleteTriggerGroup("huashan_ask")
-    create_trigger_t('huashan_ask1',
-                     "^(> )*你向岳不群打听有关『job』的消息。$",
-                     '', 'huashan_ask')
-    create_trigger_t('huashan_ask2', "^(> )*这里没有这个人。$", '',
-                     'huashan_nobody')
-    SetTriggerOption("huashan_ask1", "group", "huashan_ask")
-    SetTriggerOption("huashan_ask2", "group", "huashan_ask")
-    EnableTriggerGroup("huashan_ask", false)
     DeleteTriggerGroup("huashan_accept")
     create_trigger_t('huashan_accept1',
                      "^(> )*岳不群说道：「你不能光说呀，倒是做出点成绩给我看看！",
@@ -212,7 +209,6 @@ end
 function huashan_triggerDel()
     DeleteTriggerGroup("all_fight")
     DeleteTriggerGroup("huashan_find")
-    DeleteTriggerGroup("huashan_ask")
     DeleteTriggerGroup("huashan_accept")
     DeleteTriggerGroup("huashan_npc")
     DeleteTriggerGroup("huashan_fight")
@@ -222,16 +218,7 @@ function huashan_triggerDel()
     DeleteTriggerGroup("huashan_over")
     DeleteTriggerGroup("huashanQuest")
 end
-function huashan_ask()
-    dis_all()
-    EnableTimer('walkWait4', false)
-    EnableTriggerGroup("huashan_ask", false)
-    EnableTriggerGroup("huashan_accept", true)
-    quick_locate = 1
-end
 function huashan_nobody()
-    EnableTimer('walkWait4', false)
-    EnableTriggerGroup("huashan_ask", false)
     return huashan_start()
 end
 function huashan_shibai()
@@ -420,7 +407,6 @@ huashan_find = function(n, l, w)
             job.target .. '】。')
     locl.area = '华山'
     locl.room = '树林'
-    quick_locate = 1
     if job.room == '侧廊' then flag.times = 2 end
     if job.area == '明教' and
         (job.room == "紫杉林" or string.find(job.room, "字门")) then
@@ -473,13 +459,8 @@ huashan_fight = function(n, l, w)
     DiscardQueue()
     EnableTrigger("huashan_find2", false)
     job.id = string.lower(w[2])
-    exe('unset no_kill_ap;yield no')
-    exe('follow ' .. job.id)
     job.killer[job.target] = job.id
-    exe('kick ' .. job.id)
-    exe('kill ' .. job.id)
-    exe('set wimpycmd pfmpfm\\hp')
-    Execute('pfmwu')
+
     -- exe('set wimpy 100')
     dis_all()
     wait.make(function()
@@ -502,11 +483,7 @@ huashan_fight = function(n, l, w)
                      'huashanFindFail')
     create_trigger_t('huashan_fight4', '^(> )*这里没有 ' .. job.id .. '。',
                      '', 'huashanFindAct')
-    create_trigger_t('huashan_fight5', "^(> )*你对着" .. job.target ..
-    "(大喝一声：|喝道：|猛吼一声：|吼道：)",
-                     '', 'hskill_timer_stop')
-    create_trigger_t('huashan_fight6', "^(> )*加油！加油",
-                                      '', 'hskill_timer_stop')
+
     -- create_trigger_t('huashan_fight4','^(> )*这里没有 '..job.id..'。','','huashanFindAgain')
     SetTriggerOption("huashan_fight1", "group", "huashan_fight")
     SetTriggerOption("huashan_fight2", "group", "huashan_fight")
@@ -514,21 +491,17 @@ huashan_fight = function(n, l, w)
     SetTriggerOption("huashan_fight4", "group", "huashan_fight")
     SetTriggerOption("huashan_fight5", "group", "huashan_fight")
     SetTriggerOption("huashan_fight6", "group", "huashan_fight")
-
-    create_timer_s('hskill', 0.4, 'hskill')
-end
-function hskill() -- hs flood后kill命令出不来的workaround by joyce@tj
-    exe('unset no_kill_ap;yield no')
-    exe('set wimpycmd pfmpfm\\hp')
-    exe('follow ' .. job.id)
-    exe('kick ' .. job.id)
-    exe('kill ' .. job.id)
-    -- exe('set wimpy 100')
-end
-function hskill_timer_stop() -- hs flood后kill命令出不来的workaround by joyce@tj
-    DeleteTimer('hskill')
-    EnableTrigger("huashan_fight_hskill", false)
-    quick_locate = 1
+    wait.make(function()
+        repeat
+            exe('unset no_kill_ap;yield no')
+            exe('follow ' .. job.id)
+            exe('kick ' .. job.id)
+            exe('kill ' .. job.id)
+            exe('set wimpycmd pfmpfm\\hp')
+            Execute('pfmwu')
+            local l, w = wait.regexp('^(> )*(你对着' .. job.target.. '(大喝一声|喝道|猛吼一声|吼道)|加油！加油|这里没有这个人)',1)
+        until l ~= nil
+    end)
 end
 
 huashan_faint = function()
@@ -577,7 +550,6 @@ huashan_cut = function()
                          '】,华山2共计【' .. hstongji_2 ..
                          '】次.平均用时【' .. hstongji_pingjun ..
                          '】秒', 'aqua')
-        -- return check_halt(huashan_cut_act)
     else
         -- 开始统计次数
         hstongjilasttime_l_2 = hstongji_thistime
@@ -590,9 +562,7 @@ huashan_cut = function()
                          '】,华山1共计【' .. hstongji_1 ..
                          '】次.平均用时【' .. hstongji_pingjun ..
                          '】秒', 'aqua')
-        -- return check_halt(huashan_cut_act)
     end
-    -- return check_halt(huashan_cut_act)
     tmp.cnt = 0
     if job.area == '绝情谷' then
         exe('drop corspe')
@@ -753,7 +723,6 @@ huashan_yls_ask = function(n, l, w)
                      '', 'huashan_yls_back')
     SetTriggerOption("huashan_yls_ask1", "group", "huashan_yls_ask")
     EnableTriggerGroup("huashan_yls_ask", false)
-    quick_locate = 1
     wait.make(function()
         wait.time(0.5)
         wait_busy()
@@ -798,7 +767,6 @@ huashan_yls_back = function()
     create_trigger_t('huashan_over2', '^(> )*这里没有这个人。', '', '')
     SetTriggerOption("huashan_over1", "group", "huashan_over")
     SetTriggerOption("huashan_over2", "group", "huashan_over")
-    quick_locate = 1
     return go(huashan_over, '华山', '正气堂', 'huashan/jitan')
 end
 huashan_over = function()
@@ -823,7 +791,6 @@ huashan_finish = function()
     EnableTriggerGroup("huashan_over", false)
     EnableTriggerGroup("huashanQuest", true)
     flag.times = 1
-    quick_locate = 1
     locl.area = '华山'
     locl.room = '正气堂'
     hsjob2 = 0

@@ -531,7 +531,6 @@ function wudangTarget(n, l, w)
     EnableTrigger("hpheqi1", true)
     job.id = string.lower(w[1])
     job.killer[job.target] = job.id
-    -- SetSpeedWalkDelay(math.floor(1000 / 30))
     DiscardQueue()
     flag.wait = 1
     exe('follow ' .. job.id)

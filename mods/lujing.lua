@@ -542,6 +542,7 @@ function go(job, area, room, sId)
     tmp.go_to = nil
     sour.id = sId
     dest.id = nil
+    resume_walk_thread("kill")
     if area ~= nil then dest.area = area end
     if room ~= nil then dest.room = room end
     if string.find(dest.area, "/") then
@@ -1044,6 +1045,7 @@ function find(l_area, l_room)
         (job.room == '×ÏÉ¼ÁÖ' or string.find(job.room, "×ÖÃÅ")) then
         create_timer_st('zsl_timer', 30, 'zsl_stop')
     end
+    resume_walk_thread("kill")
     do return search() end
 end
 function zsl_stop()

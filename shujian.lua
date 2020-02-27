@@ -239,7 +239,7 @@ function disAll()
     local tl = GetTriggerList()
     if tl then for k, v in ipairs(tl) do EnableTrigger(v, false) end end
     delete_all_timers()
-    if lookxin == 1 and job.name == 'dolost' then sendXin() end
+    -- if lookxin == 1 and job.name == 'dolost' then sendXin() end
     EnableTrigger("main", true)
     EnableTrigger("main1", true)
     EnableTriggerGroup("hp", true)
@@ -284,7 +284,7 @@ function dis_all()
     busyhook = test
     waithook = test
     flag.find = 1
-    walk_goon(true)
+    resume_walk_thread("kill")
     wdgostart = 0
     -- thread_resume(lookfor)
     idle()

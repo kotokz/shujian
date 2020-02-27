@@ -1192,6 +1192,12 @@ function draw_statuswindow()
     ColourNameToRGB("cyan"), -- colour
     false)
 
+    local eff = "效率:"
+    if job.expAvg ~= nil then eff = "效率:" .. job.expAvg end
+    WindowText(win_status, "f1", eff, 105, 135, 0, 0, -- rectangle
+    ColourNameToRGB("cyan"), -- colour
+    false)
+
     local dzzz = "打造:" .. score.dz
     if score.dj ~= nil then dzzz = "打造:" .. score.dz end
     WindowText(win_status, "f1", dzzz, 220, 135, 0, 0, -- rectangle

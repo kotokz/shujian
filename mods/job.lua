@@ -1799,11 +1799,16 @@ end
 
 function check_jobx()
     for p in pairs(weaponUsave) do
-        if Bag and not Bag[p] then job.zuhe["songmoya"] = nil end
+        if Bag and not Bag[p] then 
+            job.zuhe["songmoya"] = nil 
+            messageShow('¶ªÊ§ÎäÆ÷!'.. p .. '²»¼ûÁË', 'blue')
+            weapon_lost()
+        end
     end
     --[[if score.id=='kkfromch' and (isInBags('Èı²ÅÇ¬À¤½£')==nil or isInBags('ÁúÁéÇ¬À¤óï')==nil or isInBags('ÇÉÖÆ·çÔÆóï')==nil) then
    return weapon_lost()
 end]]
+    
     if fqyytmp.goArmorD == 1 then return fqyyArmorGoCheck() end
     if job.zuhe == nil then job.zuhe = {} end
     if job.zuhe["zhuoshe"] and score.party ~= "Ø¤°ï" then

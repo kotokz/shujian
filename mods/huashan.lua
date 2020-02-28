@@ -148,12 +148,10 @@ function job_huashan()
         repeat
             exe('ask yue buqun about job')
             l, w = wait.regexp('^(> )*(你向岳不群打听|这里没有这个人)',1)
-        until l ~= nil
-    
-        if l:find("这里没有这个人") then
-            EnableTriggerGroup("huashan_accept", false)
-            return huashan_nobody()
-        end
+            if l and l:find("这里没有这个人") then
+                await_go('华山', '正气堂')
+            end
+        until l and l:find("你向岳不群打听")
     end)
 end
 function huashan_trigger()
@@ -228,21 +226,31 @@ function huashan_shibai()
     return check_busy(huashan_shibai_b)
 end
 function huashan_shibai_b()
-    EnableTimer('walkWait4', false)
-    flag.idle = nil
-    DeleteTriggerGroup("all_fight")
-    kezhiwugongclose()
-    huashan_triggerDel()
-    exe('ask yue buqun about 失败')
-    if job.where ~= nil and string.find(job.where, "侠客岛") then
-        mjlujingLog("侠客岛")
-    end
-    hstongji_fangqi = hstongji_fangqi + 1
-    messageShow(
-        '华山任务：任务失败!华山失败[' .. hstongji_fangqi ..
-            ']次。', "Plum")
-    jobfailLog()
-    return check_halt(check_food)
+
+    wait.make(function()
+        EnableTimer('walkWait4', false)
+        flag.idle = nil
+        DeleteTriggerGroup("all_fight")
+        kezhiwugongclose()
+        huashan_triggerDel()
+        local l,w
+        repeat
+            exe('ask yue buqun about 失败')
+            l, w = wait.regexp('^(> )*(你向岳不群打听|这里没有这个人)',1)
+            if l and l:find("这里没有这个人") then
+                await_go('华山', '正气堂')
+            end
+        until l and l:find("你向岳不群打听")
+        if job.where ~= nil and string.find(job.where, "侠客岛") then
+            mjlujingLog("侠客岛")
+        end
+        hstongji_fangqi = hstongji_fangqi + 1
+        messageShow(
+            '华山任务：任务失败!华山失败[' .. hstongji_fangqi ..
+                ']次。', "Plum")
+        jobfailLog()
+        return check_halt(check_food)
+    end)
 end
 function huashan_fangqi()
     EnableTimer('walkWait4', false)
@@ -416,8 +424,6 @@ huashan_find = function(n, l, w)
     return go(huashanFindAct, job.area, job.room, "huashan/shulin")
 end
 function huashan_find_again()
-    EnableTimer('hskill', false)
-    DeleteTimer('hskill')
     EnableTriggerGroup("huashan_find", false)
     go("华山", "正气堂")
     flag.wait = 0
@@ -435,8 +441,6 @@ function huashan_debug_fight()
     exe('look')
 end
 function huashanFindAct()
-    EnableTimer('hskill', false)
-    DeleteTimer('hskill')
     EnableTriggerGroup("beinang", false)
     EnableTriggerGroup("huashan_find", true)
     job.flag()
@@ -509,7 +513,6 @@ huashan_faint = function()
     exe('kill ' .. job.id)
 end
 huashan_cut = function()
-    DeleteTimer('hskill')
     EnableTriggerGroup("huashan_fight", false)
     EnableTriggerGroup("huashan_find", false)
     DeleteTriggerGroup("huashan_cut")

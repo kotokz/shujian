@@ -147,12 +147,22 @@ function calculate_flood(offset)
     local sum = offset
     local time = os.time()
     for k, v in pairs(t_cmds) do
-        if k > time - 2 then sum = sum + v end
+        if k > time - 3 then sum = sum + v end
     end
 
+    local third =  t_cmds[time-3] or 0
     local current = t_cmds[time] or 0
+    if sum > 120 then
+        return 1
+    elseif sum - third > 85 then
+        return 1.5
+    elseif current + offset > 75 then
+        return 1.5
+    end
+    return nil
 
-    return sum > 85 or (current + offset) > 75
+    -- return sum > 85 or (current + offset) > 75
+    -- return sum > 90
 end
 
 function moving_sum(cmd)
@@ -160,17 +170,17 @@ function moving_sum(cmd)
     local count = 1
     if cmd:sub(1,1) == '#' then
         count = tonumber(string.match(cmd, "%d+"))
-        print("cmd = ".. cmd .. " count="..count)
     end
     local time = os.time()
     t_cmds[time] = t_cmds[time] or 0
     t_cmds[time] = t_cmds[time] + count
     local sum = 0
     for k, v in pairs(t_cmds) do
-        if k > time - 2 then sum = sum + v end
+        if k > time - 3 then sum = sum + v end
     end
+    local sum2 = sum + (t_cmds[time-3] or 0)
     if sum > 70 then
-        print("cmd reaching limit:"..sum.."  last second:"..t_cmds[time])
+        print("3 sec:".. sum2.. " 2 sec:"..sum.."  last sec:"..t_cmds[time])
     end
     if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
@@ -620,6 +630,11 @@ function path_consider()
                          '】出发! 目的地【' .. dest.area .. dest.room ..
                          '】')
         if sour.room == "观星台" then exe('jump down') end
+        if locl.room_relation == '九老洞九老洞' or
+           locl.room_relation == "不知道哪里九老洞 不知道哪里 九老洞" then
+            exe('drop fire;leave;leave;leave;leave;leave;leave;out;ne;ed;ne;ed')
+            return checkWait(goContinue, 0.3)
+        end
         if table.getn(sour.rooms) == 0 then
             if locl.room == '小木筏' then
                 return toSldHua()
@@ -630,13 +645,6 @@ function path_consider()
                 exe('pa up')
                 return checkWait(goContinue, 0.3)
             else
-                if locl.room_relation == '九老洞九老洞' or
-                    locl.room_relation ==
-                    "不知道哪里九老洞 不知道哪里 九老洞" then
-                    exe(
-                        'drop fire;leave;leave;leave;leave;leave;leave;out;ne;ed;ne;ed')
-                    return checkWait(goContinue, 0.3)
-                end
                 if locl.room_relation ==
                     '西湖边↙｜白堤柳浪闻莺西湖边' then
                     exe('sw')
@@ -988,16 +996,12 @@ function path_start()
                 end
             else
                 local tmp = utils.split(step, ';')
-                if #tmp and calculate_flood(#tmp) then
+                local delay = calculate_flood(#tmp)
+                if #tmp >2 and delay then
                     local lastSecondCmds = t_cmds[os.time()] or 0
                     print("last second:".. lastSecondCmds.." next cmds:" .. #tmp)
-                    if lastSecondCmds > 50 then
-                        wait.time(1.5)
-                        print("wait 1.5 second as next step might flood")
-                    else
-                        wait.time(1)
-                        print("wait 1.5 second as next step might flood")
-                    end
+                    wait.time(delay)                    
+                    print("wait " ..delay .. " second as next step might flood")
                 end
                 exe(step)
                 walk_wait()
@@ -1310,7 +1314,6 @@ function searchStart()
             local path, length = map:getPath(road.id, id)
             road.id = id
             if type(path) == "string" then
-                -- print("第" .. i .. "区域:" .. path)
                 walk_hook_thread = coroutine.running()
                 if string.find(path, '#') or job.name ~= 'huashan' then
                     road.pathset = road.pathset or {}
@@ -1366,7 +1369,6 @@ function searchStart()
                 Note(path)
             end
         end
-        -- cmd_limit =max_cmd_limit
         return find_nobody()
     end)
 

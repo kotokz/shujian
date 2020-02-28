@@ -21,18 +21,7 @@ wudang_cs = 0
 -- 共计完成【'..wdtongji_cs'】次,平均战斗时间【】次,成功【】次，失败【】次，完成率【】
 wdgostart = 0
 function wudangTrigger()
-    DeleteTriggerGroup("wudangAsk")
-    create_trigger_t('wudangAsk1', "^(> )*你向宋远桥打听有关", '',
-                     'wudangAsk')
-    create_trigger_t('wudangAsk2', "^(> )*这里没有这个人。$", '',
-                     'wudangNobody')
-    create_trigger_t('wudangAsk3',
-                     "^你觉得有点什么不对劲, 可是你却说不上来",
-                     '', 'wudangStart')
-    SetTriggerOption("wudangAsk1", "group", "wudangAsk")
-    SetTriggerOption("wudangAsk2", "group", "wudangAsk")
-    SetTriggerOption("wudangAsk3", "group", "wudangAsk")
-    EnableTriggerGroup("wudangAsk", false)
+
     DeleteTriggerGroup("wudangAccept")
     create_trigger_t('wudangAccept1',
                      "^(> )*宋远桥在你的耳边悄声说道：据说(\\D*)正在(\\D*)捣乱",
@@ -96,9 +85,9 @@ function wudangTrigger()
                      '', 'wudangBack')
     create_trigger_t('wudangFight3', "^(> )*这里没有(\\D*)。", '',
                      'wudangLost')
-    create_trigger_t('wudangFight4',
-                     "^(> )*(\\D*)对着你发出一阵阴笑，说道", '',
-                     'wudangKillAct')
+    -- create_trigger_t('wudangFight4',
+    --                  "^(> )*(\\D*)对着你发出一阵阴笑，说道", '',
+    --                  'wudangKillAct')
     create_trigger_t('wudangFight5',
                      "^(> )*(\\D*)大喊一声：老子不奉陪了！转身几个起落就不见了",
                      '', 'wudangBack')
@@ -109,7 +98,7 @@ function wudangTrigger()
     SetTriggerOption("wudangFight1", "group", "wudangFight")
     SetTriggerOption("wudangFight2", "group", "wudangFight")
     SetTriggerOption("wudangFight3", "group", "wudangFight")
-    SetTriggerOption("wudangFight4", "group", "wudangFight")
+    -- SetTriggerOption("wudangFight4", "group", "wudangFight")
     SetTriggerOption("wudangFight5", "group", "wudangFight")
     SetTriggerOption("wudangFight6", "group", "wudangFight")
     SetTriggerOption("wudangFight7", "group", "wudangFight")
@@ -188,15 +177,10 @@ function wudanglevel(n, l, w)
 end
 function wudangTriggerDel()
     DeleteTriggerGroup("wudangdebug")
-    DeleteTriggerGroup("wudangAsk")
     DeleteTriggerGroup("wudangAccept")
     DeleteTriggerGroup("wudangFight")
     DeleteTriggerGroup("wudangFinish")
     DeleteTriggerGroup("wudangFind")
-end
-function wudangNobody()
-    EnableTriggerGroup("wudangAsk", false)
-    wudang()
 end
 job.list["wudang"] = "武当杀恶贼"
 function wudang()
@@ -207,11 +191,9 @@ function wudang()
     job.name = 'wudang'
     wait.make(function()
         wait_busy()
-        return wudangGo()
+        wudangBegin()
     end)
-    -- return check_busy(wudangGo)
 end
-function wudangGo() return go(wudangBegin, "武当山", "三清殿") end
 function wudangBegin()
     if newbie == 1 then
         return zhunbeineili(wdstart)
@@ -225,29 +207,25 @@ function wdstart()
 end
 function wudangStart()
     wdgostart = 1
-    EnableTriggerGroup("wudangAsk", true)
     flag.idle = nil
-    return wudangAsk11()
+    wait.make(function()
+        local l,w
+        await_go("武当山", "三清殿")
+        dis_all()
+        wdsearch_get = 0
+        flag.wipe = 1
+        wudang_canagain = 0
+        EnableTriggerGroup("wudangAccept", true)
+        repeat
+            exe('ask song yuanqiao about job')
+            l, w = wait.regexp('^(> )*(你向宋远桥打听有关|这里没有这个人)',1)
+            if l and l:find("这里没有这个人") then
+                await_go("武当山", "三清殿")
+            end
+        until l and l:find("你向宋远桥打听有关")
+    end)
 end
-function wudangAsk11()
-    wdsearch_get = 0
-    flag.wipe = 1
-    wudang_canagain = 0
-    EnableTriggerGroup("wudangAsk", true)
-    return check_busy(wudang_check_ask)
-end
-function wudang_check_ask()
-    exe('ask song yuanqiao about job')
-    create_timer_s('walkWait4', 3.0, 'wudang_ask_test')
-end
-wudang_ask_test = function() exe('ask song yuanqiao about job') end
-function wudangAsk()
-    dis_all()
-    EnableTimer('walkWait4', false)
-    DeleteTimer("walkWait4")
-    EnableTriggerGroup("wudangAsk", false)
-    EnableTriggerGroup("wudangAccept", true)
-end
+
 function wudangBusy()
     EnableTriggerGroup("wudangAccept", false)
     job.last = 'wudang'
@@ -428,15 +406,19 @@ function wudangFangqi()
     check_bei(wudangFangqiAsk)
 end
 function wudangFangqiAsk()
-    EnableTriggerGroup("wudangAsk", true)
-    exe('ask song yuanqiao about 放弃')
+    wait.make(function()
+        EnableTriggerGroup("wudangAccept", true)
+        local l,w
+        repeat
+            exe('ask song yuanqiao about 放弃')
+            l, w = wait.regexp('^(> )*(你向宋远桥打听有关|这里没有这个人)',1)
+            if l and l:find("这里没有这个人") then
+                await_go("武当山", "三清殿")
+            end
+        until l and l:find("你向宋远桥打听有关")
+        exe('unset no_kill_ap')
+    end)
     setLocateRoomID = 'wudang/sanqing'
-    DeleteTimer("walkWait4")
-    create_timer_s('walkWait4', 1.0, 'wudangFangqiAsk1')
-end
-function wudangFangqiAsk1()
-    exe('ask song yuanqiao about 放弃')
-    exe('unset no_kill_ap')
 end
 function wudangFind()
     wdgostart = 1
@@ -535,14 +517,6 @@ function wudangTarget(n, l, w)
     flag.wait = 1
     exe('follow ' .. job.id)
     wudangKillAct()
-    create_timer_s('wudang', 5, 'wudangMove')
-end
-function wudangMove()
-    if job.id then
-        exe('follow ' .. job.id)
-        exe('kick ' .. job.id)
-        exe('kill ' .. job.id)
-    end
 end
 function wudangLost(n, l, w)
     wdgostart = 0
@@ -560,60 +534,24 @@ function wudangLost(n, l, w)
     messageShow('武当任务：搜索丢失【' .. job.target ..
                     '】！回头再找！', "white")
     return wudangFindAct()
-    -- return wudangFind()
-    -- return wudangLostFind()
-    -- end
-end
-function wudangKill()
-    -- wait.make(function()
-    --     wait.time(0.2)
-    --     wudangKillAct()
-    -- end)
-    wudangKillAct()
 end
 function wudangKillAct()
     wdgostart = 0
     fight.time.b = os.time()
     flag.robber = true
-    exe('set wimpy 100;yield no')
-    exe('unset no_kill_ap')
-    exe('kill ' .. job.id)
-    exe('set wimpycmd pfmpfm\\hp')
-    -- exe('set wimpycmd pppp1\\hp')
-    wait.make(function()
-        wait.time(2)
-        exe('set wimpy 100')
-    end)
     kezhiwugong()
     kezhiwugongAddTarget(job.target, job.id)
-    -- wd flood后kill命令出不来的workaround by joyce@tj
-    addxml.trigger {
-        custom_colour = "2",
-        enabled = "y",
-        group = "wudang_fight",
-        match = "^(> )*你对着" .. job.target ..
-            "(大喝一声：|喝道：|猛吼一声：|吼道：)",
-        name = "wudang_fight_wdkill",
-        regexp = "y",
-        script = "wdkill_timer_stop",
-        sequence = "100"
-    }
-    create_timer_s('wdkill', 1.0, 'wdkill')
-    create_trigger_t('wudangFight5', "^(> )*加油！加油！", '',
-                     'wdkill_timer_stop')
-end
-function wdkill() -- wd flood后kill命令出不来的workaround by joyce@tj
-    exe('unset no_kill_ap;yield no')
-    exe('set wimpycmd pfmpfm\\hp')
-    -- exe('set wimpycmd pppp1\\hp')
-    exe('follow ' .. job.id)
-    exe('kill ' .. job.id)
-end
-function wdkill_timer_stop() -- wd flood后kill命令出不来的workaround by joyce@tj
-    DeleteTimer('wdkill')
-    DeleteTimer("walkWaitX")
-    EnableTrigger("wudang_fight_wdkill", false)
-    EnableTrigger("wudangFight5", false)
+    wait.make(function()
+        repeat
+            exe('set wimpy 100')
+            exe('unset no_kill_ap;yield no')
+            exe('set wimpycmd pfmpfm\\hp')
+            -- exe('set wimpycmd pppp1\\hp')
+            exe('follow ' .. job.id)
+            exe('kill ' .. job.id)
+            local l, w = wait.regexp('^(> )*(你对着' .. job.target.. '(大喝一声|喝道|猛吼一声|吼道)|加油！加油|这里没有这个人)',1)
+        until l ~= nil
+    end)
 end
 function wudangBack(n, l, w)
     EnableTriggerGroup("wipe", false)

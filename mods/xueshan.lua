@@ -250,13 +250,11 @@ function master_ask(task)
         repeat
             exe('ask bao xiang about '..task)
             l, w = wait.regexp('^(> )*(你向宝象打听|这里没有这个人)',1)
-        until l ~= nil
-    
-        if l:find("这里没有这个人") then
-            return xueshan_f_nobody()
-        else 
-            EnableTriggerGroup("xueshan_finish", true)
-        end
+            if l and l:find("这里没有这个人") then
+                await_go('大雪山', '入幽口')
+            end
+        until l and l:find("你向宝象打听")    
+        EnableTriggerGroup("xueshan_finish", true)
     end)
 end
 function job_xueshan()

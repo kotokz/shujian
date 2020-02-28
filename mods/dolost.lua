@@ -210,7 +210,7 @@ function cun_armor()
             not string.find(armor_list[i], 'card') and
             not string.find(armor_list[i], 'sword') and
             not string.find(armor_list[i], 'axe') then
-            Execute('cun ' .. armor_list[i])
+            exe('cun ' .. armor_list[i])
             local l, w = wait.regexp(
                              '^[> ]*你从身上拿出.+，放入自己的个人储物箱。$|^[> ]*你正忙着！$|^[> ]*你身上没有这样东西。$|^[> ]*.+不可以被保存。$')
             if string.find(l, '放入自己的个人储物箱') or

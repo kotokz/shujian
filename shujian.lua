@@ -251,6 +251,8 @@ function disAll()
         dmlTriggers()
         EnableTrigger('dmlfight1', true)
     end
+    flag.find = 1
+    resume_walk_thread("kill")
     if job.name == 'hubiao' then
         EnableTrigger("hpheqi1", true)
         EnableTriggerGroup("fight", true)

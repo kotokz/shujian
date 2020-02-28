@@ -1188,15 +1188,26 @@ end
 function xuexiParty()
     xuexiTrigger()
     if score.master then
-        master.area = locateroom(score.master)
-        if master.area then
-            return go(xuexiCheck, master.area, master.room)
+        if score.master == "上官剑南" then
+            wait.make(function()
+                await_go("铁掌山","无名峰")
+                return xuexiGoMaster()
+            end)
         else
-            ColourNote("white", "blue",
-                       "未找到师傅住址，请联系PTBX更新！")
-            return xuexiFinish()
+            return xuexiGoMaster()
         end
     else
+        return xuexiFinish()
+    end
+end
+
+function xuexiGoMaster()
+    master.area = locateroom(score.master)
+    if master.area then
+        return go(xuexiCheck, master.area, master.room)
+    else
+        ColourNote("white", "blue",
+                   "未找到师傅住址，请联系PTBX更新！")
         return xuexiFinish()
     end
 end

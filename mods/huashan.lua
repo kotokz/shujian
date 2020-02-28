@@ -233,7 +233,7 @@ function huashan_shibai_b()
     DeleteTriggerGroup("all_fight")
     kezhiwugongclose()
     huashan_triggerDel()
-    Execute('ask yue buqun about 失败')
+    exe('ask yue buqun about 失败')
     if job.where ~= nil and string.find(job.where, "侠客岛") then
         mjlujingLog("侠客岛")
     end
@@ -498,7 +498,7 @@ huashan_fight = function(n, l, w)
             exe('kick ' .. job.id)
             exe('kill ' .. job.id)
             exe('set wimpycmd pfmpfm\\hp')
-            Execute('pfmwu')
+            exe('pfmwu')
             local l, w = wait.regexp('^(> )*(你对着' .. job.target.. '(大喝一声|喝道|猛吼一声|吼道)|加油！加油|这里没有这个人)',1)
         until l ~= nil
     end)

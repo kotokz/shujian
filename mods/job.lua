@@ -1802,7 +1802,7 @@ function check_jobx()
         if Bag and not Bag[p] then 
             job.zuhe["songmoya"] = nil 
             messageShow('丢失武器!'.. p .. '不见了', 'blue')
-            weapon_lost()
+            return weapon_lost()
         end
     end
     --[[if score.id=='kkfromch' and (isInBags('三才乾坤剑')==nil or isInBags('龙灵乾坤箫')==nil or isInBags('巧制风云箫')==nil) then

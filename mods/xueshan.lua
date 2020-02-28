@@ -105,20 +105,14 @@ function xueshan_trigger()
     create_trigger_t('xueshan_guard1',
                      "^(> )*(京城|扬州|江南|江北|西南|中原|西北|河南|河北|东北)(镖头|大侠|捕头|护院|保镖) (\\D*)\\((\\D*)\\)",
                      '', 'xueshan_guard_check')
-    -- create_trigger_t('xueshan_guard2',"^(> )*这位高手似乎来自(\\D*)。",'','xueshan_judge_party')
     create_trigger_t('xueshan_guard3',
                      "^最近治安不太好，这个保镖是特别从京城请来的，据说还曾经是大内高手呢！",
                      '', 'xueshan_judge_super')
-    -- create_trigger_t('xueshan_guard6',"^  □(竹棒|长剑|长鞭|一块铁令|钢刀|箫)\\(",'','xueshan_judge_weapon')
     create_trigger_t('xueshan_guard5', '^(> )*你要看什么？', '',
                      'xueshan_kill_nobody')
-    -- create_trigger_t('xueshan_guard4',"^(他|她)装备着：$",'','npcWeapon')
     SetTriggerOption("xueshan_guard1", "group", "xueshan_guard")
-    -- SetTriggerOption("xueshan_guard2","group","xueshan_guard")
     SetTriggerOption("xueshan_guard3", "group", "xueshan_guard")
-    -- SetTriggerOption("xueshan_guard4","group","xueshan_guard")
     SetTriggerOption("xueshan_guard5", "group", "xueshan_guard")
-    -- SetTriggerOption("xueshan_guard6","group","xueshan_guard")
     EnableTriggerGroup("xueshan_guard", false)
     DeleteTriggerGroup("xueshan_finish")
     create_trigger_t('xueshan_finish1',

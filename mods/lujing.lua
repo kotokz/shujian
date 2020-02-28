@@ -1303,7 +1303,10 @@ end
 function searchStart()
     EnableTriggerGroup("wipe", true)
     flag.search = 1
-    if flag.wait == 1 then return end
+    -- only support one walk thread at the moment, so garbage collect the previous suspended one if exist.
+    if walk_hook_thread then
+        coroutine.resume(walk_hook_thread,"kill")
+    end
 
     wait.make(function()
         for i, id in ipairs(road.rooms) do
@@ -1311,10 +1314,22 @@ function searchStart()
                 print("找到目标，停止搜索")
                 return
             end
+
             local path, length = map:getPath(road.id, id)
             road.id = id
             if type(path) == "string" then
-                walk_hook_thread = coroutine.running()
+                
+                if flag.wait == 1 then 
+                    -- most likely that we found an candidate target before start searching.
+                    print("找到疑似目标，暂停遍历")
+                    walk_hook_thread = coroutine.running()
+                    local status = coroutine.yield()
+                    if status and status == "kill" then
+                        walk_hook_thread = nil
+                        return
+                    end 
+                end
+
                 if string.find(path, '#') or job.name ~= 'huashan' then
                     road.pathset = road.pathset or {}
                     if path then
@@ -1331,9 +1346,7 @@ function searchStart()
                     end
                     if road.pathset and table.getn(road.pathset) > 0 then
                         for i, steps in ipairs(road.pathset) do
-                            if walk_hook_thread then
-                                coroutine.resume(walk_hook_thread,"kill")
-                            end
+                      
                             walk_hook_thread = coroutine.running()
                             if flag.find == 1 then
                                 print("找到目标，停止搜索")
@@ -1361,6 +1374,7 @@ function searchStart()
                         end
                     end
                 else
+                    -- we might need flood check here. but seems fine so far
                     exe(string.sub(string.gsub(path, "halt;", ""), 1, -2))
                 end
                 walk_hook_thread = nil
@@ -1372,11 +1386,6 @@ function searchStart()
         return find_nobody()
     end)
 
-end
-
-function searchWait()
-    EnableTriggerGroup("find", true)
-    exe('alias action 正在搜寻中')
 end
 delElement = function(set, dir)
     local l_cnt = 0

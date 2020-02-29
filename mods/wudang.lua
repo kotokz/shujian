@@ -257,9 +257,9 @@ function wudangFail()
     else
         if wudang_checkfood == 1 then
             wudang_checkfood = 0
-            for p in pairs(weaponUsave) do
-                if Bag and not Bag[p] then return songxin() end
-            end
+            -- for p in pairs(weaponUsave) do
+            --     if Bag and not Bag[p] then return songxin() end
+            -- end
             if vippoison == 1 then return songxin() end
             if locl.weekday == 'ËÄ' and (locl.hour == 6 or locl.hour == 7) and
                 locl.min <= 55 then return songxin() end

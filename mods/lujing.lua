@@ -152,12 +152,13 @@ function calculate_flood(offset)
 
     local third =  t_cmds[time-3] or 0
     local current = t_cmds[time] or 0
-    if sum > 120 then
+    -- if sum > 120 then
+    --     return 1
+    -- end
+    if sum - third > 90 then
         return 1
-    elseif sum - third > 85 then
-        return 1.5
     elseif current + offset > 75 then
-        return 1.5
+        return 0.5
     end
     return nil
 
@@ -1017,8 +1018,8 @@ function path_start()
                 if #tmp >2 and delay then
                     local lastSecondCmds = t_cmds[os.time()] or 0
                     print("last second:".. lastSecondCmds.." next cmds:" .. #tmp)
-                    wait.time(delay)                    
                     print("wait " ..delay .. " second as next step might flood")
+                    wait.time(delay)                    
                 end
                 exe(step)
                 walk_wait()

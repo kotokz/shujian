@@ -697,12 +697,29 @@ function path_consider()
                                  locl.room_relation .. '】', 'LimeGreen')
             end
             for i = 1, table.getn(sour.rooms) do
+                local roomInfo = map.rooms[sour.rooms[i]]
                 if (locl.room_relation ~= '' and
-                    map.rooms[sour.rooms[i]].room_relative == locl.room_relation) then
-                    chats_locate('定位系统：尝试精确定位！',
-                                 'LimeGreen')
-                    sour.id = sour.rooms[i]
-                    return check_halt(path_consider)
+                    roomInfo.room_relative == locl.room_relation) then
+                    if exit.locl and roomInfo.ways and #exit.locl == tablelength(roomInfo.ways) then
+                        local match = true
+                        for k,v in ipairs(exit.locl) do
+                            if not roomInfo.ways[v] then
+                                match = false
+                            end
+                        end
+                        if match then
+                            sour.id = sour.rooms[i]
+                            chats_locate('定位系统：尝试精确定位！猜测目前位置为'..sour.id,
+                            'LimeGreen')                          
+                            return check_halt(path_consider)
+                        end
+                    else
+                        chats_locate('定位系统：尝试精确定位！',
+                        'LimeGreen')
+                        sour.id = sour.rooms[i]
+                        return check_halt(path_consider)
+                    end
+
                     -- return go(road.act,dest.area,dest.room,sour.rooms[i])
                 end
             end

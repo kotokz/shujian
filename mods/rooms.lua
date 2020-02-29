@@ -22922,6 +22922,7 @@ Room {
 	ways = {
 		["north"] = "shaolin/sengshe1",
 	},
+	room_relative="…Æ…·£¸…Æ…·…Æ…·",
 }
 Room {
 	id = "shaolin/sengshe4",

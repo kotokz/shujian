@@ -1080,8 +1080,6 @@ function lingwu_goon()
         flag.lingwu = 0
         lingwudie = 1
         xxpot = hp.pot_max
-        -- return check_bei(lingwu_finish)
-        -- wait.time(1)
         wait_busy()
         SetSpeedWalkDelay(0)  
         return lingwu_finish()

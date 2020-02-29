@@ -548,6 +548,7 @@ function wudangKillAct()
             exe('set wimpycmd pfmpfm\\hp')
             -- exe('set wimpycmd pppp1\\hp')
             exe('follow ' .. job.id)
+            exe('kick ' .. job.id)
             exe('kill ' .. job.id)
             local l, w = wait.regexp('^(> )*(你对着' .. job.target.. '(大喝一声|喝道|猛吼一声|吼道)|加油！加油|这里没有这个人)',1)
         until l ~= nil

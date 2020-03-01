@@ -255,6 +255,8 @@ function DaZao:checkJianDao(thread)
                 self:buyJianDao(coroutine.running())
                 coroutine.yield()
             end
+            checkBags()  -- we should enhance this to be await like func
+            wait_busy()
         end
         coroutine.resume(thread)
     end)

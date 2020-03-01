@@ -1155,6 +1155,9 @@ find_nobody = function()
         -- return go(lookXin, '襄阳城', '白虎门内街')
         return lookXin()
     end
+    if job.name=='dazaoArmor' then
+        return 
+     end
     return go(check_heal, '大理城', '药铺')
 end
 List = {}

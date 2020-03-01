@@ -884,6 +884,7 @@ function setAlias()
     SetAliasOption('dushu', 'send_to', '12')
     create_alias('full', '^full(.*)$', 'fullSkill("%1")')
     SetAliasOption('full', 'send_to', '12')
+    create_alias_s('dzarmor','dzarmor','dazaoArmor')
 end
 
 function setdzxy()

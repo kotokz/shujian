@@ -180,3 +180,218 @@ end
 function fqyyArmorMessage(msg)
     if msg ~= nil then messageShow(msg, '#1E90FF', '#FFFFFF') end
 end
+
+DaZao = {
+    dazaoID = "",
+    currnetCount = 0,
+    totalCount = 0,
+    expectValue = 2,
+    mainThread = nil,
+    findThread = nil,
+    autoDis = false,
+    jobName = 'dazaoArmor',
+    result = {}
+}
+
+function DaZao:new()
+    local o = {}
+    local l_result
+    l_result=utils.inputbox("你需要打造的护具ID是", "dazaoID", "", "宋体" , "12")
+    if not isNil(l_result) then
+        o.dazaoID = l_result
+    end
+
+    l_result=utils.inputbox ("你需要打造的次数", "dazaoTimes", 10, "宋体" , "12")
+    if not isNil(l_result) then
+        o.totalCount = tonumber(l_result)
+    end
+
+    l_result=utils.inputbox ("你需要保存的属性值（例如：2就是属性>=2的保存）。", "dazaoValue", 2, "宋体" , "12")
+    if not isNil(l_result) then
+        o.expectValue = tonumber(l_result)
+    end
+
+    l_result = utils.msgbox("是否自动分解不需要保存的装备", "dazaoDis",
+        "yesno", "?", 1)
+    if l_result and l_result == "yes" then
+        o.autoDis = true
+    else
+        o.autoDis = false
+    end
+    setmetatable(o, {__index = DaZao})
+    return o
+end
+
+function DaZao:start()
+    wait.make(function()
+        job.name=self.jobName
+        DeleteTimer('idle')
+        self.mainThread = coroutine.running()
+        self:checkJianDao(self.mainThread)
+        coroutine.yield()
+
+        print("买到剪刀")
+        weapon_unwield()
+        exe('wield jian dao')
+        -- now we have all we want, go crafting
+        await_go('zhiye/caifengpu1')
+        self:dazaoArmor()   
+    end)
+end
+
+function DaZao:checkJianDao(thread)
+    wait.make(function()
+        checkBags()  -- we should enhance this to be await like func
+        wait_busy()
+        while not Bag["剪刀"] do
+            await_go("扬州城","杂货铺")
+            local line, w
+            repeat
+                exe('qu jian dao')
+                line, w = wait.regexp(
+                                 '^(> )*(你把剪刀|你并没有保存)',1)
+            until line
+            if line:find('你并没有保存') then
+                self:buyJianDao(coroutine.running())
+                coroutine.yield()
+            end
+        end
+        coroutine.resume(thread)
+    end)
+end
+function DaZao:dazaoArmor()
+    wait.make(function()
+        local dazaoThread = coroutine.running()
+        while self.currnetCount < self.totalCount or g_stop_flag do
+            print('本次打造第'..self.currnetCount..'次，预计打造'..self.totalCount..'次。')
+            exe('weave '..self.dazaoID)
+            local line,w = wait.regexp(
+                '(> )*你很得意的拿起刚织造好的(\\D*)左|(> )*对于这种防具，您了解不多，还不会织造|(> )*你必须装备剪刀才能来织造')
+            if line and line:find("还不会织造") then
+                print("打造失败！")
+                break
+            elseif line and line:find('你必须装备剪刀') then
+                self:checkJianDao(dazaoThread)
+                coroutine.yield()
+                await_go('zhiye/caifengpu1')
+            else
+                self.armorName = w[2]
+                print("打造成功!".. self.armorName)
+                
+                self.currnetCount = self.currnetCount + 1
+                self:checkProduct(dazaoThread)
+                local status = coroutine.yield()
+                if status == "abort" then
+                    break
+                end
+            end
+        end
+        if g_stop_flag then
+            print("停止打造")            
+        else
+            print("全部打造完毕，一共打造了"..self.currnetCount..'次')
+        end
+        return
+    end)
+end
+
+function DaZao:checkProduct(thread)
+    wait.make(function()
+        local line,w 
+        repeat            
+            exe('look '..self.dazaoID)
+            line,w = wait.regexp(
+                '^(> )*它的功能有：【(\\N*)】',1)
+        until line
+        local value = w[2]
+        local wanttedAtr="身法根骨悟性力量"
+        local keep =false
+        for c,v in value:gmatch('(['..wanttedAtr..']+)＋(%d+)') do
+            if wanttedAtr:find(c) then
+                print(c,v)
+                local number = tonumber(v)
+                if number >= 5 then
+                    print("发现神器！！！")
+                    messageShow('出神器了，本次打造终止！','red','black')
+                    keep = true
+                    coroutine.resume(thread,"abort")
+                elseif number >= self.expectValue then
+                    print("可以保存")
+                    fqyyArmorMessage('装备属性：'..value)
+                    keep = true
+                end
+            end
+        end
+        if keep then
+            return self:cunArmor(thread)
+        elseif self.autoDis then
+            exe('dismantle '..self.dazaoID..';y')
+        else 
+            print("不符合条件，但是不自动分解")
+        end
+        wait_busy()
+        coroutine.resume(thread)
+    end)
+end
+
+function DaZao:cunArmor(thread)
+    wait.make(function()
+        await_go('city/zahuopu')
+        exe('cun '..self.dazaoID)
+        checkBags()
+        wait_busy()
+        await_go('zhiye/caifengpu1')
+        coroutine.resume(thread)
+    end)
+end
+
+function DaZao:buyJianDao(thread)
+    wait.make(function()
+        await_go("changan/northjie2")
+        wait.time(2)
+        exe('look')
+        flag.times = 1
+        self.findThread = coroutine.running()
+        jobFindAgain[self.jobName] = function (...)
+            coroutine.resume(self.findThread)
+        end
+        find()
+        local status = coroutine.yield()
+        if status then
+            return
+        else
+            print('找不到婆婆')
+        end
+    end)
+    wait.make(function() 
+        while true do
+            local line,_ = wait.regexp(
+                '^(> )*\\s*(养蚕婆婆\\(Yangcan popo\\)|这里没有 yangcan popo|你决定跟随养蚕婆婆|你.*从养蚕婆婆那里买下了一把剪刀|老裁缝说道：「你想买的东西我这里没有)')
+            if line and line:find('Yangcan popo') then
+                flag.wait = 1
+                exe('follow yangcan popo')
+            elseif line and line:find('这里没有') then
+                flag.wait = 0
+                walk_wait()
+            elseif line and line:find('你决定跟随') then
+                flag.find = 1
+                exe('buy jian dao')
+            elseif line and line:find('没有') then
+                exe('follow yangcan popo')
+                exe('buy jian dao')
+            elseif line and line:find('一把剪刀') then
+                exe('follow none')
+                break
+            end
+        end        
+        coroutine.resume(thread)
+    end)
+    
+end
+
+
+function dazaoArmor()
+    local dz = DaZao.new()
+    tprint(dz)
+    dz:start()
+end

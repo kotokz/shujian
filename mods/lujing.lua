@@ -23,10 +23,6 @@ road.wipe_who = nil
 road.wipe_con = nil
 road.resume = nil
 road.steps = 30
-road.cmd = nil
-road.cmd_save = nil
-road.maze = nil
-wait_cd = nil
 exit = {}
 exit.locl = {}
 exit.reverse = {}
@@ -1156,7 +1152,8 @@ find_nobody = function()
         end
     end
     if job.name == 'dolost' then
-        return go(lookXin, '襄阳城', '白虎门内街')
+        -- return go(lookXin, '襄阳城', '白虎门内街')
+        return lookXin()
     end
     return go(check_heal, '大理城', '药铺')
 end
@@ -1494,7 +1491,6 @@ wipe_goon = function(n, l, w)
     if road.wipe_who == Trim(w[1]) then exe('kill ' .. road.wipe_id) end
 end
 wipe_over = function()
-    wait_cd = os.time()
     DeleteTimer('wipe')
     DeleteTimer('perform')
     -- exe('set wimpy 100')

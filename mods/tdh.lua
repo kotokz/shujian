@@ -527,7 +527,6 @@ function tdhId(n, l, w)
 end
 function tdhDie(n, l, w)
     EnableTriggerGroup("tdhSet", false)
-    wait_cd = os.time()
     if job.killer[w[2]] then
         job.killer[w[2]] = nil
         locate()

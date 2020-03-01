@@ -1,6 +1,4 @@
 -------华山
-hstongji_total = 0
-hstongjilasttime_total = 0
 hstongji_1 = 0
 hstongji_2 = 0
 hstongji_zh = 0 -- 任务时间总和
@@ -12,7 +10,6 @@ hstongji_thistime = 0 -- hs 本次战斗时间
 hstongjilasttime_l = 0 -- 累计hs2战斗时间
 hstongjilasttime_l_2 = 0 -- 本次hs战斗时间
 hstongjilasttime_l_1 = 0 -- 累计hs1战斗时间
-hscheckhead = 0
 tosld = 0
 tocaidi = 0
 tomr = 0

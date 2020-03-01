@@ -829,18 +829,5 @@ function xueshan_judge()
 
     if tmp.super then messageShow('雪山任务：遇到大内高手。') end
     job.guard = {}
-    -- return check_busy(waitcd)
     return xueshan_kill()
-end
-function waitcd()
-    mytime = os.time()
-    if not wait_cd or mytime > wait_cd + 8 then
-        return check_busy(xueshan_kill)
-    else
-        wait.make(function()
-            wait.time(1)
-            exe("alias acton 等待首饰冷却！")
-            return waitcd()
-        end)
-    end
 end

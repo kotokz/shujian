@@ -237,8 +237,6 @@ function wudangBusyDazuo()
 end
 function wudangFail()
     wdgostart = 0
-    EnableTimer('walkWait4', false)
-    DeleteTimer("walkWait4")
     EnableTriggerGroup("wudangAccept", false)
     if job.level == '已入化境' then
         job.level = '未知'
@@ -632,8 +630,6 @@ function wudangFinish()
     EnableTriggerGroup("wudangFinish", false)
     wudangTriggerDel()
     wudangjobok = 0
-    wudangcss = 1
-    wudangcs = wudangcss + 1
     job.wdtime = 0
     wudangCk = 0
     nobusy = 0

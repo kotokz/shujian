@@ -5618,7 +5618,7 @@ end
 jhkzout = function()
     exe('east')
     fastLocate()
-    return checkWait(jhkzcheck, 1)
+    return checkWait(jhkzcheck,0.3)
 end
 jhkzcheck = function()
     DeleteTriggerGroup("jhkz")

@@ -235,7 +235,8 @@ function DaZao:start()
 
         -- now we have all we want, go crafting
         await_go('zhiye/caifengpu1')
-        self:dazaoArmor()
+        self:dazaoArmor(self.mainThread)
+        coroutine.yield()
         self:cunJianDao()
     end)
 end
@@ -282,10 +283,10 @@ function DaZao:checkJianDao(thread)
         coroutine.resume(thread)
     end)
 end
-function DaZao:dazaoArmor()
+function DaZao:dazaoArmor(thread)
     wait.make(function()
         local dazaoThread = coroutine.running()
-        while self.currnetCount < self.totalCount or g_stop_flag do
+        while self.currnetCount < self.totalCount do
             print('本次打造第'..self.currnetCount..'次，预计打造'..self.totalCount..'次。')
             exe('weave '..self.dazaoID)
             local line,w = wait.regexp(
@@ -315,12 +316,14 @@ function DaZao:dazaoArmor()
                     break
                 end
             end
+            if g_stop_flag then break end
         end
         if g_stop_flag then
             print("停止打造")            
         else
             print("全部打造完毕，一共打造了"..self.currnetCount..'次')
         end
+        coroutine.resume(thread)
     end)
 end
 
@@ -376,34 +379,37 @@ end
 
 function DaZao:buyJianDao(thread)
     wait.make(function()
-        await_go("changan/northjie2")
-        wait.time(2)
-        exe('look')
         local stop = false
         while true do
-            flag.times = 1
-            find()
-            local line,_ = wait.regexp(
-                '^(> )*\\s*(养蚕婆婆\\(Yangcan popo\\)|这里没有 yangcan popo|你决定跟随养蚕婆婆|你.*从养蚕婆婆那里买下了一把剪刀|老裁缝说道：「你想买的东西我这里没有)',5)
-            if line and line:find('Yangcan popo') then
-                flag.wait = 1
-                exe('follow yangcan popo')
-            elseif line and line:find('这里没有') then
-                flag.wait = 0
-                walk_wait()
-            elseif line and line:find('你决定跟随') then
-                flag.find = 1
-                exe('buy jian dao')
-            elseif line and line:find('没有') then
-                exe('follow yangcan popo')
-                exe('buy jian dao')
-            elseif line and line:find('一把剪刀') then
-                exe('follow none')
-                break 
-            elseif g_stop_flag then
+            if g_stop_flag then
                 print("停止打造")
                 stop = true
                 break
+            end
+            if walk_hook_thread == nil then
+                await_go("changan/northjie2")
+                wait.time(1)
+                exe('look')
+                flag.times = 1
+                find()
+            end
+            local line,_ = wait.regexp(
+                '^(> )*\\s*养蚕婆婆\\(Yangcan popo\\)',5)
+            if line then
+                flag.wait = 1
+                print('找到婆婆')
+                exe('follow yangcan popo;buy jian dao')
+                local line2,_ = wait.regexp('^(> )*\\s*(这里没有 yangcan popo|你.*从养蚕婆婆那里买下了一把剪刀)',1)
+                if line2 and line2:find('这里没有') then
+                    flag.find = 0
+                    flag.wait = 0
+                    walk_wait()
+                elseif line2 and line2:find('买下了一把剪刀') then
+                    flag.find = 1
+                    exe('follow none')
+                    print("买到剪刀了")
+                    break
+                end
             else
                 print("超时没有找到婆婆，再尝试一次")
             end

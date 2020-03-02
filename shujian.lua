@@ -485,7 +485,7 @@ function dzxy()
 end
 function dzxy1_go()
     messageShow('任务监控：去慕容领悟字画去了！', 'white')
-    go(dzxy1_unwield, '燕子坞', '碧水厅')
+    go(dzxy1_unwield, '燕子坞', '碧水亭')
 end
 function dzxy2_go()
     messageShow('任务监控：去慕容领悟秘籍去了！', 'white')

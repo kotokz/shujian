@@ -1798,43 +1798,47 @@ function check_job()
 end
 
 function check_jobx()
-    for p in pairs(weaponUsave) do
-        if Bag and not Bag[p] then 
-            job.zuhe["songmoya"] = nil 
-            messageShow('丢失武器!'.. p .. '不见了', 'blue')
-            return weapon_lost()
+    wait.make(function() 
+        wait_busy()
+        for p in pairs(weaponUsave) do
+            if Bag and not Bag[p] then 
+                job.zuhe["songmoya"] = nil 
+                messageShow('丢失武器!'.. p .. '不见了', 'blue')
+                return weapon_lost()
+            end
         end
-    end
-    --[[if score.id=='kkfromch' and (isInBags('三才乾坤剑')==nil or isInBags('龙灵乾坤箫')==nil or isInBags('巧制风云箫')==nil) then
-   return weapon_lost()
-end]]
-    
-    if fqyytmp.goArmorD == 1 then return fqyyArmorGoCheck() end
-    if job.zuhe == nil then job.zuhe = {} end
-    if job.zuhe["zhuoshe"] and score.party ~= "丐帮" then
-        job.zuhe["zhuoshe"] = nil
-    end
-    if job.zuhe["sldsm"] and score.party ~= "神龙教" then
-        job.zuhe["sldsm"] = nil
-    end
-    if job.zuhe["songmoya"] and hp.exp < 5000000 then
-        job.zuhe["songmoya"] = nil
-    end
-    if smydie * 1 >= smyall * 1 then job.zuhe["songmoya"] = nil end
-    if job.zuhe["husong"] and (score.party ~= "少林派" or hp.exp < 2000000) then
-        job.zuhe["husong"] = nil
-    end
-    if job.zuhe["songmoya"] and job.last ~= "songmoya" and mytime <= os.time() then
-        return songmoya()
-    end
-    if job.zuhe["hubiao"] and job.last ~= "hubiao" and job.teamname and
-        ((not condition.hubiao) or (condition.hubiao and condition.hubiao <= 0)) then
-        return hubiao()
-    elseif job.zuhe["husong"] then
-        return husong()
-    else
-        return checkJob()
-    end
+        --[[if score.id=='kkfromch' and (isInBags('三才乾坤剑')==nil or isInBags('龙灵乾坤箫')==nil or isInBags('巧制风云箫')==nil) then
+       return weapon_lost()
+    end]]
+        
+        if fqyytmp.goArmorD == 1 then return fqyyArmorGoCheck() end
+        if job.zuhe == nil then job.zuhe = {} end
+        if job.zuhe["zhuoshe"] and score.party ~= "丐帮" then
+            job.zuhe["zhuoshe"] = nil
+        end
+        if job.zuhe["sldsm"] and score.party ~= "神龙教" then
+            job.zuhe["sldsm"] = nil
+        end
+        if job.zuhe["songmoya"] and hp.exp < 5000000 then
+            job.zuhe["songmoya"] = nil
+        end
+        if smydie * 1 >= smyall * 1 then job.zuhe["songmoya"] = nil end
+        if job.zuhe["husong"] and (score.party ~= "少林派" or hp.exp < 2000000) then
+            job.zuhe["husong"] = nil
+        end
+        if job.zuhe["songmoya"] and job.last ~= "songmoya" and mytime <= os.time() then
+            return songmoya()
+        end
+        if job.zuhe["hubiao"] and job.last ~= "hubiao" and job.teamname and
+            ((not condition.hubiao) or (condition.hubiao and condition.hubiao <= 0)) then
+            return hubiao()
+        elseif job.zuhe["husong"] then
+            return husong()
+        else
+            return checkJob()
+        end
+    end)
+
 end
 function checkJob()
     if job.last ~= 'hqgzc' then

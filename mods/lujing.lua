@@ -810,6 +810,7 @@ function path_consider()
 
     if dest.id == nil and table.getn(dest.rooms) == 0 then
         Note('Path Consider GetRooms Error!')
+        chats_locate('定位系统：无法找到的地点. dest.room='..dest.room.. ' dest.area=' .. dest.area)
         return false
     end
     path_create()
@@ -1364,7 +1365,14 @@ function searchStart()
                     end
                     if road.pathset and table.getn(road.pathset) > 0 then
                         for i, steps in ipairs(road.pathset) do
-                      
+                            if job.name == 'dazaoArmor' then
+                                local tmp = utils.split(steps, ';')
+                                local delay = calculate_flood(#tmp+5)
+                                if delay then
+                                    print("wait " ..delay .. " second as next step might flood")
+                                    wait.time(delay)                    
+                                end
+                            end
                             walk_hook_thread = coroutine.running()
                             if flag.find == 1 then
                                 print("找到目标，停止搜索")

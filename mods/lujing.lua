@@ -139,6 +139,12 @@ function tablelength(T)
 end
 
 function calculate_flood(offset)
+    if score.vip_level =="白金会员" then
+        offset = offset + 3
+    elseif score.vip_level == "黄金会员" then
+        offset = offset + 5
+    end
+
     if offset == nil then offset = 0 end
     local sum = offset
     local time = os.time()
@@ -1365,13 +1371,14 @@ function searchStart()
                     end
                     if road.pathset and table.getn(road.pathset) > 0 then
                         for i, steps in ipairs(road.pathset) do
-                            if job.name == 'dazaoArmor' then
-                                local tmp = utils.split(steps, ';')
-                                local delay = calculate_flood(#tmp+5)
-                                if delay then
-                                    print("wait " ..delay .. " second as next step might flood")
-                                    wait.time(delay)                    
-                                end
+                            -- if job.name == 'dazaoArmor' then
+                               
+                            -- end
+                            local tmp = utils.split(steps, ';')
+                            local delay = calculate_flood(#tmp)
+                            if delay then
+                                print("wait " ..delay .. " second as next step might flood")
+                                wait.time(delay)                    
                             end
                             walk_hook_thread = coroutine.running()
                             if flag.find == 1 then
@@ -1400,8 +1407,15 @@ function searchStart()
                         end
                     end
                 else
+                    local steps = string.sub(string.gsub(path, "halt;", ""), 1, -2)
+                    local tmp = utils.split(steps, ';')
+                    local delay = calculate_flood(#tmp)
+                    if delay then
+                        print("wait " ..delay .. " second as next step might flood")
+                        wait.time(delay)                    
+                    end
                     -- we might need flood check here. but seems fine so far
-                    exe(string.sub(string.gsub(path, "halt;", ""), 1, -2))
+                    exe(steps)
                 end
                 walk_hook_thread = nil
             else
@@ -2587,6 +2601,34 @@ function Toghz()
         '孤鸿子' then exe("ed;yue qiaobi") end
     return walk_wait()
 end
+---------南疆沙漠测试------------
+njsm_check=function()
+    EnableTriggerGroup("fight_trigger",false)
+    DeleteTriggerGroup("njsm_check")
+    create_trigger_t('njsm_check1',"^一股暖流发自丹田流向全身，慢慢地你又恢复了知觉……",'','faint_check_njsm')
+    SetTriggerOption('njsm_check1','group','njsm_check')
+    EnableTriggerGroup("njsm_check1",true)
+    faint_check_njsm()
+end
+function njsm_eat()
+    exe('drink jiudai;drink jiudai;yun jing;yun jingli')
+end
+function njsm_goon()
+    exe('drink jiudai;drink jiudai;yun jing;yun jingli;n;n;n;n;n;n;n;n;n;n')
+end
+function faint_check_njsm()
+    if string.find(locl.room,'南疆沙漠') then
+        njsm_eat()
+        return check_busy(njsm_goon)
+    elseif locl.room=="吐谷浑伏俟城" then
+        EnableTriggerGroup("njsm_check1",false)
+        EnableTriggerGroup("fight_trigger",true)
+        -- dis_all()
+        njsm_eat()
+        return walk_wait()
+    end
+end
+
 ---------by fqyy test 武当后山茅屋---------------
 function Wdmw()
     DeleteTriggerGroup("inwdmw")

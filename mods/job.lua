@@ -590,12 +590,6 @@ function checkPrepare()
     if Bag and Bag["Ò°¾Õ»¨"] and not Bag["Í­Ô¿³×"] then
         return go(get_key, 'ÑïÖÝ³Ç', 'Ð¡ÅÌ¹Å')
     end
-    --[[if Bag and not Bag["Í­Ô¿³×"] then
-	   return check_key()
-	end
-	if Bag and not Bag["Éþ×Ó"] then
-	   return check_rope()
-	end]]
 
     return checkPrepareOver()
 end
@@ -1798,7 +1792,7 @@ function check_job()
 end
 
 function check_jobx()
-    wait.make(function() 
+    wait.make(function()        
         wait_busy()
         for p in pairs(weaponUsave) do
             if Bag and not Bag[p] then 

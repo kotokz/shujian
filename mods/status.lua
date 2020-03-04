@@ -215,6 +215,7 @@ score_title_check = function(n, l, w)
 end
 score_age_check = function(n, l, w) score.age = trans(w[1]) end
 score_gold_check = function(n, l, w)
+    score.vip_level = Trim(tostring(w[1]))
     score.gold = trans(w[2])
     if score.gold == nil then score.gold = 0 end
 end
@@ -1941,9 +1942,9 @@ function checkBags(func)
     create_trigger_t('bags4',
                      '^(> )*(\\D*)(锭|两|张)(白银|黄金|壹仟两银票)\\(',
                      '', 'checkBagsMoney')
-    create_trigger_t('bags5',
-                     '^(> )*你把 "action" 设定为 "检查包裹" 成功完成。$',
-                     '', 'checkBagsOver')
+    -- create_trigger_t('bags5',
+    --                  '^(> )*你把 "action" 设定为 "检查包裹" 成功完成。$',
+    --                  '', 'checkBagsOver')
     create_trigger_t('bags6', '^(> )*(\\D*)封失落的信笺', '',
                      'checkBagsletter')
     create_trigger_t('bags7', '^(> )*(\\D*)枚飞镖\\(', '', 'checkBagsDart')
@@ -1967,6 +1968,8 @@ function checkBags(func)
     hxd_cur = 0
     -- print(cty_cur,nxw_cur,hxd_cur)
     bags = {}
+    tmp.Bag = Bag
+    tmp.Bag_count = 0 
     Bag = {}
     Bag["黄金"] = {}
     Bag["黄金"].id = {}
@@ -1979,14 +1982,25 @@ function checkBags(func)
     Bag["枚飞镖"].cnt = 0
     tmp.bags = func
     weaponUsave = weaponUsave or {}
-    exe('id')
-    checkWield()
-    exe('look bei nang')
-    exe('uweapon;alias action 检查包裹')
+    wait.make(function()
+        local line,w
+        repeat
+            exe('id')
+            checkWield()
+            exe('look bei nang')
+            exe('uweapon;alias action 检查包裹')
+            line,w = wait.regexp('^(> )*你把 "action" 设定为 "检查包裹" 成功完成。$', 1)
+        until line
+        if tmp.Bag_count == 0 then
+            Bag = tmp.Bag
+        end
+        checkBagsOver()
+    end)
 end
 function checkBagsletter() lostletter = 1 end
 function checkBagsStart() EnableTriggerGroup("bags", true) end
 function checkBagsId(n, l, w)
+    tmp.Bag_count = tmp.Bag_count + 1
     local l_name = Trim(w[1])
     local l_id = w[2]
     local l_set = {}
@@ -3068,18 +3082,4 @@ function kedian_sleep()
     end
     locate()
     walk_wait()
-end
-function check_rope() go(get_rope, '华山', '寝室') end
-function get_rope()
-    exe('tell rope 交货')
-    check_busy(checkPrepareOver)
-end
-function check_key() go(get_juhua, '扬州城', '个园') end
-function get_juhua()
-    exe('tell daisy 交货')
-    go(get_key, '扬州城', '小盘古')
-end
-function get_key()
-    exe('give juyou ye juhua')
-    check_busy(checkPrepareOver)
 end

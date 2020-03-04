@@ -5868,6 +5868,7 @@ Room {
 Room {
     id = "emei/fushouanxxs",
     name = "ÐÝÏ¢ÊÒ",
+    nofind = true,
     no_fight = true,
     ways = {["southdown"] = "emei/fushouanzt"}
 }
@@ -6407,6 +6408,7 @@ Room {
 Room {
     id = "emei/wanfota",
     name = "Íò·ðËþ",
+    nofind = true,
     ways = {["out"] = "emei/wanfoding"}
 }
 Room {
@@ -8737,6 +8739,7 @@ Room {
 Room {
     id = "gumu/jqg/sleep2",
     name = "ÐÝÏ¢ÊÒ",
+    nofind = true,
     no_fight = true,
     ways = {["north"] = "gumu/jqg/lang4"}
 }
@@ -26328,8 +26331,9 @@ Room {
 Room {
     id = "xingxiu/nanjiang",
     name = "ÄÏ½®É³Ä®",
-    ways = {["nw;sw;se;ne"] = "xingxiu/wenquan"},
-    nolooks = {["nw;sw;se;ne"] = true}
+    nofind = true,
+    ways = {["drink jiudai;nw;sw;se;ne"] = "xingxiu/wenquan"},
+    nolooks = {["drink jiudai;nw;sw;se;ne"] = true}
 }
 Room {
     id = "xingxiu/road4",

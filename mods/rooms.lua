@@ -7613,7 +7613,8 @@ Room {
         ["north"] = "fuzhou/yuchuan1",
         ["west"] = "fuzhou/yuchuan1",
         ["out"] = "fuzhou/yugang"
-    }
+    },
+    room_relative = "Óæ´¬£üÓæ´¬-----Óæ´¬-----Óæ´¬£üÓæ´¬Óæ´¬"
 }
 Room {
     id = "fuzhou/yuchuan2",
@@ -7623,7 +7624,8 @@ Room {
         ["east"] = "fuzhou/yuchuan3",
         ["north"] = "fuzhou/yuchuan2",
         ["west"] = "fuzhou/yuchuan1"
-    }
+    },
+    room_relative = "Óæ´¬£üÓæ´¬-----Óæ´¬-----Óæ´¬£üÓæ´¬Óæ´¬"
 }
 Room {
     id = "fuzhou/yuchuan3",
@@ -7633,7 +7635,8 @@ Room {
         ["east"] = "fuzhou/yuchuan4",
         ["north"] = "fuzhou/yuchuan3",
         ["west"] = "fuzhou/yuchuan2"
-    }
+    },
+    room_relative = "Óæ´¬£üÓæ´¬-----Óæ´¬-----Óæ´¬£üÓæ´¬Óæ´¬"
 }
 Room {
     id = "fuzhou/yuchuan4",
@@ -7643,7 +7646,8 @@ Room {
         ["east"] = "fuzhou/yuchuan5",
         ["north"] = "fuzhou/yuchuan4",
         ["west"] = "fuzhou/yuchuan3"
-    }
+    },
+    room_relative = "Óæ´¬£üÓæ´¬-----Óæ´¬-----Óæ´¬£üÓæ´¬Óæ´¬"
 }
 Room {
     id = "fuzhou/yuchuan5",
@@ -7654,7 +7658,8 @@ Room {
         ["north"] = "fuzhou/yuchuan5",
         ["east"] = "fuzhou/yuchuan2",
         ["west"] = "fuzhou/yuchuan4"
-    }
+    },
+    room_relative = "Óæ´¬£üÓæ´¬-----Óæ´¬-----Óæ´¬£üÓæ´¬Óæ´¬"
 }
 Room {
     id = "fuzhou/yugang",

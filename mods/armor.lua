@@ -249,6 +249,7 @@ function DaZao:cunJianDao()
         wait_busy()
         checkWield()
         print('打造模块结束')
+        g_stop_flag = false
     end)
 
 end
@@ -295,7 +296,7 @@ function DaZao:dazaoArmor(thread)
                 print("打造失败！")
                 break
             elseif line and line:find('你必须装备剪刀') then
-                local status = self:checkJianDao(self.mainThread)
+                local status = self:checkJianDao(dazaoThread)
                 coroutine.yield()
                 if status and status == 'break' then
                     break

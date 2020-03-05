@@ -260,8 +260,13 @@ function Armor:goRepair()
         local thread = coroutine.running()
         local status = self:checkJianDao(thread)
         coroutine.yield()
-        if status and status == 'break' then
-            return self:cunJianDao()
+        if status then
+            if status == 'break' then
+                return self:cunJianDao()
+            elseif status == 'failed' then
+                messageShow('买不到剪刀，放弃维修！', "red")
+                return self:repairDone()
+            end
         end
         await_go("长安城", "裁缝铺")
         for _,item in ipairs(self.repairList) do
@@ -317,12 +322,17 @@ function Armor:dzStart()
     end
     wait.make(function()
         job.name=self.jobName
-        DeleteTimer('idle')
+        delete_all_timers()
         local thread = coroutine.running()
         local status = self:checkJianDao(thread)
         coroutine.yield()
-        if status and status == 'break' then
-            return self:cunJianDao()
+        if status then
+            if status == 'break' then
+                return self:cunJianDao()
+            elseif status == 'failed' then
+                messageShow('买不到剪刀，放弃打造！', "red")
+                return self:repairDone()
+            end
         end
 
         -- now we have all we want, go crafting
@@ -367,7 +377,7 @@ function Armor:checkJianDao(thread)
             if line:find('你并没有保存') then
                 local status = self:buyJianDao(coroutine.running())
                 coroutine.yield()
-                if status and status == 'break' then
+                if status and (status == 'break' or status == 'failed') then
                     coroutine.resume(thread,status)
                 end
             
@@ -479,6 +489,7 @@ end
 function Armor:buyJianDao(thread)
     wait.make(function()
         local stop = false
+        local searchCount = 0
         while true do
             if g_stop_flag then
                 print("停止打造")
@@ -486,6 +497,10 @@ function Armor:buyJianDao(thread)
                 break
             end
             if walk_hook_thread == nil then
+                searchCount = searchCount + 1
+                if searchCount > self.maxFindTimes then
+                    return coroutine.resume(thread,'failed')
+                end
                 await_go("changan/northjie2")
                 wait.time(1)
                 exe('look')

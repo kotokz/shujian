@@ -274,6 +274,7 @@ function Armor:goRepair()
                 if l == nil then
                     print("继续打造")
                 elseif l:find("你带的零钱不够了") then
+                    wait.time(0.5)
                     exe('e;#3s;w;qu 400 gold;e;#3n;w')
                 else
                     break
@@ -282,7 +283,8 @@ function Armor:goRepair()
             wait_busy()      
         end
         --  might need add fail repair hanlding, but not important now.
-        self:cunJianDao()
+        self:cunJianDao(thread)
+        coroutine.yield()
         self:repairDone()
     end)
 end
@@ -330,16 +332,22 @@ function Armor:dzStart()
     end)
 end
 
-function Armor:cunJianDao()
+function Armor:cunJianDao(thread)
     wait.make(function() 
         await_go("扬州城","杂货铺")
         wait_busy()
         exe('unwield jiandao;cun jian dao')
         wait_busy()
         checkWield()
-        g_stop_flag = false
+        if g_stop_flag then        
+            g_stop_flag = false
+            dis_all()
+            return
+        end
+        if thread then
+            coroutine.resume(thread)
+        end        
     end)
-
 end
 
 function Armor:checkJianDao(thread)

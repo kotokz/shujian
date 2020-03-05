@@ -596,10 +596,10 @@ go_locate = function()
     EnableTriggerGroup("gpstest", true)
     EnableTrigger("hp12", true)
     wait.make(function()
-        -- if Chuanfu.chuanfuEnable then
-        --     check_cjn()
-        --     check_hh()
-        -- end
+        if Chuanfu.chuanfuEnable then
+            check_cjn()
+            check_hh()
+        end
         locate(coroutine.running())
         coroutine.yield()
         path_consider()
@@ -5124,6 +5124,24 @@ function mjlujingLog(jname)
     file:write(s)
 
     file:close()
+end
+
+--------------------------------渡江渡河开关------------------------------------------
+function djopen()
+    map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"]='dali/dalisouth/jiangbei'
+ map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"]='dali/dalisouth/jiangnan'
+ map.rooms["city/jiangbei"].ways["#duCjiang"]='city/jiangnan'		
+ map.rooms["city/jiangnan"].ways["#duCjiang"]='city/jiangbei'
+end
+function dhopen()
+ map.rooms["lanzhou/road3"].ways["#duHhe"]='lanzhou/road2'
+ map.rooms["lanzhou/road2"].ways["#duHhe"]='lanzhou/road3'
+ map.rooms["lanzhou/dukou3"].ways["#duHhe"]='lanzhou/dukou2'		
+ map.rooms["lanzhou/dukou2"].ways["#duHhe"]='lanzhou/dukou3'
+ map.rooms["changan/road3"].ways["#duHhe"]='changan/road2'
+ map.rooms["changan/road2"].ways["#duHhe"]='changan/road3'
+ map.rooms["huanghe/road3"].ways["#duHhe"]='huanghe/road2'		
+ map.rooms["huanghe/road2"].ways["#duHhe"]='huanghe/road3'
 end
 function djdh_open() -- 重新打开被封闭的渡江渡河路径
     map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] =

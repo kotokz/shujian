@@ -202,17 +202,19 @@ end
 function trans(num)
     local words = {}
     local i = 0
-    num = string.gsub(num, "零十", "10 ");
-    num = string.gsub(num, "零", "");
-    num = string.gsub(num, "一", "1");
-    num = string.gsub(num, "二", "2");
-    num = string.gsub(num, "三", "3");
-    num = string.gsub(num, "四", "4");
-    num = string.gsub(num, "五", "5");
-    num = string.gsub(num, "六", "6");
-    num = string.gsub(num, "七", "7");
-    num = string.gsub(num, "八", "8");
-    num = string.gsub(num, "九", "9");
+    num = string.gsub(num, "零十", "10 ")
+    num = string.gsub(num, "零", "")
+    num = string.gsub(num, "一", "1")
+    num = string.gsub(num, "二", "2")
+    num = string.gsub(num, "三", "3")
+    num = string.gsub(num, "四", "4")
+    num = string.gsub(num, "五", "5")
+    num = string.gsub(num, "六", "6")
+    num = string.gsub(num, "七", "7")
+    num = string.gsub(num, "八", "8")
+    num = string.gsub(num, "九", "9")
+    num = string.gsub(num, "十万", "00000 ")
+    num = string.gsub(num, "百万", "000000 ")
     i = string.find(num, "十")
     if i == 1 then
         num = string.gsub(num, "十", "10 ")

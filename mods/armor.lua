@@ -181,7 +181,7 @@ function fqyyArmorMessage(msg)
     if msg ~= nil then messageShow(msg, '#1E90FF', '#FFFFFF') end
 end
 
-DaZao = {
+Armor = {
     dazaoID = "",
     currnetCount = 0,
     totalCount = 0,
@@ -189,45 +189,133 @@ DaZao = {
     mainThread = nil,
     findThread = nil,
     autoDis = false,
-    jobName = 'dazaoArmor',
-    result = {}
+    maxFindTimes = 4,
+    armorType = {
+        ['手套'] = 'glove',
+        ['甲胄'] = 'armor',
+        ['靴'] = 'boot',
+        ['腰带'] = 'belt',
+        ['披风'] = 'mantle',
+        ['彩衣'] = 'coat',
+        ['头盔'] = 'cap'},
+    armorKind = {
+        ["armor"] = true,
+        ["coat"] = true,
+        ["mantle"] = true,
+        ["cap"] = true,
+        ["glove"] = true,
+        ["boot"] = true
+    },
+    cannotRepair = {},
+    jobName = 'armor',
+    repairList = {}
 }
 
-function DaZao:new()
+function Armor:new()
     local o = {}
+    job.name = Armor.jobName
+    setmetatable(o, {__index = Armor})
+    return o
+end
+
+
+function Armor:checkDamage()
+    -- currently the check damage already done in weapon check, we just go thru the list to get armor 
+    wait.make(function()
+        local repairRequired = false
+        for p in pairs(weaponUsave) do
+            if Bag[p] and Bag[p].kind and self.armorKind[Bag[p].kind] and
+                not self.cannotRepair[p] then
+                local l, w
+                repeat
+                    exe('l ' .. Bag[p].fullid)
+                    l, w = wait.regexp(
+                               '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏|没有什么损坏)',
+                               1)
+                until l
+                if not string.find(l, '没有什么损坏') then                    
+                    table.insert(self.repairList,Bag[p].fullid)
+                    repairRequired = true
+                end
+            end
+        end
+        if repairRequired then
+            tprint(self.repairList)
+            self.goRepair()
+        else 
+            self.repairDone()
+        end
+    end)
+end
+
+function Armor:repairDone()
+    print("维修结束，继续任务")
+    return check_halt(check_jobx)
+end
+
+function Armor:goRepair()
+    wait.make(function() 
+        dis_all()
+        checkWield()
+        local thread = coroutine.running()
+        local status = self:checkJianDao(thread)
+        coroutine.yield()
+        if status and status == 'break' then
+            return self:cunJianDao()
+        end
+        await_go("长安城", "裁缝铺")
+        weapon_unwield()
+
+        for item in paris(self.repairList) do
+            local l,w
+            while true do
+                exe('repair ' .. item)
+                l,w = wait.regexp('^(> )*你开始仔细的修补|你仔细的修补|这件防具完好无损|对于这种防具，您了解不多|你带的零钱不够了|你现在精神状态不佳',2)
+                if l == nil then
+                    print("继续打造")
+                elseif l:find("你带的零钱不够了") then
+                    exe('e;#3s;w;qu 400 gold;e;#3n;w')
+                else
+                    break
+                end
+            end
+            wait_busy()      
+        end
+        --  might need add fail repair hanlding, but not important now.
+        self:cunJianDao()
+        self:repairDone()
+    end)
+end
+
+function Armor:dzStart()
     local l_result
     l_result=utils.inputbox("你需要打造的护具ID是", "dazaoID", "", "宋体" , "12")
     if not isNil(l_result) then
-        o.dazaoID = l_result
+        self.dazaoID = l_result
     end
 
     l_result=utils.inputbox ("你需要打造的次数", "dazaoTimes", 10, "宋体" , "12")
     if not isNil(l_result) then
-        o.totalCount = tonumber(l_result)
+        self.totalCount = tonumber(l_result)
     end
 
     l_result=utils.inputbox ("你需要保存的属性值（例如：2就是属性>=2的保存）。", "dazaoValue", 2, "宋体" , "12")
     if not isNil(l_result) then
-        o.expectValue = tonumber(l_result)
+        self.expectValue = tonumber(l_result)
     end
 
     l_result = utils.msgbox("是否自动分解不需要保存的装备", "dazaoDis",
         "yesno", "?", 1)
     if l_result and l_result == "yes" then
-        o.autoDis = true
+        self.autoDis = true
     else
-        o.autoDis = false
+        self.autoDis = false
     end
-    setmetatable(o, {__index = DaZao})
-    return o
-end
-
-function DaZao:start()
     wait.make(function()
         job.name=self.jobName
         DeleteTimer('idle')
-        self.mainThread = coroutine.running()
-        local status = self:checkJianDao(self.mainThread)
+        local thread = coroutine.running()
+        local status = self:checkJianDao(thread)
         coroutine.yield()
         if status and status == 'break' then
             return self:cunJianDao()
@@ -235,26 +323,26 @@ function DaZao:start()
 
         -- now we have all we want, go crafting
         await_go('zhiye/caifengpu1')
-        self:dazaoArmor(self.mainThread)
+        self:dazaoArmor(thread)
         coroutine.yield()
-        self:cunJianDao()
+        self:cunJianDao()        
+        print('打造模块结束')
     end)
 end
 
-function DaZao:cunJianDao()
+function Armor:cunJianDao()
     wait.make(function() 
         await_go("扬州城","杂货铺")
         wait_busy()
         exe('unwield jiandao;cun jian dao')
         wait_busy()
         checkWield()
-        print('打造模块结束')
         g_stop_flag = false
     end)
 
 end
 
-function DaZao:checkJianDao(thread)
+function Armor:checkJianDao(thread)
     wait.make(function()
         checkBags()  -- we should enhance this to be await like func
         wait_busy()
@@ -275,7 +363,7 @@ function DaZao:checkJianDao(thread)
             
             end
             checkBags()  -- we should enhance this to be await like func
-            wait_busy()            
+            wait_busy()         
         end
         
         print("买到剪刀")
@@ -284,7 +372,7 @@ function DaZao:checkJianDao(thread)
         coroutine.resume(thread)
     end)
 end
-function DaZao:dazaoArmor(thread)
+function Armor:dazaoArmor(thread)
     wait.make(function()
         local dazaoThread = coroutine.running()
         while self.currnetCount < self.totalCount do
@@ -328,7 +416,7 @@ function DaZao:dazaoArmor(thread)
     end)
 end
 
-function DaZao:checkProduct(thread)
+function Armor:checkProduct(thread)
     wait.make(function()
         local line,w 
         repeat            
@@ -367,7 +455,7 @@ function DaZao:checkProduct(thread)
     end)
 end
 
-function DaZao:cunArmor(thread)
+function Armor:cunArmor(thread)
     wait.make(function()
         await_go('city/zahuopu')
         exe('cun '..self.dazaoID)
@@ -378,7 +466,7 @@ function DaZao:cunArmor(thread)
     end)
 end
 
-function DaZao:buyJianDao(thread)
+function Armor:buyJianDao(thread)
     wait.make(function()
         local stop = false
         while true do
@@ -426,7 +514,7 @@ end
 
 
 function dazaoArmor()
-    local dz = DaZao.new()
+    local dz = Armor.new()
     tprint(dz)
-    dz:start()
+    dz:dzStart()
 end

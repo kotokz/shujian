@@ -279,7 +279,6 @@ weaponUcheck = function()
         for p in pairs(weaponUsave) do
             if weaponUsave[p] == false then
                 dis_all()
-                DiscardQueue()
                 -- return weaponRepair(p)
                 tmp.uweapon = p
                 break
@@ -442,25 +441,30 @@ weaponRepairOver = function()
     EnableTimer("repair", false)
     DeleteTimer("repair")
     DeleteTriggerGroup("repair")
-    return armorUcheck()
+    -- return armorUcheck()
+    local armor = Armor:new()
+    armor:checkDamage()
     --	return check_halt(check_jobx)
 end
 weaponRepairGoCun = function()
     EnableTriggerGroup("repair", false)
     EnableTimer("repair", false)
     cntr2 = countR(3)
-    exe('unwield tie chui')
+    -- exe('unwield tie chui')
     return go(weaponRepairCun, "扬州城", "杂货铺")
 end
 weaponRepairCun = function()
     if not Bag["铁锤"] then return checkPrepare() end
-    if cntr2() > 0 and Bag["铁锤"] then
-        weapon_unwield()
-        exe('cun tie chui')
-        checkBags()
-        return check_busy(weaponRepairCun, 1)
-    end
-    return weaponRepairOver()
+    wait.make(function()
+        repeat
+            exe('unwield tiechui;cun tiechui')
+            local l,w = wait.regexp('^(> )*(你从身上拿出一柄铁锤|你身上没有这样东西)',1)
+        until l
+        checkBags()        
+        checkWield()
+        wait_busy()
+        return weaponRepairOver()
+    end)
 end
 weaponGetSwj = function() return go(swjAsk, "武当山", "后山小院") end
 function swjAsk()
@@ -476,194 +480,7 @@ function swjAsk()
     end)
 end
 function swjOver() return checkPrepare() end
-armorUdone = function()
-    DeleteTimer("walkWait4")
-    for p in pairs(weaponUsave) do
-        if weaponUsave[p] and type(weaponUsave[p]) == "string" and
-            weaponUsave[p] == "repair" then
-            dis_all()
-            return armorRepair(p)
-        end
-    end
-    return check_bei(armorRepairOver)
-end
-armorUtmp = function(n, l, w)
-    if weaponUsave[w[3]] and Bag[w[3]] then tmp.uarmor = w[3] end
-end
-armorUwell = function()
-    if tmp.uarmor and weaponUsave[tmp.uarmor] then
-        weaponUsave[tmp.uarmor] = true
-    end
-end
-armorUcheck = function()
-    DeleteTriggerGroup("armor")
-    create_trigger_t('armor1',
-                     '^(> )*你把 "action" 设定为 "checkUarmor" 成功完成。',
-                     '', 'armorUdone')
-    create_trigger_t('armor2',
-                     '^(> )*这是由\\D*(棉花|亚麻|大麻|苎麻|蚕丝|木棉花|玉蚕丝|冰蚕丝|天蚕丝|龙茧蚕丝)制成，重\\D*的(\\D*)。$',
-                     '', 'armorUtmp')
-    create_trigger_t('armor3',
-                     '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏)了。',
-                     '', 'armorUneed')
-    create_trigger_t('armor4', '^(> )*看起来没有什么损坏。', '',
-                     'armorUwell')
-    SetTriggerOption("armor1", "group", "armor")
-    SetTriggerOption("armor2", "group", "armor")
-    SetTriggerOption("armor3", "group", "armor")
-    SetTriggerOption("armor4", "group", "armor")
-    armorUcannt = armorUcannt or {}
-    tmp.uarmor = nil
-    for p in pairs(weaponUsave) do
-        if Bag[p] and Bag[p].kind and armorKind[Bag[p].kind] and
-            not armorUcannt[p] then exe('l ' .. Bag[p].fullid) end
-    end
-    exe('alias action checkUarmor')
-    create_timer_s('walkWait4', 1.0, 'armorUcheck1')
-end
-function armorUcheck1() exe('alias action checkUarmor') end
-armorUneed = function()
-    if tmp.uarmor and weaponUsave[tmp.uarmor] then
-        weaponUsave[tmp.uarmor] = "repair"
-    end
-end
-function armorRepairGold()
-    EnableTriggerGroup("repair", false)
-    EnableTimer("repair", false)
-    exe('e;#3s;w;qu 50 gold;e;#3n;w')
-    return checkWait(armorRepairDo, 2)
-end
-armorRepairDo = function()
-    DeleteTriggerGroup("repair")
-    create_trigger_t('repair1',
-                     '^(> )*你开始仔细的修补(\\D*)，不时用剪刀来回裁剪缝纫着',
-                     '', '')
-    create_trigger_t('repair2',
-                     '^(> )*你仔细的修补(\\D*)，总算大致恢复了它的原貌。$',
-                     '', 'armorRepairGoCun')
-    create_trigger_t('repair3',
-                     '^(> )*这件防具完好无损，无需修补。$', '',
-                     'armorRepairGoCun')
-    create_trigger_t('repair4',
-                     '^(> )*对于这种防具，您了解不多，无法修补！$',
-                     '', 'armorRepairCannt')
-    create_trigger_t('repair5', '^(> )*你带的零钱不够了！你需要',
-                     '', 'armorRepairGold')
-    create_trigger_t('repair6',
-                     '^(> )*你现在精神状态不佳，还是等会再修补吧。$',
-                     '', 'armorRepairCannt')
-    SetTriggerOption("repair1", "group", "repair")
-    SetTriggerOption("repair2", "group", "repair")
-    SetTriggerOption("repair3", "group", "repair")
-    SetTriggerOption("repair4", "group", "repair")
-    SetTriggerOption("repair5", "group", "repair")
-    SetTriggerOption("repair6", "group", "repair")
-    hujuxl = hujuxl + 1
-    weapon_unwield()
-    ungeta()
-    exe(
-        'unwield zhanlu;unwield mu jian;unwield taiji sword;unwield qiankun sword;unwield qiankun xiao')
-    exe('wield jian dao')
-    exe('repair ' .. Bag[tmp.uarmor].fullid)
-    create_timer_m('repair', 3, 'armorRepairGoCun')
-end
-armorRepairQu = function()
-    exe('qu jian dao')
-    checkBags()
-    return check_bei(armorRepairQuCheck, 1)
-end
-armorRepairQuCheck = function()
-    if cntr1() > 0 and not Bag["剪刀"] then return armorRepairQu() end
-    if Bag["剪刀"] then
-        return armorRepairGo()
-    else
-        return armorRepairFind()
-    end
-end
-armorRepairFollow = function()
-    flag.find = 1
-    exe('follow yangcan popo')
-end
-armorRepairFind = function()
-    DeleteTriggerGroup("armorFind")
-    create_trigger_t('armorFind1', '^(> )*\\s*养蚕婆婆\\(Yangcan popo\\)',
-                     '', 'armorRepairFollow')
-    create_trigger_t('armorFind2', '^(> )*这里没有 yangcan popo', '',
-                     'armorRepairGoon')
-    create_trigger_t('armorFind3', '^(> )*你决定跟随\\D*一起行动。',
-                     '', 'armorRepairBuy')
-    create_trigger_t('armorFind4', '^(> )*你已经这样做了。', '',
-                     'armorRepairBuy')
-    SetTriggerOption("armorFind1", "group", "armorFind")
-    SetTriggerOption("armorFind2", "group", "armorFind")
-    SetTriggerOption("armorFind3", "group", "armorFind")
-    SetTriggerOption("armorFind4", "group", "armorFind")
-    EnableTriggerGroup("armorFind", false)
-    cntr1 = countR(20)
-    job.name = "买剪刀"
-    return go(armorRepairFact, "changan/northjie2")
-end
-armorRepairFact = function()
-    EnableTriggerGroup("armorFind", true)
-    exe('look')
-    return find()
-end
-armorRepairBuy = function()
-    EnableTriggerGroup("armorFind", false)
-    exe('buy jian dao')
-    locate()
-    checkBags()
-    return checkWait(armorRepairItem, 0.5)
-end
-armorRepairItem = function()
-    if cntr1() > 0 and not Bag["剪刀"] then return armorRepairBuy() end
-    if not Bag["剪刀"] then return armorRepairGoCun() end
-    return armorRepairGo()
-end
-armorRepairGo =
-    function() return go(armorRepairDo, "长安城", "裁缝铺") end
-armorRepairGoon = function()
-    flag.wait = 0
-    flag.find = 0
-    return walk_wait()
-end
-armorRepair = function(p_armor)
-    tmp.uarmor = p_armor
-    if not Bag["剪刀"] then
-        cntr1 = countR(3)
-        return go(armorRepairQu, "扬州城", "杂货铺")
-    end
-    return armorRepairGo()
-end
-function armorRepairCannt()
-    armorUcannt = armorUcannt or {}
-    return armorRepairGoCun()
-end
-armorRepairGoCun = function()
-    EnableTriggerGroup("repair", false)
-    EnableTimer("repair", false)
-    cntr2 = countR(3)
-    exe('unwield jian dao')
-    return go(armorRepairCun, "扬州城", "杂货铺")
-end
-armorRepairCun = function()
-    exe('unwield jian dao')
-    if not Bag["剪刀"] then return check_heal() end
-    if cntr2() > 0 and Bag["剪刀"] then
-        exe('cun jian dao')
-        checkBags()
-        return check_busy(armorRepairCun, 1)
-    end
-    return armorRepairOver()
-end
-armorRepairOver = function()
-    DeleteTriggerGroup("armor")
-    EnableTriggerGroup("repair", false)
-    EnableTimer("repair", false)
-    DeleteTimer("repair")
-    DeleteTriggerGroup("repair")
-    return check_halt(check_jobx)
-end
+
 
 function dazaoWeapon()
     tmp.dazuo = 0

@@ -25423,10 +25423,10 @@ Room {
     id = "xiangyang/guangc",
     name = "擂台前广场",
     ways = {
-        ["north"] = "xiangyang/bcx2"
-        -- ["longhu"] = "wizard/lt2",
-        -- ["fengyun"] = "wizard/lt1",
-        -- ["tiandi"] = "wizard/lt",
+        ["north"] = "xiangyang/bcx2",
+        ["longhu"] = "wizard/lt2",
+        ["fengyun"] = "wizard/lt1",
+        ["tiandi"] = "wizard/lt",
     },
     nolooks = {["longhu"] = true, ["fengyun"] = true, ["tiandi"] = true}
 }

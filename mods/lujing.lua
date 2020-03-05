@@ -1098,6 +1098,10 @@ function zsl_stop()
     end
 end
 find_nobody = function()
+    if job.name == 'armor' then
+        chats_log('定位系统：护甲模块寻找失败')
+        return
+    end
     if string.find(job.name, 'songxin') then
         chats_log(
             '定位系统：未能在【' .. job.area .. '】找到【' ..
@@ -1162,9 +1166,6 @@ find_nobody = function()
         -- return go(lookXin, '襄阳城', '白虎门内街')
         return lookXin()
     end
-    if job.name=='dazaoArmor' then
-        return 
-     end
     return go(check_heal, '大理城', '药铺')
 end
 List = {}

@@ -241,9 +241,9 @@ function Armor:checkDamage()
         end
         if repairRequired then
             tprint(self.repairList)
-            self.goRepair()
+            self:goRepair()
         else 
-            self.repairDone()
+            self:repairDone()
         end
     end)
 end
@@ -264,18 +264,20 @@ function Armor:goRepair()
             return self:cunJianDao()
         end
         await_go("长安城", "裁缝铺")
-        weapon_unwield()
-
-        for item in paris(self.repairList) do
-            local l,w
+        for _,item in ipairs(self.repairList) do
+            local l
             while true do
                 exe('repair ' .. item)
-                l,w = wait.regexp('^(> )*你开始仔细的修补|你仔细的修补|这件防具完好无损|对于这种防具，您了解不多|你带的零钱不够了|你现在精神状态不佳',2)
+                l,_ = wait.regexp('^(> )*你开始仔细的修补|你仔细的修补|这件防具完好无损|对于这种防具，您了解不多|你带的零钱不够了|你现在精神状态不佳|你必须装备剪刀',2)
                 if l == nil then
                     print("继续打造")
                 elseif l:find("你带的零钱不够了") then
                     wait.time(0.5)
                     exe('e;#3s;w;qu 400 gold;e;#3n;w')
+                elseif l:find('剪刀') then
+                    self:checkJianDao(thread)
+                    coroutine.yield()                    
+                    await_go("长安城", "裁缝铺")           
                 else
                     break
                 end
@@ -505,6 +507,7 @@ function Armor:buyJianDao(thread)
                     flag.find = 1
                     exe('follow none')
                     print("买到剪刀了")
+                    checkBags()
                     break
                 end
             else

@@ -3365,7 +3365,11 @@ Room {
 Room {
     id = "city/mingyufang",
     name = "鸣玉坊",
-    ways = {["south"] = "city/xidajie3", ["north"] = "city/lichunyuan"}
+    ways = {
+        ["south"] = "city/xidajie3",
+        ["north"] = "city/lichunyuan"
+    },
+    lengths = {["north"] = "if score.gender and score.gender == '无性' then return false else return 1 end"},
 }
 Room {
     id = "city/ml1",
@@ -16091,7 +16095,8 @@ Room {
 Room {
     id = "ningbo/qsddao1",
     name = "青石官道",
-    ways = {["southeast"] = "group/entry/nbqsddao", ["westup"] = "hz/shanlu2"}
+    ways = {["southeast"] = "group/entry/nbqsddao", ["westup"] = "hz/shanlu2"},
+    room_relative = "山路←青石官道↘青石官道青石官道"
 }
 Room {
     id = "ningbo/shilu",

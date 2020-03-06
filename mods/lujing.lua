@@ -629,64 +629,64 @@ function path_consider()
                          '】')
         if sour.room == "观星台" then exe('jump down') end
         if locl.room_relation == '九老洞九老洞' or
-           locl.room_relation == "不知道哪里九老洞 不知道哪里 九老洞" then
+           locl.where == "不知道哪里九老洞" then
+            print('尝试离开九老洞')
             exe('drop fire;leave;leave;leave;leave;leave;leave;out;ne;ed;ne;ed')
             return checkWait(goContinue, 0.3)
         end
-        if table.getn(sour.rooms) == 0 then
-            if locl.room == '小木筏' then
-                return toSldHua()
-            elseif locl.room == '泉水中' then
-                exe('tiao out;tiao out')
-                return checkWait(goContinue, 0.3)
-            elseif locl.room == '水潭' then
-                exe('pa up')
-                return checkWait(goContinue, 0.3)
-            else
-                if locl.room_relation ==
-                    '西湖边↙｜白堤柳浪闻莺西湖边' then
-                    exe('sw')
-                    return checkWait(goContinue, 0.3)
-                end
-                if locl.room == '梅林' then
-                    exe('n')
-                    return mlOutt()
-                end
-                if locl.room == '渔船' then
-                    exe('out;w;s;out;w;s;out;w;s')
-                    return checkWait(goContinue, 0.3)
-                end
-                if locl.area == '绝情谷' and locl.room == '石壁' then
-                    exe('pa down;pa up')
-                    return checkWait(goContinue, 0.2)
-                end
-
-                if locl.room_relation ==
-                    '南疆沙漠吐谷浑伏俟城南疆沙漠↖｜↗南疆沙漠---南疆沙漠---南疆沙漠↙｜↘南疆沙漠南疆沙漠南疆沙漠南疆沙漠' then
-                    chats_locate('进入南疆地图，尝试出来')
-                    exe('look;hp;drink jiudai;n;n;n;n;n;n;n;n;n;n')
-                    return njsm_check()
-                end
-                if locl.room_relation == '清水温泉' then
-                    exe('look;hp;drink jiudai;ne')
-                    return walk_wait()
-                end
-                if locl.room_relation ~= '' then
-                    chats_locate(
-                        '定位系统：没有归属地的房间加入了room_relative，【可以尝试定位没有归属地的房间】',
-                        'LimeGreen')
-                    -- 这里可以尝试定位没有归属地的房间
-                end
-                chats_locate('定位系统：地图系统无此地点【' ..
-                                 locl.area .. locl.room ..
-                                 '】资料，随机移动寻找确切定位点！',
-                             'red')
-                exe('stand;leave')
-                exe(locl.dir)
-                return checkWait(goContinue, 0.2)
-            end
+        if locl.room == '渔船' then
+            exe('out;w;s;out;w;s;out;w;s')
+            return checkWait(goContinue, 0.3)
         end
-        if table.getn(sour.rooms) > 1 and sour.id ~= 'city/jiangbei' then ---------------------------------------------------------------------------------------------------
+        if locl.room_relation == '西湖边↙｜白堤柳浪闻莺西湖边' then
+            exe('sw') 
+            return checkWait(goContinue, 0.3)
+        end
+        if locl.room == '梅林' then
+            exe('n')
+            return mlOutt()
+        end
+        if locl.area == '绝情谷' and locl.room == '石壁' then
+            exe('pa down;pa up')
+            return checkWait(goContinue, 0.2)
+        end
+
+        if locl.room_relation ==
+            '南疆沙漠吐谷浑伏俟城南疆沙漠↖｜↗南疆沙漠---南疆沙漠---南疆沙漠↙｜↘南疆沙漠南疆沙漠南疆沙漠南疆沙漠' then
+            chats_locate('进入南疆地图，尝试出来')
+            exe('look;hp;drink jiudai;n;n;n;n;n;n;n;n;n;n')
+            return njsm_check()
+        end
+        if locl.room_relation == '清水温泉' then
+            exe('look;hp;drink jiudai;ne')
+            return walk_wait()
+        end
+        if locl.room == '小木筏' then
+            return toSldHua()
+        elseif locl.room == '泉水中' then
+            exe('tiao out;tiao out')
+            return checkWait(goContinue, 0.3)
+        elseif locl.room == '水潭' then
+            exe('pa up')
+            return checkWait(goContinue, 0.3)
+        end
+        if table.getn(sour.rooms) == 0 then          
+            if locl.room_relation ~= '' then
+                chats_locate(
+                    '定位系统：没有归属地的房间加入了room_relative，【可以尝试定位没有归属地的房间】',
+                    'LimeGreen')
+                -- 这里可以尝试定位没有归属地的房间
+            end
+            chats_locate('定位系统：地图系统无此地点【' ..
+                             locl.area .. locl.room ..
+                             '】资料，随机移动寻找确切定位点！',
+                         'red')
+            exe('stand;leave')
+            exe(locl.dir)
+            return checkWait(goContinue, 0.2)
+        end
+        if table.getn(sour.rooms) > 1 and sour.id ~= 'city/jiangbei' then 
+        ---------------------------------------------------------------------------------------------------
             chats_locate(
                 '定位系统：进入第一个同名房间判断【' ..
                     sour.room .. '】了!', 'LimeGreen')
@@ -709,15 +709,13 @@ function path_consider()
                             sour.id = sour.rooms[i]
                             chats_locate('定位系统：尝试精确定位！猜测目前位置为'..sour.id,
                             'LimeGreen')                          
-                            return check_halt(path_consider)
                         end
                     else
                         chats_locate('定位系统：尝试精确定位！',
                         'LimeGreen')
                         sour.id = sour.rooms[i]
-                        return check_halt(path_consider)
                     end
-
+                    return check_halt(path_consider)
                     -- return go(road.act,dest.area,dest.room,sour.rooms[i])
                 end
             end
@@ -4876,13 +4874,13 @@ MidNight = {
     ['亥'] = true,
     ['子'] = true,
     ['丑'] = true,
-    ['寅'] = false,
+    ['寅'] = true,
     ['卯'] = false,
     ['辰'] = false,
     ['巳'] = false,
     ['午'] = false,
     ['未'] = false,
-    ['申'] = true
+    ['申'] = false
 }
 
 MidDay = {
@@ -5503,7 +5501,8 @@ end
 jldout1 = function()
     wait.make(function()
         wait.time(1)
-        if locl.room_relation == '九老洞九老洞' then
+        if locl.room_relation == '九老洞九老洞' or locl.where == "不知道哪里九老洞" then
+            print('离开九老洞')
             return jldout()
         else
             return walk_wait()

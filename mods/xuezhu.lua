@@ -94,7 +94,7 @@ function getxuezhu0()
     if inwdj == 0 then
         messageShow('抓雪蛛：苗疆地图不可到达，任务放弃。',
                     "Plum")
-        SetVariable("xuezhu_status", "2")
+        -- SetVariable("xuezhu_status", "2")
         return check_halt(checkPrepare)
     end
     go(askcheng, '苗疆', '药王居')
@@ -150,7 +150,7 @@ function xuezhu_go()
     if inwdj == 0 then
         messageShow('抓雪蛛：苗疆山洞不可到达，任务放弃。',
                     "Plum")
-        SetVariable("xuezhu_status", "2")
+        -- SetVariable("xuezhu_status", "2")
         return check_halt(checkPrepare)
     end
     EnableTriggerGroup("xuezhuAccept", false)

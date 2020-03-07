@@ -116,7 +116,6 @@ function huashanFindFail() return go(huashan_shibai, '华山', '正气堂') end
 function huashan_start()
     DeleteTriggerGroup("all_fight")
     DeleteTriggerGroup("huashan_fight")
-    DeleteTriggerGroup("huashan_cut")
     DeleteTriggerGroup("huashan_yls")
     DeleteTriggerGroup("huashan_yls_ask")
     DeleteTriggerGroup("huashan_over")
@@ -207,7 +206,6 @@ function huashan_triggerDel()
     DeleteTriggerGroup("huashan_accept")
     DeleteTriggerGroup("huashan_npc")
     DeleteTriggerGroup("huashan_fight")
-    DeleteTriggerGroup("huashan_cut")
     DeleteTriggerGroup("huashan_yls")
     DeleteTriggerGroup("huashan_yls_ask")
     DeleteTriggerGroup("huashan_over")
@@ -512,24 +510,7 @@ end
 huashan_cut = function()
     EnableTriggerGroup("huashan_fight", false)
     EnableTriggerGroup("huashan_find", false)
-    DeleteTriggerGroup("huashan_cut")
-    create_trigger_t('huashan_cut1',
-                     '^(> )*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。',
-                     '', 'huashan_cut_con')
-    create_trigger_t('huashan_cut2',
-                     '^(> )*(光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来)',
-                     '', 'huashan_cut_weapon')
-    create_trigger_t('huashan_cut3',
-                     '^(> )*你将(\\D*)的尸体扶了起来背在背上。',
-                     '', 'huashan_get_con')
-    create_trigger_t('huashan_cut4',
-                     '^(> )*你上一个动作还没有完成！', '',
-                     'huashan_get_con1')
-    SetTriggerOption("huashan_cut1", "group", "huashan_cut")
-    SetTriggerOption("huashan_cut2", "group", "huashan_cut")
-    SetTriggerOption("huashan_cut3", "group", "huashan_cut")
-    SetTriggerOption("huashan_cut4", "group", "huashan_cut")
-    SetTriggerOption("huashan_cut4", "keep_evaluating", "y")
+
     job.killer = {}
     fight.time.e = os.time()
     fight.time.over = fight.time.e - fight.time.b
@@ -563,98 +544,63 @@ huashan_cut = function()
                          '】次.平均用时【' .. hstongji_pingjun ..
                          '】秒', 'aqua')
     end
-    tmp.cnt = 0
+    local cut = false
     if job.area == '绝情谷' then
         exe('drop corspe')
-        for i = 1, 5 do
-            exe('halt;get ling pai from corpse ' .. i)
-            exe('qie corpse ' .. i)
-        end
-        create_timer_st('walkWait2', 1.0, 'huashan_cut_act1')
-    else
-        exe('get corpse')
-        create_timer_st('walkWait2', 1.0, 'huashan_cut_act1')
+        cut = true
     end
-end
-huashan_get_con1 = function()
-    EnableTimer('walkWait2', false)
-    EnableTriggerGroup("huashan_fight", false)
-    EnableTriggerGroup("huashan_find", false)
-    checkWait(huashan_cut, 1)
-end
-huashan_cut1 = function()
-    exe('get corpse')
-    for i = 1, 5 do exe('get ling pai from corpse ' .. i) end
-end
-huashan_cut_act = function()
-    tmp.cnt = 0
-    -- weapon_unwield()
-    weaponWieldCut()
-    -- wipe_kill=0
-    wait.make(function()
-        wait.time(1.5)
-        exe('drop corpse')
-        for i = 1, 3 do
-            exe('get ling pai from corpse ' .. i)
-            exe('qie corpse ' .. i)
+    kezhiwugongclose()
+    wait.make(function() 
+        local index = 1
+        local giveup = false
+
+        while true do       
+            if index > 5 then
+                giveup = true
+                break
+            end     
+            if cut then
+                exe('halt;get ling pai from corpse ' .. index)
+                exe('qie corpse ' .. index)
+            else
+                exe('get corpse '.. index)
+            end            
+            local l,_ = wait.regexp('^(> )*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。|^(> )*(光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来)|^(> )*你将(\\D*)的尸体扶了起来背在背上。',1)
+            if l then
+                index = index + 1
+                if l:find("扶了起来背在背上") then 
+                    -- tprint(w)                   
+                    if l:find(job.target) then
+                        checkBags()
+                        for i = 1, 3 do exe('get ling pai from corpse ' .. i) end
+                        road.id = nil                        
+                        fightoverweapon()
+                        break
+                    else
+                        exe("drop corpse")
+                        cut = true
+                    end
+                elseif l:find("无锋无刃") or l:find("锋利的器具") then
+                    weaponWieldCut()
+                    checkWield()
+                elseif l:find("首级斩了下来") then
+                    if not l:find(job.target) then
+                        exe('drop head')
+                    else
+                        road.id = nil
+                        wait.time(1)
+                        wait_busy()
+                        fightoverweapon()
+                        break
+                    end
+                end
+            end
         end
-        create_timer_s('walkWait2', 1.0, 'huashan_cut_act1')
+        await_go('华山', '祭坛')
+        return huashan_yls_give()
     end)
 end
-function huashan_cut_act1()
-    if tmp.cnt then tmp.cnt = tmp.cnt + 1 end
-    if not tmp.cnt or tmp.cnt > 10 then
-        dis_all()
-        return huashanFindFail()
-    end
-    exe('drop corpse')
-    for i = 1, 3 do
-        exe('get ling pai from corpse ' .. i)
-        exe('qie corpse ' .. i)
-    end
-end
-huashan_cut_weapon = function()
-    DeleteTimer('walkWait2')
-    return check_halt(huashan_cut_act, 1)
-end
-huashan_get_con = function(n, l, w)
-    DeleteTimer('walkWait2')
-    DeleteTriggerGroup("all_fight")
-    EnableTriggerGroup("huashan_npc", false)
-    kezhiwugongclose()
-    -- if fqyytmp.goArmorD ~= 1 then checkBags() end
-    if job.target == tostring(w[2]) then
-        EnableTriggerGroup("huashan_npc", false)
-        EnableTriggerGroup("huashan_cut", false)
-        -- fpk_prepare()--预防pk的设置，定义在skill.lua中
-        checkBags()
-        for i = 1, 3 do exe('get ling pai from corpse ' .. i) end
-        road.id = nil
-        fightoverweapon()
-        return go(huashan_yls_give, '华山', '祭坛')
-    else
-        return check_halt(huashan_cut_act)
-    end
-end
-huashan_cut_con = function(n, l, w)
-    EnableTimer('walkWait2', false)
-    DeleteTriggerGroup("all_fight")
-    EnableTriggerGroup("huashan_npc", false)
-    kezhiwugongclose()
-    flag.find = 0
-    if job.target ~= tostring(w[2]) then
-        exe('drop head')
-        return check_halt(huashan_cut_act)
-    else
-        EnableTriggerGroup("huashan_cut", false)
-        road.id = nil
-        wait.make(function()
-            wait.time(1)
-            fightoverweapon()
-            return go(huashan_yls_give, '华山', '祭坛')
-        end)
-    end
-end
+
 huashan_yls = function()
     huashan_yls_trigger()
     EnableTriggerGroup("ylshead", true)
@@ -677,6 +623,8 @@ huashan_yls_timer = function()
 end
 
 huashan_yls_give = function()
+    EnableTimer('walkWait2', false)
+    DeleteTimer('walkWait2')
     EnableTriggerGroup("ylshead", false)
     DeleteTriggerGroup("huashan_yls")
     -- create_trigger_t('huashan_yls1','^(> )*(这里没有这个人。|你身上没有这样东西。|这人好象不是你杀的吧？|你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？)','','huashan_yls_fail')

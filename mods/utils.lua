@@ -124,31 +124,19 @@ function busyok()
     return busyhook()
 end
 
-waithook = test
+
 function checkWait(func, sec)
-    disWait()
-    DeleteTriggerGroup("checkwait")
-    create_trigger_t('checkwait1',
-                     '^(> )*你把 "action" 设定为 "等待一下" 成功完成。$',
-                     '', 'checkWaitOk')
-    SetTriggerOption("checkwait1", "group", "checkwait")
-    EnableTriggerGroup("checkwait", true)
-    EnableTrigger("hp12", true)
-    waithook = func
-    if sec == nil then sec = 5 end
-    return create_timer_s('waitimer', sec, 'wait_timer_set')
-end
-function wait_timer_set()
-    -- EnableTriggerGroup("checkwait",true)
-    exe('alias action 等待一下')
-end
-function checkWaitOk()
-    EnableTriggerGroup("checkwait", false)
-    EnableTrigger("hp12", false)
-    -- DeleteTimer('waitimer
-    EnableTimer('waitimer', false)
-    if waithook == nil then waithook = test end
-    return waithook()
+    wait.make(function()
+        EnableTrigger("hp12", true)
+        if sec == nil then sec = 5 end
+        wait.time(sec) 
+        repeat
+            exe('halt')
+            local l,_ = wait.regexp("^>*\\s*(你现在不忙。|你身形向后一跃，跳出战圈不打了。|你把正在运行的真气强行压回丹田)",0.5)            
+        until l
+        EnableTrigger("hp12", false)
+        func()
+    end)
 end
 
 nexthook = test

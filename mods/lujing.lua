@@ -715,7 +715,9 @@ function path_consider()
                         'LimeGreen')
                         sour.id = sour.rooms[i]
                     end
-                    return check_halt(path_consider)
+                    if sour.id then
+                        return check_halt(path_consider)
+                    end
                     -- return go(road.act,dest.area,dest.room,sour.rooms[i])
                 end
             end

@@ -417,7 +417,7 @@ hp_dazuo_timer = function()
     tmp.i = tmp.i + 1
     if tmp.i > 30 then return main() end
     exe('hp;yun jing;yun qi;dazuo ' .. hp.qixue)
-    return checkWait(hp_dz_count, 0.5)
+    return hp_dz_count()
 end
 hp_dz_count = function()
     EnableTriggerGroup("dz_count", false)

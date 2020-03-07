@@ -583,9 +583,11 @@ function checkPrepare()
         xuezhu_require = 0
     end
 
-    local x = check_xuezhu_status()
-    if x == '0' then return getxuezhu0() end
-    if x == '-1' or x == '1' then return getxuezhu1() end
+    if inwdj == 1 then
+        local x = check_xuezhu_status()
+        if x == '0' then return getxuezhu0() end
+        if x == '-1' or x == '1' then return getxuezhu1() end
+    end
 
     if Bag and Bag["Ò°¾Õ»¨"] and not Bag["Í­Ô¿³×"] then
         return go(get_key, 'ÑïÖÝ³Ç', 'Ð¡ÅÌ¹Å')

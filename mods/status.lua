@@ -550,7 +550,6 @@ function hp_trigger()
                      'check_lcjdk1')
     create_trigger_t('hp36', "^(> )*\\D*告诉你：长江渡船到达时间",
                      '', 'check_cjdk1')
-    -- create_trigger_t('hp45',"^(> )*你将手中的三才神通剑一弹，电光闪耀中",'','unstop')
     create_trigger_t('hp37',
                      "^(> )*\\D*告诉你：黄河流域大渡口出发时间",
                      '', 'check_hhdk2_open')
@@ -668,52 +667,44 @@ function hp_trigger()
 end
 
 function check_hhdk_open()
+    -- 陕晋渡口开启->对应关系：黄河流域大渡口
     Chuanfu.ck_hhdk1 = 0
     Chuanfu.dkopen1 = os.clock()
-    Chuanfu.checkdktime1 = Chuanfu.dkopen1 - Chuanfu.dkclose1
-    -- print('陕晋渡口开启->对应关系：黄河流域大渡口')
 end
 function check_hhdk_close()
+    -- 陕晋渡口关闭->对应关系：黄河流域大渡口
     Chuanfu.ck_hhdk1 = 1
     Chuanfu.dkclose1 = os.clock()
-    Chuanfu.checkdktime1 = Chuanfu.dkclose1 - Chuanfu.dkopen1
-    -- print('陕晋渡口关闭->对应关系：黄河流域大渡口')
 end
 function check_hhdk2_open()
+    -- 黄河流域大渡口开启->对应关系：陕晋渡口
     Chuanfu.ck_hhdk2 = 0
     Chuanfu.dkopen2 = os.clock()
-    Chuanfu.checkdktime2 = Chuanfu.dkopen2 - Chuanfu.dkclose2
-    -- print('黄河流域大渡口开启->对应关系：陕晋渡口')
 end
 function check_hhdk2_close()
+    -- 黄河流域大渡口关闭->对应关系：陕晋渡口
     Chuanfu.ck_hhdk2 = 1
     Chuanfu.dkclose2 = os.clock()
-    Chuanfu.checkdktime2 = Chuanfu.dkclose2 - Chuanfu.dkopen2
-    -- print('黄河流域大渡口关闭->对应关系：陕晋渡口')
 end
 function check_hhdk3()
+    -- 西夏渡口开启->对应关系：兰州渡口
     Chuanfu.ck_hhdk3 = 0
     Chuanfu.dkopen3 = os.clock()
-    Chuanfu.checkdktime3 = Chuanfu.dkopen3 - Chuanfu.dkclose3
-    -- print('西夏渡口开启->对应关系：兰州渡口')
 end
 function check_hhdk33()
+    -- 西夏渡口关闭->对应关系：兰州渡口
     Chuanfu.ck_hhdk3 = 1
     Chuanfu.dkclose3 = os.clock()
-    Chuanfu.checkdktime3 = Chuanfu.dkclose3 - Chuanfu.dkopen3
-    -- print('西夏渡口关闭->对应关系：兰州渡口')
 end
 function check_hhdk4()
+    -- 兰州渡口开启->对应关系：西夏渡口
     Chuanfu.ck_hhdk4 = 0
     Chuanfu.dkopen4 = os.clock()
-    Chuanfu.checkdktime4 = Chuanfu.dkopen4 - Chuanfu.dkclose4
-    -- print('兰州渡口开启->对应关系：西夏渡口')
 end
 function check_hhdk44()
+    -- 兰州渡口关闭->对应关系：西夏渡口
     Chuanfu.ck_hhdk4 = 1
     Chuanfu.dkclose4 = os.clock()
-    Chuanfu.checkdktime4 = Chuanfu.dkclose4 - Chuanfu.dkopen4
-    -- print('兰州渡口关闭->对应关系：西夏渡口')
 end
 
 function check_hh()

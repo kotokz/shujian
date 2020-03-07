@@ -3,7 +3,7 @@ function wait_busy()
     while true do
         exe('bei bei bei')
         local l, w = wait.regexp(
-                         '^(> )*(你现在已经组合|你已准备有一种技能了|你至少不会这两种拳脚技能的其中之一)',
+                         '^(> )*(你现在已经组合|你已准备有一种技能了|你至少不会这两种拳脚技能的其中之一|你现在没有激发任何有效特殊技能)',
                          1)
         if l ~= nil then
             EnableTrigger("hp12", false)
@@ -17,13 +17,13 @@ function check_busy(func, p_cmd)
     disWait()
     DeleteTriggerGroup("check_bei")
     create_trigger_t('check_bei1',
-                     "^(> )*(你现在已经组合|你已准备有一种技能了|你至少不会这两种拳脚技能的其中之一)",
+                     "^(> )*(你现在已经组合|你已准备有一种技能了|你至少不会这两种拳脚技能的其中之一|你现在没有激发任何有效特殊技能)",
                      '', 'beiok')
-    create_trigger_t('check_bei2',
-                     "^(> )*你现在没有激发任何有效特殊技能。",
-                     '', 'beinone')
+    -- create_trigger_t('check_bei2',
+    --                  "^(> )*你现在没有激发任何有效特殊技能。",
+    --                  '', 'beinone')
     SetTriggerOption("check_bei1", "group", "check_bei")
-    SetTriggerOption("check_bei2", "group", "check_bei")
+    -- SetTriggerOption("check_bei2", "group", "check_bei")
     EnableTriggerGroup("check_bei", true)
     EnableTrigger("hp12", true)
     beihook = func

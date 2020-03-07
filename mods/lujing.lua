@@ -482,13 +482,6 @@ function walk_wait()
         EnableTrigger("hp12", true)
         create_timer_s('walkWait', 0.4, 'walkTimer')
         if tmp.find then
-            -- if cntr1() > 0 then
-            --     exe('alias action 正在赶路中')
-            -- else
-            --     wait.time(0.2)
-            --     cntr1 = countR(15)
-            --     exe('alias action 正在赶路中')
-            -- end
             exe('alias action 正在赶路中')
         else
             return walk_goon()
@@ -550,11 +543,9 @@ end
 function await_go(area, room, sId)
     local self = coroutine.running()
     local async_continue = function(...)
-        -- print("async resume")
         coroutine.resume(self, ...)
     end
     go(async_continue, area, room, sId)
-    -- print("async yield")
     return coroutine.yield()
 end
 
@@ -588,7 +579,6 @@ function go(job, area, room, sId)
     -- end
 end
 go_locate = function()
-    EnableTriggerGroup("gpstest", true)
     EnableTrigger("hp12", true)
     wait.make(function()
         if Chuanfu.chuanfuEnable then

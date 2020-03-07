@@ -567,31 +567,37 @@ huashan_cut = function()
             end            
             local l,_ = wait.regexp('^(> )*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。|^(> )*(光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来)|^(> )*你将(\\D*)的尸体扶了起来背在背上。',1)
             if l then
-                index = index + 1
-                if l:find("扶了起来背在背上") then 
-                    -- tprint(w)                   
-                    if l:find(job.target) then
-                        checkBags()
-                        for i = 1, 3 do exe('get ling pai from corpse ' .. i) end
-                        road.id = nil                        
-                        fightoverweapon()
-                        break
-                    else
-                        exe("drop corpse")
-                        cut = true
-                    end
-                elseif l:find("无锋无刃") or l:find("锋利的器具") then
+                if l:find("无锋无刃") or l:find("锋利的器具") then
                     weaponWieldCut()
                     checkWield()
-                elseif l:find("首级斩了下来") then
-                    if not l:find(job.target) then
-                        exe('drop head')
-                    else
-                        road.id = nil
-                        wait.time(1)
-                        wait_busy()
-                        fightoverweapon()
-                        break
+                else
+                    index = index + 1
+                    if l:find("扶了起来背在背上") then 
+                        -- tprint(w)                   
+                        if l:find(job.target) then
+                            checkBags()
+                            for i = 1, 3 do exe('get ling pai from corpse ' .. i) end
+                            road.id = nil                        
+                            fightoverweapon()
+                            break
+                        else
+                            exe("drop corpse")
+                            cut = true
+                        end
+                    elseif l:find("无锋无刃") or l:find("锋利的器具") then
+                        weaponWieldCut()
+                        checkWield()
+                        index = index - 1
+                    elseif l:find("首级斩了下来") then
+                        if not l:find(job.target) then
+                            exe('drop head')
+                        else
+                            road.id = nil
+                            wait.time(1)
+                            wait_busy()
+                            fightoverweapon()
+                            break
+                        end
                     end
                 end
             end

@@ -92,7 +92,7 @@ Chuanfu = {
         departTime = 0        
     }
 }
-function check_hhdk_open()
+function sanjinOpen()
     -- 陕晋渡口开启->对应关系：黄河流域大渡口
     Chuanfu.ck_hhdk1 = 0
     Chuanfu.dkopen1 = os.clock()
@@ -100,43 +100,43 @@ function check_hhdk_open()
     Chuanfu.sanjin.enable = true
     Chuanfu.sanjin.departTime = os.clock()
 end
-function check_hhdk_close()
+function sanjinClose()
     -- 陕晋渡口关闭->对应关系：黄河流域大渡口
     Chuanfu.sanjin.enable = false
     Chuanfu.sanjin.arriveTime = os.clock()
 end
-function check_hhdk2_open()
+function huangheOpen()
     -- 黄河流域大渡口开启->对应关系：陕晋渡口
     Chuanfu.huanghe.enable = true
     Chuanfu.huanghe.departTime = os.clock()
 end
-function check_hhdk2_close()
+function huangheClose()
     -- 黄河流域大渡口关闭->对应关系：陕晋渡口
     Chuanfu.huanghe.enable = false
     Chuanfu.huanghe.arriveTime = os.clock()
 end
-function check_hhdk3()
+function xixiaOpen()
     -- 西夏渡口开启->对应关系：兰州渡口
     Chuanfu.xixia.enable = true
     Chuanfu.xixia.departTime = os.clock()
     Chuanfu.ck_hhdk3 = 0
     Chuanfu.dkopen3 = os.clock()
 end
-function check_hhdk33()
+function xixiaClose()
     -- 西夏渡口关闭->对应关系：兰州渡口
     Chuanfu.xixia.enable = false
     Chuanfu.xixia.arriveTime = os.clock()
     Chuanfu.ck_hhdk3 = 1
     Chuanfu.dkclose3 = os.clock()
 end
-function check_hhdk4()
+function lanzhouOpen()
     -- 兰州渡口开启->对应关系：西夏渡口
     Chuanfu.lanzhou.enable = true
     Chuanfu.lanzhou.departTime = os.clock()
     Chuanfu.ck_hhdk4 = 0
     Chuanfu.dkopen4 = os.clock()
 end
-function check_hhdk44()
+function lanzhouClose()
     -- 兰州渡口关闭->对应关系：西夏渡口
     Chuanfu.lanzhou.enable = false
     Chuanfu.lanzhou.arriveTime = os.clock()
@@ -225,24 +225,24 @@ function Chuanfu:checkXixiaLanzhou()
     end
 end
 
-function check_cjdk()
+function changjiangOpen()
     Chuanfu.enable = true
     -- print('长江渡口开启')
     Chuanfu.changjiang.enable = true
     Chuanfu.changjiang.departTime = os.clock()
 end
-function check_cjdk1()
+function changjiangClose()
     Chuanfu.enable = true
     -- print('长江渡口关闭')
     Chuanfu.changjiang.enable = false
     Chuanfu.changjiang.arriveTime = os.clock()
 end
-function check_lcjdk()
+function lancangjiangOpen()
     -- print('澜沧江渡口开启')
     Chuanfu.lancangjiang.enable = true
     Chuanfu.lancangjiang.departTime = os.clock()
 end
-function check_lcjdk1()
+function lancangjiangClose()
     -- print('澜沧江渡口关闭')
     Chuanfu.lancangjiang.enable = false
     Chuanfu.lancangjiang.arriveTime = os.clock()
@@ -783,33 +783,33 @@ function hp_trigger()
     create_trigger_t('hp30', '^.*据说' .. score.name .. '被.*打傻了!', '',
                      'dolost_hitlog_close')
     create_trigger_t('hp33', "^(> )*\\D*告诉你：长江渡船出发时间",
-                     '', 'check_cjdk')
+                     '', 'changjiangOpen')
     create_trigger_t('hp34',
                      "^(> )*\\D*告诉你：澜沧江渡船出发时间", '',
-                     'check_lcjdk')
+                     'lancangjiangOpen')
     create_trigger_t('hp35',
                      "^(> )*\\D*告诉你：澜沧江渡船到达时间", '',
-                     'check_lcjdk1')
+                     'lancangjiangClose')
     create_trigger_t('hp36', "^(> )*\\D*告诉你：长江渡船到达时间",
-                     '', 'check_cjdk1')
+                     '', 'changjiangClose')
     create_trigger_t('hp37',
                      "^(> )*\\D*告诉你：黄河流域大渡口出发时间",
-                     '', 'check_hhdk2_open')
+                     '', 'huangheOpen')
     create_trigger_t('hp38',
                      "^(> )*\\D*告诉你：黄河流域大渡口到达时间",
-                     '', 'check_hhdk2_close')
+                     '', 'huangheClose')
     create_trigger_t('hp39', "^(> )*\\D*告诉你：陕晋渡口出发时间",
-                     '', 'check_hhdk_open')
+                     '', 'sanjinOpen')
     create_trigger_t('hp40', "^(> )*\\D*告诉你：陕晋渡口到达时间",
-                     '', 'check_hhdk_close')
+                     '', 'sanjinClose')
     create_trigger_t('hp41', "^(> )*\\D*告诉你：西夏渡口出发时间",
-                     '', 'check_hhdk3')
+                     '', 'xixiaOpen')
     create_trigger_t('hp42', "^(> )*\\D*告诉你：西夏渡口到达时间",
-                     '', 'check_hhdk33')
+                     '', 'xixiaClose')
     create_trigger_t('hp43', "^(> )*\\D*告诉你：兰州渡口出发时间",
-                     '', 'check_hhdk4')
+                     '', 'lanzhouOpen')
     create_trigger_t('hp44', "^(> )*\\D*告诉你：兰州渡口到达时间",
-                     '', 'check_hhdk44')
+                     '', 'lanzhouClose')
     SetTriggerOption("hp24", "group", "hp")
     SetTriggerOption("hp25", "group", "hp")
     SetTriggerOption("hp26", "group", "hp")

@@ -605,6 +605,7 @@ function huashan_yls_give()
                 line = nil
             end
         until line
+        wait_busy()
         if line:find('你的令牌呢') or line:find('你还没有去找恶贼') then
             return huashan_yls_fail()
         elseif line:find('写下了一个 一') then

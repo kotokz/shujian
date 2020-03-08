@@ -116,8 +116,6 @@ function huashanFindFail() return go(huashan_shibai, '华山', '正气堂') end
 function huashan_start()
     DeleteTriggerGroup("all_fight")
     DeleteTriggerGroup("huashan_fight")
-    DeleteTriggerGroup("huashan_yls")
-    DeleteTriggerGroup("huashan_yls_ask")
     DeleteTriggerGroup("huashan_over")
     DeleteTriggerGroup("huashan_find")
     flag.idle = nil
@@ -206,8 +204,6 @@ function huashan_triggerDel()
     DeleteTriggerGroup("huashan_accept")
     DeleteTriggerGroup("huashan_npc")
     DeleteTriggerGroup("huashan_fight")
-    DeleteTriggerGroup("huashan_yls")
-    DeleteTriggerGroup("huashan_yls_ask")
     DeleteTriggerGroup("huashan_over")
     DeleteTriggerGroup("huashanQuest")
 end
@@ -277,10 +273,8 @@ function huashan_npc()
     if hsjob2 < 1 then
         hstongji_lq = hstongji_lq + 1
         messageShow('华山任务：开始任务。')
-        -- locate_finish = 'huashan_npc_go'
         return check_busy(huashan_npc_go)
     else
-        -- locate_finish = 'huashan_npc_go2'
         return check_busy(huashan_npc_go2)
     end
 
@@ -552,13 +546,7 @@ huashan_cut = function()
     kezhiwugongclose()
     wait.make(function() 
         local index = 1
-        local giveup = false
-
-        while true do       
-            if index > 5 then
-                giveup = true
-                break
-            end     
+        while index <= 5 do       
             if cut then
                 exe('halt;get ling pai from corpse ' .. index)
                 exe('qie corpse ' .. index)
@@ -573,12 +561,10 @@ huashan_cut = function()
                 else
                     index = index + 1
                     if l:find("扶了起来背在背上") then 
-                        -- tprint(w)                   
                         if l:find(job.target) then
                             checkBags()
                             for i = 1, 3 do exe('get ling pai from corpse ' .. i) end
-                            road.id = nil                        
-                            fightoverweapon()
+                            road.id = nil
                             break
                         else
                             exe("drop corpse")
@@ -595,100 +581,54 @@ huashan_cut = function()
                             road.id = nil
                             wait.time(1)
                             wait_busy()
-                            fightoverweapon()
                             break
                         end
                     end
                 end
             end
         end
+        fightoverweapon()
         await_go('华山', '祭坛')
         return huashan_yls_give()
     end)
 end
 
-huashan_yls = function()
-    huashan_yls_trigger()
-    EnableTriggerGroup("ylshead", true)
-    exe('alias action 华山任务完成')
-    create_timer_s('walkWait4', 0.6, 'huashan_yls_timer')
+function huashan_yls_give()
+    wait.make(function() 
+        local line
+        repeat
+            exe('get ling pai from corpse;give head to yue lingshan')
+            exe('give corpse to yue lingshan')
+            line,_ = wait.regexp('^(> )*(你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？|岳灵珊在你的令牌上写下了一个 (一|二) 字。|这好象不是你领的令牌吧？)',1)
+            if line and line:find('这好象不是你领的令牌') then
+                exe('drop ling pai')
+                line = nil
+            end
+        until line
+        if line:find('你的令牌呢') or line:find('你还没有去找恶贼') then
+            return huashan_yls_fail()
+        elseif line:find('写下了一个 一') then
+            if dohs2 == 0 or (lostletter == 1 and needdolost == 1) then
+               repeat
+                exe('drop head;ask yue lingshan about 力不从心')
+                local line,_ = wait.regexp('^(> )*你向岳灵珊打听有关『力不从心』的消息。',1)
+               until line
+               return huashan_yls_back()
+            else
+                return huashan_heal()
+            end
+        elseif line:find('写下了一个 二') then
+            return huashan_yls_back()
+        end    
+    end)
+
 end
 
-huashan_yls_trigger = function()
-    DeleteTriggerGroup("ylshead")
-    create_trigger_t('ylshead1',
-                     '^(> )*你把 "action" 设定为 "华山任务完成" 成功完成。$',
-                     '', 'huashan_yls_give')
-    SetTriggerOption("ylshead1", "group", "ylshead")
-    EnableTriggerGroup("ylshead", false)
-end
-
-huashan_yls_timer = function()
-    exe('get ling pai from corpse;give head to yue lingshan')
-    exe('give corpse to yue lingshan')
-end
-
-huashan_yls_give = function()
-    EnableTimer('walkWait2', false)
-    DeleteTimer('walkWait2')
-    EnableTriggerGroup("ylshead", false)
-    DeleteTriggerGroup("huashan_yls")
-    -- create_trigger_t('huashan_yls1','^(> )*(这里没有这个人。|你身上没有这样东西。|这人好象不是你杀的吧？|你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？)','','huashan_yls_fail')
-    -- create_trigger_t('huashan_yls1','^(> )*(这人好象不是你杀的吧？|你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？)','','huashan_yls_fail')
-    create_trigger_t('huashan_yls1',
-                     '^(> )*(你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？)',
-                     '', 'huashan_yls_fail')
-    create_trigger_t('huashan_yls2',
-                     '^(> )*岳灵珊在你的令牌上写下了一个 (一|二) 字。',
-                     '', 'huashan_yls_ask')
-    create_trigger_t('huashan_yls3',
-                     '^(> )*这好象不是你领的令牌吧？', '',
-                     'huashan_yls_lingpai')
-    SetTriggerOption("huashan_yls1", "group", "huashan_yls")
-    SetTriggerOption("huashan_yls2", "group", "huashan_yls")
-    SetTriggerOption("huashan_yls3", "group", "huashan_yls")
-    EnableTriggerGroup("huashan_yls", true)
-    exe('get ling pai from corpse;give head to yue lingshan')
-    exe('give corpse to yue lingshan')
-    create_timer_s('walkWait4', 2.0, 'huashan_yls_timer')
-end
---[[huashan_head_return=function()
-    exe('give head to yue lingshan;hp')        
-end]]
 huashan_yls_fail = function()
     EnableTimer('walkWait4', false)
-    EnableTriggerGroup("huashan_yls", false)
     if locl.room ~= "祭坛" then return go(huashan_yls, '华山', '祭坛') end
     exe('out;w;s;se;su;su;s')
     return check_halt(huashan_shibai_b)
-end
-huashan_yls_lingpai = function()
-    EnableTimer('walkWait4', false)
-    EnableTriggerGroup("huashan_yls", false)
-    exe('drop ling pai')
-    return check_halt(huashan_yls)
-end
-huashan_yls_ask = function(n, l, w)
-    EnableTimer('walkWait4', false)
-    EnableTriggerGroup("huashan_yls", false)
-    DeleteTriggerGroup("huashan_yls_ask")
-    create_trigger_t('huashan_yls_ask1',
-                     '^(> )*你向岳灵珊打听有关『力不从心』的消息。',
-                     '', 'huashan_yls_back')
-    SetTriggerOption("huashan_yls_ask1", "group", "huashan_yls_ask")
-    EnableTriggerGroup("huashan_yls_ask", false)
-    wait.make(function()
-        wait.time(0.5)
-        wait_busy()
-        if w[2] == '二' then
-            return huashan_yls_back()
-        elseif dohs2 == 0 or (lostletter == 1 and needdolost == 1) then
-            return huashan_yls_lbcx()
-        else
-            return huashan_heal()
-        end
-    end)
-
 end
 huashan_heal = function()
     exe('set no_kill_ap')
@@ -704,16 +644,10 @@ huashan_neili = function()
         return check_bei(huashan_npc)
     end
 end
-huashan_yls_lbcx = function()
-    locate_finish = 0
-    EnableTriggerGroup("huashan_yls_ask", true)
-    weapon_unwield()
-    return exe('drop head;askk yue lingshan about 力不从心')
-end
+
 huashan_yls_back = function()
     locate_finish = 0
     EnableTimer('walkWait4', false)
-    EnableTriggerGroup("huashan_yls_ask", false)
     EnableTriggerGroup("huashanQuest", true)
     DeleteTriggerGroup("huashan_over")
     create_trigger_t('huashan_over1', '^(> )*你给岳不群一块令牌。',

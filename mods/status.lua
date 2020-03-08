@@ -57,40 +57,282 @@ skillsLingwu = {
 
 -- 船夫系列
 Chuanfu = {
-    chuanfuEnable = false,
-    dkopen1 = 0,
-    dkclose1 = 0,
-    checkdktime1 = 0,
-    ck_hhdk2 = 0,
-    dkopen2 = 0,
-    dkclose2 = 0,
-    checkdktime2 = 0,
-    ck_hhdk3 = 0,
-    dkopen3 = 0,
-    dkclose3 = 0,
-    ck_hhdk4 = 0,
-    dkopen4 = 0,
-    dkclose4 = 0,
-    checkdktime4 = 0,
-    hstesta = 0,
-    hstestb = 0,
-    hstestc = 0,
-    hstest = 0,
-    wdtesta = 0,
-    wdtestb = 0,
-    wdtestc = 0,
-    wdtest = 0,
-    wdtestaa = 0,
-    hstestaa = 0,
-    wdtestaaa = 0,
-    hstestaaa = 0,
-    check_cjdkk = 0,
-    check_lcjdkk = 0,
-    check_cjdkkk = 0,
-    check_lcjdkkk = 0,
-    first_leave = 'changjiang',
-    first_arrive = 'lancangjiang'
+    enable = false,
+    -- 陕晋渡口 黄河流域大渡口
+    -- 西夏渡口 兰州渡口
+    -- 长江渡口 澜沧江
+    sanjin = {
+        enable = false,
+        arriveTime = 0,
+        departTime = 0
+    },
+    huanghe = {
+        enable = false,
+        arriveTime = 0,
+        departTime = 0
+    },
+    xixia = {
+        enable = false,
+        arriveTime = 0,
+        departTime = 0        
+    },
+    lanzhou = {
+        enable = false,
+        arriveTime = 0,
+        departTime = 0        
+    },
+    changjiang = {
+        enable = false,
+        arriveTime = 0,
+        departTime = 0        
+    },
+    lancangjiang = {
+        enable = false,
+        arriveTime = 0,
+        departTime = 0        
+    }
 }
+function check_hhdk_open()
+    -- 陕晋渡口开启->对应关系：黄河流域大渡口
+    Chuanfu.ck_hhdk1 = 0
+    Chuanfu.dkopen1 = os.clock()
+
+    Chuanfu.sanjin.enable = true
+    Chuanfu.sanjin.departTime = os.clock()
+end
+function check_hhdk_close()
+    -- 陕晋渡口关闭->对应关系：黄河流域大渡口
+    Chuanfu.sanjin.enable = false
+    Chuanfu.sanjin.arriveTime = os.clock()
+end
+function check_hhdk2_open()
+    -- 黄河流域大渡口开启->对应关系：陕晋渡口
+    Chuanfu.huanghe.enable = true
+    Chuanfu.huanghe.departTime = os.clock()
+end
+function check_hhdk2_close()
+    -- 黄河流域大渡口关闭->对应关系：陕晋渡口
+    Chuanfu.huanghe.enable = false
+    Chuanfu.huanghe.arriveTime = os.clock()
+end
+function check_hhdk3()
+    -- 西夏渡口开启->对应关系：兰州渡口
+    Chuanfu.xixia.enable = true
+    Chuanfu.xixia.departTime = os.clock()
+    Chuanfu.ck_hhdk3 = 0
+    Chuanfu.dkopen3 = os.clock()
+end
+function check_hhdk33()
+    -- 西夏渡口关闭->对应关系：兰州渡口
+    Chuanfu.xixia.enable = false
+    Chuanfu.xixia.arriveTime = os.clock()
+    Chuanfu.ck_hhdk3 = 1
+    Chuanfu.dkclose3 = os.clock()
+end
+function check_hhdk4()
+    -- 兰州渡口开启->对应关系：西夏渡口
+    Chuanfu.lanzhou.enable = true
+    Chuanfu.lanzhou.departTime = os.clock()
+    Chuanfu.ck_hhdk4 = 0
+    Chuanfu.dkopen4 = os.clock()
+end
+function check_hhdk44()
+    -- 兰州渡口关闭->对应关系：西夏渡口
+    Chuanfu.lanzhou.enable = false
+    Chuanfu.lanzhou.arriveTime = os.clock()
+    Chuanfu.ck_hhdk4 = 1
+    Chuanfu.dkclose4 = os.clock()
+end
+
+
+function Chuanfu:closeSanjin()
+    map.rooms["changan/road2"].ways["#duHhe"] = nil
+    map.rooms["changan/road3"].ways["#duHhe"] = nil
+end
+
+function Chuanfu:closeHuanghe()
+    map.rooms["huanghe/road2"].ways["#duHhe"] = nil
+    map.rooms["huanghe/road3"].ways["#duHhe"] = nil
+end
+
+
+function Chuanfu:openHuangHeArea()
+    map.rooms["lanzhou/road3"].ways["#duHhe"]='lanzhou/road2'
+    map.rooms["lanzhou/road2"].ways["#duHhe"]='lanzhou/road3'
+    map.rooms["lanzhou/dukou3"].ways["#duHhe"]='lanzhou/dukou2'		
+    map.rooms["lanzhou/dukou2"].ways["#duHhe"]='lanzhou/dukou3'
+    map.rooms["changan/road3"].ways["#duHhe"]='changan/road2'
+    map.rooms["changan/road2"].ways["#duHhe"]='changan/road3'
+    map.rooms["huanghe/road3"].ways["#duHhe"]='huanghe/road2'		
+    map.rooms["huanghe/road2"].ways["#duHhe"]='huanghe/road3'
+   end
+
+function Chuanfu:check_hh()
+    Chuanfu:openHuangHeArea()
+    
+-- 陕晋渡口 changan/road2  changan/road3
+-- 黄河流域大渡口 huanghe/road2 huanghe/road3
+    if Chuanfu.sanjin.enable and Chuanfu.huanghe.enable then
+        if Chuanfu.sanjin.departTime > Chuanfu.huanghe.departTime then
+            Chuanfu:closeHuanghe()
+        else
+            Chuanfu:closeSanjin()
+        end
+    elseif Chuanfu.huanghe.enable then
+        Chuanfu:closeSanjin()
+    elseif Chuanfu.sanjin.enable then
+        Chuanfu:closeHuanghe()
+    else
+        if Chuanfu.sanjin.arriveTime > Chuanfu.huanghe.arriveTime then
+            Chuanfu:closeSanjin()
+        else
+            Chuanfu:closeHuanghe()
+        end
+    end
+    return Chuanfu:checkXixiaLanzhou()
+end
+
+function Chuanfu:closeLanzhou()
+    map.rooms["lanzhou/road2"].ways["#duHhe"] = nil
+    map.rooms["lanzhou/road3"].ways["#duHhe"] = nil
+end
+
+function Chuanfu:closeXixia()
+    map.rooms["lanzhou/dukou2"].ways["#duHhe"] = nil
+    map.rooms["lanzhou/dukou3"].ways["#duHhe"] = nil
+end
+
+
+function Chuanfu:checkXixiaLanzhou()
+-- 西夏渡口 lanzhou/dukou2 lanzhou/dukou3
+-- 兰州渡口 lanzhou/road2 lanzhou/road3
+    if Chuanfu.xixia.enable and Chuanfu.lanzhou.enable then
+        if Chuanfu.xixia.departTime > Chuanfu.lanzhou.departTime then
+            Chuanfu:closeLanzhou()
+        else
+            Chuanfu:closeXixia()
+        end
+    elseif Chuanfu.xixia.enable then
+        Chuanfu:closeLanzhou()
+    elseif Chuanfu.lanzhou.enable then
+        Chuanfu:closeXixia()
+    else
+        if Chuanfu.xixia.arriveTime > Chuanfu.lanzhou.arriveTime then
+            Chuanfu:closeXixia()
+        else
+            Chuanfu:closeLanzhou()
+        end
+    end
+end
+
+function check_cjdk()
+    Chuanfu.enable = true
+    -- print('长江渡口开启')
+    Chuanfu.changjiang.enable = true
+    Chuanfu.changjiang.departTime = os.clock()
+end
+function check_cjdk1()
+    Chuanfu.enable = true
+    -- print('长江渡口关闭')
+    Chuanfu.changjiang.enable = false
+    Chuanfu.changjiang.arriveTime = os.clock()
+end
+function check_lcjdk()
+    -- print('澜沧江渡口开启')
+    Chuanfu.lancangjiang.enable = true
+    Chuanfu.lancangjiang.departTime = os.clock()
+end
+function check_lcjdk1()
+    -- print('澜沧江渡口关闭')
+    Chuanfu.lancangjiang.enable = false
+    Chuanfu.lancangjiang.arriveTime = os.clock()
+end
+
+function Chuanfu:openAllareas()
+    Chuanfu:openChangJiangArea()
+    Chuanfu:openHuangHeArea()
+end
+
+function Chuanfu:openChangJiangArea()
+    map.rooms["city/jiangbei"].ways["#duCjiang"] = 'city/jiangnan'
+    map.rooms["city/jiangnan"].ways["#duCjiang"] = 'city/jiangbei'
+    map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] =
+        'dali/dalisouth/jiangbei'
+    map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] =
+        'dali/dalisouth/jiangnan'
+end
+
+function Chuanfu:closeChangJiang()
+    map.rooms["city/jiangbei"].ways["#duCjiang"] = nil
+    map.rooms["city/jiangnan"].ways["#duCjiang"] = nil
+end
+
+function Chuanfu:closeLanCangJiang()
+    map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] = nil
+    map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] = nil
+end
+
+function Chuanfu:check_cjn()
+    Chuanfu:openChangJiangArea()
+    if Chuanfu.changjiang.enable and Chuanfu.lancangjiang.enable then
+        if Chuanfu.changjiang.departTime > Chuanfu.lancangjiang.departTime then
+            Chuanfu:closeLanCangJiang()
+        else
+            Chuanfu:closeChangJiang()
+        end
+    elseif Chuanfu.changjiang.enable then
+        Chuanfu:closeLanCangJiang()
+    elseif Chuanfu.lancangjiang.enable then
+        Chuanfu:closeChangJiang()
+    else
+        if Chuanfu.changjiang.arriveTime < Chuanfu.lancangjiang.arriveTime then
+            Chuanfu:closeLanCangJiang()
+        else
+            Chuanfu:closeChangJiang()
+        end
+    end
+end
+
+function Chuanfu:closeLoclroom() -- 封闭渡江渡河路径
+    if locl.room_relation == '西双版纳---澜沧江边澜沧江边' or
+        locl.room_relation == '渡船∧西双版纳---澜沧江边澜沧江边' then
+        map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] = nil
+    elseif locl.room_relation == '澜沧江边---林间道澜沧江边' or
+        locl.room_relation == '渡船∧澜沧江边---林间道澜沧江边' then
+        map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] = nil
+    elseif locl.room == '长江北岸' then
+        map.rooms["city/jiangbei"].ways["#duCjiang"] = nil
+        map.rooms["city/jiangbei"].ways["enter"] = nil
+        map.rooms["city/jiangbei"].ways["west"] = nil
+        map.rooms["city/jiangbei"].ways["east"] = nil
+    elseif locl.room == '长江南岸' then
+        map.rooms["city/jiangnan"].ways["#duCjiang"] = nil
+    elseif locl.room_relation == '大道↖大渡口大渡口' or
+        locl.room_relation == '大道黄河渡船↖∧大渡口大渡口' then
+        map.rooms["lanzhou/road3"].ways["#duHhe"] = nil
+    elseif locl.room_relation == '大渡口----大道大渡口' or
+        locl.room_relation == '黄河渡船∧大渡口----大道大渡口' then
+        map.rooms["lanzhou/road2"].ways["#duHhe"] = nil
+    elseif locl.room_relation == '黄河↖西夏渡口西夏渡口' or
+        locl.room_relation == '黄河黄河渡船↖∧西夏渡口西夏渡口' then
+        map.rooms["lanzhou/dukou3"].ways["#duHhe"] = nil
+    elseif locl.room_relation == '西夏渡口↘山脚下西夏渡口' or
+        locl.room_relation ==
+        '黄河渡船∧西夏渡口↘山脚下西夏渡口' then
+        map.rooms["lanzhou/dukou2"].ways["#duHhe"] = nil
+    elseif locl.room_relation == '大道｜陕晋渡口陕晋渡口' then
+        map.rooms["changan/road3"].ways["#duHhe"] = nil
+    elseif locl.room_relation ==
+        '陕晋渡口｜↘土路黄土高原陕晋渡口' or locl.room_relation ==
+        '渡船∧陕晋渡口｜↘土路黄土高原陕晋渡口' then
+        map.rooms["changan/road2"].ways["#duHhe"] = nil
+    elseif locl.room_relation == '官道｜大渡口大渡口' then
+        map.rooms["huanghe/road3"].ways["#duHhe"] = nil
+    elseif locl.room_relation == '大渡口｜黄河入海口大渡口' or
+        locl.room_relation == '渡船∧大渡口｜黄河入海口大渡口' then
+        map.rooms["huanghe/road2"].ways["#duHhe"] = nil
+    end
+end
 
 check_skills = function(n, l, w)
 
@@ -664,192 +906,6 @@ function hp_trigger()
     SetTriggerOption("score10", "group", "score")
     SetTriggerOption("score11", "group", "score")
     SetTriggerOption("score12", "group", "score")
-end
-
-function check_hhdk_open()
-    -- 陕晋渡口开启->对应关系：黄河流域大渡口
-    Chuanfu.ck_hhdk1 = 0
-    Chuanfu.dkopen1 = os.clock()
-end
-function check_hhdk_close()
-    -- 陕晋渡口关闭->对应关系：黄河流域大渡口
-    Chuanfu.ck_hhdk1 = 1
-    Chuanfu.dkclose1 = os.clock()
-end
-function check_hhdk2_open()
-    -- 黄河流域大渡口开启->对应关系：陕晋渡口
-    Chuanfu.ck_hhdk2 = 0
-    Chuanfu.dkopen2 = os.clock()
-end
-function check_hhdk2_close()
-    -- 黄河流域大渡口关闭->对应关系：陕晋渡口
-    Chuanfu.ck_hhdk2 = 1
-    Chuanfu.dkclose2 = os.clock()
-end
-function check_hhdk3()
-    -- 西夏渡口开启->对应关系：兰州渡口
-    Chuanfu.ck_hhdk3 = 0
-    Chuanfu.dkopen3 = os.clock()
-end
-function check_hhdk33()
-    -- 西夏渡口关闭->对应关系：兰州渡口
-    Chuanfu.ck_hhdk3 = 1
-    Chuanfu.dkclose3 = os.clock()
-end
-function check_hhdk4()
-    -- 兰州渡口开启->对应关系：西夏渡口
-    Chuanfu.ck_hhdk4 = 0
-    Chuanfu.dkopen4 = os.clock()
-end
-function check_hhdk44()
-    -- 兰州渡口关闭->对应关系：西夏渡口
-    Chuanfu.ck_hhdk4 = 1
-    Chuanfu.dkclose4 = os.clock()
-end
-
-function check_hh()
-    dhopen()
-    if Chuanfu.ck_hhdk1 == 0 and Chuanfu.ck_hhdk2 == 0 then
-        if Chuanfu.dkopen1 > Chuanfu.dkopen2 then
-            map.rooms["huanghe/road2"].ways["#duHhe"] = nil
-            map.rooms["huanghe/road3"].ways["#duHhe"] = nil
-            return checkhhh()
-        else
-            map.rooms["changan/road2"].ways["#duHhe"] = nil
-            map.rooms["changan/road3"].ways["#duHhe"] = nil
-            return checkhhh()
-        end
-    end
-    if Chuanfu.ck_hhdk1 == 1 and Chuanfu.ck_hhdk2 == 1 then
-        if Chuanfu.dkclose1 > Chuanfu.dkclose2 then
-            map.rooms["changan/road3"].ways["#duHhe"] = nil
-            map.rooms["changan/road2"].ways["#duHhe"] = nil
-            return checkhhh()
-        else
-            map.rooms["huanghe/road3"].ways["#duHhe"] = nil
-            map.rooms["huanghe/road2"].ways["#duHhe"] = nil
-            return checkhhh()
-        end
-    end
-    if Chuanfu.ck_hhdk1 == 0 and Chuanfu.ck_hhdk2 == 1 then
-        map.rooms["huanghe/road3"].ways["#duHhe"] = nil
-        map.rooms["huanghe/road2"].ways["#duHhe"] = nil
-        return checkhhh()
-    end
-    if Chuanfu.ck_hhdk1 == 1 and Chuanfu.ck_hhdk2 == 0 then
-        map.rooms["changan/road2"].ways["#duHhe"] = nil
-        map.rooms["changan/road3"].ways["#duHhe"] = nil
-        return checkhhh()
-    end
-end
-
-function checkhhh()
-    if Chuanfu.ck_hhdk3 == 0 and Chuanfu.ck_hhdk4 == 0 then
-        if Chuanfu.dkopen3 > Chuanfu.dkopen4 then
-            map.rooms["lanzhou/road2"].ways["#duHhe"] = nil
-            map.rooms["lanzhou/road3"].ways["#duHhe"] = nil
-            return
-        else
-            map.rooms["lanzhou/dukou2"].ways["#duHhe"] = nil
-            map.rooms["lanzhou/dukou3"].ways["#duHhe"] = nil
-            return
-        end
-    end
-    if Chuanfu.ck_hhdk3 == 1 and Chuanfu.ck_hhdk4 == 1 then
-        if Chuanfu.dkclose3 > Chuanfu.dkclose4 then
-            map.rooms["lanzhou/dukou2"].ways["#duHhe"] = nil
-            map.rooms["lanzhou/dukou3"].ways["#duHhe"] = nil
-            return
-        else
-            map.rooms["lanzhou/road2"].ways["#duHhe"] = nil
-            map.rooms["lanzhou/road3"].ways["#duHhe"] = nil
-            return
-        end
-    end
-    if Chuanfu.ck_hhdk3 == 0 and Chuanfu.ck_hhdk4 == 1 then
-        map.rooms["lanzhou/road2"].ways["#duHhe"] = nil
-        map.rooms["lanzhou/road3"].ways["#duHhe"] = nil
-        return
-    end
-    if Chuanfu.ck_hhdk3 == 1 and Chuanfu.ck_hhdk4 == 0 then
-        map.rooms["lanzhou/dukou2"].ways["#duHhe"] = nil
-        map.rooms["lanzhou/dukou3"].ways["#duHhe"] = nil
-        return
-    end
-end
-
-function check_cjdk()
-    Chuanfu.chuanfuEnable = true
-    -- print('长江渡口开启')
-    Chuanfu.first_leave = 'changjiang'
-    Chuanfu.check_cjdkkk = 0
-    Chuanfu.hstestaaa = os.clock()
-    Chuanfu.cj_test = Chuanfu.hstestaaa - Chuanfu.hstestaa
-end
-function check_cjdk1()
-    Chuanfu.chuanfuEnable = true
-    -- print('长江渡口关闭')
-    Chuanfu.first_arrive = 'changjiang'
-    Chuanfu.check_cjdkkk = 1
-    Chuanfu.hstestaa = os.clock()
-    Chuanfu.cj_test = Chuanfu.hstestaa - Chuanfu.hstestaaa
-end
-function check_lcjdk()
-    -- print('澜沧江渡口开启')
-    Chuanfu.first_leave = 'lancangjiang'
-    Chuanfu.check_lcjdkkk = 0
-    Chuanfu.wdtestaaa = os.clock()
-    Chuanfu.lcj_test = Chuanfu.wdtestaaa - Chuanfu.wdtestaa
-
-end
-function check_lcjdk1()
-    -- print('澜沧江渡口关闭')
-    Chuanfu.first_arrive = 'lancangjiang'
-    Chuanfu.check_lcjdkkk = 1
-    Chuanfu.wdtestaa = os.clock()
-    Chuanfu.lcj_test = Chuanfu.wdtestaa - Chuanfu.wdtestaaa
-end
-function check_cjn()
-    if Chuanfu.check_cjdkkk == 0 and Chuanfu.check_lcjdkkk == 0 then
-        map.rooms["city/jiangbei"].ways["#duCjiang"] = 'city/jiangnan'
-        map.rooms["city/jiangnan"].ways["#duCjiang"] = 'city/jiangbei'
-        map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] = nil
-        map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] = nil
-        return
-    end
-    if Chuanfu.check_cjdkkk == 1 and Chuanfu.check_lcjdkkk == 1 then
-        if Chuanfu.hstestaa < Chuanfu.wdtestaa then
-            map.rooms["city/jiangbei"].ways["#duCjiang"] = 'city/jiangnan'
-            map.rooms["city/jiangnan"].ways["#duCjiang"] = 'city/jiangbei'
-            map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] = nil
-            map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] = nil
-            return
-        else
-            map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] =
-                'dali/dalisouth/jiangbei'
-            map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] =
-                'dali/dalisouth/jiangnan'
-            map.rooms["city/jiangbei"].ways["#duCjiang"] = nil
-            map.rooms["city/jiangnan"].ways["#duCjiang"] = nil
-            return
-        end
-    end
-    if Chuanfu.check_cjdkkk == 0 and Chuanfu.check_lcjdkkk == 1 then
-        map.rooms["city/jiangbei"].ways["#duCjiang"] = 'city/jiangnan'
-        map.rooms["city/jiangnan"].ways["#duCjiang"] = 'city/jiangbei'
-        map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] = nil
-        map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] = nil
-        return
-    end
-    if Chuanfu.check_cjdkkk == 1 and Chuanfu.check_lcjdkkk == 0 then
-        map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] =
-            'dali/dalisouth/jiangbei'
-        map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] =
-            'dali/dalisouth/jiangnan'
-        map.rooms["city/jiangbei"].ways["#duCjiang"] = nil
-        map.rooms["city/jiangnan"].ways["#duCjiang"] = nil
-        return
-    end
 end
 
 score_dz_check = function(n, l, w)

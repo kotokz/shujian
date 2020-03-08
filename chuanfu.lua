@@ -181,6 +181,7 @@ end
 -- 兰州渡口 lanzhou/road2 lanzhou/road3
 -- 长江渡口 city/jiangbei city/jiangnan
 -- 沧澜江 dali/dalisouth/jiangbei dali/dalisouth/jiangnan
+-- /SetVariable("commlist", "rainbow|hnwbh|wbh|xiaohama|parrot|qqqqqqqq|bubble|lakesi|beggar|root|tjkl|android|yuji|aion|lfw|tzssp|zruo|zjj|gjy|hfx|kickall|dzyu|mjjjjlll|tanwr|asura|azi|muxue|daji|dragon|yelang|tuiop|kickcool|juvair|minds|cdm|thaxthx")
 
 function boatmsg(msg)
     wait.make(function()
@@ -235,7 +236,7 @@ flag = {}
 
 skills = {}
 
-Chuanfu = {chuanfuEnable= false}
+Chuanfu = {enable= false}
 MudUser = {}
 weaponPrepare = {}
 

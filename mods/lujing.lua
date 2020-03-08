@@ -581,9 +581,9 @@ end
 go_locate = function()
     EnableTrigger("hp12", true)
     wait.make(function()
-        if Chuanfu.chuanfuEnable then
-            check_cjn()
-            check_hh()
+        if Chuanfu.enable then
+            Chuanfu:check_cjn()
+            Chuanfu:check_hh()
         end
         locate(coroutine.running())
         coroutine.yield()
@@ -1766,7 +1766,7 @@ duhe_over = function()
     DeleteTriggerGroup("duhe")
     weapon_unwield()
     weapon_wield()
-    djdh_open()
+    Chuanfu:openAllareas()
     -- if road.i==0 then road.i=2 end
     return walk_wait()
 end
@@ -1778,11 +1778,6 @@ duhe_wait = function()
         exe('yun qi;yun jingli;dazuo ' .. hp.dazuo)
     end
     create_timer_st('walkWait4', 2, 'dazuo_check')
-    --[[EnableTriggerGroup("duhe",false)
-    DeleteTriggerGroup("duhe")    
-    djdh_open()        
-    djdh_close()        
-    return path_consider()]]
 end
 duhe_waitb = function()
     DeleteTimer('walkwait4')
@@ -1792,9 +1787,6 @@ duhe_waitb = function()
         exe('yun qi;yun jingli;dazuo ' .. hp.dazuo)
     end
     create_timer_st('walkWait4', 2, 'dazuo_check')
-    --[[djdh_open()        
-    djdh_close()        
-    return checkWait(path_consider,4)]]
 end
 duhe_jingli = function()
     DeleteTimer('walkwait4')
@@ -1989,7 +1981,7 @@ dujiang_over = function()
     DeleteTriggerGroup("dujiang")
     weapon_unwield()
     weapon_wield()
-    djdh_open()
+    Chuanfu:openAllareas()
     return walk_wait()
 end
 dujiang_wait = function()
@@ -5106,79 +5098,6 @@ function mjlujingLog(jname)
     file:close()
 end
 
---------------------------------渡江渡河开关------------------------------------------
-function djopen()
-    map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"]='dali/dalisouth/jiangbei'
- map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"]='dali/dalisouth/jiangnan'
- map.rooms["city/jiangbei"].ways["#duCjiang"]='city/jiangnan'		
- map.rooms["city/jiangnan"].ways["#duCjiang"]='city/jiangbei'
-end
-function dhopen()
- map.rooms["lanzhou/road3"].ways["#duHhe"]='lanzhou/road2'
- map.rooms["lanzhou/road2"].ways["#duHhe"]='lanzhou/road3'
- map.rooms["lanzhou/dukou3"].ways["#duHhe"]='lanzhou/dukou2'		
- map.rooms["lanzhou/dukou2"].ways["#duHhe"]='lanzhou/dukou3'
- map.rooms["changan/road3"].ways["#duHhe"]='changan/road2'
- map.rooms["changan/road2"].ways["#duHhe"]='changan/road3'
- map.rooms["huanghe/road3"].ways["#duHhe"]='huanghe/road2'		
- map.rooms["huanghe/road2"].ways["#duHhe"]='huanghe/road3'
-end
-function djdh_open() -- 重新打开被封闭的渡江渡河路径
-    map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] =
-        'dali/dalisouth/jiangbei'
-    map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] =
-        'dali/dalisouth/jiangnan'
-    map.rooms["city/jiangbei"].ways["#duCjiang"] = 'city/jiangnan'
-    map.rooms["city/jiangnan"].ways["#duCjiang"] = 'city/jiangbei'
-    map.rooms["lanzhou/road3"].ways["#duHhe"] = 'lanzhou/road2'
-    map.rooms["lanzhou/road2"].ways["#duHhe"] = 'lanzhou/road3'
-    map.rooms["lanzhou/dukou3"].ways["#duHhe"] = 'lanzhou/dukou2'
-    map.rooms["lanzhou/dukou2"].ways["#duHhe"] = 'lanzhou/dukou3'
-    map.rooms["changan/road3"].ways["#duHhe"] = 'changan/road2'
-    map.rooms["changan/road2"].ways["#duHhe"] = 'changan/road3'
-    map.rooms["huanghe/road3"].ways["#duHhe"] = 'huanghe/road2'
-    map.rooms["huanghe/road2"].ways["#duHhe"] = 'huanghe/road3'
-end
-function djdh_close() -- 封闭渡江渡河路径
-    if locl.room_relation == '西双版纳---澜沧江边澜沧江边' or
-        locl.room_relation == '渡船∧西双版纳---澜沧江边澜沧江边' then
-        map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] = nil
-    elseif locl.room_relation == '澜沧江边---林间道澜沧江边' or
-        locl.room_relation == '渡船∧澜沧江边---林间道澜沧江边' then
-        map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] = nil
-    elseif locl.room == '长江北岸' then
-        map.rooms["city/jiangbei"].ways["#duCjiang"] = nil
-        map.rooms["city/jiangbei"].ways["enter"] = nil
-        map.rooms["city/jiangbei"].ways["west"] = nil
-        map.rooms["city/jiangbei"].ways["east"] = nil
-    elseif locl.room == '长江南岸' then
-        map.rooms["city/jiangnan"].ways["#duCjiang"] = nil
-    elseif locl.room_relation == '大道↖大渡口大渡口' or
-        locl.room_relation == '大道黄河渡船↖∧大渡口大渡口' then
-        map.rooms["lanzhou/road3"].ways["#duHhe"] = nil
-    elseif locl.room_relation == '大渡口----大道大渡口' or
-        locl.room_relation == '黄河渡船∧大渡口----大道大渡口' then
-        map.rooms["lanzhou/road2"].ways["#duHhe"] = nil
-    elseif locl.room_relation == '黄河↖西夏渡口西夏渡口' or
-        locl.room_relation == '黄河黄河渡船↖∧西夏渡口西夏渡口' then
-        map.rooms["lanzhou/dukou3"].ways["#duHhe"] = nil
-    elseif locl.room_relation == '西夏渡口↘山脚下西夏渡口' or
-        locl.room_relation ==
-        '黄河渡船∧西夏渡口↘山脚下西夏渡口' then
-        map.rooms["lanzhou/dukou2"].ways["#duHhe"] = nil
-    elseif locl.room_relation == '大道｜陕晋渡口陕晋渡口' then
-        map.rooms["changan/road3"].ways["#duHhe"] = nil
-    elseif locl.room_relation ==
-        '陕晋渡口｜↘土路黄土高原陕晋渡口' or locl.room_relation ==
-        '渡船∧陕晋渡口｜↘土路黄土高原陕晋渡口' then
-        map.rooms["changan/road2"].ways["#duHhe"] = nil
-    elseif locl.room_relation == '官道｜大渡口大渡口' then
-        map.rooms["huanghe/road3"].ways["#duHhe"] = nil
-    elseif locl.room_relation == '大渡口｜黄河入海口大渡口' or
-        locl.room_relation == '渡船∧大渡口｜黄河入海口大渡口' then
-        map.rooms["huanghe/road2"].ways["#duHhe"] = nil
-    end
-end
 --------蝴蝶谷---------
 function hudieguTriggers()
     DeleteTriggerGroup('hudiegu')

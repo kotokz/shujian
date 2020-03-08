@@ -1849,14 +1849,16 @@ function checkJob()
             end
         end
 
-        if tmp:len() == 10 then
+        if not tmp then
+            lastHqgDate = nil
+        elseif tmp:len() == 10 then
             lastHqgDate = tonumber(tmp) * 100 
         else
-            lastHqgDate = tonumber(lastHqgDate)
+            lastHqgDate = tonumber(tmp)
         end
         local currentDate = tonumber(os.date("%Y%m%d%H%M"))
 
-        if score.xiangyun == 'ËÀ' and currentDate - lastHqgDate > 10000 then 
+        if score.xiangyun == 'ËÀ' and (not lastHqgDate or currentDate - lastHqgDate > 10000) then 
             return hqgzc()
         end
     end

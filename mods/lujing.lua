@@ -676,7 +676,6 @@ function path_consider()
             return checkWait(goContinue, 0.2)
         end
         if table.getn(sour.rooms) > 1 and sour.id ~= 'city/jiangbei' then 
-        ---------------------------------------------------------------------------------------------------
             chats_locate(
                 '定位系统：进入第一个同名房间判断【' ..
                     sour.room .. '】了!', 'LimeGreen')

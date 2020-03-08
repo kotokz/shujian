@@ -190,6 +190,12 @@ end
 function trans(num)
     local words = {}
     local i = 0
+    local num2 = 0
+    if num:find("万") then
+        local idx,e_idx = num:find("万")
+        num2 = trans(num:sub(1,idx-1)) * 10000
+        num = num:sub(e_idx+1)        
+    end    
     num = string.gsub(num, "零十", "10 ")
     num = string.gsub(num, "零", "")
     num = string.gsub(num, "一", "1")
@@ -201,8 +207,6 @@ function trans(num)
     num = string.gsub(num, "七", "7")
     num = string.gsub(num, "八", "8")
     num = string.gsub(num, "九", "9")
-    num = string.gsub(num, "十万", "00000 ")
-    num = string.gsub(num, "百万", "000000 ")
     i = string.find(num, "十")
     if i == 1 then
         num = string.gsub(num, "十", "10 ")
@@ -215,7 +219,7 @@ function trans(num)
     for w in string.gmatch(num, "(%w+)") do table.insert(words, w) end
     i = 0
     for p = 1, table.getn(words) do i = i + tonumber(words[p]) end
-    return i
+    return i + num2
 end
 
 function isNil(p_str)

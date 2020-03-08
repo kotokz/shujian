@@ -646,30 +646,28 @@ huashan_neili = function()
     end
 end
 
-huashan_yls_back = function()
+function huashan_yls_back()
     locate_finish = 0
     EnableTimer('walkWait4', false)
     EnableTriggerGroup("huashanQuest", true)
-    DeleteTriggerGroup("huashan_over")
-    create_trigger_t('huashan_over1', '^(> )*你给岳不群一块令牌。',
-                     '', 'huashan_finish')
-    create_trigger_t('huashan_over2', '^(> )*这里没有这个人。', '', '')
-    SetTriggerOption("huashan_over1", "group", "huashan_over")
-    SetTriggerOption("huashan_over2", "group", "huashan_over")
-    return go(huashan_over, '华山', '正气堂', 'huashan/jitan')
+    wait.make(function() 
+        await_go('华山', '正气堂', 'huashan/jitan')
+        job.time.e = os.time()
+        job.time.over = job.time.e - job.time.b
+        messageShowT('华山任务：完成任务，用时:【' .. job.time.over ..
+                         '】秒。')
+        repeat
+            exe('give ling pai to yue buqun')
+            local line,_ = wait.regexp('^(> )*你给岳不群一块令牌|^(> )*这里没有这个人',1)
+            if line and line:find('没有这个人') then
+                await_go('华山', '正气堂')
+                line = nil
+            end
+        until line
+        return huashan_finish()
+    end)
 end
-huashan_over = function()
-    -- weapon_unwield()
-    EnableTriggerGroup("huashanQuest", true)
-    job.time.e = os.time()
-    job.time.over = job.time.e - job.time.b
-    messageShowT('华山任务：完成任务，用时:【' .. job.time.over ..
-                     '】秒。')
-    exe('give ling pai to yue buqun')
-    DeleteTimer("walkWait4")
-    create_timer_s('walkWait4', 1.0, 'job_huashan_over1')
-end
-function job_huashan_over1() exe('give ling pai to yue buqun') end
+
 huashan_finish = function()
     EnableTimer('walkWait4', false)
     DeleteTimer("walkWait4")

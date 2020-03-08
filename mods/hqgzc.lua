@@ -520,33 +520,8 @@ function hqgzcFinishGold1(n, l, w)
         wait.time(5)
         exe('ask hong about finish')
     end)
-    local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
-    local f = io.open(fn, "r")
-    local s = os.date("%Y%m%d%H")
-    if not f then
-        f = io.open(fn, "w")
-        f:write(s)
-        f:close()
-    else
-        local x = f:read()
-        f:close()
-        if not x then
-            f = io.open(fn, "w")
-            f:write(s)
-            f:close()
-        elseif x ~= os.date("%Y%m%d%H") then
-            if os.date("%Y%m%d%H") - x >= 100 then
-                x = tostring(x)
-                s = tostring(s)
-                local y = string.sub(x, -2, -1)
-                local z = string.sub(s, 1, -3)
-                z = z .. y
-                f = io.open(fn, "w")
-                f:write(z)
-                f:close()
-            end
-        end
-    end
+
+    updateHqgStats()
     hqgzcCnt = 0
 end
 function hqgzcFinishGold(n, l, w)
@@ -560,40 +535,18 @@ function hqgzcFinishGold(n, l, w)
     messageShow('做菜任务：完成！获得【' .. w[2] .. '】锭黄金！')
     messageShowT('做菜任务：任务完成，用时:【' .. job.time.over ..
                      '】秒。')
-    if hqgzcCnt >= 10 then
-        local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
-        local f = io.open(fn, "r")
-        local s = os.date("%Y%m%d%H")
-        if not f then
-            f = io.open(fn, "w")
-            f:write(s)
-            f:close()
-        else
-            local x = f:read()
-            f:close()
-            if not x then
-                f = io.open(fn, "w")
-                f:write(s)
-                f:close()
-            elseif x ~= os.date("%Y%m%d%H") then
-                if os.date("%Y%m%d%H") - x >= 100 then
-                    x = tostring(x)
-                    s = tostring(s)
-                    local y = string.sub(x, -2, -1)
-                    local z = string.sub(s, 1, -3)
-                    z = z .. y
-                    f = io.open(fn, "w")
-                    f:write(z)
-                    f:close()
-                end
-            end
-        end
-        hqgzcCnt = 0
-    end
+    updateHqgStats()
     job.zctime = 0
     flag.idle = 0
     dis_all()
     return check_halt(check_food)
+end
+
+function updateHqgStats()
+    if hqgzcCnt >= 10 then
+        SetVariable("job_hqg_date",tonumber(os.date("%Y%m%d%H%M"))-200)
+        hqgzcCnt = 0
+    end
 end
 function hqgzcFinish1(n, l, w)
     EnableTimer('walkWait4', false)

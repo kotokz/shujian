@@ -1838,27 +1838,26 @@ function check_jobx()
 end
 function checkJob()
     if job.last ~= 'hqgzc' then
-        local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
-        local f = io.open(fn, "r")
-        if not f then
-            return hqgzc()
-        else
-            local s = f:read()
-            f:close()
-            if s ~= os.date("%Y%m%d%H") then
-                if os.date("%Y%m%d%H") - s >= 100 then
-                    local x = tostring(os.date("%Y%m%d%H"))
-                    local y1 = tonumber(string.sub(x, -4, -3))
-                    if y1 == 1 then
-                        local y = tonumber(string.sub(x, -2, -1))
-                        s = tostring(s)
-                        local z = tonumber(string.sub(s, -2, -1))
-                        if y >= z then return hqgzc() end
-                    else
-                        return hqgzc()
-                    end
-                end
+        local tmp = GetVariable('job_hqg_date')
+        local lastHqgDate
+        if tmp == nil then
+            local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
+            local f = io.open(fn, "r") 
+            if f then
+                tmp = tostring(f:read())
+                f:close()
             end
+        end
+
+        if tmp:len() == 10 then
+            lastHqgDate = tonumber(tmp) * 100 
+        else
+            lastHqgDate = tonumber(lastHqgDate)
+        end
+        local currentDate = tonumber(os.date("%Y%m%d%H%M"))
+
+        if score.xiangyun == 'ËÀ' and currentDate - lastHqgDate > 10000 then 
+            return hqgzc()
         end
     end
     -- if hp.exp>2000000 then job.zuhe["zhuoshe"]=nil end

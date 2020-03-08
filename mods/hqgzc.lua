@@ -541,6 +541,7 @@ function hqgzcFinishGold(n, l, w)
     dis_all()
     return check_halt(check_food)
 end
+hqgzcCnt = 0
 
 function updateHqgStats()
     if hqgzcCnt >= 10 then

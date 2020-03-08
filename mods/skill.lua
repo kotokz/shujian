@@ -506,7 +506,7 @@ function dazuo_lianxi_auto()
 
     tmp_lxskill = 'bei none;'
     for p in pairs(Bag) do
-        if Bag[p].kind and Bag[p].fullid ~= "coin_money" then
+        if Bag[p].kind and Bag[p].fullid ~= "coin_money" and weaponKind[Bag[p].kind] then
             local _, l_cnt = isInBags(Bag[p].fullid)
             for i = 1, l_cnt do
                 tmp_lxskill =

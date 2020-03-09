@@ -3534,10 +3534,14 @@ function toSldDkCheck()
     end
 end
 function toSldOver()
-    bqcheck()
-	exe('bei none')
-	beiUnarmed()
-    return walk_wait()
+    wait.make(function()
+        checkWield()
+        wait_busy()        
+        weapon_wield()
+        exe('bei none')
+        beiUnarmed()
+        return walk_wait()
+    end)
 end
 
 function outSld()

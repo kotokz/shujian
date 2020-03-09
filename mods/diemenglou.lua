@@ -410,7 +410,7 @@ end
 function dekedml()
     weapon_unwield()
     local pfmpre = GetVariable("performpre")
-    if pfmpre then exe(GetVariable("performpre")) end
+    if pfmpre then exe(pfmpre) end
     exe('yun qi')
     return checkTop(dmlCheckToplist)
 end

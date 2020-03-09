@@ -565,6 +565,7 @@ function wudangBack(n, l, w)
         DeleteTimer("perform")
         DeleteTimer("wudang")
         kezhiwugongclose()
+        checkWield()
         -- fpk_prepare()--预防pk的设置，定义在skill.lua中
         check_busy(wudangBackGet)
         fight.time.e = os.time()
@@ -590,21 +591,12 @@ function wudangBackGet()
     flag.wipe = 0
     dis_all()
     -- weapon_unwield()
-    -- bqcheck()
     EnableTriggerGroup("wudangFinish", true)
-    -- return go(wudangFinishWait,'武当山','三清殿')
     EnableTrigger("bags6", true) -- 启动检查失落信笺触发器。
     road.id = nil
     fightoverweapon()
     if needdolost == 1 then checkBags() end
     return go(wudangFinishC, '武当山', '三清殿')
-end
-function wudangFinishWait()
-    if locl.id["宋远桥"] then
-        return wudangFinishC()
-    else
-        return go(wudangFinishWait, '武当山', '三清殿')
-    end
 end
 function wudangFinishT()
     wdtongji_finish = wdtongji_finish + 1

@@ -465,6 +465,7 @@ function checkPrepare()
         g_stop_flag = false
         return disAll()
     end
+
     drugPrepare = drugPrepare or {}
     exe('hp')
     if hp.exp < 150000 then return checkPrepareOver() end
@@ -583,30 +584,35 @@ function checkPrepare()
         xuezhu_require = 0
     end
 
-    if inwdj == 1 then
-        local x = check_xuezhu_status()
-        if x == '0' then return getxuezhu0() end
-        if x == '-1' or x == '1' then return getxuezhu1() end
-    end
-
-    if Bag and Bag["野菊花"] and not Bag["铜钥匙"] then
-        return go(get_key, '扬州城', '小盘古')
-    end
+    local x = check_xuezhu_status()
+    if x < 1 then return xuezhuGetDan() end
+    -- if x == '-1' or x == '1' then return getxuezhu1() end
 
     return checkPrepareOver()
 end
 function checkPrepareOver()
+    if g_stop_flag == true then
+        print("任务结束，游戏暂停")
+        g_stop_flag = false
+        return disAll()
+    end
     if lostletter == 1 and needdolost == 1 then return letterLost() end
     condition.busy = 0
     vippoison = 0
-    exe('score;cond')
-    if wudang_checkfood == 1 or (condition.busy and condition.busy > 10) or
-        needxuexi == 1 then
-        return check_xuexi()
-    else
-        if needxuexi ~= 1 then messageShow('不需要学习') end
-        return check_job()
-    end
+    wait.make(function()
+        exe('score;cond')
+        wait_busy()
+        if flag.xuezhu == false and condition.busy and condition.busy > 30 then 
+            return xuezhuGoCatch()
+        elseif wudang_checkfood == 1 or (condition.busy and condition.busy > 10) or
+            needxuexi == 1 then
+            return check_xuexi()
+        else
+            if needxuexi ~= 1 then messageShow('不需要学习') end
+            return check_job()
+        end
+    end)
+
 end
 function getchai()
     wait.make(function()

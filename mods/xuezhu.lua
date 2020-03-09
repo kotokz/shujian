@@ -3,23 +3,16 @@ function check_xuezhu_status()
     local xuezhu_status = GetVariable("xuezhu_status")
     if xuezhu_status == nil then
         messageShow(
-            '未找到雪蛛变量：xuezhu_status，请尽快设置！',
+            '未找到雪蛛变量：xuezhu_status，请尽快设置！从未抓过雪蛛请设置-1，上周抓过请设置0',
             'white', 'black')
-    elseif xuezhu_status == "0" then
-        messageShow(
-            '本周还未抓到雪蛛，启动自动抓雪蛛机器人，前往抓雪蛛！',
-            'white', 'black')
-        return xuezhu_status
-    elseif xuezhu_status == "1" then
-        messageShow('已问程灵素要了真丹，现在前往抓雪蛛！',
-                    'white', 'black')
-        return xuezhu_status
-    elseif xuezhu_status == "-1" then
-        messageShow(
-            '程灵素给了假丹，小贱人！怒！！！现在前往抓雪蛛！',
-            'white', 'black')
-        return xuezhu_status
+    else
+        xuezhu_status = tonumber(xuezhu_status) 
+        if xuezhu_status < 2 then
+            flag.xuezhu = false
+        end
     end
+    
+    return xuezhu_status
 end
 function xuezhuTrigger()
     DeleteTriggerGroup("xuezhuAsk")
@@ -39,7 +32,7 @@ function xuezhuTrigger()
                      "^(> )*你获得一颗九雪碧云丹。$", '', 'eatDan')
     create_trigger_t('xuezhuAccept3',
                      "^(> )*你把一颗九雪碧云丹，轻轻咬碎含进嘴里，顿觉神明意朗，脸色红润。$",
-                     '', 'xuezhu_go')
+                     '', 'realDan')
     create_trigger_t('xuezhuAccept4',
                      "^(> )*程灵素说道：「你上次答应我的事情还没做\\D*",
                      '', 'fakeDan')
@@ -89,17 +82,17 @@ function xuezhuTriDel()
     DeleteTriggerGroup("xuezhuFight")
     DeleteTriggerGroup("xuezhuFinish")
 end
-function getxuezhu0()
+function xuezhuGetDan()
     xuezhuTrigger()
     if inwdj == 0 then
-        messageShow('抓雪蛛：苗疆地图不可到达，任务放弃。',
+        messageShow('抓雪蛛：苗疆地图不可到达，放弃问程灵素要丹。',
                     "Plum")
         -- SetVariable("xuezhu_status", "2")
-        return check_halt(checkPrepare)
+        return check_halt(checkPrepareOver)
     end
     go(askcheng, '苗疆', '药王居')
 end
-function getxuezhu1()
+function xuezhuGoCatch()
     xuezhuTrigger()
     xuezhu_go()
 end
@@ -135,23 +128,35 @@ function fakeDan()
     EnableTimer('walkWait4', false)
     DeleteTimer("walkWait4")
     SetVariable("xuezhu_status", "-1")
-    return xuezhu_go()
+    messageShow(
+            '程灵素给了假丹，小贱人！怒！！！任务空闲再去抓雪蛛！',
+            'white', 'black')
+    -- return xuezhu_go()
+    return check_halt(checkPrepareOver)
 end
+
+function realDan()
+    messageShow('已问程灵素要了真丹，任务空闲再去抓雪蛛！',
+                    'white', 'black')
+    return check_halt(checkPrepareOver)
+end
+
 function xuezhu_go()
     EnableTimer('walkWait4', false)
     DeleteTimer("walkWait4")
     if not Bag["火折"] and drugPrepare["火折"] then
         if locl.weekday == '四' and locl.hour == 8 then
-            return checkPrepareOver()
+            return check_xuexi()
         else
             return checkFire()
         end
     end
     if inwdj == 0 then
+        EnableTriggerGroup("xuezhuAccept", false)
         messageShow('抓雪蛛：苗疆山洞不可到达，任务放弃。',
                     "Plum")
         -- SetVariable("xuezhu_status", "2")
-        return check_halt(checkPrepare)
+        return check_halt(check_xuexi)
     end
     EnableTriggerGroup("xuezhuAccept", false)
     go(yaoshuteng, '苗疆', '山洞')
@@ -165,7 +170,7 @@ function yaoshuteng1() exe('fang dfly;dian fire;yao shuteng') end
 function xuezhuFail()
     xuezhuTriDel()
     messageShow('雪蛛不在，一会再来抓！', 'white', 'black')
-    return checkPrepareOver()
+    return check_xuexi()
 end
 --[[function xuezhuFail1()
 	xuezhuTriDel()
@@ -200,9 +205,13 @@ end
 function givexuezhu1() exe('give cheng xue zhu') end
 function xuezhuFinish()
     local x = GetVariable("xuezhu_status")
-    if x == '-1' then SetVariable("xuezhu_status", "0") end
+    if x == '-1' then 
+        SetVariable("xuezhu_status", "0") 
+        flag.xuezhu = false
+    end
     if x == '1' then
         SetVariable("xuezhu_status", "2")
+        flag.xuezhu = true
         messageShow('本周已成功抓到雪蛛，请安心游戏！：)',
                     'red', 'black')
     end

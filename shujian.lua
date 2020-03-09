@@ -63,7 +63,8 @@ flag = {
     duhe = 1,
     dujiang = 1,
     jixu = 1,
-    wipe = 0
+    wipe = 0,
+    xuezhu = false
 }
 flag.autoll = 1
 flag.food = 0

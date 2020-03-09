@@ -193,6 +193,13 @@ function main()
     hpheqi()
     -- ain
     Openfpk()
+    Bag = {}
+    weaponUsave = {}
+
+    local xuezhu = GetVariable("xuezhu_status")
+    if xuezhu and (xuezhu == "2" or xuezhu == "1")then
+        inwdj = 1
+    end
     checkBags()
     map.rooms["sld/lgxroom"].ways["#outSld"] = "huanghe/huanghe8"
     exe(

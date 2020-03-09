@@ -113,7 +113,7 @@ function main()
     setAlias()
     currentLocate = nil
     idle()
-
+    
 end
 
 function add_triggers()

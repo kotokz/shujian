@@ -2379,12 +2379,6 @@ function vipover()
     EnableTriggerGroup("vipdhd", false)
     DeleteTriggerGroup("vipdhd")
     ptbxvip = 0
-    local xuezhu = GetVariable("xuezhu_status")
-    if xuezhu and xuezhu == "2" then
-        inwdj = 1
-    else
-        inwdj = 0
-    end
     return check_xue()
 end
 function checkvip()

@@ -41,6 +41,7 @@ loadmod "sj_egg"
 loadmod "lostletter"
 loadmod "taohuazhen"
 loadmod "xuezhu"
+loadmod "chuanfu"
 
 test = test or function() print("initial behavior, does nothing") end
 
@@ -195,6 +196,7 @@ function main()
     Openfpk()
     Bag = {}
     weaponUsave = {}
+    Chuanfu:addtrigger()
 
     local xuezhu = GetVariable("xuezhu_status")
     if xuezhu and (xuezhu == "2" or xuezhu == "1")then
@@ -251,6 +253,7 @@ function disAll()
     EnableTrigger("main1", true)
     EnableTriggerGroup("hp", true)
     EnableTriggerGroup("score", true)
+    EnableTriggerGroup("chuanfu", true)
     -- ain
     EnableTrigger("pk1", true)
     EnableTrigger("pk2", true)
@@ -279,6 +282,7 @@ function dis_all()
     -- EnableTrigger('idle',true)
     EnableTriggerGroup("chat", true)
     EnableTriggerGroup("hp", true)
+    EnableTriggerGroup("chuanfu", true)
     EnableTriggerGroup("score", true)
     EnableTriggerGroup("count", true)
     EnableTriggerGroup("fight", true)

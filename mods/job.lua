@@ -1467,6 +1467,9 @@ function prepareLianxi()
             return check_halt(check_dny)        
         end
     end
+    if flag.xuezhu == false and condition.busy and condition.busy > 30 then 
+        return xuezhuGoCatch()
+    end
     flag.jixu = 1
     if hp.neili_max > hp.neili_lim - 10 then
         exe('unset Л§аю')

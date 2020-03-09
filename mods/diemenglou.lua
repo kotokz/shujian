@@ -459,6 +459,9 @@ end
 ---------------------------------------------------------------------------------------------------准备模块二：查询目标---------------------------------------------------------------------------------------------------
 
 function sortFunc(a, b)
+    if a.lvl == nil or b.lbl == nil or a.rank == nil or b.rank == nil then        
+        return true
+    end    
     if a.lvl ~= b.lvl then
         return a.lvl > b.lvl
     else
@@ -551,6 +554,10 @@ function dmlInfo()
         _t2 = userLvl +
                   (GetVariable('dmlIncreaseLvl') +
                       GetVariable('dmlNewIncreaseLvl'))
+    end
+    if next(_target) == nil then
+        messageShow('蝶梦楼全自动挑战模块：没能找到对手')
+        return
     end
     table.sort(_target, sortFunc)
     if tonumber(GetVariable('dmlMode')) == 1 then

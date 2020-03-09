@@ -170,9 +170,7 @@ weapon_wield = function()
 	   end                     ]]
     if weapon.first and Bag[weapon.first] then
         exe('wield ' .. Bag[weapon.first].fullid)
-        return
-    end
-    if perform and perform.skill and skillEnable[perform.skill] and weaponKind[skillEnable[perform.skill]] then
+    elseif perform and perform.skill and skillEnable[perform.skill] and weaponKind[skillEnable[perform.skill]] then
         for p in pairs(Bag) do
             if Bag[p].kind and Bag[p].kind == skillEnable[perform.skill] then
                 if not weapon.first or weapon.first ~= p then

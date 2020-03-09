@@ -603,7 +603,10 @@ function checkPrepareOver()
         exe('score;cond')
         wait_busy()
         if flag.xuezhu == false and condition.busy and condition.busy > 30 then 
-            return xuezhuGoCatch()
+            local status = check_xuezhu_status()
+            if status < 2 then
+                return xuezhuGoCatch()
+            end
         elseif wudang_checkfood == 1 or (condition.busy and condition.busy > 10) or
             needxuexi == 1 then
             return check_xuexi()
@@ -1406,7 +1409,7 @@ fight_prepare = function()
     -----------------------------------   -- ain
     --  if skills["longxiang-boruo"] and perform.force and perform.force=="longxiang-boruo" then
     --     exe('yun shield')
-    --  end
+    --  endhaven
 
     if skills["xiantian-gong"] and perform.force and perform.force ==
         "xiantian-gong" then exe('yun wuqi') end
@@ -1468,7 +1471,10 @@ function prepareLianxi()
         end
     end
     if flag.xuezhu == false and condition.busy and condition.busy > 30 then 
-        return xuezhuGoCatch()
+        local status = check_xuezhu_status()
+        if status < 2 then
+            return xuezhuGoCatch()
+        end
     end
     flag.jixu = 1
     if hp.neili_max > hp.neili_lim - 10 then

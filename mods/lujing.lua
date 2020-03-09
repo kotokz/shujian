@@ -3384,33 +3384,6 @@ function ptosldDukou()
         return checkWait(ptoSldCheck, 2)
     end
 end
-sld_unwield = function()
-    for p in pairs(Bag) do
-        if Bag[p].kind and (not itemWield or itemWield[p]) then
-            local _, l_cnt = isInBags(Bag[p].fullid)
-            for i = 1, l_cnt do
-                exe('unwield ' .. Bag[p].fullid .. ' ' .. i)
-            end
-        end
-    end
-    checkWield()
-end
-sld_weaponWieldCut = function()
-    for p in pairs(Bag) do
-        if Bag[p].kind and weaponKind[Bag[p].kind] and weaponKind[Bag[p].kind] ==
-            "cut" then
-            if not (Bag[p].kind == "xiao" and weaponUsave[p]) then
-                for q in pairs(Bag) do
-                    if Bag[q].kind == "xiao" and weaponUsave[q] then
-                        exe('unwield ' .. Bag[q].fullid)
-                    end
-                end
-                exe('wield ' .. Bag[p].fullid)
-            end
-        end
-    end
-    checkWield()
-end
 function toSld()
     wait.make(function() 
         fastLocate(coroutine.running())
@@ -3430,65 +3403,30 @@ function toSld()
     end)
 end
 function toSldTrigger()
-    DeleteTriggerGroup("mufabusy")
-    create_trigger_t('mufabusy1',
-                     '^(> )*木筏还没扎结实，等下再坐吧。', '',
-                     'wait_mufa')
-    create_trigger_t('mufabusy2',
-                     '^(> )*只见(\\D*)轻轻一跃，已坐在木筏上。',
-                     '', 'mufaok')
-    create_trigger_t('mufabusy3', '^(> )*你好象没有武器，拿手砍？',
-                     '', 'sld_need_weapon')
-    create_trigger_t('mufabusy4', '^(> )*你要绑什么？', '', 'wait_mufa')
-    create_trigger_t('mufabusy5', '^(> )*什么？', '', 'wait_mufa')
-    create_trigger_t('mufabusy6',
-                     '^(> )*你拿起木筏上的一根木头，将木筏向前划去。',
-                     '', 'toSldHua')
-    SetTriggerOption("mufabusy1", "group", "mufabusy")
-    SetTriggerOption("mufabusy2", "group", "mufabusy")
-    SetTriggerOption("mufabusy3", "group", "mufabusy")
-    SetTriggerOption("mufabusy4", "group", "mufabusy")
-    SetTriggerOption("mufabusy5", "group", "mufabusy")
-    SetTriggerOption("mufabusy6", "group", "mufabusy")
-    EnableTriggerGroup("mufabusy", true)
     if locl.where == '神龙岛海滩' then toSldChop() end
 end
 function toSldChop()
-    exe('chop tree;bang mu tou;zuo mufa')
-    create_timer_s('walkWait4', 1.0, 'toSldChop1')
-end
-function toSldChop1()
-    if tmp.cnt then tmp.cnt = tmp.cnt + 1 end
-    if not tmp.cnt or tmp.cnt > 2 then EnableTimer('walkWait4', false) end
-    exe('chop tree;bang mu tou;zuo mufa')
-end
-function toSldDelTrigger() DeleteTriggerGroup("mufabusy") end
-function sld_need_weapon()
-    wait.make(function()
-        wait.time(1)
-        weaponWieldCut()
-        return check_bei(toSldChop)
-    end)
-end
-function wait_mufa()
-    EnableTimer('walkWait4', false)
-    wait.make(function()
-        wait.time(0.2)
-        return check_bei(toSldChop)
-    end)
-end
-function mufaok(n, l, w)
-    EnableTimer('walkWait4', false)
-    print("mufaokw--" .. w[2])
-    if string.find(w[2], "你") then
+    wait.make(function() 
+        
+        while true do
+            exe('chop tree;bang mu tou;zuo mufa')
+            local line,_ = wait.regexp('^(> )*(只见(\\D*)轻轻一跃，已坐在木筏上。|你好象没有武器，拿手砍？|你手上这件兵器无锋无刃|你要绑什么|木筏还没扎结实，等下再坐吧)')
+            if line then
+                if line:find('轻轻一跃') and line:find('你') then
+                    break
+                elseif line:find('你好象没有武器') or line:find('锋无刃') then
+                    weaponWieldCut()
+                end
+            end
+            wait.time(0.4)
+        end
         print("mufaokw--toslddk")
-        EnableTriggerGroup("mufabusy", false)
-        DeleteTriggerGroup("mufabusy")
+        weapon_unwield()
+        weapon_wield()
         toSldDukou()
-    else
-        sld_need_weapon()
-    end
+    end)
 end
+
 function toSldCheck()
     print("toSldCheck")
 	flag.idle = nil
@@ -3521,7 +3459,6 @@ end
 function toSldDkCheck()
      print("toSldDkCheck")
 	 locate_finish=0
-	toSldDelTrigger()
 	if locl.room=="渡口" then
        return toSldOver()
     elseif locl.room=="小木筏" or locl.room=="木筏" then

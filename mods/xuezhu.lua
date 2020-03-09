@@ -9,6 +9,8 @@ function check_xuezhu_status()
         xuezhu_status = tonumber(xuezhu_status) 
         if xuezhu_status < 2 then
             flag.xuezhu = false
+        else
+            flag.xuezhu = true
         end
     end
     

@@ -476,24 +476,7 @@ function xueshan_find()
     create_trigger_t('xueshan_find1',
                      '^\\s*\\D*(格格|公主|小姐|姑娘|夫人|郡主)\\(Beauty\\)',
                      '', 'xueshan_look')
-    create_trigger_t('xueshan_find2', '^(> )*你要看什么？', '',
-                     'xueshan_goon')
-    create_trigger_t('xueshan_find3',
-                     '^看来就是血刀老祖要求(\\D*)\\(\\D*\\)强抢的美女。',
-                     '', 'xueshan_add')
-    create_trigger_t('xueshan_find4', '^(> )*这里没有 beauty', '',
-                     'xueshan_goon')
-    create_trigger_t('xueshan_find5',
-                     '^(> )*你决定跟随\\D*一起行动。', '',
-                     'xueshan_guard')
-    create_trigger_t('xueshan_find6', '^(> )*你已经这样做了。', '',
-                     'xueshan_guard')
     SetTriggerOption("xueshan_find1", "group", "xueshan_find")
-    SetTriggerOption("xueshan_find2", "group", "xueshan_find")
-    SetTriggerOption("xueshan_find3", "group", "xueshan_find")
-    SetTriggerOption("xueshan_find4", "group", "xueshan_find")
-    SetTriggerOption("xueshan_find5", "group", "xueshan_find")
-    SetTriggerOption("xueshan_find6", "group", "xueshan_find")
     EnableTriggerGroup("xueshan_find", false)
     flag.times = 1
     flag.wait = 0
@@ -525,33 +508,40 @@ function xueshan_look()
     if flag.wait == 0 then
         flag.wait = 1
         job.cnt = 1
-        exe('look beauty')
-        DeleteTimer("walkWait4")
-        create_timer_s('walkWait4', 1.0, 'xueshan_look1')
+        wait.make(function() 
+            while true do
+                exe('look beauty ' .. job.cnt)
+                local line,w = wait.regexp('^(> )*(你要看什么？|看来就是血刀老祖要求|这里没有 beauty)',1)
+                if line then
+                    if line:find('你要看什么') then
+                        return xueshan_goon()
+                    end
+                    if line:find("看来就是血刀老祖要求") then
+                        if line:find(score.name) then
+                            DiscardQueue()
+                            local text = nil
+                            repeat 
+                                exe('follow beauty ' .. job.cnt)
+                                text,_ = wait.regexp('^(> )*(这里没有 beauty|你决定跟随\\D*一起行动|你已经这样做了)',0.5)                                
+                            until text
+                            if text:find('你决定跟随') or text:find('你已经这样做了') then
+                                return xueshan_guard()
+                            else
+                                return xueshan_goon()
+                            end
+                        else
+                            job.cnt = job.cnt +1
+                        end
+                    end
+                end
+            end
+        end)
     end
 end
-function xueshan_look1() exe('look beauty') end
-function xueshan_add(n, l, w)
-    EnableTimer('walkWait4', false)
-    DeleteTimer("walkWait4")
-    if w[1] == score.name then
-        DiscardQueue()
-        exe('follow beauty ' .. job.cnt)
-        DeleteTimer("walkWait4")
-        create_timer_s('walkWait4', 1.0, 'xueshan_add1')
-    else
-        job.cnt = job.cnt + 1
-        exe('look beauty ' .. job.cnt)
-    end
-end
-function xueshan_add1() exe('follow beauty ' .. job.cnt) end
 function xueshan_goon()
-    EnableTimer('walkWait4', false)
-    DeleteTimer("walkWait4")
     EnableTrigger("xueshan_find1", true)
     flag.wait = 0
     flag.find = 0
-    job.cnt = 0
     print(locl.area .. "|locl|" .. locl.room)
     if XsBugRoom[locl.area .. locl.room] then
         print("run " .. XsBugRoom[locl.area .. locl.room])
@@ -753,8 +743,6 @@ function xueshan_sa_act()
     exe('sa beauty ' .. job.cnt)
 end
 function xueshan_guard()
-    EnableTimer('walkWait4', false)
-    DeleteTimer("walkWait4")
     EnableTrigger("xueshan_find1", false)
     EnableTriggerGroup("xueshan_find", false)
     EnableTriggerGroup("xueshan_guard", true)

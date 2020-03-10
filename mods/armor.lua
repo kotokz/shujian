@@ -278,7 +278,7 @@ function Armor:goRepair()
                     print("继续打造")
                 elseif l:find("你带的零钱不够了") then
                     wait.time(0.5)
-                    exe('e;#3s;w;qu 400 gold;e;#3n;w')
+                    exe('e;#3s;w;qu 50 gold;e;#3n;w')
                 elseif l:find('剪刀') then
                     self:checkJianDao(thread)
                     coroutine.yield()                    

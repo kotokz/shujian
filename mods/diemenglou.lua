@@ -459,9 +459,6 @@ end
 ---------------------------------------------------------------------------------------------------准备模块二：查询目标---------------------------------------------------------------------------------------------------
 
 function sortFunc(a, b)
-    if a.lvl == nil or b.lbl == nil or a.rank == nil or b.rank == nil then        
-        return true
-    end    
     if a.lvl ~= b.lvl then
         return a.lvl > b.lvl
     else
@@ -488,10 +485,10 @@ function dmlCheckToplist()
     checkTop(checkTop)
 end
 function dmlCheckToplistAct(n, l, w)
-    targetRank = tonumber(w[1])
+    targetRank = tonumber(w[1]) or 0
     targetName = tostring(w[2])
     targetId = string.lower(w[3])
-    targetLvl = tonumber(w[4])
+    targetLvl = tonumber(w[4]) or 0
     table.insert(_target, {
         name = targetName,
         id = targetId,

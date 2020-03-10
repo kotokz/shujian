@@ -85,10 +85,7 @@ function exe(cmd, queue)
 end
 
 -- max_cmd_limit=30
-CMD = {
-    cmd_throttling = false,
-    walkecho = true
-}
+CMD = {cmd_throttling = false, walkecho = true}
 
 function executeCmd(cmds)
     if ((cmds == "") or (cmds == nil)) then return end
@@ -97,9 +94,7 @@ function executeCmd(cmds)
     _cmds = {}
     if string.find(cmds, ';') then
         _cmds = utils.split(cmds, ';')
-        for i, cmd in pairs(_cmds) do
-            moving_sum(cmd)
-        end
+        for i, cmd in pairs(_cmds) do moving_sum(cmd) end
     else
         moving_sum(cmds)
     end
@@ -141,7 +136,7 @@ end
 function calculate_flood(offset)
     if offset == nil then offset = 0 end
 
-    if score.vip_level =="白金会员" then
+    if score.vip_level == "白金会员" then
         offset = offset + 3
     elseif score.vip_level == "黄金会员" then
         offset = offset + 5
@@ -149,9 +144,7 @@ function calculate_flood(offset)
 
     local sum = offset
     local time = os.time()
-    for k, v in pairs(t_cmds) do
-        if k > time - 2 then sum = sum + v end
-    end
+    for k, v in pairs(t_cmds) do if k > time - 2 then sum = sum + v end end
 
     local current = t_cmds[time] or 0
 
@@ -166,19 +159,18 @@ end
 function moving_sum(cmd)
 
     local count = 1
-    if cmd:sub(1,1) == '#' then
-        count = tonumber(string.match(cmd, "%d+"))
-    end
+    if cmd:sub(1, 1) == '#' then count = tonumber(string.match(cmd, "%d+")) end
     local time = os.time()
     t_cmds[time] = t_cmds[time] or 0
     t_cmds[time] = t_cmds[time] + count
     local sum = 0
 
-    local second = t_cmds[time] + (t_cmds[time-1] or 0)
-    local third = second + (t_cmds[time-2] or 0)
+    local second = t_cmds[time] + (t_cmds[time - 1] or 0)
+    local third = second + (t_cmds[time - 2] or 0)
 
     if second > 70 then
-        print("3 sec:".. third.. " 2 sec:"..second.."  last sec:"..t_cmds[time])
+        print("3 sec:" .. third .. " 2 sec:" .. second .. "  last sec:" ..
+                  t_cmds[time])
     end
     if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
@@ -226,7 +218,7 @@ function locate_trigger()
     SetTriggerOption("locate2", "multi_line", "y")
     SetTriggerOption("locate2", "lines_to_match", "7")
     EnableTrigger("locate2", true)
-    SetTriggerOption("locate_unknown1","group","locate_unknown")
+    SetTriggerOption("locate_unknown1", "group", "locate_unknown")
     SetTriggerOption("locate2", "group", "locate")
     SetTriggerOption("locate3", "group", "locate")
     SetTriggerOption("locate4", "group", "locate")
@@ -516,7 +508,7 @@ function resume_walk_thread(msg)
         -- print("resume suspended walk")
         local tmp_thread = walk_hook_thread
         walk_hook_thread = nil
-        coroutine.resume(tmp_thread,msg)
+        coroutine.resume(tmp_thread, msg)
     end
 end
 
@@ -542,9 +534,7 @@ end
 
 function await_go(area, room, sId)
     local self = coroutine.running()
-    local async_continue = function(...)
-        coroutine.resume(self, ...)
-    end
+    local async_continue = function(...) coroutine.resume(self, ...) end
     go(async_continue, area, room, sId)
     return coroutine.yield()
 end
@@ -618,8 +608,8 @@ function path_consider()
                          '】出发! 目的地【' .. dest.area .. dest.room ..
                          '】')
         if sour.room == "观星台" then exe('jump down') end
-        if locl.room_relation == '九老洞九老洞' or
-           locl.where == "不知道哪里九老洞" then
+        if locl.room_relation == '九老洞九老洞' or locl.where ==
+            "不知道哪里九老洞" then
             print('尝试离开九老洞')
             exe('drop fire;leave;leave;leave;leave;leave;leave;out;ne;ed;ne;ed')
             return checkWait(goContinue, 0.3)
@@ -629,7 +619,7 @@ function path_consider()
             return checkWait(goContinue, 0.3)
         end
         if locl.room_relation == '西湖边↙｜白堤柳浪闻莺西湖边' then
-            exe('sw') 
+            exe('sw')
             return checkWait(goContinue, 0.3)
         end
         if locl.room == '梅林' then
@@ -660,7 +650,7 @@ function path_consider()
             exe('pa up')
             return checkWait(goContinue, 0.3)
         end
-        if table.getn(sour.rooms) == 0 then          
+        if table.getn(sour.rooms) == 0 then
             if locl.room_relation ~= '' then
                 chats_locate(
                     '定位系统：没有归属地的房间加入了room_relative，【可以尝试定位没有归属地的房间】',
@@ -675,7 +665,7 @@ function path_consider()
             exe(locl.dir)
             return checkWait(goContinue, 0.2)
         end
-        if table.getn(sour.rooms) > 1 and sour.id ~= 'city/jiangbei' then 
+        if table.getn(sour.rooms) > 1 and sour.id ~= 'city/jiangbei' then
             chats_locate(
                 '定位系统：进入第一个同名房间判断【' ..
                     sour.room .. '】了!', 'LimeGreen')
@@ -685,23 +675,25 @@ function path_consider()
             end
             for i = 1, table.getn(sour.rooms) do
                 local roomInfo = map.rooms[sour.rooms[i]]
-                if (locl.room_relation ~= '' and
-                    roomInfo.room_relative == locl.room_relation) then
-                    if exit.locl and roomInfo.ways and #exit.locl == tablelength(roomInfo.ways) then
+                if (locl.room_relation ~= '' and roomInfo.room_relative ==
+                    locl.room_relation) then
+                    if exit.locl and roomInfo.ways and #exit.locl ==
+                        tablelength(roomInfo.ways) then
                         local match = true
-                        for k,v in ipairs(exit.locl) do
+                        for k, v in ipairs(exit.locl) do
                             if not roomInfo.ways[v] then
                                 match = false
                             end
                         end
                         if match then
                             sour.id = sour.rooms[i]
-                            chats_locate('定位系统：尝试精确定位！猜测目前位置为'..sour.id,
-                            'LimeGreen')                          
+                            chats_locate(
+                                '定位系统：尝试精确定位！猜测目前位置为' ..
+                                    sour.id, 'LimeGreen')
                         end
                     else
                         chats_locate('定位系统：尝试精确定位！',
-                        'LimeGreen')
+                                     'LimeGreen')
                         sour.id = sour.rooms[i]
                     end
                     if sour.id then
@@ -800,7 +792,8 @@ function path_consider()
 
     if dest.id == nil and table.getn(dest.rooms) == 0 then
         Note('Path Consider GetRooms Error!')
-        chats_locate('定位系统：无法找到的地点. dest.room='..dest.room.. ' dest.area=' .. dest.area)
+        chats_locate('定位系统：无法找到的地点. dest.room=' ..
+                         dest.room .. ' dest.area=' .. dest.area)
         return false
     end
     path_create()
@@ -985,7 +978,7 @@ function path_start()
             end
 
             if walk_hook_thread then
-                coroutine.resume(walk_hook_thread,"kill")
+                coroutine.resume(walk_hook_thread, "kill")
             end
 
             walk_hook_thread = coroutine.running()
@@ -1002,11 +995,12 @@ function path_start()
             else
                 local tmp = utils.split(step, ';')
                 local delay = calculate_flood(#tmp)
-                if #tmp >2 and delay then
+                if #tmp > 2 and delay then
                     local lastSecondCmds = t_cmds[os.time()] or 0
-                    print("last second:".. lastSecondCmds.." next cmds:" .. #tmp)
-                    print("wait " ..delay .. " second as next step might flood")
-                    wait.time(delay)                    
+                    print("last second:" .. lastSecondCmds .. " next cmds:" ..
+                              #tmp)
+                    print("wait " .. delay .. " second as next step might flood")
+                    wait.time(delay)
                 end
                 exe(step)
                 walk_wait()
@@ -1314,9 +1308,7 @@ function searchStart()
     EnableTriggerGroup("wipe", true)
     flag.search = 1
     -- only support one walk thread at the moment, so garbage collect the previous suspended one if exist.
-    if walk_hook_thread then
-        coroutine.resume(walk_hook_thread,"kill")
-    end
+    if walk_hook_thread then coroutine.resume(walk_hook_thread, "kill") end
 
     wait.make(function()
         for i, id in ipairs(road.rooms) do
@@ -1328,8 +1320,8 @@ function searchStart()
             local path, length = map:getPath(road.id, id)
             road.id = id
             if type(path) == "string" then
-                
-                if flag.wait == 1 then 
+
+                if flag.wait == 1 then
                     -- most likely that we found an candidate target before start searching.
                     print("找到疑似目标，暂停遍历")
                     walk_hook_thread = coroutine.running()
@@ -1337,7 +1329,7 @@ function searchStart()
                     if status and status == "kill" then
                         walk_hook_thread = nil
                         return
-                    end 
+                    end
                 end
 
                 if string.find(path, '#') or job.name ~= 'huashan' then
@@ -1358,8 +1350,9 @@ function searchStart()
                         for i, steps in ipairs(road.pathset) do
                             local delay = calculate_flood()
                             if delay then
-                                print("wait " ..delay .. " second as next step might flood")
-                                wait.time(delay)                    
+                                print("wait " .. delay ..
+                                          " second as next step might flood")
+                                wait.time(delay)
                             end
                             walk_hook_thread = coroutine.running()
                             if flag.find == 1 then
@@ -1388,12 +1381,14 @@ function searchStart()
                         end
                     end
                 else
-                    local steps = string.sub(string.gsub(path, "halt;", ""), 1, -2)
+                    local steps = string.sub(string.gsub(path, "halt;", ""), 1,
+                                             -2)
                     local tmp = utils.split(steps, ';')
                     local delay = calculate_flood(#tmp)
                     if delay then
-                        print("wait " ..delay .. " second as next step might flood")
-                        wait.time(delay)                    
+                        print("wait " .. delay ..
+                                  " second as next step might flood")
+                        wait.time(delay)
                     end
                     -- we might need flood check here. but seems fine so far
                     exe(steps)
@@ -1512,9 +1507,9 @@ end
 function thread_resume(thread)
     if type(thread) == 'thread' then coroutine.resume(thread) end
 end
-function walkBusy(time) 
+function walkBusy(time)
     local period = time or 0.2
-    return check_halt(walk_wait, period) 
+    return check_halt(walk_wait, period)
 end
 --------------------------------华山松树林-------------------------------------
 hssslgo = function()
@@ -2575,27 +2570,27 @@ function Toghz()
     return walk_wait()
 end
 ---------南疆沙漠测试------------
-njsm_check=function()
-    EnableTriggerGroup("fight_trigger",false)
+njsm_check = function()
+    EnableTriggerGroup("fight_trigger", false)
     DeleteTriggerGroup("njsm_check")
-    create_trigger_t('njsm_check1',"^一股暖流发自丹田流向全身，慢慢地你又恢复了知觉……",'','faint_check_njsm')
-    SetTriggerOption('njsm_check1','group','njsm_check')
-    EnableTriggerGroup("njsm_check1",true)
+    create_trigger_t('njsm_check1',
+                     "^一股暖流发自丹田流向全身，慢慢地你又恢复了知觉……",
+                     '', 'faint_check_njsm')
+    SetTriggerOption('njsm_check1', 'group', 'njsm_check')
+    EnableTriggerGroup("njsm_check1", true)
     faint_check_njsm()
 end
-function njsm_eat()
-    exe('drink jiudai;drink jiudai;yun jing;yun jingli')
-end
+function njsm_eat() exe('drink jiudai;drink jiudai;yun jing;yun jingli') end
 function njsm_goon()
     exe('drink jiudai;drink jiudai;yun jing;yun jingli;n;n;n;n;n;n;n;n;n;n')
 end
 function faint_check_njsm()
-    if string.find(locl.room,'南疆沙漠') then
+    if string.find(locl.room, '南疆沙漠') then
         njsm_eat()
         return check_busy(njsm_goon)
-    elseif locl.room=="吐谷浑伏俟城" then
-        EnableTriggerGroup("njsm_check1",false)
-        EnableTriggerGroup("fight_trigger",true)
+    elseif locl.room == "吐谷浑伏俟城" then
+        EnableTriggerGroup("njsm_check1", false)
+        EnableTriggerGroup("fight_trigger", true)
         -- dis_all()
         njsm_eat()
         return walk_wait()
@@ -3342,24 +3337,25 @@ end
 function ShangguanAsk()
     wait.make(function()
         wait.time(1.5)
-        if flag.find==1 then return end
+        if flag.find == 1 then return end
         exe("sd;se;sd;sd;se;sd;se;sd;sd;s;s;s;sd;e;ask qianzhang about 闹鬼")
         return GoShangguanQiuError()
-    end)    
+    end)
 end
 function GoShangguan() return check_halt(GoShangguanOk) end
 function GoShangguanOk()
     wait.make(function()
-	    wait.time(2)
-	    exe("sd;sd;n;n;nw;w;w;e;nu;n;n;n;nu;nu;nw;nu;nw;nu;nu;nw;nu;move bei")
-	end)
+        wait.time(2)
+        exe("sd;sd;n;n;nw;w;w;e;nu;n;n;n;nu;nu;nw;nu;nw;nu;nu;nw;nu;move bei")
+    end)
 end
 function GoShangguanQiuError()
     EnableTrigger("tiezhangsg4", false)
     wait.make(function()
         wait.time(1.5)
-  exe("ask qianzhang about 闹鬼;se;ask qianzhang about 闹鬼;nw;w;ask qianzhang about 闹鬼;w;ask qianzhang about 闹鬼;e;nu;ask qianzhang about 闹鬼;sd;s;ask qianzhang about 闹鬼;n;e")
-  end)
+        exe(
+            "ask qianzhang about 闹鬼;se;ask qianzhang about 闹鬼;nw;w;ask qianzhang about 闹鬼;w;ask qianzhang about 闹鬼;e;nu;ask qianzhang about 闹鬼;sd;s;ask qianzhang about 闹鬼;n;e")
+    end)
 end
 function ShangguanOk()
     EnableTriggerGroup("tiezhangsg", false)
@@ -3385,13 +3381,11 @@ function ptosldDukou()
     end
 end
 function toSld()
-    wait.make(function() 
+    wait.make(function()
         fastLocate(coroutine.running())
         coroutine.yield()
-            
+
         if locl.where ~= '神龙岛海滩' then return toSldDkCheck() end
-        -- sld_unwield()
-        -- sld_weaponWieldCut()
         weaponWieldCut()
         if not Bag["粗绳子"] then
             exe('buy cu shengzi')
@@ -3402,19 +3396,20 @@ function toSld()
         return check_halt(toSldTrigger, 1.5)
     end)
 end
-function toSldTrigger()
-    if locl.where == '神龙岛海滩' then toSldChop() end
-end
+function toSldTrigger() if locl.where == '神龙岛海滩' then toSldChop() end end
 function toSldChop()
-    wait.make(function() 
-        
+    wait.make(function()
+
         while true do
             exe('chop tree;bang mu tou;zuo mufa')
-            local line,_ = wait.regexp('^(> )*(只见(\\D*)轻轻一跃，已坐在木筏上。|你好象没有武器，拿手砍？|你手上这件兵器无锋无刃|你要绑什么|木筏还没扎结实，等下再坐吧)')
+            local line, _ = wait.regexp(
+                                '^(> )*(只见(\\D*)轻轻一跃，已坐在木筏上。|你好象没有武器，拿手砍？|你手上这件兵器无锋无刃|你要绑什么|木筏还没扎结实，等下再坐吧)',
+                                1)
             if line then
                 if line:find('轻轻一跃') and line:find('你') then
                     break
-                elseif line:find('你好象没有武器') or line:find('锋无刃') then
+                elseif line:find('你好象没有武器') or
+                    line:find('锋无刃') then
                     weaponWieldCut()
                 end
             end
@@ -3429,18 +3424,18 @@ end
 
 function toSldCheck()
     print("toSldCheck")
-	flag.idle = nil
-	if locl.room=="小木筏" or locl.room=="木筏" then
-	    if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian;hp') end
-	    locate_finish='toSldHua'
-       return check_busy(locate)
+    flag.idle = nil
+    if locl.room == "小木筏" or locl.room == "木筏" then
+        if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian;hp') end
+        locate_finish = 'toSldHua'
+        return check_busy(locate)
     else
-       return check_halt(toSld)
+        return check_halt(toSld)
     end
 end
 function toSldHua()
-	print("toSldHua")
-	locate_finish=0
+    print("toSldHua")
+    locate_finish = 0
     -- sld_unwield()
     exe('hua mufa')
     wait.make(function()
@@ -3450,30 +3445,30 @@ function toSldHua()
 end
 function toSldDukou()
     print("toSldDukou")
-	wait.make(function()
-            wait.time(2)
-			locate_finish='toSldDkCheck'
-            return check_busy(locate)
+    wait.make(function()
+        wait.time(2)
+        locate_finish = 'toSldDkCheck'
+        return check_busy(locate)
     end)
 end
 function toSldDkCheck()
-     print("toSldDkCheck")
-	 locate_finish=0
-	if locl.room=="渡口" then
-       return toSldOver()
-    elseif locl.room=="小木筏" or locl.room=="木筏" then
+    print("toSldDkCheck")
+    locate_finish = 0
+    if locl.room == "渡口" then
+        return toSldOver()
+    elseif locl.room == "小木筏" or locl.room == "木筏" then
         if hp.neili > hp.neili_max / 4 * 3 then exe('sxlian;hp') end
-       return toSldHua()
-    elseif locl.area and locl.area=='神龙岛' and locl.room=='海滩' then
-       return toSld()
-    elseif locl.area and locl.area~='神龙岛' then
-       return walk_wait()
+        return toSldHua()
+    elseif locl.area and locl.area == '神龙岛' and locl.room == '海滩' then
+        return toSld()
+    elseif locl.area and locl.area ~= '神龙岛' then
+        return walk_wait()
     end
 end
 function toSldOver()
     wait.make(function()
         checkWield()
-        wait_busy()        
+        wait_busy()
         weapon_wield()
         exe('bei none')
         beiUnarmed()
@@ -3482,54 +3477,53 @@ function toSldOver()
 end
 
 function outSld()
-    if score.party and score.party=="神龙教" then
-       exe('ask lu gaoxuan about ling pai')
+    if score.party and score.party == "神龙教" then
+        exe('ask lu gaoxuan about ling pai')
     else
-       exe('steal lingpai')
+        exe('steal lingpai')
     end
     check_busy(outSldGive)
 end
 function outSldGive()
-    wait.make(function() 
+    wait.make(function()
         wait.time(2)
         exe('out;#3s;give ling pai to chuan fu')
-        check_busy(outSldWait,3)
+        check_busy(outSldWait, 3)
     end)
 end
 function outSldWait()
-    EnableTriggerGroup("outSldGive_test",false)
-    EnableTimer('walkWait4',false)
-    wait.make(function() 
+    EnableTriggerGroup("outSldGive_test", false)
+    EnableTimer('walkWait4', false)
+    wait.make(function()
         wait.time(6)
-        locate_finish='outSldCheck'
+        locate_finish = 'outSldCheck'
         return check_busy(locate)
     end)
 end
 function outSldCheck()
-    locate_finish=0
-    if locl.room=="渡口" then
-       return outSldGive_test()
+    locate_finish = 0
+    if locl.room == "渡口" then
+        return outSldGive_test()
     else
-	   --cntr1 = countR(20)
-       return walk_wait()
+        -- cntr1 = countR(20)
+        return walk_wait()
     end
 end
 
-outSldGive_test=function()
+outSldGive_test = function()
     DeleteTriggerGroup("outSldGive_test")
-    create_trigger_t('outSldGive_test1','^(> )*你给船夫一块通行令牌。','','outSldWait')
-    SetTriggerOption("outSldGive_test1","group","outSldGive_test")
-    EnableTriggerGroup("outSldGive_test",true)
+    create_trigger_t('outSldGive_test1',
+                     '^(> )*你给船夫一块通行令牌。', '', 'outSldWait')
+    SetTriggerOption("outSldGive_test1", "group", "outSldGive_test")
+    EnableTriggerGroup("outSldGive_test", true)
     sld_lp()
- end
+end
 
 function sld_lp()
     exe('give ling pai to chuan fu')
-    create_timer_s('walkWait4',1.0,'sld_duko_test')      
+    create_timer_s('walkWait4', 1.0, 'sld_duko_test')
 end
-    sld_duko_test=function()
-    exe('give ling pai to chuan fu')
-end
+sld_duko_test = function() exe('give ling pai to chuan fu') end
 
 function outSldBoat()
     if cntr1() < 1 then return go(road.act) end
@@ -5058,9 +5052,7 @@ function go_hudiegu()
     return checkWait(goHudiegu, 1)
 end
 function goHudiegu() return go(hudieguStart, '蝴蝶谷', '牛棚') end
-function hudieguWalk()
-    exe('nd;n;n;w;n;n;nd;n;w;n;yun jing;look')
-end
+function hudieguWalk() exe('nd;n;n;w;n;n;nd;n;w;n;yun jing;look') end
 function hudieguStart() create_timer_s('hudieguWalk', 0.4, 'hudieguWalk') end
 function hudiegu() return go(go_hudiegu, '蝴蝶谷', '山壁') end
 function hudieguOk()
@@ -5352,7 +5344,8 @@ end
 jldout1 = function()
     wait.make(function()
         wait.time(1)
-        if locl.room_relation == '九老洞九老洞' or locl.where == "不知道哪里九老洞" then
+        if locl.room_relation == '九老洞九老洞' or locl.where ==
+            "不知道哪里九老洞" then
             print('离开九老洞')
             return jldout()
         else
@@ -5520,7 +5513,7 @@ end
 jhkzout = function()
     exe('east')
     fastLocate()
-    return checkWait(jhkzcheck,0.3)
+    return checkWait(jhkzcheck, 0.3)
 end
 jhkzcheck = function()
     DeleteTriggerGroup("jhkz")

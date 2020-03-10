@@ -124,15 +124,16 @@ function busyok()
     return busyhook()
 end
 
-
 function checkWait(func, sec)
     wait.make(function()
         EnableTrigger("hp12", true)
         if sec == nil then sec = 5 end
-        wait.time(sec) 
+        wait.time(sec)
         repeat
             exe('halt')
-            local l,_ = wait.regexp("^>*\\s*(你现在不忙。|你身形向后一跃，跳出战圈不打了。|你把正在运行的真气强行压回丹田)",0.5)            
+            local l, _ = wait.regexp(
+                             "^>*\\s*(你现在不忙。|你身形向后一跃，跳出战圈不打了。|你把正在运行的真气强行压回丹田)",
+                             0.5)
         until l
         EnableTrigger("hp12", false)
         func()
@@ -192,10 +193,10 @@ function trans(num)
     local i = 0
     local num2 = 0
     if num:find("万") then
-        local idx,e_idx = num:find("万")
-        num2 = trans(num:sub(1,idx-1)) * 10000
-        num = num:sub(e_idx+1)        
-    end    
+        local idx, e_idx = num:find("万")
+        num2 = trans(num:sub(1, idx - 1)) * 10000
+        num = num:sub(e_idx + 1)
+    end
     num = string.gsub(num, "零十", "10 ")
     num = string.gsub(num, "零", "")
     num = string.gsub(num, "一", "1")

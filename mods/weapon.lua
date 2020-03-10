@@ -170,7 +170,8 @@ weapon_wield = function()
 	   end                     ]]
     if weapon.first and Bag[weapon.first] then
         exe('wield ' .. Bag[weapon.first].fullid)
-    elseif perform and perform.skill and skillEnable[perform.skill] and weaponKind[skillEnable[perform.skill]] then
+    elseif perform and perform.skill and skillEnable[perform.skill] and
+        weaponKind[skillEnable[perform.skill]] then
         for p in pairs(Bag) do
             if Bag[p].kind and Bag[p].kind == skillEnable[perform.skill] then
                 if not weapon.first or weapon.first ~= p then
@@ -180,17 +181,6 @@ weapon_wield = function()
         end
     end
     checkWield()
-end
-function bqcheck()
-    if perform and perform.skill and skillEnable[perform.skill] and
-        weaponKind[skillEnable[perform.skill]] then
-        if weapon.first and Bag[weapon.first] then
-            exe('wield ' .. Bag[weapon.first].fullid)
-        else
-            exe('wield sanqing sword')
-            messageShow('恢复武器不见了！', "red")
-        end
-    end
 end
 weaponWWalk = function()
     weapon_wield()
@@ -205,7 +195,6 @@ weapon_unwield = function()
             end
         end
     end
-    -- ungeta()
     checkWield()
 end
 weaponUnWalk = function()
@@ -213,28 +202,31 @@ weaponUnWalk = function()
     return walk_wait()
 end
 weaponWieldCut = function()
-    weapon_unwield()
-    local found = false
-    local first = weapon.first
-    if first and Bag[first] and Bag[first].kind and weaponKind[Bag[first].kind] and
-        weaponKind[Bag[first].kind] == "cut" then
-        found = true
-        exe('wield ' .. Bag[first].fullid)
-    else
-        for p in pairs(Bag) do
-            if Bag[p].kind and weaponKind[Bag[p].kind] and
-                weaponKind[Bag[p].kind] == "cut" then
-                found = true
-                exe('wield ' .. Bag[p].fullid)
+    wait.make(function()
+        weapon_unwield()
+        wait_busy()
+        local found = false
+        local first = weapon.first
+        if first and Bag[first] and Bag[first].kind and
+            weaponKind[Bag[first].kind] and weaponKind[Bag[first].kind] == "cut" then
+            found = true
+            exe('wield ' .. Bag[first].fullid)
+        else
+            for p in pairs(Bag) do
+                if Bag[p].kind and weaponKind[Bag[p].kind] and
+                    weaponKind[Bag[p].kind] == "cut" then
+                    found = true
+                    exe('wield ' .. Bag[p].fullid)
+                end
             end
         end
-    end
-    if not found then
-        local weapon = GetVariable("myweapon")
-        print("包裹空的？？")
-        if weapon then exe('wield ' .. weapon) end
-    end
-    checkWield()
+        if not found then
+            local weapon = GetVariable("myweapon")
+            print("包裹空的？？")
+            if weapon then exe('wield ' .. weapon) end
+        end
+        checkWield()
+    end)
 end
 
 function weaponWieldLearn()
@@ -257,7 +249,8 @@ weaponUcheck = function()
                                '^(> )*看起来(需要修理|已经使用过一段时间|马上就要坏|没有什么损坏)',
                                1)
                 until l ~= nil
-                if string.find(l, '没有什么损坏') or l:find('已经使用过一段时间') then
+                if string.find(l, '没有什么损坏') or
+                    l:find('已经使用过一段时间') then
                     weaponUsave[p] = true
                 else
                     weaponUsave[p] = false
@@ -448,9 +441,11 @@ weaponRepairCun = function()
     wait.make(function()
         repeat
             exe('unwield tiechui;cun tiechui')
-            local l,w = wait.regexp('^(> )*(你从身上拿出一柄铁锤|你身上没有这样东西)',1)
+            local l, w = wait.regexp(
+                             '^(> )*(你从身上拿出一柄铁锤|你身上没有这样东西)',
+                             1)
         until l
-        checkBags()        
+        checkBags()
         checkWield()
         wait_busy()
         return weaponRepairOver()
@@ -470,7 +465,6 @@ function swjAsk()
     end)
 end
 function swjOver() return checkPrepare() end
-
 
 function dazaoWeapon()
     tmp.dazuo = 0

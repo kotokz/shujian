@@ -136,12 +136,13 @@ end
 function job_huashan()
     wait.make(function()
         wait_busy()
-        local l,w
+        local l, w
         dis_all()
         EnableTriggerGroup("huashan_accept", true)
         repeat
             exe('ask yue buqun about job')
-            l, w = wait.regexp('^(> )*(你向岳不群打听|这里没有这个人)',1)
+            l, w = wait.regexp(
+                       '^(> )*(你向岳不群打听|这里没有这个人)', 1)
             if l and l:find("这里没有这个人") then
                 await_go('华山', '正气堂')
             end
@@ -207,9 +208,7 @@ function huashan_triggerDel()
     DeleteTriggerGroup("huashan_over")
     DeleteTriggerGroup("huashanQuest")
 end
-function huashan_nobody()
-    return huashan_start()
-end
+function huashan_nobody() return huashan_start() end
 function huashan_shibai()
     EnableTimer('walkWait4', false)
     EnableTriggerGroup("huashan_accept", false)
@@ -224,10 +223,11 @@ function huashan_shibai_b()
         DeleteTriggerGroup("all_fight")
         kezhiwugongclose()
         huashan_triggerDel()
-        local l,w
+        local l, w
         repeat
             exe('ask yue buqun about 失败')
-            l, w = wait.regexp('^(> )*(你向岳不群打听|这里没有这个人)',1)
+            l, w = wait.regexp(
+                       '^(> )*(你向岳不群打听|这里没有这个人)', 1)
             if l and l:find("这里没有这个人") then
                 await_go('华山', '正气堂')
             end
@@ -236,9 +236,8 @@ function huashan_shibai_b()
             mjlujingLog("侠客岛")
         end
         hstongji_fangqi = hstongji_fangqi + 1
-        messageShow(
-            '华山任务：任务失败!华山失败[' .. hstongji_fangqi ..
-                ']次。', "Plum")
+        messageShow('华山任务：任务失败!华山失败[' ..
+                        hstongji_fangqi .. ']次。', "Plum")
         jobfailLog()
         return check_halt(check_food)
     end)
@@ -342,6 +341,12 @@ huashan_where = function(n, l, w)
         string.find(job.where, "珠宝店")) then
         job.where = "扬州城西大街"
     end
+
+    if string.find(job.where, "武当") and
+        (string.find(job.where, "院门") or
+            string.find(job.where, "后山小院")) then
+        job.where = "武当山小径"
+    end
 end
 huashan_find = function(n, l, w)
     local flag_huashan = 0
@@ -377,11 +382,19 @@ huashan_find = function(n, l, w)
     end
     if string.find(job.where, "洗象池") or
         string.find(job.where, "地下黑拳市") or
-        string.find(job.where, '绝情谷石窟') then
+        -- string.find(job.where, '绝情谷石窟') or
+        string.find(job.where, '曼佗罗山庄') then
         messageShow('华山任务②：任务地点【' .. job.where ..
                         '】不可到达，任务放弃。')
         return check_halt(huashanFindFail)
     end
+
+    if Yiliaddr[job.where] and MidNight[locl.time] then
+        messageShow('华山任务②：任务地点【' .. job.where ..
+                        '】时间不对，任务放弃。', 'blue')
+        return check_halt(huashanFindFail)
+    end
+
     if string.find(job.where, "梅林") then job.where = '梅庄西湖边' end
     -- print("2"..job.where)
     if huashanArea1[job.where] then
@@ -392,8 +405,7 @@ huashan_find = function(n, l, w)
     end
     dest.room = job.room
     dest.area = job.area
-    if not job.room or not path_cal() or
-        string.find(job.where, '绝情谷石窟') then
+    if not job.room or not path_cal() then
         messageShow('华山任务：任务地点【' .. job.where ..
                         '】不可到达，任务放弃。', "Plum")
         return check_halt(huashanFindFail)
@@ -492,14 +504,31 @@ huashan_fight = function(n, l, w)
             exe('kill ' .. job.id)
             exe('set wimpycmd pfmpfm\\hp')
             exe('pfmwu')
-            local l, w = wait.regexp('^(> )*(你对着' .. job.target.. '(大喝一声|喝道|猛吼一声|吼道)|加油！加油|这里没有这个人)',1)
-        until l ~= nil
+            local l, _ = wait.regexp('^(> )*(你对着' .. job.target ..
+                                         '(大喝一声|喝道|猛吼一声|吼道)|加油！加油|这里没有这个人|这不是抢走你令牌的人)',
+                                     1)
+            if l and l:find("这不是抢走你令牌的人") then
+                exe('kill ' .. job.id .. " 2")
+                l = nil
+            end
+        until l
     end)
 end
 
 huashan_faint = function()
     exe('unset wimpy;unset no_kill_ap;yield no')
-    exe('kill ' .. job.id)
+    wait.make(function()
+        repeat
+            exe('kill ' .. job.id)
+            local l, _ = wait.regexp(
+                             '^(> )*(加油！加油|你看着已经昏迷的|这不是抢走你令牌的人)',
+                             1)
+            if l and l:find("这不是抢走你令牌的人") then
+                exe('kill ' .. job.id .. " 2")
+                l = nil
+            end
+        until l
+    end)
 end
 huashan_cut = function()
     EnableTriggerGroup("huashan_fight", false)
@@ -544,16 +573,18 @@ huashan_cut = function()
         cut = true
     end
     kezhiwugongclose()
-    wait.make(function() 
+    wait.make(function()
         local index = 1
-        while index <= 5 and index > 0 do       
+        while index <= 5 and index > 0 do
             if cut then
                 exe('halt;get ling pai from corpse ' .. index)
                 exe('qie corpse ' .. index)
             else
-                exe('get corpse '.. index)
-            end            
-            local l,_ = wait.regexp('^(> )*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。|^(> )*(光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来)|^(> )*你将(\\D*)的尸体扶了起来背在背上。|你附近没有这样东西',1)
+                exe('get corpse ' .. index)
+            end
+            local l, _ = wait.regexp(
+                             '^(> )*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。|^(> )*(光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来)|^(> )*你将(\\D*)的尸体扶了起来背在背上。|你附近没有这样东西',
+                             1)
             if l then
                 if l:find("无锋无刃") or l:find("锋利的器具") then
                     weaponWieldCut()
@@ -562,16 +593,18 @@ huashan_cut = function()
                     index = index - 1
                 else
                     index = index + 1
-                    if l:find("扶了起来背在背上") then 
+                    if l:find("扶了起来背在背上") then
                         if l:find(job.target) then
                             checkBags()
-                            for i = 1, 3 do exe('get ling pai from corpse ' .. i) end
+                            for i = 1, 3 do
+                                exe('get ling pai from corpse ' .. i)
+                            end
                             road.id = nil
                             break
                         else
                             exe("drop corpse")
                             cut = true
-                        end                    
+                        end
                     elseif l:find("首级斩了下来") then
                         if not l:find(job.target) then
                             exe('drop head')
@@ -592,12 +625,14 @@ huashan_cut = function()
 end
 
 function huashan_yls_give()
-    wait.make(function() 
+    wait.make(function()
         local line
         repeat
             exe('get ling pai from corpse;give head to yue lingshan')
             exe('give corpse to yue lingshan')
-            line,_ = wait.regexp('^(> )*(你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？|岳灵珊在你的令牌上写下了一个 (一|二) 字。|这好象不是你领的令牌吧？)',1)
+            line, _ = wait.regexp(
+                          '^(> )*(你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？|岳灵珊在你的令牌上写下了一个 (一|二) 字。|这好象不是你领的令牌吧？)',
+                          1)
             if line and line:find('这好象不是你领的令牌') then
                 exe('drop ling pai')
                 line = nil
@@ -608,17 +643,19 @@ function huashan_yls_give()
             return huashan_yls_fail()
         elseif line:find('写下了一个 一') then
             if dohs2 == 0 or (lostletter == 1 and needdolost == 1) then
-               repeat
-                exe('drop head;ask yue lingshan about 力不从心')
-                local line,_ = wait.regexp('^(> )*你向岳灵珊打听有关『力不从心』的消息。',1)
-               until line
-               return huashan_yls_back()
+                repeat
+                    exe('drop head;ask yue lingshan about 力不从心')
+                    local line, _ = wait.regexp(
+                                        '^(> )*你向岳灵珊打听有关『力不从心』的消息。',
+                                        1)
+                until line
+                return huashan_yls_back()
             else
                 return huashan_heal()
             end
         elseif line:find('写下了一个 二') then
             return huashan_yls_back()
-        end    
+        end
     end)
 
 end
@@ -648,15 +685,18 @@ function huashan_yls_back()
     locate_finish = 0
     EnableTimer('walkWait4', false)
     EnableTriggerGroup("huashanQuest", true)
-    wait.make(function() 
+    wait.make(function()
         await_go('华山', '正气堂', 'huashan/jitan')
         job.time.e = os.time()
         job.time.over = job.time.e - job.time.b
-        messageShowT('华山任务：完成任务，用时:【' .. job.time.over ..
-                         '】秒。')
+        messageShowT(
+            '华山任务：完成任务，用时:【' .. job.time.over ..
+                '】秒。')
         repeat
             exe('give ling pai to yue buqun')
-            local line,_ = wait.regexp('^(> )*你给岳不群一块令牌|^(> )*这里没有这个人',1)
+            local line, _ = wait.regexp(
+                                '^(> )*你给岳不群一块令牌|^(> )*这里没有这个人',
+                                1)
             if line and line:find('没有这个人') then
                 await_go('华山', '正气堂')
                 line = nil
@@ -684,13 +724,13 @@ huashan_finish = function()
     setLocateRoomID = 'huashan/zhengqi'
     messageShow('华山任务地点统计：神龙岛【' .. tosld ..
                     '】次 ！菜地【' .. tocaidi .. '】次 ！慕容【' ..
-                    tomr .. '】次 ！燕子坞【' .. toyzw ..
-                    '】次 ！曼佗罗山庄【' .. tomtl .. '】次 ！',
+                    tomr .. '】次 ！燕子坞【' .. toyzw .. '】次 ！',
                 "cyan")
     messageShow(
         '华山2不可到达地点统计：华山石洞【' .. hstohssd ..
             '】次 ！苏州闺房【' .. hstoszgf .. '】次 ！心禅堂【' ..
-            hstoxct .. '】次 ！', "cyan")
+            hstoxct .. '】次 ！曼佗罗山庄【' .. tomtl .. '】次 ！',
+        "cyan")
 
     if g_stop_flag == true then
         print("任务结束，游戏暂停")

@@ -535,7 +535,8 @@ function hqgzcFinishGold(n, l, w)
     messageShow('做菜任务：完成！获得【' .. w[2] .. '】锭黄金！')
     messageShowT('做菜任务：任务完成，用时:【' .. job.time.over ..
                      '】秒。')
-    updateHqgStats()
+
+    if hqgzcCnt >= 10 then updateHqgStats() end
     job.zctime = 0
     flag.idle = 0
     dis_all()
@@ -544,10 +545,8 @@ end
 hqgzcCnt = 0
 
 function updateHqgStats()
-    if hqgzcCnt >= 10 then
-        SetVariable("job_hqg_date",tonumber(os.date("%Y%m%d%H%M"))-200)
-        hqgzcCnt = 0
-    end
+    SetVariable("job_hqg_date", tonumber(os.date("%Y%m%d%H%M")) - 200)
+    hqgzcCnt = 0
 end
 function hqgzcFinish1(n, l, w)
     EnableTimer('walkWait4', false)

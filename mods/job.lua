@@ -602,11 +602,9 @@ function checkPrepareOver()
     wait.make(function()
         exe('score;cond')
         wait_busy()
-        if flag.xuezhu == false and condition.busy and condition.busy > 30 then 
+        if flag.xuezhu == false and condition.busy and condition.busy > 30 then
             local status = check_xuezhu_status()
-            if status < 2 then
-                return xuezhuGoCatch()
-            end
+            if status < 2 then return xuezhuGoCatch() end
         elseif wudang_checkfood == 1 or (condition.busy and condition.busy > 10) or
             needxuexi == 1 then
             return check_xuexi()
@@ -1465,16 +1463,16 @@ function prepareLianxi()
                 "任务监控：是三段斗转星移，而且是晚上，可以去看星星领悟斗转星移了！",
                 "white")
             return check_halt(checkdzxy)
-        elseif score.party=='明教' and skills['qiankun-danuoyi'].lvl>449 and skills['qiankun-danuoyi'].lvl<hp.pot_max-102 and hp.pot >= 1 then
-            messageShow("任务监控：去向小张同学学习大挪移！","white")
-            return check_halt(check_dny)        
+        elseif score.party == '明教' and skills['qiankun-danuoyi'].lvl > 449 and
+            skills['qiankun-danuoyi'].lvl < hp.pot_max - 102 and hp.pot >= 1 then
+            messageShow("任务监控：去向小张同学学习大挪移！",
+                        "white")
+            return check_halt(check_dny)
         end
     end
-    if flag.xuezhu == false and condition.busy and condition.busy > 30 then 
+    if flag.xuezhu == false and condition.busy and condition.busy > 30 then
         local status = check_xuezhu_status()
-        if status < 2 then
-            return xuezhuGoCatch()
-        end
+        if status < 2 then return xuezhuGoCatch() end
     end
     flag.jixu = 1
     if hp.neili_max > hp.neili_lim - 10 then
@@ -1809,19 +1807,19 @@ function check_job()
 end
 
 function check_jobx()
-    wait.make(function()        
+    wait.make(function()
         wait_busy()
         for p in pairs(weaponUsave) do
-            if Bag and not Bag[p] then 
-                job.zuhe["songmoya"] = nil 
-                messageShow('丢失武器!'.. p .. '不见了', 'blue')
+            if Bag and not Bag[p] then
+                job.zuhe["songmoya"] = nil
+                messageShow('丢失武器!' .. p .. '不见了', 'blue')
                 return weapon_lost()
             end
         end
         --[[if score.id=='kkfromch' and (isInBags('三才乾坤剑')==nil or isInBags('龙灵乾坤箫')==nil or isInBags('巧制风云箫')==nil) then
        return weapon_lost()
     end]]
-        
+
         if fqyytmp.goArmorD == 1 then return fqyyArmorGoCheck() end
         if job.zuhe == nil then job.zuhe = {} end
         if job.zuhe["zhuoshe"] and score.party ~= "丐帮" then
@@ -1834,14 +1832,15 @@ function check_jobx()
             job.zuhe["songmoya"] = nil
         end
         if smydie * 1 >= smyall * 1 then job.zuhe["songmoya"] = nil end
-        if job.zuhe["husong"] and (score.party ~= "少林派" or hp.exp < 2000000) then
+        if job.zuhe["husong"] and
+            (score.party ~= "少林派" or hp.exp < 2000000) then
             job.zuhe["husong"] = nil
         end
-        if job.zuhe["songmoya"] and job.last ~= "songmoya" and mytime <= os.time() then
-            return songmoya()
-        end
+        if job.zuhe["songmoya"] and job.last ~= "songmoya" and mytime <=
+            os.time() then return songmoya() end
         if job.zuhe["hubiao"] and job.last ~= "hubiao" and job.teamname and
-            ((not condition.hubiao) or (condition.hubiao and condition.hubiao <= 0)) then
+            ((not condition.hubiao) or
+                (condition.hubiao and condition.hubiao <= 0)) then
             return hubiao()
         elseif job.zuhe["husong"] then
             return husong()
@@ -1857,7 +1856,7 @@ function checkJob()
         local lastHqgDate
         if tmp == nil then
             local fn = GetInfo(67) .. 'logs\\hqgzc_mark_' .. score.id .. '.log'
-            local f = io.open(fn, "r") 
+            local f = io.open(fn, "r")
             if f then
                 tmp = tostring(f:read())
                 f:close()
@@ -1867,13 +1866,14 @@ function checkJob()
         if not tmp then
             lastHqgDate = nil
         elseif tmp:len() == 10 then
-            lastHqgDate = tonumber(tmp) * 100 
+            lastHqgDate = tonumber(tmp) * 100
         else
             lastHqgDate = tonumber(tmp)
         end
         local currentDate = tonumber(os.date("%Y%m%d%H%M"))
 
-        if score.xiangyun == '死' and (not lastHqgDate or currentDate - lastHqgDate > 10000) then 
+        if score.xiangyun == '死' and
+            (not lastHqgDate or (currentDate - lastHqgDate > 10000)) then
             return hqgzc()
         end
     end

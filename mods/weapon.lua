@@ -188,7 +188,8 @@ weaponWWalk = function()
 end
 weapon_unwield = function()
     for p in pairs(Bag) do
-        if Bag[p].kind and (not itemWield or itemWield[p]) then
+        if Bag[p].kind and weaponKind[Bag[p].kind] and
+            (not itemWield or itemWield[p]) then
             local _, l_cnt = isInBags(Bag[p].fullid)
             for i = 1, l_cnt do
                 exe('unwield ' .. Bag[p].fullid .. ' ' .. i)
@@ -202,31 +203,29 @@ weaponUnWalk = function()
     return walk_wait()
 end
 weaponWieldCut = function()
-    wait.make(function()
-        weapon_unwield()
-        wait_busy()
-        local found = false
-        local first = weapon.first
-        if first and Bag[first] and Bag[first].kind and
-            weaponKind[Bag[first].kind] and weaponKind[Bag[first].kind] == "cut" then
-            found = true
-            exe('wield ' .. Bag[first].fullid)
-        else
-            for p in pairs(Bag) do
-                if Bag[p].kind and weaponKind[Bag[p].kind] and
-                    weaponKind[Bag[p].kind] == "cut" then
-                    found = true
-                    exe('wield ' .. Bag[p].fullid)
-                end
+    weapon_unwield()
+    if coroutine.running() then wait_busy() end
+    local found = false
+    local first = weapon.first
+    if first and Bag[first] and Bag[first].kind and weaponKind[Bag[first].kind] and
+        weaponKind[Bag[first].kind] == "cut" then
+        found = true
+        exe('wield ' .. Bag[first].fullid)
+    else
+        for p in pairs(Bag) do
+            if Bag[p].kind and weaponKind[Bag[p].kind] and
+                weaponKind[Bag[p].kind] == "cut" then
+                found = true
+                exe('wield ' .. Bag[p].fullid)
             end
         end
-        if not found then
-            local weapon = GetVariable("myweapon")
-            print("包裹空的？？")
-            if weapon then exe('wield ' .. weapon) end
-        end
-        checkWield()
-    end)
+    end
+    if not found then
+        local weapon = GetVariable("myweapon")
+        print("包裹空的？？")
+        if weapon then exe('wield ' .. weapon) end
+    end
+    checkWield()
 end
 
 function weaponWieldLearn()

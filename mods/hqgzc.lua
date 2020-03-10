@@ -522,13 +522,11 @@ function hqgzcFinishGold1(n, l, w)
     end)
 
     updateHqgStats()
-    hqgzcCnt = 0
 end
 function hqgzcFinishGold(n, l, w)
     job.name = 'idle'
-    if not hqgzcCnt then hqgzcCnt = 0 end
     job.last = 'hqgzc'
-    hqgzcCnt = hqgzcCnt + 1
+
     EnableTriggerGroup("hqgzcFinish", false)
     job.time.e = os.time()
     job.time.over = job.time.e - job.time.b
@@ -536,17 +534,23 @@ function hqgzcFinishGold(n, l, w)
     messageShowT('做菜任务：任务完成，用时:【' .. job.time.over ..
                      '】秒。')
 
-    if hqgzcCnt >= 10 then updateHqgStats() end
+    increaseJobCount()
     job.zctime = 0
     flag.idle = 0
     dis_all()
     return check_halt(check_food)
 end
-hqgzcCnt = 0
 
 function updateHqgStats()
     SetVariable("job_hqg_date", tonumber(os.date("%Y%m%d%H%M")) - 200)
-    hqgzcCnt = 0
+    SetVariable("job_hqg_count", 0)
+end
+
+function increaseJobCount()
+    local count = GetVariable("job_hqg_count") or 0
+    count = count + 1
+    if count >= 10 then return updateHqgStats() end
+    SetVariable("job_hqg_count", count + 1)
 end
 function hqgzcFinish1(n, l, w)
     EnableTimer('walkWait4', false)

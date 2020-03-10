@@ -508,6 +508,7 @@ huashan_fight = function(n, l, w)
                                          '(大喝一声|喝道|猛吼一声|吼道)|加油！加油|这里没有这个人|这不是抢走你令牌的人)',
                                      1)
             if l and l:find("这不是抢走你令牌的人") then
+                exe('kill ' .. job.id)
                 exe('kill ' .. job.id .. " 2")
                 l = nil
             end
@@ -538,7 +539,7 @@ huashan_cut = function()
     fight.time.e = os.time()
     fight.time.over = fight.time.e - fight.time.b
     hstongji_thistime = fight.time.over
-    checkWield()
+    weaponWieldCut()
     if hsjob2 == 1 then
         -- 开始统计次数
         hstongjilasttime_l_2 = hstongji_thistime
@@ -577,8 +578,9 @@ huashan_cut = function()
         local index = 1
         while index <= 5 and index > 0 do
             if cut then
-                exe('halt;get ling pai from corpse ' .. index)
+                exe('halt')
                 exe('qie corpse ' .. index)
+                exe('get ling pai from corpse ' .. index)
             else
                 exe('get corpse ' .. index)
             end
@@ -588,7 +590,6 @@ huashan_cut = function()
             if l then
                 if l:find("无锋无刃") or l:find("锋利的器具") then
                     weaponWieldCut()
-                    checkWield()
                 elseif l:find("没有这样东西") then
                     index = index - 1
                 else

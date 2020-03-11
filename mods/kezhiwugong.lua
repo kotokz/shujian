@@ -1293,21 +1293,33 @@ function kezhiwugongcheck(i, n, l, w)
     end
     -------»ªÉ½¶À¹Â¾Å½£set po ÅÐ¶Ï---------
     if score.party == '»ªÉ½ÅÉ' then
-        if string.find(tmpdes, "ÕÆ") then
-            print('tmpdes=' .. tmpdes)
+        if job.name == 'wudang' or job.name == 'huashan' then
+            exe('look ' .. job.id)
             exe('set po ÕÆ')
-        end
-        if string.find(tmpdes, "½£") then
-            print('tmpdes=' .. tmpdes)
-            exe('set po ½£')
-        end
-        if string.find(tmpdes, "Ç¹") then
-            print('tmpdes=' .. tmpdes)
-            exe('set po Ç¹')
-        end
-        if string.find(tmpdes, "µ¶") then
-            print('tmpdes=' .. tmpdes)
-            exe('set po µ¶')
+        elseif job.name == 'xueshan' then
+            exe('look ' .. guard_id)
+            exe('set po ÕÆ')
+        elseif job.name == 'songxin' then
+            if sxjob.id1 then exe('look ' .. sxjob.id1) end
+            if sxjob.id2 then exe('look ' .. sxjob.id2) end
+            exe('set po ÕÆ')
+        else
+            if string.find(tmpdes, "ÕÆ") then
+                print('tmpdes=' .. tmpdes)
+                exe('set po ÕÆ')
+            end
+            if string.find(tmpdes, "½£") then
+                print('tmpdes=' .. tmpdes)
+                exe('set po ½£')
+            end
+            if string.find(tmpdes, "Ç¹") then
+                print('tmpdes=' .. tmpdes)
+                exe('set po Ç¹')
+            end
+            if string.find(tmpdes, "µ¶") then
+                print('tmpdes=' .. tmpdes)
+                exe('set po µ¶')
+            end
         end
     end
     -------»ªÉ½¶À¹Â¾Å½£set po ÅÐ¶Ï---------
@@ -1343,11 +1355,11 @@ function kezhiwugongSetPerform(tempatt, i, targetid)
         job.name == 'hubiao' then
         local pfm = GetVariable(pk_valuecmd[tempatt])
         if pfm then
-            create_alias('kezhiwugongpfm', 'kezhiwugongpfm', 'alias pppp' .. i ..
-                            ' ' .. pfm)
+            create_alias('kezhiwugongpfm', 'kezhiwugongpfm',
+                         'alias pppp' .. i .. ' ' .. pfm)
             Execute('kezhiwugongpfm')
         elseif pk_valuecmd[tempatt] then
-            messageShow('ÕÒ²»µ½pfmÉè¶¨£º'..pk_valuecmd[tempatt])
+            messageShow('ÕÒ²»µ½pfmÉè¶¨£º' .. pk_valuecmd[tempatt])
         end
         create_alias('mypfm_kezhi', 'mypfm_kezhi',
                      'alias mypfm ' .. GetVariable("mypfm") .. ' ' .. targetid)

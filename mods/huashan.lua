@@ -342,14 +342,13 @@ huashan_where = function(n, l, w)
         job.where = "扬州城西大街"
     end
 
-    if string.find(job.where, "武当") and
-        (string.find(job.where, "院门") or
-            string.find(job.where, "后山小院")) then
-        job.where = "武当山小径"
-    end
+    -- if string.find(job.where, "武当") and
+    --     (string.find(job.where, "院门") or
+    --         string.find(job.where, "后山小院")) then
+    --     job.where = "武当山小径"
+    -- end
 end
 huashan_find = function(n, l, w)
-    local flag_huashan = 0
     dis_all()
     job.target = tostring(w[2])
     job.killer = {}
@@ -585,12 +584,13 @@ huashan_cut = function()
                 exe('get corpse ' .. index)
             end
             local l, _ = wait.regexp(
-                             '^(> )*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。|^(> )*(光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来)|^(> )*你将(\\D*)的尸体扶了起来背在背上。|你附近没有这样东西',
+                             '^(> )*(只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中|光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来|你将(\\D*)的尸体扶了起来背在背上。|你附近没有这样东西|找不到这个东西)',
                              1)
             if l then
                 if l:find("无锋无刃") or l:find("锋利的器具") then
                     weaponWieldCut()
-                elseif l:find("没有这样东西") then
+                elseif l:find("没有这样东西") or
+                    l:find('找不到这个东西') then
                     index = index - 1
                 else
                     index = index + 1
@@ -603,16 +603,17 @@ huashan_cut = function()
                             road.id = nil
                             break
                         else
+                            wait_busy()
                             exe("drop corpse")
                             cut = true
                         end
                     elseif l:find("首级斩了下来") then
+                        wait.time(1)
+                        wait_busy()
                         if not l:find(job.target) then
                             exe('drop head')
                         else
                             road.id = nil
-                            wait.time(1)
-                            wait_busy()
                             break
                         end
                     end

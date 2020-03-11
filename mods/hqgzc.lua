@@ -533,7 +533,6 @@ function hqgzcFinishGold(n, l, w)
     messageShow('做菜任务：完成！获得【' .. w[2] .. '】锭黄金！')
     messageShowT('做菜任务：任务完成，用时:【' .. job.time.over ..
                      '】秒。')
-
     increaseJobCount()
     job.zctime = 0
     flag.idle = 0
@@ -550,7 +549,7 @@ function increaseJobCount()
     local count = GetVariable("job_hqg_count") or 0
     count = count + 1
     if count >= 10 then return updateHqgStats() end
-    SetVariable("job_hqg_count", count + 1)
+    SetVariable("job_hqg_count", count)
 end
 function hqgzcFinish1(n, l, w)
     EnableTimer('walkWait4', false)

@@ -810,7 +810,7 @@ function lingwu_goon()
         lingwudie = 1
         xxpot = hp.pot_max
         wait_busy()
-        SetSpeedWalkDelay(0)  
+        SetSpeedWalkDelay(0)
         return lingwu_finish()
     end)
 end
@@ -917,7 +917,7 @@ function xuexiParty()
     if score.master then
         if score.master == "上官剑南" then
             wait.make(function()
-                await_go("铁掌山","无名峰")
+                await_go("铁掌山", "无名峰")
                 return xuexiGoMaster()
             end)
         else
@@ -1697,7 +1697,7 @@ function checkBags(func)
     -- print(cty_cur,nxw_cur,hxd_cur)
     bags = {}
     tmp.Bag = Bag
-    tmp.Bag_count = 0 
+    tmp.Bag_count = 0
     Bag = {}
     Bag["黄金"] = {}
     Bag["黄金"].id = {}
@@ -1711,17 +1711,17 @@ function checkBags(func)
     tmp.bags = func
     weaponUsave = weaponUsave or {}
     wait.make(function()
-        local line,w
+        local line, w
         repeat
             exe('id')
             checkWield()
             exe('look bei nang')
             exe('uweapon;alias action 检查包裹')
-            line,w = wait.regexp('^(> )*你把 "action" 设定为 "检查包裹" 成功完成。$', 1)
+            line, w = wait.regexp(
+                          '^(> )*你把 "action" 设定为 "检查包裹" 成功完成。$',
+                          1)
         until line
-        if tmp.Bag_count == 0 then
-            Bag = tmp.Bag
-        end
+        if tmp.Bag_count == 0 then Bag = tmp.Bag end
         checkBagsOver()
     end)
 end
@@ -2701,36 +2701,51 @@ function checkdhdBag()
         return checkNxwOver()
     end
 end
-function checkFire()
-    if not Bag["火折"] then
-        return go(checkFireBuy, randomElement(drugBuy["火折"]))
-    else
-        return checkFireOver()
-    end
-end
-function checkFireBuy()
-    exe('buy fire')
-    checkBags()
-    return checkFireOver()
-end
-function checkFireOver()
-    exe('drop fire 2')
-    return check_busy(checkPrepare, 1)
+function checkFire(thread)
+    wait.make(function()
+        if not Bag["火折"] then
+            for i, location in pairs(drugBuy["火折"]) do
+                await_go(location)
+                exe('buy fire')
+                checkBags()
+                wait_busy()
+                if Bag["火折"] then
+                    exe('drop fire 2')
+                    return resume_or_prepare(thread)
+                end
+            end
+        else
+            return resume_or_prepare(thread)
+        end
+    end)
+
 end
 
-function checkJiudai()
-    if not Bag["牛皮酒袋"] then
-        return go(checkJiudaiBuy, randomElement(drugBuy["牛皮酒袋"]))
+function resume_or_prepare(thread)
+    if thread then
+        coroutine.resume(thread)
     else
-        return checkJiudaiOver()
+        return checkPrepare()
     end
 end
-function checkJiudaiBuy()
-    exe('buy jiudai;buy jiudai;buy jiudai')
-    checkBags()
-    return checkJiudaiOver()
+
+function checkJiudai(thread)
+    wait.make(function()
+        if not Bag["牛皮酒袋"] then
+            for i, location in pairs(drugBuy["牛皮酒袋"]) do
+                await_go(location)
+                exe('buy jiudai;buy jiudai;buy jiudai')
+                checkBags()
+                wait_busy()
+                if Bag["牛皮酒袋"] then
+                    return resume_or_prepare(thread)
+                end
+            end
+        else
+            return resume_or_prepare(thread)
+        end
+    end)
 end
-function checkJiudaiOver() return check_busy(checkPrepare, 1) end
 
 function checkYu(p_yu)
     tmp.yu = p_yu

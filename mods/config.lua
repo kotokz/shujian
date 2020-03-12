@@ -884,7 +884,7 @@ function setAlias()
     SetAliasOption('dushu', 'send_to', '12')
     create_alias('full', '^full(.*)$', 'fullSkill("%1")')
     SetAliasOption('full', 'send_to', '12')
-    create_alias_s('dzarmor','dzarmor','dazaoArmor')
+    create_alias_s('dzarmor', 'dzarmor', 'dazaoArmor')
 end
 
 function setdzxy()
@@ -1158,7 +1158,7 @@ drugBuy = {
     ["½â¶¾Íè"] = {"dali/yaopu", "zhiye/yaodian1"},
     ["´ó»¹µ¤"] = "city/dangpu",
     ["»ðÕÛ"] = {"xueshan/laifu", "suzhou/baodaiqiao"},
-    ["Å£Æ¤¾Æ´ü"] = {"city/xiaochidian"}
+    ["Å£Æ¤¾Æ´ü"] = {"city/xiaochidian", "dali/jiulou", "suzhou/chunzailou"}
 }
 
 drugPoison = {["¾Å»¨ÓñÂ¶Íè"] = true}

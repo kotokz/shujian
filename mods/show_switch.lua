@@ -1180,6 +1180,12 @@ function draw_statuswindow()
     ColourNameToRGB("cyan"), -- colour
     false)
 
+    local vip = "会员:"
+    if score.vip_level ~= nil then vip = "会员:" .. score.vip_level end
+    WindowText(win_status, "f1", vip, 105, 120, 0, 0, -- rectangle
+    ColourNameToRGB("cyan"), -- colour
+    false)
+
     local djjj = "等级:" .. score.dj
     if score.dj ~= nil then djjj = "等级:" .. score.dj end
     WindowText(win_status, "f1", djjj, 220, 120, 0, 0, -- rectangle

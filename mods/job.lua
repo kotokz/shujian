@@ -515,18 +515,7 @@ function checkPrepare()
         if score.party == "少林派" and not Bag["护腰"] and
             not Bag["护腕"] then return check_item() end
     end
-    if locl.weekday == '四' and locl.hour == 8 then
-        print(
-            '避开周四服务器重启高峰，错后火折和酒袋购买时间一小时！')
-    else
-        if not Bag["火折"] and drugPrepare["火折"] then
-            return checkFire()
-        end
 
-        if not Bag["牛皮酒袋"] and drugPrepare["牛皮酒袋"] then
-            return checkJiudai()
-        end
-    end
     if score.gold and score.gold > 100 and hxd_cur < 3 and
         drugPrepare["活血疗精丹"] then return checkLjd() end
 
@@ -570,25 +559,40 @@ function checkPrepare()
     end
     exe('wear all')
 
-    if needjinchai == 1 then return go(getchai, "扬州城", "杂货铺") end
-
-    if xuezhu_require == 1 then
-        if GetVariable("xuezhu_status") ~= nil and GetVariable("xuezhu_status") ==
-            '2' then
-            SetVariable("xuezhu_status", "0") -- 重启之后初始化自动抓雪蛛变量为0
+    wait.make(function()
+        local thread = coroutine.running()
+        if not Bag["火折"] and drugPrepare["火折"] then
+            checkFire(thread)
+            coroutine.yield()
         end
-        if GetVariable("xuezhu_status") ~= nil and GetVariable("xuezhu_status") ==
-            '1' then
-            SetVariable("xuezhu_status", "-1") -- 如果上周要了真丹，未给雪蛛，重启之后初始化自动抓雪蛛变量为-1
+
+        if not Bag["牛皮酒袋"] and drugPrepare["牛皮酒袋"] then
+            checkJiudai(thread)
+            coroutine.yield()
         end
-        xuezhu_require = 0
-    end
+        if needjinchai == 1 then
+            return go(getchai, "扬州城", "杂货铺")
+        end
 
-    local x = check_xuezhu_status()
-    if x < 1 then return xuezhuGetDan() end
-    -- if x == '-1' or x == '1' then return getxuezhu1() end
+        if xuezhu_require == 1 then
+            if GetVariable("xuezhu_status") ~= nil and
+                GetVariable("xuezhu_status") == '2' then
+                SetVariable("xuezhu_status", "0") -- 重启之后初始化自动抓雪蛛变量为0
+            end
+            if GetVariable("xuezhu_status") ~= nil and
+                GetVariable("xuezhu_status") == '1' then
+                SetVariable("xuezhu_status", "-1") -- 如果上周要了真丹，未给雪蛛，重启之后初始化自动抓雪蛛变量为-1
+            end
+            xuezhu_require = 0
+        end
 
-    return checkPrepareOver()
+        local x = check_xuezhu_status()
+        if x < 1 then return xuezhuGetDan() end
+        -- if x == '-1' or x == '1' then return getxuezhu1() end
+
+        return checkPrepareOver()
+    end)
+
 end
 function checkPrepareOver()
     if g_stop_flag == true then
@@ -883,6 +887,8 @@ function npcWP(n, l, w)
     elseif string.find(n_words, "法轮") then
         exe('set po 鞭')
     elseif string.find(n_words, "铁笔") then
+        exe('set po 鞭')
+    elseif n_words:find("长鞭") then
         exe('set po 鞭')
     else
         job.weapon = 'unarmed'

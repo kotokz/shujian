@@ -6,14 +6,14 @@ function check_xuezhu_status()
             '未找到雪蛛变量：xuezhu_status，请尽快设置！从未抓过雪蛛请设置-1，上周抓过请设置0',
             'white', 'black')
     else
-        xuezhu_status = tonumber(xuezhu_status) 
+        xuezhu_status = tonumber(xuezhu_status)
         if xuezhu_status < 2 then
             flag.xuezhu = false
         else
             flag.xuezhu = true
         end
     end
-    
+
     return xuezhu_status
 end
 function xuezhuTrigger()
@@ -87,8 +87,9 @@ end
 function xuezhuGetDan()
     xuezhuTrigger()
     if inwdj == 0 then
-        messageShow('抓雪蛛：苗疆地图不可到达，放弃问程灵素要丹。',
-                    "Plum")
+        messageShow(
+            '抓雪蛛：苗疆地图不可到达，放弃问程灵素要丹。',
+            "Plum")
         -- SetVariable("xuezhu_status", "2")
         return check_halt(checkPrepareOver)
     end
@@ -131,15 +132,15 @@ function fakeDan()
     DeleteTimer("walkWait4")
     SetVariable("xuezhu_status", "-1")
     messageShow(
-            '程灵素给了假丹，小贱人！怒！！！任务空闲再去抓雪蛛！',
-            'white', 'black')
+        '程灵素给了假丹，小贱人！怒！！！任务空闲再去抓雪蛛！',
+        'white', 'black')
     -- return xuezhu_go()
     return check_halt(checkPrepareOver)
 end
 
 function realDan()
     messageShow('已问程灵素要了真丹，任务空闲再去抓雪蛛！',
-                    'white', 'black')
+                'white', 'black')
     return check_halt(checkPrepareOver)
 end
 
@@ -207,8 +208,8 @@ end
 function givexuezhu1() exe('give cheng xue zhu') end
 function xuezhuFinish()
     local x = GetVariable("xuezhu_status")
-    if x == '-1' then 
-        SetVariable("xuezhu_status", "0") 
+    if x == '-1' then
+        SetVariable("xuezhu_status", "0")
         flag.xuezhu = false
     end
     if x == '1' then

@@ -118,7 +118,6 @@ function xuezhuAccept()
         wait.time(2)
         exe('yes')
     end)
-    SetVariable("xuezhu_status", "1")
 end
 function eatDan()
     EnableTimer('walkWait4', false)
@@ -141,6 +140,7 @@ end
 function realDan()
     messageShow('已问程灵素要了真丹，任务空闲再去抓雪蛛！',
                 'white', 'black')
+    SetVariable("xuezhu_status", "1")
     return check_halt(checkPrepareOver)
 end
 

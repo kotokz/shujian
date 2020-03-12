@@ -575,12 +575,11 @@ function checkPrepare()
         end
 
         if xuezhu_require == 1 then
-            if GetVariable("xuezhu_status") ~= nil and
-                GetVariable("xuezhu_status") == '2' then
+            local xuezhuStatus = GetVariable("xuezhu_status")
+            if xuezhuStatus and xuezhuStatus == '2' then
                 SetVariable("xuezhu_status", "0") -- 重启之后初始化自动抓雪蛛变量为0
             end
-            if GetVariable("xuezhu_status") ~= nil and
-                GetVariable("xuezhu_status") == '1' then
+            if xuezhuStatus and xuezhuStatus == '1' then
                 SetVariable("xuezhu_status", "-1") -- 如果上周要了真丹，未给雪蛛，重启之后初始化自动抓雪蛛变量为-1
             end
             xuezhu_require = 0

@@ -1216,6 +1216,7 @@ function kezhiwugongcheck(i, n, l, w)
     if string.find(w[3], "猛然击出两剑两掌，齐齐指向你！") then
         if score.party == '桃花岛' then exe('perform throwing.tan') end
     end
+
     if w[2] ~= nil then
         if not string.find(w[2], "你") and string.find(w[3], "的") == 1 then
             -- print("----------检测npc出招-----------")
@@ -1233,7 +1234,14 @@ function kezhiwugongcheck(i, n, l, w)
         end
         tmpdes = tmpdes .. w[2]
     end
-    if w[3] ~= nil then tmpdes = tmpdes .. "|" .. w[3] end
+    if w[3] ~= nil then
+        if string.find(w[3], "你剑守") or
+            string.find(w[3], "你反手圈转化解") then
+            -- 太极剑有两招后发制人，在npc名字后面出现，加上特殊判断
+            return
+        end
+        tmpdes = tmpdes .. "|" .. w[3]
+    end
     if string.find(w[2],
                    "对着你的背部踢去，正是一招「神龙追逝") or
         string.find(w[3],

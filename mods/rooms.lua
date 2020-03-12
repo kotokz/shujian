@@ -8184,7 +8184,7 @@ Room {
     name = "大驿道",
     outdoor = "扬州城",
     ways = {["east"] = "city/eroad2", ["west"] = "city/dongmen"},
-    room_relative = "不知道哪里大驿道 不知道哪里 大驿道"
+    room_relative = "东门----大驿道----大驿道大驿道"
 }
 Room {
     id = "gumu/bzy",
@@ -27902,7 +27902,8 @@ Room {
     id = "zhiye/jimaidian1",
     name = "寄卖店",
     outdoor = "扬州城",
-    ways = {["north"] = "city/dongdajie1", ["west"] = "zhiye/jiaoliushi1"}
+    ways = {["north"] = "city/dongdajie1", ["west"] = "zhiye/jiaoliushi1"},
+    room_relative = "东大街｜陈列室----寄卖店寄卖店"
 }
 Room {
     id = "zhiye/nongtian0",

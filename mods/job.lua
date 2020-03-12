@@ -1822,10 +1822,6 @@ function check_jobx()
                 return weapon_lost()
             end
         end
-        --[[if score.id=='kkfromch' and (isInBags('»˝≤≈«¨¿§Ω£')==nil or isInBags('¡˙¡È«¨¿§ÛÔ')==nil or isInBags('«…÷∆∑Á‘∆ÛÔ')==nil) then
-       return weapon_lost()
-    end]]
-
         if fqyytmp.goArmorD == 1 then return fqyyArmorGoCheck() end
         if job.zuhe == nil then job.zuhe = {} end
         if job.zuhe["zhuoshe"] and score.party ~= "ÿ§∞Ô" then

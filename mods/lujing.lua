@@ -655,15 +655,20 @@ function path_consider()
                 chats_locate(
                     '定位系统：没有归属地的房间加入了room_relative，【可以尝试定位没有归属地的房间】',
                     'LimeGreen')
-                -- 这里可以尝试定位没有归属地的房间
+                sour.rooms = getRoomsByRelation(locl.room_relation)
+                if table.getn(sour.rooms) == 1 then
+                    sour.id = sour.rooms[1]
+                end
             end
-            chats_locate('定位系统：地图系统无此地点【' ..
-                             locl.area .. locl.room ..
-                             '】资料，随机移动寻找确切定位点！',
-                         'red')
-            exe('stand;leave')
-            exe(locl.dir)
-            return checkWait(goContinue, 0.2)
+            if table.getn(sour.rooms) == 0 then
+                chats_locate('定位系统：地图系统无此地点【' ..
+                                 locl.area .. locl.room ..
+                                 '】资料，随机移动寻找确切定位点！',
+                             'red')
+                exe('stand;leave')
+                exe(locl.dir)
+                return checkWait(goContinue, 0.2)
+            end
         end
         if table.getn(sour.rooms) > 1 and sour.id ~= 'city/jiangbei' then
             chats_locate(
@@ -3403,7 +3408,7 @@ function toSldChop()
         while true do
             exe('chop tree;bang mu tou;zuo mufa')
             local line, _ = wait.regexp(
-                                '^(> )*(只见(\\D*)轻轻一跃，已坐在木筏上。|你好象没有武器，拿手砍？|你手上这件兵器无锋无刃|你要绑什么|木筏还没扎结实，等下再坐吧)',
+                                '^(> )*(只见(\\D*)轻轻一跃，已坐在木筏上。|你好象没有武器，拿手砍？|你手上这件兵器无锋无刃|木筏还没扎结实，等下再坐吧)',
                                 1)
             if line then
                 if line:find('轻轻一跃') and line:find('你') then

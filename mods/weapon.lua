@@ -531,5 +531,6 @@ function weapon_found()
 end
 function weapon_found_get()
     exe('get all')
+    checkBags()
     return check_halt(check_food)
 end

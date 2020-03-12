@@ -287,6 +287,14 @@ function getRooms(name, city, type)
     return rooms
 end
 
+function getRoomsByRelation(relation)
+    local rooms = {}
+    for id, room in pairs(map.rooms) do
+        if relation == room.room_relative then table.insert(rooms, id) end
+    end
+    return rooms
+end
+
 function getCity(path)
     local place = getPlace(path)
     for k, v in pairs(place) do

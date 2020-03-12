@@ -214,9 +214,9 @@ function getLookCity(path)
     if path == "meizhuang/plum_maze" then return nil end
     local place = getPlace(path)
     for k, v in pairs(place) do
-        if (v == "zhiye" or v == "entry") and not tmp.go_to then
-            return nil
-        end
+        -- if (v == "zhiye" or v == "entry") and not tmp.go_to then
+        --     return nil
+        -- end
         if v ~= "entry" then city = lookCitys[v] end
         if city then return city end
     end
@@ -27794,7 +27794,8 @@ Room {
     outdoor = "ÑïÖÝ³Ç",
     no_fight = true,
     ways = {["north"] = "city/dongdajie0"},
-    objs = {["»ðÂ¯"] = "huo lu", ["º«Ìú½³"] = "han tiejiang"}
+    objs = {["»ðÂ¯"] = "huo lu", ["º«Ìú½³"] = "han tiejiang"},
+    room_relative = "¶«´ó½Ö£ü±øÆ÷ÆÌ±øÆ÷ÆÌ"
 }
 Room {
     id = "zhiye/caifengpu1",
@@ -27802,7 +27803,8 @@ Room {
     outdoor = "³¤°²³Ç",
     no_fight = true,
     ways = {["east"] = "changan/northjie2"},
-    objs = {["²Ã·ì×À"] = "caifeng zhuo"}
+    objs = {["²Ã·ì×À"] = "caifeng zhuo"},
+    room_relative = "²Ã·ìÆÌ----±±´ó½Ö²Ã·ìÆÌ"
 }
 Room {
     id = "zhiye/caikuang-chang0",
@@ -27875,7 +27877,8 @@ Room {
     id = "zhiye/datiepu1",
     name = "´òÌúÆÌ",
     outdoor = "ÑïÖÝ³Ç",
-    ways = {["south"] = "city/dongdajie0"}
+    ways = {["south"] = "city/dongdajie0"},
+    room_relative = "´òÌúÆÌ£ü¶«´ó½Ö´òÌúÆÌ"
 }
 Room {
     id = "zhiye/gaoshan0",

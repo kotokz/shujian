@@ -660,6 +660,16 @@ function path_consider()
                     sour.id = sour.rooms[1]
                 end
             end
+            if table.getn(sour.rooms) == 0 and locl.area == "不知道哪里" then
+                local unknown_city = {"郊外", "中原"}
+                for i, city in pairs(unknown_city) do
+                    sour.rooms = getRooms(sour.room, city)
+                    if table.getn(sour.rooms) > 0 then break end
+                end
+                if table.getn(sour.rooms) == 1 then
+                    sour.id = sour.rooms[1]
+                end
+            end
             if table.getn(sour.rooms) == 0 then
                 chats_locate('定位系统：地图系统无此地点【' ..
                                  locl.area .. locl.room ..

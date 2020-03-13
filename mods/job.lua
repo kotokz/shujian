@@ -867,7 +867,7 @@ function npcWP(n, l, w)
         exe('set po µ¶')
     elseif string.find(n_words, "±Þ") then
         job.weapon = 'whip'
-        exe('set po ±Þ')
+        exe('set po Ë÷')
     elseif string.find(n_words, "ÐÇÔÂÆÐÌá") then
         job.weapon = 'whip'
         exe('set po Ë÷')

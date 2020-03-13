@@ -578,19 +578,18 @@ huashan_cut = function()
         while index <= 5 and index > 0 do
             if cut then
                 exe('halt')
-                exe('qie corpse ' .. index)
                 exe('get ling pai from corpse ' .. index)
+                exe('qie corpse ' .. index)
             else
                 exe('get corpse ' .. index)
             end
             local l, _ = wait.regexp(
-                             '^(> )*(只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中|光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来|你将(\\D*)的尸体扶了起来背在背上。|你附近没有这样东西|找不到这个东西)',
+                             '^(> )*(只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中|光天化日的想抢劫啊|乱切别人杀的人干嘛啊|你手上这件兵器无锋无刃|你得用件锋利的器具才能切下这尸体的头来|你将(\\D*)的尸体扶了起来背在背上。|你附近没有这样东西)',
                              1)
             if l then
                 if l:find("无锋无刃") or l:find("锋利的器具") then
                     weaponWieldCut()
-                elseif l:find("没有这样东西") or
-                    l:find('找不到这个东西') then
+                elseif l:find("没有这样东西") then
                     index = index - 1
                 else
                     index = index + 1
@@ -633,11 +632,13 @@ function huashan_yls_give()
             exe('get ling pai from corpse;give head to yue lingshan')
             exe('give corpse to yue lingshan')
             line, _ = wait.regexp(
-                          '^(> )*(你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？|岳灵珊在你的令牌上写下了一个 (一|二) 字。|这好象不是你领的令牌吧？)',
+                          '^(> )*(你的令牌呢|你还没有去找恶贼，怎么就来祭坛了？|岳灵珊在你的令牌上写下了一个 (一|二) 字。|这好象不是你领的令牌吧？|这人好象不是你杀的吧)',
                           1)
             if line and line:find('这好象不是你领的令牌') then
                 exe('drop ling pai')
                 line = nil
+            elseif line and line:find('这人好象不是你杀的吧') then
+                exe('drop corpse')
             end
         until line
         wait_busy()

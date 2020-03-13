@@ -70,21 +70,7 @@ function dmlTriggers()
                      '', 'dmlNeiliCheck')
     SetTriggerOption('dmldazuo1', 'group', 'dmldazuo')
     EnableTriggerGroup('dmldazuo', false)
-    DeleteTriggerGroup('dmlask')
-    create_trigger_t('dmlask1',
-                     '^(> )*老仆说道：「你还是明天再来吧。」',
-                     '', 'dmlOver')
-    create_trigger_t('dmlask2',
-                     '^(> )*老仆说道：「你(精血|内力)不足，如何全力一战？」',
-                     '', 'dmlHpCheck')
-    create_trigger_t('dmlask3',
-                     '^(> )*老仆咪咪笑着闪过身子，你觉得神志恍惚……',
-                     '', 'dmlAskOk')
-    create_trigger_t('dmlask4',
-                     '^(> )*如梦如醉之间，发现你已经在一所亭台之中，老仆已不知哪里去了',
-                     '', 'dmlAskOk')
-    for i = 1, 4 do SetTriggerOption("dmlask" .. i, "group", "dmlask") end
-    EnableTriggerGroup('dmlask', false)
+
     DeleteTriggerGroup('dmltopcheck')
     create_trigger_t('dmltopcheck3',
                      '^>*\\s*\\d*:*\\s*\\S*\\s*(\\d*)\\s*(\\D*)\\((\\D*)\\)\\s*\\D*\\s*(\\d*)\\s*\\S*\\s*\\S*$',
@@ -176,7 +162,7 @@ function dmlTriggersRemove()
     DeleteTriggerGroup('dmldazuo')
     DeleteTriggerGroup('dmldazuo2')
     DeleteTriggerGroup('dmlforce')
-    DeleteTriggerGroup('dmlask')
+    -- DeleteTriggerGroup('dmlask')
     DeleteTriggerGroup('dmlfight')
     DeleteTriggerGroup('dmltopcheck')
     DeleteTriggerGroup('dmlnofight')
@@ -469,7 +455,7 @@ function dmlCheckToplist()
     DeleteTimer('dmlWait')
     create_timer_s('dmlWait', 10, 'dmlWait')
     EnableTriggerGroup('dmltopcheck', true)
-    EnableTriggerGroup('dmlask', false)
+    -- EnableTriggerGroup('dmlask', false)
     dmlCheckCnt = dmlCheckCnt + 1
     if tonumber(GetVariable('dmlMode')) ~= 3 then
         SetVariable('dmlDecreaseLvl', 20)
@@ -820,7 +806,7 @@ function dmlInfo()
             end
         end
     end
-    return dmlConsider()
+    return check_busy(dmlConsider)
 end
 function dmlConsider()
     if dmlCheckCnt < 3 then
@@ -922,7 +908,7 @@ function dmlConsider()
         messageShow(
             '蝶梦楼全自动模块：已到达查询上限，没有符合条件的目标，请手动检查或修改条件重新开始.........',
             'white', 'red')
-        return dmlOver()
+        return dmlOverCheck()
     end
 end
 function dmlWait()
@@ -988,10 +974,31 @@ function dmlAsk()
     EnableTriggerGroup('dmltargetcheck', false)
     EnableTrigger('fight2', false)
     EnableTrigger('fight16', false)
-    EnableTriggerGroup('dmlask', false)
+    -- EnableTriggerGroup('dmlask', false)
     exe(GetVariable("performpre"))
-    exe('ask laopu about 梦境')
-    checkTop(dmlAsk1)
+
+    wait.make(function()
+        exe('ask laopu about 梦境')
+        wait_busy()
+        local line
+        repeat
+            exe('ask laopu about 上楼')
+            line = wait.regexp(
+                       '^(> )*(老仆说道：「你还是明天再来吧。」|老仆说道：「你(精血|内力)不足，如何全力一战？|老仆咪咪笑着闪过身子，你觉得神志恍惚…|如梦如醉之间，发现你已经在一所亭台之中|梦蝶楼上只能比)',
+                       1)
+            wait_busy()
+        until line
+        if line:find("明天再") then
+            return dmlOver()
+        elseif line:find("如何全力一战") then
+            return dmlHpCheck()
+        else
+            exe('ask laopu about 上楼')
+            wait_busy()
+            return dmlDream()
+        end
+    end)
+    -- checkTop(dmlAsk1)
 end
 function dmlAsk1()
     EnableTriggerGroup('dmlask', true)
@@ -1025,7 +1032,7 @@ function dmlDream()
             return checkWait(dmlCheckToplist, 5)
         end
     else
-        return dmlOver()
+        return dmlOverCheck()
     end
 end
 function dmlTakePlace() return checkWait(dmlTopTake, 5) end
@@ -1140,45 +1147,48 @@ function dmlOut()
             return checkWait(dmlCheckToplist, 5)
         end
     else
-        return dmlOver()
+        return dmlOverCheck()
     end
 end
+
 function dmlOver()
+    local fn = GetInfo(67) .. 'logs\\diemenglou_mark_' .. score.id .. '.log'
+    local f = io.open(fn, "w")
+    local s = os.date("%Y%m%d%H")
+    if tonumber(os.date('%H')) >= 22 then s = os.date("%Y%m%d") .. '09' end
+    if tonumber(os.date('%H')) < 8 then
+        s = tonumber(os.date("%Y%m%d") .. '09') - 100
+    end
+    f:write(s)
+    f:close()
+    dmlTriggersRemove()
+    EnableTrigger('fight2', true)
+    EnableTrigger('fight16', true)
+    print('本日蝶梦楼可挑战次数为零，模块退出')
+    messageShow(
+        '蝶梦楼全自动模块：挑战成功【' .. dmlsucceedCnt ..
+            '】次，获得【' .. dmlPrestige .. '】点声望，【' ..
+            dmlCompetitionCoin .. '】点竞技币.........', 'gold')
+    messageShow(
+        '蝶梦楼全自动模块：本日蝶梦楼可挑战次数为零，模块退出.........',
+        'lime')
+    if GetVariable("dmlPkFlag") == 'yes' and table.getn(pkList) > 0 then
+        exe('unset pk_give_up')
+        return dmlPkFunc()
+    else
+        return checkTop(check_food)
+    end
+end
+
+function dmlOverCheck()
     if dmlFightCnt == 5 then
-        local fn = GetInfo(67) .. 'logs\\diemenglou_mark_' .. score.id .. '.log'
-        local f = io.open(fn, "w")
-        local s = os.date("%Y%m%d%H")
-        if tonumber(os.date('%H')) >= 22 then
-            s = os.date("%Y%m%d") .. '09'
-        end
-        if tonumber(os.date('%H')) < 8 then
-            s = tonumber(os.date("%Y%m%d") .. '09') - 100
-        end
-        f:write(s)
-        f:close()
-        dmlTriggersRemove()
-        EnableTrigger('fight2', true)
-        EnableTrigger('fight16', true)
-        print('本日蝶梦楼可挑战次数为零，模块退出')
-        messageShow('蝶梦楼全自动模块：挑战成功【' ..
-                        dmlsucceedCnt .. '】次，获得【' .. dmlPrestige ..
-                        '】点声望，【' .. dmlCompetitionCoin ..
-                        '】点竞技币.........', 'gold')
-        messageShow(
-            '蝶梦楼全自动模块：本日蝶梦楼可挑战次数为零，模块退出.........',
-            'lime')
-        if GetVariable("dmlPkFlag") == 'yes' and table.getn(pkList) > 0 then
-            exe('unset pk_give_up')
-            return dmlPkFunc()
-        else
-            return checkTop(check_food)
-        end
+        dmlOver()
     else
         askCnt = askCnt + 1
         if askCnt > 1 then
             askCnt = 0
             dmlFightCnt = 5
-            return dmlOver()
+            return dmlOverCheck()
         end
     end
 end

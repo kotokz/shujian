@@ -50,7 +50,7 @@ function jinhe_get(n, l, w)
             end
         end
         Log:error('遍历完全部房间,在' .. jinhe_location ..
-                      '找到锦盒')
+                      '找不到锦盒')
         return jinheOver()
     end)
 end

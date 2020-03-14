@@ -2794,7 +2794,8 @@ Room {
     ways = {
         ["southwest"] = "group/entry/cdtulu2",
         ["northeast"] = "chengdu/sroad1"
-    }
+    },
+    room_relative = 
 }
 Room {
     id = "chengdu/wroad1",
@@ -3511,7 +3512,8 @@ Room {
         ["east"] = "city/wroad2",
         ["west"] = "xiangyang/outeroad1"
     },
-    objs = {["简捷"] = "jian jie"}
+    objs = {["简捷"] = "jian jie"},
+    room_relative = "山壁｜东门外-----土路-----青石大道土路"
 }
 Room {
     id = "city/xiaochidian",
@@ -8065,7 +8067,8 @@ Room {
     id = "group/entry/hjroad",
     name = "小路",
     outdoor = "回疆草原",
-    ways = {["westup"] = "hj/shanqiu", ["east"] = "hj/pmchang"}
+    ways = {["westup"] = "hj/shanqiu", ["east"] = "hj/pmchang"},
+    room_relative = "小山丘←小路-----跑马场小路"
 }
 Room {
     id = "group/entry/hmyroad2",
@@ -8074,7 +8077,8 @@ Room {
     ways = {
         ["eastup"] = "hmy/pingding/road3",
         ["southwest"] = "hmy/pingding/road1"
-    }
+    },
+    room_relative = "土路→土路↙土路土路"
 }
 Room {
     id = "group/entry/hmyroad8",
@@ -8083,7 +8087,8 @@ Room {
     ways = {
         ["southeast"] = "hmy/pingding/road9",
         ["west"] = "hmy/pingding/road7"
-    }
+    },
+    room_relative = "土路-----土路↘土路土路"
 }
 Room {
     id = "group/entry/hzqsd7",
@@ -8155,13 +8160,15 @@ Room {
     id = "group/entry/sztulu2",
     name = "土路",
     outdoor = "苏州城",
-    ways = {["southwest"] = "suzhou/jiangbian", ["northeast"] = "suzhou/tulu1"}
+    ways = {["southwest"] = "suzhou/jiangbian", ["northeast"] = "suzhou/tulu1"},
+    room_relative = "土路↗土路↙江边土路"
 }
 Room {
     id = "group/entry/thdroad1",
     name = "土路",
     outdoor = "牛家村",
-    ways = {["southeast"] = "thd/niujia/road2", ["north"] = "thd/niujia/road"}
+    ways = {["southeast"] = "thd/niujia/road2", ["north"] = "thd/niujia/road"},
+    room_relative = "土路｜土路↘土路土路"
 }
 Room {
     id = "group/entry/tsyidao3",
@@ -19905,7 +19912,8 @@ Room {
 Room {
     id = "suzhou/tulu1",
     name = "土路",
-    ways = {["southwest"] = "group/entry/sztulu2", ["north"] = "suzhou/qsgdao5"}
+    ways = {["southwest"] = "group/entry/sztulu2", ["north"] = "suzhou/qsgdao5"},
+    room_relative = "枫桥镇｜土路↙土路土路"
 }
 Room {
     id = "suzhou/wenmeige",
@@ -21077,7 +21085,8 @@ Room {
         ["southwest"] = "thd/niujia/njeast",
         ["north"] = "thd/niujia/kezhan",
         ["east"] = "thd/niujia/bay"
-    }
+    },
+    room_relative ="归来客栈｜土路-----小渔港↙村口土路"
 }
 Room {
     id = "thd/niujia/jiangpan1",
@@ -21182,7 +21191,8 @@ Room {
 Room {
     id = "thd/niujia/road",
     name = "土路",
-    ways = {["south"] = "group/entry/thdroad1", ["northwest"] = "hz/qsddao3"}
+    ways = {["south"] = "group/entry/thdroad1", ["northwest"] = "hz/qsddao3"},
+    room_relative = "青石大道↖土路｜土路土路"
 }
 Room {
     id = "thd/niujia/road2",
@@ -21190,7 +21200,8 @@ Room {
     ways = {
         ["southeast"] = "thd/niujia/njwest",
         ["northwest"] = "group/entry/thdroad1"
-    }
+    },
+    room_relative = "土路↖土路↘村口土路"
 }
 Room {
     id = "thd/niujia/xiaodian",

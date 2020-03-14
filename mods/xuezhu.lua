@@ -38,10 +38,14 @@ function xuezhuTrigger()
     create_trigger_t('xuezhuAccept4',
                      "^(> )*程灵素说道：「你上次答应我的事情还没做\\D*",
                      '', 'fakeDan')
+    create_trigger_t('xuezhuAccept5',
+                     "^(> )*程灵素说道：「你我已经给过你了\\D*",
+                     '', 'realDan')
     SetTriggerOption("xuezhuAccept1", "group", "xuezhuAccept")
     SetTriggerOption("xuezhuAccept2", "group", "xuezhuAccept")
     SetTriggerOption("xuezhuAccept3", "group", "xuezhuAccept")
     SetTriggerOption("xuezhuAccept4", "group", "xuezhuAccept")
+    SetTriggerOption("xuezhuAccept5", "group", "xuezhuAccept")
     EnableTriggerGroup("xuezhuAccept", false)
     DeleteTriggerGroup("xuezhuFight")
     create_trigger_t('xuezhuFight1',

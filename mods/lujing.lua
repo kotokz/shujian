@@ -1232,7 +1232,7 @@ function searchPre()
 
 end
 function DFS()
-    myrt = {}
+    local myrt = {}
 
     for _, roomid in pairs(newrooms) do -- 插入房间链表
         roomV = List.new(roomid)
@@ -1275,6 +1275,7 @@ end
 function FastDFS(myrt, i)
     visited[i] = true -- 设置下标为I的顶点为已访问  
     -- Note("myrt["..i.."]="..myrt[i].index)  --输出顶点信息
+    if myrt[i] == nil or myrt[i].index == nil then return end
     table.insert(road.rooms, myrt[i].index)
     local p = myrt[i].pnext -- 下一个边表结点  
     if p == nil then return end
@@ -5006,6 +5007,40 @@ function locateroom(where)
         end
     end
     return false
+end
+
+function findAllRooms(where)
+    local l_dest = {}
+    where = Trim(where)
+    if string.find(where, "/") then
+        local l_path = map:getPath("xiangyang/dangpu", where)
+        if l_path then
+            table.insert(l_dest, where)
+            return l_dest
+        end
+    else
+        l_dest.room, l_dest.area = getAddr(Trim(where))
+    end
+    if l_dest.area then
+        local l_rooms = getRooms(l_dest.room, l_dest.area)
+        for k, v in pairs(l_rooms) do
+            local l_path = map:getPath("xiangyang/dangpu", v)
+            if l_path then table.insert(l_dest, v) end
+        end
+        return l_dest
+    end
+
+    for p in pairs(map.rooms) do
+        if map.rooms[p].objs then
+            for k in pairs(map.rooms[p].objs) do
+                if k == where then
+                    local l_path = map:getPath("xiangyang/dangpu", p)
+                    if l_path then table.insert(l_dest, p) end
+                end
+            end
+        end
+        return l_dest
+    end
 end
 
 dirReverse = {

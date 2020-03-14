@@ -42,6 +42,7 @@ loadmod "lostletter"
 loadmod "taohuazhen"
 loadmod "xuezhu"
 loadmod "chuanfu"
+loadmod "jinhe"
 
 test = test or function() print("initial behavior, does nothing") end
 
@@ -199,9 +200,7 @@ function main()
     Chuanfu:addtrigger()
 
     local xuezhu = GetVariable("xuezhu_status")
-    if xuezhu and (xuezhu == "2" or xuezhu == "1")then
-        inwdj = 1
-    end
+    if xuezhu and (xuezhu == "2" or xuezhu == "1") then inwdj = 1 end
     checkBags()
     map.rooms["sld/lgxroom"].ways["#outSld"] = "huanghe/huanghe8"
     exe(
@@ -612,32 +611,7 @@ function turnShen(x)
         end
     end
 end
---------------检查锦盒-------------
-jinheTrigger = function()
-    DeleteTriggerGroup("jinheTrigger")
-    create_trigger_t('jinheTrigger1',
-                     "^>*\\s*你看了半天，也没有明白这盒子到底是怎么回事。",
-                     '', 'jinhe_goon')
-    create_trigger_t('jinheTrigger2',
-                     "^>*\\s*盒子的夹层已经打开，你可以仔细看盒子（look jinhe）然后采取相应行动。",
-                     '', 'jinhe_find')
-    create_trigger_t('jinheTrigger3',
-                     "^>*\\s*吾纵横江湖时曾在(\\D*)留下些许物事，待有缘人前去挖掘",
-                     '', 'jinhe_get')
-    SetTriggerOption("jinheTrigger1", "group", "jinheTrigger")
-    SetTriggerOption("jinheTrigger2", "group", "jinheTrigger")
-    SetTriggerOption("jinheTrigger3", "group", "jinheTrigger")
-    EnableTriggerGroup("jinheTrigger", true)
-    exe('jiancha jinhe')
-end
-jinhe_goon = function() exe('jiancha he') end
-function jinhe_get(n, l, w)
-    jinhe_dd = tostring(w[1])
-    exe('sz ' .. jinhe_dd)
-    EnableTriggerGroup("jinheTrigger", false)
-    DeleteTriggerGroup("jinheTrigger")
-end
-jinhe_find = function() exe('look he') end
+
 -----兑换红蓝石头----
 function stoneSet()
     stonePrepare = {}

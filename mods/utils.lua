@@ -261,3 +261,137 @@ function randomElement(p_set)
 
     return l_element
 end
+
+Log = Log or {}
+
+function Log:info(text)
+    print(text)
+    messageShow(text, 'white')
+end
+
+function Log:warn(text)
+    print(text)
+    messageShow(text, 'yellow')
+end
+
+function Log:green(text)
+    print(text)
+    messageShow(text, 'lime')
+end
+
+function Log:error(text)
+    print(text)
+    messageShow(text, 'red')
+end
+
+function messageShow(p_msg, ccolor, bcolor)
+    local c_color = ccolor or "white"
+    local b_color = bcolor or "green"
+
+    if isNil(p_msg) then return end
+
+    if GetVariable("flagnote") then
+        flag.note = tonumber(GetVariable("flagnote"))
+    end
+    if flag.note and flag.note == 1 then
+        if flag.log and flag.log == "yes" then
+            chats_log(p_msg, c_color, b_color)
+        else
+            ColourNote("white", "black", p_msg)
+        end
+    else
+        chats_log(p_msg, c_color, b_color)
+    end
+end
+function messageShowT(p_msg, ccolor, bcolor)
+    local c_color = ccolor or "yellow"
+    local b_color = bcolor or "green"
+
+    if isNil(p_msg) then return end
+
+    chats_log(p_msg, c_color, b_color)
+end
+
+function setJobwhere(p) job.where = p end
+
+function scrLog()
+    local filename = GetInfo(67) .. "logs\\" .. score.id .. '发呆' ..
+                         os.date("%Y%m%d_%H时%M分%S秒") .. ".log"
+
+    local file = io.open(filename, "w")
+
+    local t = {}
+
+    for i = 1, GetLinesInBufferCount() do table.insert(t, GetLineInfo(i, 1)) end
+
+    local s = table.concat(t, "\n") .. "\n"
+
+    file:write(s)
+
+    file:close()
+end
+function dieLog()
+    local filename = GetInfo(67) .. "logs\\" .. score.id .. '死亡' ..
+                         os.date("%Y%m%d_%H时%M分%S秒") .. ".log"
+
+    local file = io.open(filename, "w")
+
+    local t = {}
+
+    for i = 1, GetLinesInBufferCount() do table.insert(t, GetLineInfo(i, 1)) end
+
+    local s = table.concat(t, "\n") .. "\n"
+
+    file:write(s)
+
+    file:close()
+end
+function jobbugLog()
+    local filename = GetInfo(67) .. "logs\\" .. score.id .. '任务BUG' ..
+                         os.date("%Y%m%d_%H时%M分%S秒") .. ".log"
+
+    local file = io.open(filename, "w")
+
+    local t = {}
+
+    for i = 1, GetLinesInBufferCount() do table.insert(t, GetLineInfo(i, 1)) end
+
+    local s = table.concat(t, "\n") .. "\n"
+
+    file:write(s)
+
+    file:close()
+end
+
+function jobfailLog()
+    local filename = GetInfo(67) .. "logs\\" .. score.id .. '任务失败' ..
+                         os.date("%Y%m%d_%H时%M分%S秒") .. ".log"
+
+    local file = io.open(filename, "w")
+
+    local t = {}
+
+    for i = 1, GetLinesInBufferCount() do table.insert(t, GetLineInfo(i, 1)) end
+
+    local s = table.concat(t, "\n") .. "\n"
+
+    file:write(s)
+
+    file:close()
+end
+function smyfailLog()
+    local filename = GetInfo(67) .. "logs\\" .. score.id .. 'smy' ..
+                         os.date("%Y%m%d_%H时%M分%S秒") .. ".log"
+
+    local file = io.open(filename, "w")
+
+    local t = {}
+
+    for i = 1, GetLinesInBufferCount() do table.insert(t, GetLineInfo(i, 1)) end
+
+    local s = table.concat(t, "\n") .. "\n"
+
+    file:write(s)
+
+    file:close()
+end

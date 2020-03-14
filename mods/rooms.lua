@@ -2795,7 +2795,7 @@ Room {
         ["southwest"] = "group/entry/cdtulu2",
         ["northeast"] = "chengdu/sroad1"
     },
-    room_relative = 
+    room_relative = "南门外↗土路↙土路土路"
 }
 Room {
     id = "chengdu/wroad1",
@@ -8109,7 +8109,8 @@ Room {
     id = "group/entry/lzroad1",
     name = "大道",
     outdoor = "兰州城",
-    ways = {["southwest"] = "lanzhou/road5", ["northeast"] = "lanzhou/jingyuan"}
+    ways = {["southwest"] = "lanzhou/road5", ["northeast"] = "lanzhou/jingyuan"},
+    room_relative = "靖远↗大道↙大道大道"
 }
 Room {
     id = "group/entry/lzshixia",
@@ -8118,7 +8119,8 @@ Room {
     ways = {
         ["southwest"] = "lanzhou/tumenzi",
         ["northeast"] = "lanzhou/bingcao"
-    }
+    },
+    room_relative = "冰草湾↗石峡子↙土门子石峡子"
 }
 Room {
     id = "group/entry/lzsroad3",
@@ -8127,7 +8129,8 @@ Room {
     ways = {
         ["southeast"] = "lanzhou/qingcheng",
         ["northwest"] = "lanzhou/sroad2"
-    }
+    },
+    room_relative = "大道↖大道↘青城大道"
 }
 Room {
     id = "group/entry/mjshamo1",
@@ -8142,19 +8145,22 @@ Room {
     ways = {
         ["south"] = "miaojiang/shandao2",
         ["northeast"] = "xiangyang/hunanroad2"
-    }
+    },
+    room_relative = "泸溪北↗山路｜山道山路"
 }
 Room {
     id = "group/entry/nbqsddao",
     name = "青石官道",
     outdoor = "宁波城",
-    ways = {["southeast"] = "ningbo/shilu", ["northwest"] = "ningbo/qsddao1"}
+    ways = {["southeast"] = "ningbo/shilu", ["northwest"] = "ningbo/qsddao1"},
+    room_relative = "青石官道↖青石官道↘石路青石官道"
 }
 Room {
     id = "group/entry/slxiaoj1",
     name = "山坡",
     outdoor = "嵩山少林",
-    ways = {["northup"] = "shaolin/xiaojing2", ["east"] = "shaolin/shijie1"}
+    ways = {["northup"] = "shaolin/xiaojing2", ["east"] = "shaolin/shijie1"},
+    room_relative = "田埂边↑山坡-----石阶山坡"
 }
 Room {
     id = "group/entry/sztulu2",
@@ -8174,13 +8180,15 @@ Room {
     id = "group/entry/tsyidao3",
     name = "大驿道",
     outdoor = "泰山",
-    ways = {["north"] = "taishan/daizong", ["west"] = "taishan/yidao2"}
+    ways = {["north"] = "taishan/daizong", ["west"] = "taishan/yidao2"},
+    room_relative = "岱宗坊｜大驿道----大驿道大驿道"
 }
 Room {
     id = "group/entry/wdroad7",
     name = "黄土路",
     outdoor = "武当山",
-    ways = {["east"] = "wudang/wdroad6", ["west"] = "wudang/wdroad8"}
+    ways = {["east"] = "wudang/wdroad6", ["west"] = "wudang/wdroad8"},
+    room_relative = "山脚下----黄土路----黄土路黄土路"
 }
 Room {
     id = "group/entry/xstulu2",
@@ -9440,7 +9448,8 @@ Room {
         ["east"] = "hengshan/mtroad1",
         ["west"] = "hengshan/mtroad2"
     },
-    objs = {["李四"] = "Li si", ["张三"] = "Zhang san"}
+    objs = {["李四"] = "Li si", ["张三"] = "Zhang san"},
+    room_relative = "树林｜树林-----树林-----树林｜树林树林"
 }
 Room {
     id = "hengshan/mtroad3",
@@ -9451,7 +9460,8 @@ Room {
         ["east"] = "hengshan/mtroad2",
         ["west"] = "hengshan/mtroad3"
     },
-    objs = {["樵夫"] = "Qiao fu"}
+    objs = {["樵夫"] = "Qiao fu"},
+    room_relative = "树林｜树林-----树林-----树林｜树林树林"
 }
 Room {
     id = "hengshan/mtroad4",
@@ -9461,7 +9471,8 @@ Room {
         ["north"] = "hengshan/mtroad6",
         ["east"] = "hengshan/mtroad3",
         ["west"] = "hengshan/mtroad5"
-    }
+    },
+    room_relative = "树林｜树林-----树林-----树林｜树林树林"
 }
 Room {
     id = "hengshan/mtroad5",
@@ -9471,7 +9482,8 @@ Room {
         ["north"] = "hengshan/mtroad5",
         ["east"] = "hengshan/mtroad4",
         ["west"] = "hengshan/mtroad5"
-    }
+    },
+    room_relative = "树林｜树林-----树林-----树林｜树林树林"
 }
 Room {
     id = "hengshan/mtroad6",
@@ -9482,7 +9494,8 @@ Room {
         ["east"] = "hengshan/mtroad4",
         ["west"] = "hengshan/mtroad4"
     },
-    objs = {["史婆婆"] = "shi popo"}
+    objs = {["史婆婆"] = "shi popo"},
+    room_relative = "树林｜树林-----树林-----树林｜树林树林"
 }
 -- add end
 Room {
@@ -17795,13 +17808,15 @@ Room {
     id = "shaolin/sengshe5",
     name = "僧舍",
     no_fight = true,
-    ways = {["south"] = "shaolin/sengshe4"}
+    ways = {["south"] = "shaolin/sengshe4"},
+    room_relative = "僧舍｜僧舍僧舍"
 }
 Room {
     id = "shaolin/sengshe6",
     name = "僧舍",
     no_fight = true,
-    ways = {["north"] = "shaolin/sengshe4"}
+    ways = {["north"] = "shaolin/sengshe4"},
+    room_relative = "僧舍｜僧舍僧舍"
 }
 Room {
     id = "shaolin/shanlu1",
@@ -21086,7 +21101,7 @@ Room {
         ["north"] = "thd/niujia/kezhan",
         ["east"] = "thd/niujia/bay"
     },
-    room_relative ="归来客栈｜土路-----小渔港↙村口土路"
+    room_relative = "归来客栈｜土路-----小渔港↙村口土路"
 }
 Room {
     id = "thd/niujia/jiangpan1",

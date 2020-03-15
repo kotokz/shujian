@@ -59,13 +59,10 @@ function jinheOver(dispose)
     wait.make(
         function()
             if dispose then
-                if inwdj == 1 then
-                    await_go("苗疆", "药王居")
-                    exe("give he to cheng")
-                    Log.info("处理完锦盒")
-                else
-                    Log.error("无法处理不能到达的地点的锦盒，请打开苗疆地图")
-                end
+                await_go("苗疆", "药王居")
+                wait_busy()
+                exe("give he to cheng")
+                Log.info("处理完锦盒")
             end
             Log:green("锦盒模块完成")
             return check_job()

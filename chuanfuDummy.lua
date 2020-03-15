@@ -116,6 +116,9 @@ function main()
                 "rainbow|hnwbh|wbh|xiaohama|parrot|qqqqqqqq|bubble|lakesi|beggar|root|tjkl|android|yuji|aion|lfw|tzssp|zruo|zjj|gjy|hfx|kickall|dzyu|mjjjjlll|tanwr|asura|azi|muxue|daji|dragon|yelang|tuiop|kickcool|juvair|minds|cdm|thaxthx|gouglz|xuxiake")
 end
 
+-- 渡船猛地一震，已经靠岸，船夫说道：“请大伙儿下船吧！”
+-- 说着将一块踏脚板搭上堤岸，形成一个出去(out)的阶梯。
+
 function add_triggers()
     create_trigger_t('main', "^「书剑\\D*」\\D*已经连续执行了", '',
                      'login')
@@ -190,9 +193,11 @@ function boatmsg(msg)
                 currentLocate = "西夏渡口"
             elseif locl.where:find("兰州城大渡口") then
                 currentLocate = "兰州渡口"
-            elseif locl.where:find("长安城陕晋渡口") then
+            elseif locl.where:find("长安城陕晋渡口") or
+                locl.where:find('长安城渡船') then
                 currentLocate = "陕晋渡口"
-            elseif locl.where:find("黄河流域大渡口") then
+            elseif locl.where:find("黄河流域大渡口") or
+                locl.where:find('黄河流域渡船') then
                 currentLocate = "黄河流域大渡口"
             end
         end

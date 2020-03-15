@@ -43,6 +43,7 @@ function jinhe_get(n, l, w)
                                     '^>*\\s*你从铁盒子里拿出了(\\D*)。|^>*\\s*你挖了一阵，什么也没有找到',
                                     1)
                 dig_count = dig_count + 1
+                wait_busy()
                 if line and line:find("你从铁盒子里") then
                     Log:info('锦盒：获得' .. w[1])
                     return jinheOver()

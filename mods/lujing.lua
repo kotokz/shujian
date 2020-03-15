@@ -1417,7 +1417,6 @@ function searchStart()
         end
         return find_nobody()
     end)
-
 end
 delElement = function(set, dir)
     local l_cnt = 0

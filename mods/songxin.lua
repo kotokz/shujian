@@ -328,23 +328,9 @@ function songxin_find()
     DeleteTriggerGroup("songxin_find")
     create_trigger_t('songxin_find1', '^>*\\D*' .. job.target .. '\\((\\D*)\\)',
                      '', 'songxin_send')
-    create_trigger_t('songxin_find2', '^>*\\s*你要送给谁', '',
-                     'songxin_goon')
-    create_trigger_t('songxin_find3',
-                     '^>*\\s*\\D*道：(这封信不是给我的，|你看清楚)',
-                     '', 'songxin_add')
-    create_trigger_t('songxin_find4',
-                     '^>*\\s*(这封信不是送给这个人的。|看清楚点，那是活人吗？！)',
-                     '', 'songxin_add')
-    create_trigger_t('songxin_find5',
-                     '^>*\\s*你擦了一把额头的汗，从怀中掏出信交给',
-                     '', 'songxin_finish')
+
     SetTriggerOption("songxin_find1", "group", "songxin_find")
     SetTriggerOption("songxin_find1", "keep_evaluating", "y")
-    SetTriggerOption("songxin_find2", "group", "songxin_find")
-    SetTriggerOption("songxin_find3", "group", "songxin_find")
-    SetTriggerOption("songxin_find4", "group", "songxin_find")
-    SetTriggerOption("songxin_find5", "group", "songxin_find")
     EnableTriggerGroup("songxin_find", false)
 end
 function songxin_find_begin()
@@ -390,54 +376,44 @@ function songxin_find_go()
 end
 function songxin_send(n, l, w)
     EnableTrigger("songxin_find1", false)
-    if flag.wait == 0 then
-        flag.wait = 1
-        sxjob.cnt = 1
-        sxjob.id = string.lower(w[1])
-        exe('follow ' .. sxjob.id)
-        -- checkBags()
-        return checkNext(songxin_send_act)
-    end
+    wait.make(function()
+        if flag.wait == 0 then
+            flag.wait = 1
+            sxjob.cnt = 1
+            sxjob.id = string.lower(w[1])
+            exe('follow ' .. sxjob.id)
+            while true do
+                exe('halt;songxin ' .. sxjob.id .. ' ' .. sxjob.cnt)
+                local line = wait.regexp(
+                                 '^>*\\s*(\\D*道：这封信不是给我的，|\\D*道：你看清楚|这封信不是送给这个人的。|看清楚点，那是活人吗？！|你擦了一把额头的汗，从怀中掏出信交给|你要送给谁)',
+                                 1)
+                if line then
+                    if line:find('掏出信交给') then
+                        return songxin_finish()
+                    elseif line:find('你要送给谁') then
+                        return songxin_goon()
+                    else
+                        sxjob.cnt = sxjob.cnt + 1
+                    end
+                end
+            end
+        end
+    end)
+
 end
---[[function songxin_check()    
-    if Bag["信件"] then
-       return check_halt(songxin_send_act)
-    else
-       return check_heal()
-    end
-end]]
-function songxin_send_act()
-    exe('halt;songxin ' .. sxjob.id)
-    tmp.cnt = 0
-    EnableTrigger("hp12", true)
-    create_timer_s('songxin', 1, 'songxin_act_set')
-end
-function songxin_act_set()
-    EnableTrigger("hp12", false)
-    if job.name ~= 'songxin' then
-        EnableTriggerGroup("songxin_find", false)
-        DeleteTimer('songxin')
-        return
-    end
-    if tmp.cnt then tmp.cnt = tmp.cnt + 1 end
-    if not tmp.cnt or tmp.cnt > 20 then
-        DeleteTimer('songxin')
-        return check_heal()
-    end
-    exe('halt;songxin ' .. sxjob.id .. ' ' .. sxjob.cnt)
-end
-function songxin_add()
-    sxjob.cnt = sxjob.cnt + 1
-    exe('halt;songxin ' .. sxjob.id .. ' ' .. sxjob.cnt)
-    tmp.cnt = 0
-    EnableTrigger("hp12", true)
-    create_timer_s('songxin', 1, 'songxin_act_set')
-end
+
 function songxin_goon()
     EnableTrigger("songxin_find1", true)
     flag.wait = 0
-    DeleteTimer('songxin')
-    return walk_wait()
+    if walk_hook_thread then
+        return walk_wait()
+    else
+        jobbugLog()
+        messageShow(
+            '送信任务：无法继续下一步，可能是bug, area=' ..
+                locl.area .. " locl.room=" .. locl.room)
+        return find_nobody()
+    end
     -- thread_resume(lookfor)
 end
 function songxin_finish()
@@ -469,7 +445,7 @@ end
 function songxin_killer()
     fight.time.b = os.time()
     sx1wait = 0
-    flag.find = 1    
+    flag.find = 1
     dis_all()
     EnableTrigger("hpheqi1", true)
     DeleteTriggerGroup("sx1lian")

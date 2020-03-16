@@ -730,14 +730,13 @@ huashan_finish = function()
         g_stop_flag = false
         return disAll()
     end
-    if Bag and Bag["白银"] and Bag["白银"].cnt and Bag["白银"].cnt > 500 then
-        return check_gold()
-    end
-    if
-        (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt < count.gold_max and score.gold > count.gold_max) or
-            (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt > count.gold_max * 4)
-     then
-        return check_gold()
+    if Bag then
+        if Bag["白银"] and Bag["白银"].cnt and Bag["白银"].cnt > 500 then
+            return check_gold()
+        end
+        if Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt > count.gold_max * 4 then
+            return check_gold()
+        end
     end
 
     hsruntime = hsruntime + 1

@@ -2485,9 +2485,7 @@ end
 function check_gold_count()
     if Bag['壹仟两银票'] and Bag['壹仟两银票'].cnt > 10 then
         exe('score;chazhang')
-        if score.goldlmt and score.gold and (score.goldlmt - score.gold) > 50 then
-            return check_cash_cun()
-        end
+        return check_busy(check_cash_cun)
     end
     if Bag and Bag["白银"] and Bag["白银"].cnt and
         (Bag["白银"].cnt > 100 or Bag["白银"].cnt < 50) then
@@ -2512,7 +2510,7 @@ function check_cash_cun()
         if l_cnt > 0 then exe('cun ' .. l_cnt .. ' cash') end
     end
     checkBags()
-    return checkWait(check_gold_check)
+    return check_busy(check_gold_check)
 end
 function check_silver_qu()
     local l_cnt = Bag["白银"].cnt - 50

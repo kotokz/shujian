@@ -205,10 +205,14 @@ function main()
     setAlias()
     currentLocate = nil
     idle()
-    SetVariable(
-        "commlist",
-        "rainbow|hnwbh|wbh|xiaohama|parrot|qqqqqqqq|bubble|lakesi|beggar|root|tjkl|android|yuji|aion|lfw|tzssp|zruo|zjj|gjy|hfx|kickall|dzyu|mjjjjlll|tanwr|asura|azi|muxue|daji|dragon|yelang|tuiop|kickcool|juvair|minds|cdm|thaxthx|gouglz|xuxiake|pumkmai"
-    )
+    if GetVariable("id") == "amp" then
+        SetVariable("commlist", "yhj|somickey|tanwr|linglong|kjrwd|kjrgm|taot|xice")
+    else
+        SetVariable(
+            "commlist",
+            "rainbow|hnwbh|wbh|xiaohama|parrot|qqqqqqqq|bubble|lakesi|beggar|root|tjkl|android|yuji|aion|lfw|tzssp|zruo|zjj|gjy|hfx|kickall|dzyu|mjjjjlll|asura|azi|muxue|daji|dragon|yelang|tuiop|kickcool|juvair|minds|cdm|thaxthx|gouglz|xuxiake|pumkmai|too|xibei"
+        )
+    end
 end
 
 -- 渡船猛地一震，已经靠岸，船夫说道：“请大伙儿下船吧！”
@@ -220,9 +224,75 @@ function add_triggers()
     DeleteTriggerGroup("jinheTrigger")
     create_trigger_t("jiang1", "^(> )*艄公(们|)把踏脚板收", "", "boatout")
     create_trigger_t("jiang2", "^(> )*一艘渡船缓缓地驶了过来，艄公将一块踏脚板搭上堤岸，以便乘客上下", "", "boatarrive")
+    create_trigger_t("chuanfu1", "^(> )*\\D*告诉你：长江渡船出发时间", "", "changjiangOpen")
+    create_trigger_t("chuanfu2", "^(> )*\\D*告诉你：澜沧江渡船出发时间", "", "lancangjiangOpen")
+    create_trigger_t("chuanfu3", "^(> )*\\D*告诉你：澜沧江渡船到达时间", "", "lancangjiangClose")
+    create_trigger_t("chuanfu4", "^(> )*\\D*告诉你：长江渡船到达时间", "", "changjiangClose")
+    create_trigger_t("chuanfu5", "^(> )*\\D*告诉你：黄河流域大渡口出发时间", "", "huangheOpen")
+    create_trigger_t("chuanfu6", "^(> )*\\D*告诉你：黄河流域大渡口到达时间", "", "huangheClose")
+    create_trigger_t("chuanfu7", "^(> )*\\D*告诉你：陕晋渡口出发时间", "", "sanjinOpen")
+    create_trigger_t("chuanfu8", "^(> )*\\D*告诉你：陕晋渡口到达时间", "", "sanjinClose")
+    create_trigger_t("chuanfu9", "^(> )*\\D*告诉你：西夏渡口出发时间", "", "xixiaOpen")
+    create_trigger_t("chuanfu10", "^(> )*\\D*告诉你：西夏渡口到达时间", "", "xixiaClose")
+    create_trigger_t("chuanfu11", "^(> )*\\D*告诉你：兰州渡口出发时间", "", "lanzhouOpen")
+    create_trigger_t("chuanfu12", "^(> )*\\D*告诉你：兰州渡口到达时间", "", "lanzhouClose")
     SetTriggerOption("jiang1", "group", "jinheTrigger")
     SetTriggerOption("jiang2", "group", "jinheTrigger")
     EnableTriggerGroup("jinheTrigger", true)
+    for i = 1, 12 do
+        SetTriggerOption("chuanfu" .. i, "group", "chuanfu")
+    end
+    EnableTriggerGroup("chuanfu", true)
+end
+
+function sanjinOpen()
+    currentLocate = "陕晋渡口"
+    boatout()
+end
+function sanjinClose()
+    currentLocate = "陕晋渡口"
+    boatarrive()
+end
+function huangheOpen()
+    currentLocate = "黄河流域大渡口"
+    boatout()
+end
+function huangheClose()
+    currentLocate = "黄河流域大渡口"
+    boatarrive()
+end
+function xixiaOpen()
+    currentLocate = "西夏渡口"
+    boatout()
+end
+function xixiaClose()
+    currentLocate = "西夏渡口"
+    boatarrive()
+end
+function lanzhouOpen()
+    currentLocate = "兰州渡口"
+    boatout()
+end
+function lanzhouClose()
+    currentLocate = "兰州渡口"
+    boatarrive()
+end
+
+function changjiangOpen()
+    currentLocate = "长江渡船"
+    boatout()
+end
+function changjiangClose()
+    currentLocate = "长江渡船"
+    boatarrive()
+end
+function lancangjiangOpen()
+    currentLocate = "澜沧江渡船"
+    boatout()
+end
+function lancangjiangClose()
+    currentLocate = "澜沧江渡船"
+    boatarrive()
 end
 
 function login_choose()

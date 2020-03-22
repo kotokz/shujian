@@ -67,34 +67,93 @@ end
 function sanjinOpen()
     Chuanfu.sanjin.enable = true
     Chuanfu.sanjin.departTime = os.clock()
+    if score.id == "hbgui" then
+        Send("tell amp 陕晋渡口出发时间" .. os.time())
+    end
 end
 function sanjinClose()
     Chuanfu.sanjin.enable = false
     Chuanfu.sanjin.arriveTime = os.clock()
+    if score.id == "hbgui" then
+        Send("tell amp 陕晋渡口到达时间" .. os.time())
+    end
 end
 function huangheOpen()
     Chuanfu.huanghe.enable = true
     Chuanfu.huanghe.departTime = os.clock()
+    if score.id == "hbgui" then
+        Send("tell amp 黄河流域大渡口出发时间" .. os.time())
+    end
 end
 function huangheClose()
     Chuanfu.huanghe.enable = false
     Chuanfu.huanghe.arriveTime = os.clock()
+    if score.id == "hbgui" then
+        Send("tell amp 黄河流域大渡口到达时间" .. os.time())
+    end
 end
 function xixiaOpen()
     Chuanfu.xixia.enable = true
     Chuanfu.xixia.departTime = os.clock()
+    if score.id == "hbgui" then
+        Send("tell amp 西夏渡口出发时间" .. os.time())
+    end
 end
 function xixiaClose()
     Chuanfu.xixia.enable = false
     Chuanfu.xixia.arriveTime = os.clock()
+    if score.id == "hbgui" then
+        Send("tell amp 西夏渡口到达时间" .. os.time())
+    end
 end
 function lanzhouOpen()
     Chuanfu.lanzhou.enable = true
     Chuanfu.lanzhou.departTime = os.clock()
+    if score.id == "hbgui" then
+        Send("tell amp 兰州渡口出发时间" .. os.time())
+    end
 end
 function lanzhouClose()
     Chuanfu.lanzhou.enable = false
     Chuanfu.lanzhou.arriveTime = os.clock()
+    if score.id == "hbgui" then
+        Send("tell amp 兰州渡口到达时间" .. os.time())
+    end
+end
+
+function changjiangOpen()
+    Chuanfu.enable = true
+    -- print('长江渡口开启')
+    Chuanfu.changjiang.enable = true
+    Chuanfu.changjiang.departTime = os.clock()
+    if score.id == hbgui then
+        Send("tell amp 长江渡船出发时间" .. os.time())
+    end
+end
+function changjiangClose()
+    Chuanfu.enable = true
+    -- print('长江渡口关闭')
+    Chuanfu.changjiang.enable = false
+    Chuanfu.changjiang.arriveTime = os.clock()
+    if score.id == hbgui then
+        Send("tell amp 长江渡船到达时间" .. os.time())
+    end
+end
+function lancangjiangOpen()
+    -- print('澜沧江渡口开启')
+    Chuanfu.lancangjiang.enable = true
+    Chuanfu.lancangjiang.departTime = os.clock()
+    if score.id == hbgui then
+        Send("tell amp 澜沧江渡船出发时间" .. os.time())
+    end
+end
+function lancangjiangClose()
+    -- print('澜沧江渡口关闭')
+    Chuanfu.lancangjiang.enable = false
+    Chuanfu.lancangjiang.arriveTime = os.clock()
+    if score.id == hbgui then
+        Send("tell amp 澜沧江渡船到达时间" .. os.time())
+    end
 end
 
 function Chuanfu:closeSanjin()
@@ -173,29 +232,6 @@ function Chuanfu:checkXixiaLanzhou()
             Chuanfu:closeLanzhou()
         end
     end
-end
-
-function changjiangOpen()
-    Chuanfu.enable = true
-    -- print('长江渡口开启')
-    Chuanfu.changjiang.enable = true
-    Chuanfu.changjiang.departTime = os.clock()
-end
-function changjiangClose()
-    Chuanfu.enable = true
-    -- print('长江渡口关闭')
-    Chuanfu.changjiang.enable = false
-    Chuanfu.changjiang.arriveTime = os.clock()
-end
-function lancangjiangOpen()
-    -- print('澜沧江渡口开启')
-    Chuanfu.lancangjiang.enable = true
-    Chuanfu.lancangjiang.departTime = os.clock()
-end
-function lancangjiangClose()
-    -- print('澜沧江渡口关闭')
-    Chuanfu.lancangjiang.enable = false
-    Chuanfu.lancangjiang.arriveTime = os.clock()
 end
 
 function Chuanfu:openAllareas()

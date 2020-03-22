@@ -35,7 +35,7 @@ function jinhe_get(n, l, w)
                 Log:info("前往" .. room .. "挖锦盒")
                 await_go(room)
                 local dig_count = 0
-                while dig_count < 5 do
+                while dig_count < 3 do
                     exe("dig")
                     local line, w = wait.regexp("^>*\\s*你从铁盒子里拿出了(\\D*)。|^>*\\s*你挖了一阵，什么也没有找到", 1)
                     dig_count = dig_count + 1

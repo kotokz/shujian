@@ -1908,7 +1908,7 @@ function check_jobx()
             for p in pairs(weaponUsave) do
                 if Bag and not Bag[p] then
                     job.zuhe["songmoya"] = nil
-                    log:greem("丢失武器!" .. p .. "不见了")
+                    Log:green("丢失武器!" .. p .. "不见了")
                     return weapon_lost()
                 end
             end
@@ -1952,6 +1952,9 @@ end
 function checkJob()
     if job.last ~= "hqgzc" then
         local tmp = GetVariable("job_hqg_date")
+        if GetVariable("job_hqg_lx") == nil then
+            SetVariable("job_hqg_lx", 1)
+        end
         local lx_flag = GetVariable("job_hqg_lx") == "1"
         local lastHqgDate
         if tmp == nil then

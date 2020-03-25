@@ -1659,6 +1659,13 @@ function checkBY()
     end
 end
 
+function await_check_bags()
+    local self = coroutine.running()
+    local async_continue = function(...) coroutine.resume(self, ...) end
+    checkBags(async_continue)
+    return coroutine.yield()
+end
+
 function checkBags(func)
     DeleteTriggerGroup("bags")
     create_trigger_t('bags1', "^(> )*你身上携带物品的别称如下", '',

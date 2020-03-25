@@ -373,7 +373,7 @@ end
 function Armor:checkJianDao(thread)
     wait.make(
         function()
-            checkBags() -- we should enhance this to be await like func
+            await_check_bags()
             wait_busy()
             while not Bag["ºÙµ∂"] do
                 await_go("—Ô÷›≥«", "‘”ªı∆Ã")
@@ -389,7 +389,7 @@ function Armor:checkJianDao(thread)
                         coroutine.resume(thread, status)
                     end
                 end
-                checkBags() -- we should enhance this to be await like func
+                await_check_bags()
                 wait_busy()
             end
 
@@ -493,7 +493,7 @@ function Armor:cunArmor(thread)
         function()
             await_go("city/zahuopu")
             exe("cun " .. self.dazaoID)
-            checkBags()
+            await_check_bags()
             wait_busy()
             await_go("zhiye/caifengpu1")
             coroutine.resume(thread)
@@ -537,7 +537,7 @@ function Armor:buyJianDao(thread)
                         flag.find = 1
                         exe("follow none")
                         print("¬ÚµΩºÙµ∂¡À")
-                        checkBags()
+                        await_check_bags()
                         break
                     end
                 else

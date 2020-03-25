@@ -126,7 +126,7 @@ function changjiangOpen()
     -- print('长江渡口开启')
     Chuanfu.changjiang.enable = true
     Chuanfu.changjiang.departTime = os.clock()
-    if score.id == hbgui then
+    if score.id == "hbgui" then
         Send("tell amp 长江渡船出发时间" .. os.time())
     end
 end
@@ -135,7 +135,7 @@ function changjiangClose()
     -- print('长江渡口关闭')
     Chuanfu.changjiang.enable = false
     Chuanfu.changjiang.arriveTime = os.clock()
-    if score.id == hbgui then
+    if score.id == "hbgui" then
         Send("tell amp 长江渡船到达时间" .. os.time())
     end
 end
@@ -143,7 +143,7 @@ function lancangjiangOpen()
     -- print('澜沧江渡口开启')
     Chuanfu.lancangjiang.enable = true
     Chuanfu.lancangjiang.departTime = os.clock()
-    if score.id == hbgui then
+    if score.id == "hbgui" then
         Send("tell amp 澜沧江渡船出发时间" .. os.time())
     end
 end
@@ -151,7 +151,7 @@ function lancangjiangClose()
     -- print('澜沧江渡口关闭')
     Chuanfu.lancangjiang.enable = false
     Chuanfu.lancangjiang.arriveTime = os.clock()
-    if score.id == hbgui then
+    if score.id == "hbgui" then
         Send("tell amp 澜沧江渡船到达时间" .. os.time())
     end
 end

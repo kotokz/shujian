@@ -34,6 +34,7 @@ function jinhe_get(n, l, w)
             for _, room in pairs(rooms) do
                 Log:info("Ç°Íù" .. room .. "ÍÚ½õºÐ")
                 await_go(room)
+                wait_busy()
                 local dig_count = 0
                 while dig_count < 3 do
                     exe("dig")

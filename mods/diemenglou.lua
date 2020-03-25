@@ -493,8 +493,13 @@ function dmlCheckToplist()
     target = {}
     _target = {}
     backupList = {}
-    exe("top pk 999")
-    checkTop(checkTop)
+    wait.make(
+        function()
+            wait_busy()
+            exe("top pk 999")
+            checkTop(checkTop)
+        end
+    )
 end
 function dmlCheckToplistAct(n, l, w)
     targetRank = tonumber(w[1]) or 0

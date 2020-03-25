@@ -14265,12 +14265,12 @@ Room {
     name = "É½±Ú",
     ways = {
         ["south"] = "city/wroad3",
-        ["right"] = "mingjiao/hdg/huacong1"
-        -- ["#go_hudiegu"] = "mingjiao/hdg/huacong1",
+        -- ["right"] = "mingjiao/hdg/huacong1",
+        ["#go_hudiegu"] = "mingjiao/hdg/huacong1",
     },
     nolooks = {
-        ["right"] = true
-        -- ["#go_hudiegu"] = true,
+        -- ["right"] = true
+        ["#go_hudiegu"] = true,
     }
     --[[lengths = {
 		["right"] = "if score.party and score.party=='Ã÷½Ì' then return 10 else return false end",

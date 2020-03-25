@@ -625,6 +625,8 @@ function checkPrepareOver()
                 end
             elseif wudang_checkfood == 1 or (condition.busy and condition.busy > 10) or needxuexi == 1 then
                 return check_xuexi()
+            elseif Bag["锦盒"] and (condition.busy and condition.busy > 10) then
+                return jinheTrigger()
             else
                 if needxuexi ~= 1 then
                     messageShow("不需要学习")
@@ -1906,7 +1908,7 @@ function check_jobx()
             for p in pairs(weaponUsave) do
                 if Bag and not Bag[p] then
                     job.zuhe["songmoya"] = nil
-                    messageShow("丢失武器!" .. p .. "不见了", "blue")
+                    log:greem("丢失武器!" .. p .. "不见了")
                     return weapon_lost()
                 end
             end
@@ -1950,6 +1952,7 @@ end
 function checkJob()
     if job.last ~= "hqgzc" then
         local tmp = GetVariable("job_hqg_date")
+        local lx_flag = GetVariable("job_hqg_lx") == "1"
         local lastHqgDate
         if tmp == nil then
             local fn = GetInfo(67) .. "logs\\hqgzc_mark_" .. score.id .. ".log"
@@ -1963,14 +1966,18 @@ function checkJob()
         if not tmp then
             lastHqgDate = nil
         elseif tmp:len() == 10 then
-            lastHqgDate = tonumber(tmp) * 100
-        else
             lastHqgDate = tonumber(tmp)
+        else
+            lastHqgDate = tonumber(tmp) / 100
         end
-        local currentDate = tonumber(os.date("%Y%m%d%H%M"))
+        local currentDate = tonumber(os.date("%Y%m%d%H"))
 
-        if score.xiangyun == "死" and (not lastHqgDate or (currentDate - lastHqgDate > 10000)) then
-            return hqgzc()
+        if (not lastHqgDate or (currentDate - lastHqgDate > 100)) then
+            if lx_flag and score.xiangyun == "死" then
+                return hqgzc()
+            elseif lx_flag == false then
+                return hqgzc()
+            end
         end
     end
     -- if hp.exp>2000000 then job.zuhe["zhuoshe"]=nil end

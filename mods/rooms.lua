@@ -14266,7 +14266,7 @@ Room {
     ways = {
         ["south"] = "city/wroad3",
         -- ["right"] = "mingjiao/hdg/huacong1",
-        ["#go_hudiegu"] = "mingjiao/hdg/huacong1",
+        ["#bohuacong"] = "mingjiao/hdg/huacong1",
     },
     nolooks = {
         -- ["right"] = true

@@ -517,10 +517,10 @@ function wudangLost(n, l, w)
 end
 function wudangKillAct()
     wdgostart = 0
-    fight.time.b = os.time()
     flag.robber = true
     kezhiwugong()
     kezhiwugongAddTarget(job.target, job.id)
+    fight.time.b = os.time()
     wait.make(
         function()
             repeat
@@ -559,8 +559,16 @@ function wudangBack(n, l, w)
         wdtongji_zdcs = wdtongji_zdcs + 1
         wdtongji_lasttime_lj = wdtongji_lasttime_lj + wdtongji_thistime
         wdtongji_pingjun = string.format("%0.2f", wdtongji_lasttime_lj / wdtongji_zdcs)
+        local l_time = os.time() - tongji.time
+        local wd_count = math.modf(wdtongji_zdcs * 3600 / l_time)
         messageShowT("武当任务：【" .. job.target .. "】【" .. job.id .. "】。使用武功【" .. npc_skill .. "】，武功属性【" .. npc_val .. "】。")
-        messageShowT("武当任务：搞定" .. "【" .. job.target .. "】！战斗用时:【" .. fight.time.over .. "】秒。")
+        messageShowT(
+            "武当任务：搞定" ..
+                "【" ..
+                    job.target ..
+                        "】！战斗用时:【" ..
+                            fight.time.over .. "】秒.平均用时【" .. wdtongji_pingjun .. "】秒。平均每小时成功【" .. wd_count .. "】个任务。"
+        )
     end
 end
 function wudangBackGet()

@@ -227,6 +227,8 @@ weaponWieldCut = function()
     if first and Bag[first] and Bag[first].kind and weaponKind[Bag[first].kind] and weaponKind[Bag[first].kind] == "cut" then
         found = true
         exe("wield " .. Bag[first].fullid)
+
+        weaponshape(first)
     else
         for p in pairs(Bag) do
             if Bag[p].kind and weaponKind[Bag[p].kind] and weaponKind[Bag[p].kind] == "cut" then
@@ -243,6 +245,19 @@ weaponWieldCut = function()
         end
     end
     checkWield()
+end
+
+function weaponshape(name)
+    local shenqi_id = GetVariable("myshenqi_id")
+    if shenqi_id then
+        if shenqi_id:find(" ") then
+            local ids = utils.split(shenqi_id, " ")
+            shenqi_id = ids[-1]
+        end
+        exe("uweapon shape " .. shenqi_id .. " " .. Bag[name].kind)
+    else
+        exe("uweapon shape " .. Bag[name].kind .. " " .. Bag[name].kind)
+    end
 end
 
 function weaponWieldLearn()
@@ -382,11 +397,7 @@ weaponRepairDo = function()
             local shenqi_id = GetVariable("myshenqi_id")
             if tmp.uweapon and Bag[tmp.uweapon] then
                 while true do
-                    if shenqi_id then
-                        exe("uweapon shape " .. shenqi_id .. " " .. Bag[tmp.uweapon].kind)
-                    else
-                        exe("uweapon shape " .. Bag[tmp.uweapon].kind .. " " .. Bag[tmp.uweapon].kind)
-                    end
+                    weaponshape(tmp.uweapon)
                     exe("repair " .. Bag[tmp.uweapon].fullid)
                     l, w =
                         wait.regexp(
@@ -394,7 +405,8 @@ weaponRepairDo = function()
                         2
                     )
                     if l and l:find("必须装备铁锤才能来维修") then
-                        checkBags(weapon_unwield)
+                        await_check_bags()
+                        weapon_unwield()
                         exe("wield tie chui")
                         wait_busy()
                     elseif l then

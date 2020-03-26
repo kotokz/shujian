@@ -535,9 +535,9 @@ huashan_cut = function()
         hstongjilasttime_l = hstongjilasttime_l + hstongjilasttime_l_2
         hstongji_2 = hstongji_2 + 1
         hstongji_pingjun = string.format("%0.2f", hstongjilasttime_l / hstongji_2)
-        messageShowT("华山任务：【" .. job.target .. "】【" .. job.id .. "】。使用武功【" .. npc_skill .. "】，武功属性【" .. npc_val .. "】。")
+        messageShowT("华山任务②：【" .. job.target .. "】【" .. job.id .. "】。使用武功【" .. npc_skill .. "】，武功属性【" .. npc_val .. "】。")
         messageShowT(
-            "华山任务：战斗用时:【" ..
+            "华山任务②：战斗用时:【" ..
                 fight.time.over ..
                     "】秒,搞定蒙面人：【" .. job.target .. "】,华山2共计【" .. hstongji_2 .. "】次.平均用时【" .. hstongji_pingjun .. "】秒",
             "aqua"
@@ -548,10 +548,11 @@ huashan_cut = function()
         hstongjilasttime_l_1 = hstongjilasttime_l_1 + hstongjilasttime_l_2
         hstongji_1 = hstongji_1 + 1
         hstongji_pingjun = string.format("%0.2f", hstongjilasttime_l_1 / hstongji_1)
+        messageShowT("华山任务①：【" .. job.target .. "】【" .. job.id .. "】。使用武功【" .. npc_skill .. "】，武功属性【" .. npc_val .. "】。")
         messageShowT(
-            "华山任务：战斗用时:【" ..
+            "华山任务①：战斗用时:【" ..
                 fight.time.over ..
-                    "】秒,搞定蒙面人：【" .. job.target .. "】,华山1共计【" .. hstongji_1 .. "】次.平均用时【" .. hstongji_pingjun .. "】秒",
+                    "】秒,搞定蒙面人：【" .. job.target .. "】,华山①共计【" .. hstongji_1 .. "】次.平均用时【" .. hstongji_pingjun .. "】秒",
             "aqua"
         )
     end

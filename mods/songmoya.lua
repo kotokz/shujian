@@ -820,9 +820,6 @@ function yptDzover()
         function()
             wait.time(2)
             exe("halt;yun qi;yun jingli;yun jing")
-            if score.id and score.id == "kkfromch" then
-                exe("bei none;bei finger")
-            end
             print("打座完毕，等待准备中！")
         end
     )

@@ -1,4 +1,10 @@
 -- 雪山
+xueshantongji_1 = 0
+xueshantongji_zh = 0 -- 任务时间总和
+xueshantongji_lq = 0 -- hs领取次数
+xeushan_pingjun = 0 -- 平均时间
+xueshanjilasttime_l = 0 -- 累计雪山任务战斗时间
+xueshanjilasttime_l_2 = 0 -- 本次雪山战斗时间
 local XsIgnores = {
     ["武当山院门"] = true,
     ["武当山后山小院"] = true,
@@ -654,12 +660,27 @@ function xueshan_faint(n, l, w)
 end
 function xueshan_sa(n, l, w)
     fightoverweapon()
-    fight.time.e = os.time()
-    fight.time.over = fight.time.e - fight.time.b
+    fight.time.over = os.time() - fight.time.b
+    xueshantongji_thistime = fight.time.over
     if job.target == w[2] then
         tmp.kill = true
         EnableTriggerGroup("xueshan_fight", false)
-        messageShowT("雪山任务：搞定保镖【" .. job.target .. "】！战斗用时:【" .. fight.time.over .. "】秒。")
+        xueshanjilasttime_l = xueshanjilasttime_l + xueshantongji_thistime
+        xueshantongji_1 = xueshantongji_1 + 1
+        xueshan_pingjun = string.format("%0.2f", xueshanjilasttime_l / xueshantongji_1)
+        messageShowT(
+            "雪山任务：搞定保镖【" ..
+                job.target ..
+                    "】【" ..
+                        guard_id ..
+                            "】.使用武功【" ..
+                                npc_skill .. "】，武功属性【" .. npc_val .. "】,战斗用时:【" .. xueshantongji_thistime .. "】秒。"
+        )
+        messageShowT(
+            "雪山任务：战斗用时:【" ..
+                fight.time.over ..
+                    "】秒,搞定保镖【" .. job.target .. "】,雪山任务共计【" .. xueshantongji_1 .. "】次.平均用时【" .. xueshan_pingjun .. "】秒。"
+        )
         geta()
         -- exe('pfmset')
         -- ain

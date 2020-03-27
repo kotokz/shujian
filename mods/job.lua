@@ -37,8 +37,10 @@ gaibangCancel =
 sldsmCancel =
     "黄蓉|杨逍|钟万仇|任盈盈|薛慕华|凌震天|黄天令|张浩天|洪啸天|丁勉|静风师太|陆大有|高升泰|马光佐|张浩天|洪啸天|西华子|执勤兵|玉玑子|玉磬子|玉音子|梁子翁|吕文德|达尔巴|看守|尼摩星|看窑弟子|赵敏|出尘子|侯君集|忽必烈|摘星子|飘然子|黯然子|狮吼子|阿紫|马掌柜|飞天子"
 wudangcancel = ""
-sx2joblevel = "微不足道|马马虎虎|小有所成|融会贯通|颇为了得|极其厉害"
-jiangnan_area = "佛山镇|福州城|杭州城|嘉兴城|梅庄|姑苏慕容|燕子坞|曼佗罗山庄|宁波城|莆田少林|苏州城|牛家村|归云庄"
+sx2joblevel =
+    "微不足道|马马虎虎|小有所成|融会贯通|颇为了得|极其厉害"
+jiangnan_area =
+    "佛山镇|福州城|杭州城|嘉兴城|梅庄|姑苏慕容|燕子坞|曼佗罗山庄|宁波城|莆田少林|苏州城|牛家村|归云庄"
 zhongyuan_area =
     "苗疆|长乐帮|成都城|扬州城|大理城|无量山|大理皇宫|大理王府|终南山|玉虚观|峨嵋山|襄阳郊外|黄河流域|萧府|华山|南阳城|嵩山|嵩山少林|大理城西|大理城南|大理城东|泰山|铁掌山|天龙寺|华山村|武当山|襄阳城|柳宗镇|大雪山|中原|成都郊外|大理城北|长安城"
 cjn_area = "长江南岸|江南官道"
@@ -345,26 +347,35 @@ dangerousNpc = {
 prepare_trigger = function()
     DeleteTriggerGroup("prepare_neili")
     -- ain dls nv id dazuo
-    create_trigger_t(
-        "prepare_neili1",
-        "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
-        "",
-        "prepare_neili_b"
-    )
-    create_trigger_t(
-        "prepare_neili2",
-        "^(> )*(你运起玄天无极神功，气聚丹田|你手捏剑诀，将寒冰真气|你盘膝而坐，运起八荒六合唯我独尊功|你运起纯阳神通功，片刻之间|你抉弃杂念盘膝坐定，手捏气诀|你盘膝坐下，默运天魔大法|你凝神静气，盘坐下来|你随意坐下，双手平放在双膝，默念口诀|你手捏绣花针，盘膝坐下，默运葵花神功|你坐下来运气用功，一股内息开始在体内流动|你慢慢盘膝而坐，双手摆于胸前|你五心向天，排除一切杂念，内息顺经脉缓缓流动|你盘膝坐下，双手合十置于头顶，潜运内力|你屏息静气，坐了下来，左手搭在右手之上|你盘膝坐下，垂目合什，默运枯荣禅功|你盘膝坐下，闭目合什，运起乾天一阳神功|你盘膝坐下，暗运内力，试图采取天地之精华|你轻轻的吸一口气，闭上眼睛，运起玉女心经|你盘腿坐下，双目微闭，双手掌心相向成虚握太极|你气运丹田，将体内毒素慢慢逼出，控制着它环绕你缓缓飘动|你盘膝而坐，双手垂于胸前成火焰状，深吸口气|你盘膝而坐，运使九阳，气向下沉|你随意坐下，双手平放在双膝，默念口诀|你随意一站，双手缓缓抬起，深吸一口气|你盘膝而坐，双目紧闭，深深吸一口气引入丹田|你席地而坐，五心向天，脸上红光时隐时现|你暗运临济十二庄，气聚丹田|你收敛心神闭目打坐，手搭气诀，调匀呼吸，感受天地之深邃，自然之精华，渐入无我境界)",
-        "",
-        "prepare_neili_t"
-    )
-    create_trigger_t("prepare_neili3", "^(> )*卧室不能(吐纳|打坐)，会影响别人休息。", "", "prepare_neili_w")
-    create_trigger_t("prepare_neili4", "^(> )*(你正要有所动作|你无法静下心来修炼|你还是专心拱猪吧)", "", "prepare_neili_w")
-    create_trigger_t("prepare_neili5", "^(> )*这里不准战斗，也不准(吐纳|打坐)。", "", "prepare_neili_w")
-    create_trigger_t("prepare_neili6", "^(> )*这里可不是让你提高(内力|精力)的地方。", "", "prepare_neili_w")
-    create_trigger_t("prepare_neili7", "^(> )*你吐纳完毕，睁开双眼，站了起来。", "", "prepare_neili_b")
-    create_trigger_t("prepare_neili8", "^(> )*你闭上眼睛开始吐纳。", "", "prepare_neili_t")
-    create_trigger_t("prepare_neili9", "^(> )*你现在手脚戴着镣铐，不能做出正确的姿势来打坐", "", "prepare_neili_liaokao")
-    create_trigger_t("prepare_neili10", "^(> )*你身上没有包括任何特殊状态。", "", "prepare_neili_over")
+    create_trigger_t("prepare_neili1",
+                     "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
+                     "", "prepare_neili_b")
+    create_trigger_t("prepare_neili2",
+                     "^(> )*(你运起玄天无极神功，气聚丹田|你手捏剑诀，将寒冰真气|你盘膝而坐，运起八荒六合唯我独尊功|你运起纯阳神通功，片刻之间|你抉弃杂念盘膝坐定，手捏气诀|你盘膝坐下，默运天魔大法|你凝神静气，盘坐下来|你随意坐下，双手平放在双膝，默念口诀|你手捏绣花针，盘膝坐下，默运葵花神功|你坐下来运气用功，一股内息开始在体内流动|你慢慢盘膝而坐，双手摆于胸前|你五心向天，排除一切杂念，内息顺经脉缓缓流动|你盘膝坐下，双手合十置于头顶，潜运内力|你屏息静气，坐了下来，左手搭在右手之上|你盘膝坐下，垂目合什，默运枯荣禅功|你盘膝坐下，闭目合什，运起乾天一阳神功|你盘膝坐下，暗运内力，试图采取天地之精华|你轻轻的吸一口气，闭上眼睛，运起玉女心经|你盘腿坐下，双目微闭，双手掌心相向成虚握太极|你气运丹田，将体内毒素慢慢逼出，控制着它环绕你缓缓飘动|你盘膝而坐，双手垂于胸前成火焰状，深吸口气|你盘膝而坐，运使九阳，气向下沉|你随意坐下，双手平放在双膝，默念口诀|你随意一站，双手缓缓抬起，深吸一口气|你盘膝而坐，双目紧闭，深深吸一口气引入丹田|你席地而坐，五心向天，脸上红光时隐时现|你暗运临济十二庄，气聚丹田|你收敛心神闭目打坐，手搭气诀，调匀呼吸，感受天地之深邃，自然之精华，渐入无我境界)",
+                     "", "prepare_neili_t")
+    create_trigger_t("prepare_neili3",
+                     "^(> )*卧室不能(吐纳|打坐)，会影响别人休息。",
+                     "", "prepare_neili_w")
+    create_trigger_t("prepare_neili4",
+                     "^(> )*(你正要有所动作|你无法静下心来修炼|你还是专心拱猪吧)",
+                     "", "prepare_neili_w")
+    create_trigger_t("prepare_neili5",
+                     "^(> )*这里不准战斗，也不准(吐纳|打坐)。",
+                     "", "prepare_neili_w")
+    create_trigger_t("prepare_neili6",
+                     "^(> )*这里可不是让你提高(内力|精力)的地方。",
+                     "", "prepare_neili_w")
+    create_trigger_t("prepare_neili7",
+                     "^(> )*你吐纳完毕，睁开双眼，站了起来。",
+                     "", "prepare_neili_b")
+    create_trigger_t("prepare_neili8", "^(> )*你闭上眼睛开始吐纳。",
+                     "", "prepare_neili_t")
+    create_trigger_t("prepare_neili9",
+                     "^(> )*你现在手脚戴着镣铐，不能做出正确的姿势来打坐",
+                     "", "prepare_neili_liaokao")
+    create_trigger_t("prepare_neili10",
+                     "^(> )*你身上没有包括任何特殊状态。", "",
+                     "prepare_neili_over")
     SetTriggerOption("prepare_neili1", "group", "prepare_neili")
     SetTriggerOption("prepare_neili2", "group", "prepare_neili")
     SetTriggerOption("prepare_neili3", "group", "prepare_neili")
@@ -379,47 +390,49 @@ prepare_trigger = function()
 end
 fight_trigger = function()
     DeleteTriggerGroup("fight")
-    create_trigger_t(
-        "fight1",
-        "^>*\\s*\\( (\\D*)(已经伤痕累累，正在勉力支撑着不倒下去|受了相当重的伤，只怕会有生命危险|已经一副头重脚轻的模样，正在勉力支撑着不倒下去|气息粗重，动作开始散乱，看来所受的伤着实不轻|已经一副头重脚轻的模样，正在勉力支撑着不倒下去|似乎十分疲惫，看来需要好好休息了|看起来已经力不从心了|气喘嘘嘘，看起来状况并不太好|动作似乎开始有点不太灵光，但是仍然有条不紊|看起来可能受了点轻伤|看起来可能有些累了|受了几处伤，不过似乎并不碍事|受伤不轻，看起来状况并不太好|似乎受了点轻伤，不过光从外表看不大出来|似乎有些疲惫，但是仍然十分有活力|已经陷入半昏迷状态，随时都可能摔倒晕去|受伤过重，已经奄奄一息，命在旦夕了|受伤过重，已经有如风中残烛，随时都可能断气)。 \\)",
-        "",
-        "fight_check"
-    )
-    create_trigger_t("fight16", "^一股暖流发自丹田流向全身，慢慢地你又恢复了知觉……", "", "faint_check")
+    create_trigger_t("fight1",
+                     "^>*\\s*\\( (\\D*)(已经伤痕累累，正在勉力支撑着不倒下去|受了相当重的伤，只怕会有生命危险|已经一副头重脚轻的模样，正在勉力支撑着不倒下去|气息粗重，动作开始散乱，看来所受的伤着实不轻|已经一副头重脚轻的模样，正在勉力支撑着不倒下去|似乎十分疲惫，看来需要好好休息了|看起来已经力不从心了|气喘嘘嘘，看起来状况并不太好|动作似乎开始有点不太灵光，但是仍然有条不紊|看起来可能受了点轻伤|看起来可能有些累了|受了几处伤，不过似乎并不碍事|受伤不轻，看起来状况并不太好|似乎受了点轻伤，不过光从外表看不大出来|似乎有些疲惫，但是仍然十分有活力|已经陷入半昏迷状态，随时都可能摔倒晕去|受伤过重，已经奄奄一息，命在旦夕了|受伤过重，已经有如风中残烛，随时都可能断气)。 \\)",
+                     "", "fight_check")
+    create_trigger_t("fight16",
+                     "^一股暖流发自丹田流向全身，慢慢地你又恢复了知觉……",
+                     "", "faint_check")
     --    create_triggerex_t101('fight17',"^(.*)你",'','fight_zhaoshi_check')
-    create_trigger_t("fight18", "^(> )*你(必须使用剑|拿着武器怎么能|必须空手|手里没有|手里无|手上无|手中无剑|所使用的外功中没有这种功能)", "", "weapon_unwield")
-    create_trigger_t("fight17", "^(> )*使用「冲拳」时必须空手！", "", "weapon_unwield")
-    create_trigger_t("fight2", "^(> )*你「啪」的一声倒在地上，挣扎着抽动了几下就死了。$", "", "fightDie")
-    create_trigger_t(
-        "fight3",
-        "^(> )*(\\D*)(只觉全身一麻|突然一颤，脸上瞬间冒出许多冷汗|目前正自顾不暇|左蹿右跳，始终逃不出棒影|长长地舒了一口气。|深深吸了几口气，脸色看起来好多了|的身子突然晃了两晃，牙关格格地响了起来)",
-        "",
-        "fightXiqi"
-    )
+    create_trigger_t("fight18",
+                     "^(> )*你(必须使用剑|拿着武器怎么能|必须空手|手里没有|手里无|手上无|手中无剑|所使用的外功中没有这种功能)",
+                     "", "weapon_unwield")
+    create_trigger_t("fight17", "^(> )*使用「冲拳」时必须空手！",
+                     "", "weapon_unwield")
+    create_trigger_t("fight2",
+                     "^(> )*你「啪」的一声倒在地上，挣扎着抽动了几下就死了。$",
+                     "", "fightDie")
+    create_trigger_t("fight3",
+                     "^(> )*(\\D*)(只觉全身一麻|突然一颤，脸上瞬间冒出许多冷汗|目前正自顾不暇|左蹿右跳，始终逃不出棒影|长长地舒了一口气。|深深吸了几口气，脸色看起来好多了|的身子突然晃了两晃，牙关格格地响了起来)",
+                     "", "fightXiqi")
     --    create_trigger_t('fight4',"^(> )*看起来(\\D*)想杀死你！$",'','fightConsider')
-    create_trigger_t("fight5", "^(你)(的体力快消耗完了|现在太累了|现在真气太弱)", "", "fight_hp")
-    create_trigger_t(
-        "fight6",
-        "^(> )*你(必须拿着|使用的兵刃不对|使用的兵刃不正确|使用的武器不对|所使用的外功中没有这种功能|不够狠毒|掏了掏背囊，发现里面的暗器已经不够)",
-        "",
-        "noweaponpfm"
-    )
-    create_trigger_t("fight7", "^(\\D*)眼花缭乱，被攻了个措手不及！", "", "performMie")
-    create_trigger_t(
-        "fight8",
-        "^(> )*太极者，无极而生；动之则分，静之则合！你立如秤准，活如车轮，运起\\D*带动\\D*的(\\D*)一送，让他马步不稳，全力都打向空处",
-        "",
-        "fightLiuhe"
-    )
-    create_trigger_t("fight9", "^(> )*你(缓缓收回内力，眼中的红光|现在无法收功|好象虚脱了一样，突然垮了下来|心神一松，再也支持不)", "", "yunWudiDone")
-    create_trigger_t("fight10", "^(> )*你(大声叫道：“洪教主神通广大，我教战无不胜|发疯般的叫道：“洪教主神通护佑)", "", "yunWudi")
-    create_trigger_t("fight11", "^(> )*结果(\\D*)(气血一滞，已被定在当堂|顿时手忙脚乱，施展出浑身解数|顿时面色苍白，感觉浑身内息)", "", "fightXiqi")
-    create_trigger_t(
-        "fight12",
-        "^(> )*你(的内力太少|现在内力太弱|现在真气|现在内力不|的内力不|内力现在不够|目前内力太少|的真气不足，无法|的真气不足以|发现自己现在真气太弱|真气太弱|的真气不够！)",
-        "",
-        "fightDrug"
-    )
+    create_trigger_t("fight5",
+                     "^(你)(的体力快消耗完了|现在太累了|现在真气太弱)",
+                     "", "fight_hp")
+    create_trigger_t("fight6",
+                     "^(> )*你(必须拿着|使用的兵刃不对|使用的兵刃不正确|使用的武器不对|所使用的外功中没有这种功能|不够狠毒|掏了掏背囊，发现里面的暗器已经不够)",
+                     "", "noweaponpfm")
+    create_trigger_t("fight7",
+                     "^(\\D*)眼花缭乱，被攻了个措手不及！", "",
+                     "performMie")
+    create_trigger_t("fight8",
+                     "^(> )*太极者，无极而生；动之则分，静之则合！你立如秤准，活如车轮，运起\\D*带动\\D*的(\\D*)一送，让他马步不稳，全力都打向空处",
+                     "", "fightLiuhe")
+    create_trigger_t("fight9",
+                     "^(> )*你(缓缓收回内力，眼中的红光|现在无法收功|好象虚脱了一样，突然垮了下来|心神一松，再也支持不)",
+                     "", "yunWudiDone")
+    create_trigger_t("fight10",
+                     "^(> )*你(大声叫道：“洪教主神通广大，我教战无不胜|发疯般的叫道：“洪教主神通护佑)",
+                     "", "yunWudi")
+    create_trigger_t("fight11",
+                     "^(> )*结果(\\D*)(气血一滞，已被定在当堂|顿时手忙脚乱，施展出浑身解数|顿时面色苍白，感觉浑身内息)",
+                     "", "fightXiqi")
+    create_trigger_t("fight12",
+                     "^(> )*你(的内力太少|现在内力太弱|现在真气|现在内力不|的内力不|内力现在不够|目前内力太少|的真气不足，无法|的真气不足以|发现自己现在真气太弱|真气太弱|的真气不够！)",
+                     "", "fightDrug")
     SetTriggerOption("fight1", "group", "fight")
     SetTriggerOption("fight2", "group", "fight")
     SetTriggerOption("fight3", "group", "fight")
@@ -439,9 +452,7 @@ fight_trigger = function()
     job_exp_trigger()
 end
 
-function wuxingzhenFinish()
-    return check_heal()
-end
+function wuxingzhenFinish() return check_heal() end
 
 function checkPrepare()
     EnableTriggerGroup("poison", false)
@@ -455,42 +466,29 @@ function checkPrepare()
 
     drugPrepare = drugPrepare or {}
     exe("hp")
-    if hp.exp < 150000 then
-        return checkPrepareOver()
-    end
-    if hp.food < 40 or hp.water < 40 then
-        return check_food()
-    end
-    if hp.jingxue_per < 90 or hp.qixue_per < 60 then
-        return check_heal()
-    end
-    if Bag["镣铐"] then
-        return tiaoshui()
-    end
+    if hp.exp < 150000 then return checkPrepareOver() end
+    if hp.food < 40 or hp.water < 40 then return check_food() end
+    if hp.jingxue_per < 90 or hp.qixue_per < 60 then return check_heal() end
+    if Bag["镣铐"] then return tiaoshui() end
 
-    if Bag and Bag["白银"] and Bag["白银"].cnt and (Bag["白银"].cnt > 100 or Bag["白银"].cnt < 50) then
+    if Bag and Bag["白银"] and Bag["白银"].cnt and
+        (Bag["白银"].cnt > 100 or Bag["白银"].cnt < 50) then
         return check_gold()
     end
-    if
-        (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt < count.gold_max and score.gold > count.gold_max) or
-            (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt > count.gold_max * 4)
-     then
-        return check_gold()
-    end
-    if score.gold and score.gold > 100 and nxw_cur < 5 and drugPrepare["内息丸"] then
-        return checkNxw()
-    end
-    if score.gold and score.gold > 100 and cbw_cur < 5 and drugPrepare["川贝内息丸"] then
-        return checkNxw()
-    end
+    if (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt <
+        count.gold_max and score.gold > count.gold_max) or
+        (Bag and Bag["黄金"] and Bag["黄金"].cnt and Bag["黄金"].cnt >
+            count.gold_max * 4) then return check_gold() end
+    if score.gold and score.gold > 100 and nxw_cur < 5 and
+        drugPrepare["内息丸"] then return checkNxw() end
+    if score.gold and score.gold > 100 and cbw_cur < 5 and
+        drugPrepare["川贝内息丸"] then return checkNxw() end
 
-    if score.gold and score.gold > 100 and hqd_cur < 5 and drugPrepare["黄芪内息丹"] then
-        return checkNxw()
-    end
+    if score.gold and score.gold > 100 and hqd_cur < 5 and
+        drugPrepare["黄芪内息丹"] then return checkNxw() end
 
-    if score.gold and score.gold > 100 and cty_cur < 5 and drugPrepare["蝉蜕金疮药"] then
-        return checkHxd()
-    end
+    if score.gold and score.gold > 100 and cty_cur < 5 and
+        drugPrepare["蝉蜕金疮药"] then return checkHxd() end
 
     --[[if job.zuhe["wudang"] and job.zuhe["xueshan"] and job.last=="wudang" and (not Bag["邪气丸"] or Bag["邪气丸"].cnt<2) then
        return checkXqw()
@@ -511,14 +509,12 @@ function checkPrepare()
         if score.party and score.party == "峨嵋派" and not Bag["腰带"] then
             return check_item()
         end
-        if score.party == "少林派" and not Bag["护腰"] and not Bag["护腕"] then
-            return check_item()
-        end
+        if score.party == "少林派" and not Bag["护腰"] and
+            not Bag["护腕"] then return check_item() end
     end
 
-    if score.gold and score.gold > 100 and hxd_cur < 3 and drugPrepare["活血疗精丹"] then
-        return checkLjd()
-    end
+    if score.gold and score.gold > 100 and hxd_cur < 3 and
+        drugPrepare["活血疗精丹"] then return checkLjd() end
 
     if score.tb and score.tb > 100 and dhd_cur < 1 and drugPrepare["大还丹"] then
         return checkdhd()
@@ -546,62 +542,52 @@ function checkPrepare()
         return checkWeapon("木剑")
     end
 
-    if Bag["韦兰之锤"] then
-        return checkHammer()
-    end
+    if Bag["韦兰之锤"] then return checkHammer() end
 
     for p in pairs(Bag) do
-        if Bag[p] and itemSave[p] then
-            return checkYu(p)
-        end
+        if Bag[p] and itemSave[p] then return checkYu(p) end
         if Bag[p].id and Bag[p].id["yu"] and string.find(p, "玉") then
             return checkYu(p)
         end
-        if Bag[p].id and Bag[p].id["jintie chui"] and string.find(p, "金铁锤") then
-            return checkYu(p)
-        end
-        if Bag[p].id and Bag[p].id["shentie chui"] and string.find(p, "神铁锤") then
-            return checkYu(p)
-        end
+        if Bag[p].id and Bag[p].id["jintie chui"] and
+            string.find(p, "金铁锤") then return checkYu(p) end
+        if Bag[p].id and Bag[p].id["shentie chui"] and
+            string.find(p, "神铁锤") then return checkYu(p) end
     end
     exe("wear all")
 
-    wait.make(
-        function()
-            local thread = coroutine.running()
-            if not Bag["火折"] and drugPrepare["火折"] then
-                checkFire(thread)
-                coroutine.yield()
-            end
-
-            if not Bag["牛皮酒袋"] and drugPrepare["牛皮酒袋"] then
-                checkJiudai(thread)
-                coroutine.yield()
-            end
-            if needjinchai == 1 then
-                return go(getchai, "扬州城", "杂货铺")
-            end
-
-            if xuezhu_require == 1 then
-                local xuezhuStatus = GetVariable("xuezhu_status")
-                if xuezhuStatus and xuezhuStatus == "2" then
-                    SetVariable("xuezhu_status", "0") -- 重启之后初始化自动抓雪蛛变量为0
-                end
-                if xuezhuStatus and xuezhuStatus == "1" then
-                    SetVariable("xuezhu_status", "-1") -- 如果上周要了真丹，未给雪蛛，重启之后初始化自动抓雪蛛变量为-1
-                end
-                xuezhu_require = 0
-            end
-
-            local x = check_xuezhu_status()
-            if x < 1 then
-                return xuezhuGetDan()
-            end
-            -- if x == '-1' or x == '1' then return getxuezhu1() end
-
-            return checkPrepareOver()
+    wait.make(function()
+        local thread = coroutine.running()
+        if not Bag["火折"] and drugPrepare["火折"] then
+            checkFire(thread)
+            coroutine.yield()
         end
-    )
+
+        if not Bag["牛皮酒袋"] and drugPrepare["牛皮酒袋"] then
+            checkJiudai(thread)
+            coroutine.yield()
+        end
+        if needjinchai == 1 then
+            return go(getchai, "扬州城", "杂货铺")
+        end
+
+        if xuezhu_require == 1 then
+            local xuezhuStatus = GetVariable("xuezhu_status")
+            if xuezhuStatus and xuezhuStatus == "2" then
+                SetVariable("xuezhu_status", "0") -- 重启之后初始化自动抓雪蛛变量为0
+            end
+            if xuezhuStatus and xuezhuStatus == "1" then
+                SetVariable("xuezhu_status", "-1") -- 如果上周要了真丹，未给雪蛛，重启之后初始化自动抓雪蛛变量为-1
+            end
+            xuezhu_require = 0
+        end
+
+        local x = check_xuezhu_status()
+        if x < 1 then return xuezhuGetDan() end
+        -- if x == '-1' or x == '1' then return getxuezhu1() end
+
+        return checkPrepareOver()
+    end)
 end
 function checkPrepareOver()
     if g_stop_flag == true then
@@ -609,42 +595,31 @@ function checkPrepareOver()
         g_stop_flag = false
         return disAll()
     end
-    if lostletter == 1 and needdolost == 1 then
-        return letterLost()
-    end
+    if lostletter == 1 and needdolost == 1 then return letterLost() end
     condition.busy = 0
     vippoison = 0
-    wait.make(
-        function()
-            exe("score;cond")
-            wait_busy()
-            if flag.xuezhu == false and condition.busy and condition.busy > 30 then
-                local status = check_xuezhu_status()
-                if status < 2 then
-                    return xuezhuGoCatch()
-                end
-            elseif wudang_checkfood == 1 or (condition.busy and condition.busy > 10) or needxuexi == 1 then
-                return check_xuexi()
-            elseif Bag["锦盒"] and (condition.busy and condition.busy > 10) then
-                return jinheTrigger()
-            else
-                if needxuexi ~= 1 then
-                    messageShow("不需要学习")
-                end
-                return check_job()
-            end
+    wait.make(function()
+        exe("score;cond")
+        wait_busy()
+        if flag.xuezhu == false and condition.busy and condition.busy > 30 then
+            local status = check_xuezhu_status()
+            if status < 2 then return xuezhuGoCatch() end
+        elseif Bag["锦盒"] and (condition.busy and condition.busy > 10) then
+            return jinheTrigger()
+        elseif (condition.busy and condition.busy > 10) or needxuexi == 1 then
+            return check_xuexi()
+        else
+            return check_job()
         end
-    )
+    end)
 end
 function getchai()
-    wait.make(
-        function()
-            wait.time(1)
-            exe("qu jin chai")
-            needjinchai = 0
-            return check_busy(getshengzi, 3)
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        exe("qu jin chai")
+        needjinchai = 0
+        return check_busy(getshengzi, 3)
+    end)
 end
 function getshengzi()
     exe("qu sheng zi")
@@ -664,82 +639,75 @@ function getjuhua()
 end
 function askfuli()
     DeleteTriggerGroup("vipfuli")
-    create_trigger_t("askfuli1", "^(> )*当铺老板为你在钱庄中存入(\\D*)锭黄金。", "", "vip_gold")
-    create_trigger_t("askfuli2", "^(> )*你的帐号增加了(\\D*)个通宝。", "", "vip_tongbao")
-    create_trigger_t("askfuli3", "^(> )*你增加了(\\D*)点内力修为。", "", "vip_neili")
+    create_trigger_t("askfuli1",
+                     "^(> )*当铺老板为你在钱庄中存入(\\D*)锭黄金。",
+                     "", "vip_gold")
+    create_trigger_t("askfuli2",
+                     "^(> )*你的帐号增加了(\\D*)个通宝。", "",
+                     "vip_tongbao")
+    create_trigger_t("askfuli3", "^(> )*你增加了(\\D*)点内力修为。",
+                     "", "vip_neili")
     SetTriggerOption("askfuli1", "group", "vipfuli")
     SetTriggerOption("askfuli2", "group", "vipfuli")
     SetTriggerOption("askfuli3", "group", "vipfuli")
     return go(askfuli1, "扬州城", "当铺")
 end
 function askfuli1()
-    wait.make(
-        function()
-            wait.time(1)
-            exe("ask laoban about 会员福利")
-            return check_busy(askfuli2)
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        exe("ask laoban about 会员福利")
+        return check_busy(askfuli2)
+    end)
 end
 function askfuli2()
     exe("ask laoban about 会员基金")
-    wait.make(
-        function()
-            wait.time(2)
-            return check_busy(checkPrepare)
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        return check_busy(checkPrepare)
+    end)
 end
 function vip_gold(n, l, w)
     EnableTriggerGroup("vipfuli", false)
     DeleteTriggerGroup("vipfuli")
-    messageShow("每周会员福利：   当铺老板为你在钱庄中存入【" .. w[2] .. "】锭黄金。", "gold", "black")
+    messageShow(
+        "每周会员福利：   当铺老板为你在钱庄中存入【" ..
+            w[2] .. "】锭黄金。", "gold", "black")
 end
 function vip_tongbao(n, l, w)
-    messageShow("每周会员福利：   你的帐号增加了【" .. w[2] .. "】个通宝。", "red", "black")
+    messageShow("每周会员福利：   你的帐号增加了【" .. w[2] ..
+                    "】个通宝。", "red", "black")
 end
 function vip_neili(n, l, w)
-    messageShow("每周会员福利：   你增加了【" .. w[2] .. "】点内力修为。", "blue", "black")
+    messageShow("每周会员福利：   你增加了【" .. w[2] ..
+                    "】点内力修为。", "blue", "black")
 end
 function vip_get_rope()
-    wait.make(
-        function()
-            wait.time(3)
-            exe("qu sheng zi")
-            return check_busy(check_jobx, 3)
-        end
-    )
+    wait.make(function()
+        wait.time(3)
+        exe("qu sheng zi")
+        return check_busy(check_jobx, 3)
+    end)
 end
 function vip_get_juhua()
-    wait.make(
-        function()
-            wait.time(3)
-            exe("qu ye juhua")
-            return check_busy(check_jobx, 3)
-        end
-    )
+    wait.make(function()
+        wait.time(3)
+        exe("qu ye juhua")
+        return check_busy(check_jobx, 3)
+    end)
 end
 function hp_heqi_check(n, l, w)
     heqi = tonumber(w[1])
     print("heqi=" .. heqi)
-    if hp.qixue_per < 35 and dhd_cur > 0 then
-        exe("fu dahuan dan")
-    end
-    if hp.qixue_per < 70 and cty_cur > 0 then
-        exe("eat chantui yao")
-    end
+    if hp.qixue_per < 35 and dhd_cur > 0 then exe("fu dahuan dan") end
+    if hp.qixue_per < 70 and cty_cur > 0 then exe("eat chantui yao") end
     if (hp.qixue / (hp.qixue_max / hp.qixue_per) < 35) and cty_cur > 0 then
         exe("eat chantui yao")
     end
     if score.party == "天龙寺" and hp.qixue_per < 80 then
         exe("yun liao.. score.id")
     end
-    if hp.qixue < hp.qixue_max * 0.7 then
-        exe("yun qi")
-    end
-    if hp.jingxue < hp.jingxue_max * 0.5 then
-        exe("yun jing")
-    end
+    if hp.qixue < hp.qixue_max * 0.7 then exe("yun qi") end
+    if hp.jingxue < hp.jingxue_max * 0.5 then exe("yun jing") end
     if hp.neili < hp.neili_max * 0.4 and cbw_cur > 0 then
         exe("eat " .. drug.neili2)
     end
@@ -753,21 +721,19 @@ function hp_heqi_check(n, l, w)
         exe("eat " .. drug.neili)
     end
     if job.name == "songmoya" then
-        if hp.qixue_per < 80 then
-            exe("eat " .. drug.heal)
-        end
-        if perform.force and perform.force == "dulong-dafa" and (not flag.wudi or flag.wudi == 0) then
-            exe("yun wudi")
-        end
-        if perform.force and perform.force == "dulong-dafa" and hp.qixue_per < 70 then
-            exe("yun wudi")
-        end
+        if hp.qixue_per < 80 then exe("eat " .. drug.heal) end
+        if perform.force and perform.force == "dulong-dafa" and
+            (not flag.wudi or flag.wudi == 0) then exe("yun wudi") end
+        if perform.force and perform.force == "dulong-dafa" and hp.qixue_per <
+            70 then exe("yun wudi") end
         if os.time() > fight.time.b + 120 then
             exe("set wimpycmd halt\\down")
             return
         end
         if heqi == 1000 and hp.qixue_per < 55 then
-            chats_log("报效国家任务：合气到达1000满值，放弃任务！", "cyan")
+            chats_log(
+                "报效国家任务：合气到达1000满值，放弃任务！",
+                "cyan")
             exe("set wimpycmd halt\\down")
             return
         end
@@ -800,7 +766,8 @@ function hp_heqi_check(n, l, w)
         end
         if yptjob.name1 ~= "无威胁" and yptjob.name2 ~= "无威胁" then
             if heqi > 400 then
-                if GetVariable("double_kill") ~= nil and GetVariable("double_kill") == "yes" then
+                if GetVariable("double_kill") ~= nil and
+                    GetVariable("double_kill") == "yes" then
                     if sxkiller1 >= sxkiller2 then
                         exe("set wimpycmd pfmbuff\\ppp1\\ppp2\\hp")
                         hqpd = 0
@@ -832,16 +799,19 @@ function hp_heqi_check(n, l, w)
         geta()
         EnableTrigger("hpheqi1", true)
         if job.name == "songxin" then
-            chats_log("送信任务：合气到达1000满值，放弃任务！", "cyan")
+            chats_log("送信任务：合气到达1000满值，放弃任务！",
+                      "cyan")
             EnableTrigger("songxin_fight7", true)
             return check_halt(songxinKillFail, 1)
         end
         if job.name == "wudang" then
-            chats_log("武当任务：合气到达1000满值，放弃任务！", "cyan")
+            chats_log("武当任务：合气到达1000满值，放弃任务！",
+                      "cyan")
             return check_halt(wudangKillFail, 1)
         end
         if job.name == "xueshan" then
-            chats_log("雪山任务：合气到达1000满值，放弃任务！", "cyan")
+            chats_log("雪山任务：合气到达1000满值，放弃任务！",
+                      "cyan")
             return check_halt(xueshanKillFail, 1)
         end
     end
@@ -858,21 +828,11 @@ function xueshanKillFail()
     exe("yield no")
     return go(xueshan_fangqi, "大雪山", "入幽口")
 end
-function noweaponpfm()
-    Execute("pfmks")
-end
+function noweaponpfm() Execute("pfmks") end
 
-function yunWudiDone()
-    flag.wudi = 0
-end
-function yunWudi()
-    flag.wudi = 1
-end
-function fightDrug()
-    if isInBags(drug.neili) then
-        exe("eat " .. drug.neili)
-    end
-end
+function yunWudiDone() flag.wudi = 0 end
+function yunWudi() flag.wudi = 1 end
+function fightDrug() if isInBags(drug.neili) then exe("eat " .. drug.neili) end end
 function npcWeapon()
     DeleteTriggerGroup("npcWeapon")
     create_trigger_t("npcWeapon1", "^  □(\\D*)\\(", "", "npcWP")
@@ -923,7 +883,8 @@ function npcWP(n, l, w)
         exe("set po 鞭")
     elseif string.find(n_words, "铁笔") then
         exe("set po 鞭")
-    elseif n_words:find("飞蝗石") or n_words:find("镖") or n_words:find("铜钱") then
+    elseif n_words:find("飞蝗石") or n_words:find("镖") or
+        n_words:find("铜钱") then
         exe("set po 箭")
     else
         job.weapon = "unarmed"
@@ -934,9 +895,7 @@ function npcWP(n, l, w)
 end
 function fightLiuhe(n, l, w)
     local l_force = w[2]
-    if string.len(l_force) < 6 then
-        return
-    end
+    if string.len(l_force) < 6 then return end
     if string.find("化功大法|归元吐纳法|毒龙大法", w[2]) then
         exe("set 六合劲 螺旋")
     end
@@ -952,9 +911,9 @@ function fightLiuhe(n, l, w)
     if string.find("玉女心经|神照经", w[2]) then
         exe("set 六合劲 静恒")
     end
-    if string.find("临济十二庄|寒冰真气|玄天无极功|先天功|碧海潮生功", w[2]) then
-        exe("set 六合劲 虚灵")
-    end
+    if string.find(
+        "临济十二庄|寒冰真气|玄天无极功|先天功|碧海潮生功",
+        w[2]) then exe("set 六合劲 虚灵") end
 end
 
 function fightConsider(n, l, w)
@@ -963,12 +922,8 @@ function fightConsider(n, l, w)
     -- end
 end
 function fightXiqi(n, l, w)
-    do
-        return
-    end
-    if not perform.xiqi then
-        return
-    end
+    do return end
+    if not perform.xiqi then return end
 
     local l_jiali = max
     if job.killer and job.killer[w[2]] then
@@ -979,9 +934,7 @@ function fightXiqi(n, l, w)
                 break
             end
         end
-        if l_jiali > 200 then
-            l_jiali = max
-        end
+        if l_jiali > 200 then l_jiali = max end
         if skills["yinyun-ziqi"] and skills["yinyun-ziqi"].lvl < 300 then
         else
             exe("jiali max")
@@ -1005,20 +958,12 @@ function fightXiqi(n, l, w)
 end
 
 function performMie(n, l, w)
-    do
-        return
-    end
-    if not perform.xiqi then
-        return
-    end
-    if job.killer and job.killer[w[1]] then
-        return performBusy(w[1], 2)
-    end
+    do return end
+    if not perform.xiqi then return end
+    if job.killer and job.killer[w[1]] then return performBusy(w[1], 2) end
 end
 function performBusy(p_id, p_sec)
-    if not p_id or type(p_id) ~= "string" then
-        return
-    end
+    if not p_id or type(p_id) ~= "string" then return end
     tmp.pfmid = p_id
     if p_sec and type(p_sec) == "number" then
         create_timer_s("performbusy", p_sec, "performAction")
@@ -1028,9 +973,7 @@ function performBusy(p_id, p_sec)
 end
 function performAction()
     local l_jiali
-    if tmp.pfmid == nil then
-        return
-    end
+    if tmp.pfmid == nil then return end
     if not job.killer[tmp.pfmid] then
         tmp.pfmid = nil
         return
@@ -1042,9 +985,7 @@ function performAction()
             break
         end
     end
-    if l_jiali > 200 then
-        l_jiali = max
-    end
+    if l_jiali > 200 then l_jiali = max end
     if skills["yinyun-ziqi"] and skills["yinyun-ziqi"].lvl < 300 then
     else
         exe("jiali max")
@@ -1068,9 +1009,7 @@ function fightDie()
     dis_all()
     nobusy = 0
     messageShow("挂了！")
-    if job.name == "songmoya" then
-        smydie = smydie + 1
-    end
+    if job.name == "songmoya" then smydie = smydie + 1 end
     job.name = nil
     if hp.exp < 2000000 then
         create_triggerex("die", "^(> )*城隍庙", "", "xcquit")
@@ -1080,13 +1019,11 @@ function fightDie()
 end
 function xcquit()
     exe("quit")
-    wait.make(
-        function()
-            wait.time(3)
-            Disconnect()
-            Connect()
-        end
-    )
+    wait.make(function()
+        wait.time(3)
+        Disconnect()
+        Connect()
+    end)
 end
 function fight_hurt()
     local per = 100 - damage
@@ -1113,7 +1050,8 @@ function fight_check(n, l, w, styles)
             damage = 100
             return fight_hurt()
         end
-        if string.find(l, "似乎受了点轻伤，不过光从外表看不大出来") then
+        if string.find(l,
+                       "似乎受了点轻伤，不过光从外表看不大出来") then
             damage = 90
             return fight_hurt()
         end
@@ -1129,12 +1067,14 @@ function fight_check(n, l, w, styles)
         if string.find(l, "受伤不轻，看起来状况并不太好") then
             damage = 60
         end
-        if string.find(l, "气息粗重，动作开始散乱，看来所受的伤着实不轻") then
+        if string.find(l,
+                       "气息粗重，动作开始散乱，看来所受的伤着实不轻") then
             damage = 50
             return fight_hurt()
         end
 
-        if string.find(l, "已经伤痕累累，正在勉力支撑着不倒下去") then
+        if string.find(l,
+                       "已经伤痕累累，正在勉力支撑着不倒下去") then
             damage = 40
             return fight_hurt()
         end
@@ -1143,7 +1083,8 @@ function fight_check(n, l, w, styles)
             damage = 30
             return fight_hurt()
         end
-        if string.find(l, "伤重之下已经难以支撑，眼看就要倒在地上") then
+        if string.find(l,
+                       "伤重之下已经难以支撑，眼看就要倒在地上") then
             damage = 20
             return fight_hurt()
         end
@@ -1151,7 +1092,8 @@ function fight_check(n, l, w, styles)
             damage = 10
             return fight_hurt()
         end
-        if string.find(l, "受伤过重，已经有如风中残烛，随时都可能断气") then
+        if string.find(l,
+                       "受伤过重，已经有如风中残烛，随时都可能断气") then
             damage = 0
             return fight_hurt()
         end
@@ -1168,7 +1110,8 @@ function fight_check(n, l, w, styles)
             return fight_hurt()
         end
 
-        if string.find(l, "动作似乎开始有点不太灵光，但是仍然有条不紊") then
+        if string.find(l,
+                       "动作似乎开始有点不太灵光，但是仍然有条不紊") then
             damage = 66
             return fight_hurt()
         end
@@ -1180,7 +1123,8 @@ function fight_check(n, l, w, styles)
             damage = 44
             return fight_hurt()
         end
-        if string.find(l, "已经一副头重脚轻的模样，正在勉力支撑着不倒下去") then
+        if string.find(l,
+                       "已经一副头重脚轻的模样，正在勉力支撑着不倒下去") then
             damage = 33
             return fight_hurt()
         end
@@ -1188,11 +1132,13 @@ function fight_check(n, l, w, styles)
             damage = 22
             return fight_hurt()
         end
-        if string.find(l, "摇头晃脑、歪歪斜斜地站都站不稳，眼看就要倒在地上") then
+        if string.find(l,
+                       "摇头晃脑、歪歪斜斜地站都站不稳，眼看就要倒在地上") then
             damage = 11
             return fight_hurt()
         end
-        if string.find(l, "已经陷入半昏迷状态，随时都可能摔倒晕去") then
+        if string.find(l,
+                       "已经陷入半昏迷状态，随时都可能摔倒晕去") then
             damage = 1
             return fight_hurt()
         end
@@ -1211,18 +1157,12 @@ function fightHpCheck()
     -- if score.party and score.party=="神龙教" and hp.qixue_per<50 then
     --   exe('yun wudi '.. score.id)
     -- end
-    if hp.qixue_per < 50 and cty_cu > 0 then
-        exe("eat chantui yao")
-    end
+    if hp.qixue_per < 50 and cty_cu > 0 then exe("eat chantui yao") end
     if (hp.qixue / (hp.qixue_max / hp.qixue_per) < 35) and cty_cur > 0 then
         exe("eat chantui yao")
     end
-    if hp.qixue < hp.qixue_max * 0.7 then
-        exe("yun qi")
-    end
-    if hp.jingxue < hp.jingxue_max * 0.5 then
-        exe("yun jing")
-    end
+    if hp.qixue < hp.qixue_max * 0.7 then exe("yun qi") end
+    if hp.jingxue < hp.jingxue_max * 0.5 then exe("yun jing") end
     if hp.neili < hp.neili_max * 0.5 and nxw_cur > 0 then
         exe("eat " .. drug.neili)
     end
@@ -1237,11 +1177,7 @@ function faint_check()
     job.killer = {}
     tmp = {}
     faintFunc = faintFunc or {}
-    for k, v in pairs(faintFunc) do
-        if job.name == k then
-            return _G[v]()
-        end
-    end
+    for k, v in pairs(faintFunc) do if job.name == k then return _G[v]() end end
     return check_heal()
 end
 --[[
@@ -1292,21 +1228,17 @@ end
 
 function killPfm(id, p_cmd)
     local l_cmd = "kill"
-    if p_cmd and type(p_cmd) == "string" then
-        l_cmd = p_cmd
-    end
+    if p_cmd and type(p_cmd) == "string" then l_cmd = p_cmd end
     if id then
         exe(l_cmd .. " " .. id)
-    -- exe('pfmpfm')
+        -- exe('pfmpfm')
     end
     tmp.pfm = 100
     tmp.busytest = 0
     exe("set wimpycmd pfmpfm\\hp;set wimpy 100")
 end
 function performPre()
-    if GetVariable("performpre") then
-        perform.pre = GetVariable("performpre")
-    end
+    if GetVariable("performpre") then perform.pre = GetVariable("performpre") end
 
     local l_pfm = perform.pre
     local l_jiali
@@ -1321,10 +1253,9 @@ function performPre()
             break
         end
     end
-    if l_jiali > 200 then
-        l_jiali = max
-    end
-    if skills["linji-zhuang"] and skills["linji-zhuang"].lvl > 149 and string.find(perform.huaxue, "yun riyue") then
+    if l_jiali > 200 then l_jiali = max end
+    if skills["linji-zhuang"] and skills["linji-zhuang"].lvl > 149 and
+        string.find(perform.huaxue, "yun riyue") then
         exe("jiali max")
     else
         if skills["yinyun-ziqi"] then
@@ -1333,14 +1264,20 @@ function performPre()
             exe("jiali max")
         end
     end
-    if job.name == "gblu" and road.wipe_id == "shiwei" and score.party == "丐帮" then
-        l_pfm = string.gsub(l_pfm, "perform stick.zhuan", "perform stick.chuo shiwei")
+    if job.name == "gblu" and road.wipe_id == "shiwei" and score.party ==
+        "丐帮" then
+        l_pfm = string.gsub(l_pfm, "perform stick.zhuan",
+                            "perform stick.chuo shiwei")
     end
-    if job.name == "gblu" and road.wipe_id == "wu shi" and score.party == "丐帮" then
-        l_pfm = string.gsub(l_pfm, "perform stick.chuo", "perform stick.chuo wu shi")
+    if job.name == "gblu" and road.wipe_id == "wu shi" and score.party ==
+        "丐帮" then
+        l_pfm = string.gsub(l_pfm, "perform stick.chuo",
+                            "perform stick.chuo wu shi")
     end
-    if job.name == "gblu" and road.wipe_id == "wu shi" and score.party == "峨嵋派" then
-        l_pfm = string.gsub(l_pfm, "perform stick.mie", "perform stick.mie wu shi")
+    if job.name == "gblu" and road.wipe_id == "wu shi" and score.party ==
+        "峨嵋派" then
+        l_pfm = string.gsub(l_pfm, "perform stick.mie",
+                            "perform stick.mie wu shi")
     end
     if job.name == "zhuoshe" and score.party == "丐帮" then
         l_pfm = string.gsub(l_pfm, "perform stick.chuo", "perform stick.zhuan")
@@ -1351,17 +1288,13 @@ function performPre()
     exe(l_pfm)
 end
 function pfmhuaxue()
-    if not tmp.pfmid then
-        DeleteTimer("performbusy")
-    end
+    if not tmp.pfmid then DeleteTimer("performbusy") end
     if tmp.busytest then
         tmp.busytest = tmp.busytest + 1
     else
         tmp.busytest = 1
     end
-    if tmp.busytest < 3 then
-        exe("alias action pfmhuaxue")
-    end
+    if tmp.busytest < 3 then exe("alias action pfmhuaxue") end
 end
 function performhuaxue()
     tmp.pfm = tmp.pfm - 1
@@ -1371,46 +1304,56 @@ function performhuaxue()
     end
     tmp.busytest = 0
     local l_pfm = perform.huaxue
-    if not perform.huaxue then
-        return
-    end
+    if not perform.huaxue then return end
     fightHpCheck()
-    if job.name == "gblu" and road.wipe_id == "shiwei" and score.party == "丐帮" then
+    if job.name == "gblu" and road.wipe_id == "shiwei" and score.party ==
+        "丐帮" then
         if tmp.faint and tmp.faint > 0 then
-            l_pfm = string.gsub(l_pfm, "perform stick.zhuan", "perform stick.zhuan shiwei " .. tmp.faint + 1)
+            l_pfm = string.gsub(l_pfm, "perform stick.zhuan",
+                                "perform stick.zhuan shiwei " .. tmp.faint + 1)
         else
-            l_pfm = string.gsub(l_pfm, "perform stick.zhuan", "perform stick.zhuan shiwei")
+            l_pfm = string.gsub(l_pfm, "perform stick.zhuan",
+                                "perform stick.zhuan shiwei")
         end
     end
     if job.name == "gblu" and road.wipe_id == "wu shi" then
         if tmp.faint and tmp.faint > 0 then
-            l_pfm = string.gsub(l_pfm, "perform stick.chan", "perform stick.chan wu shi " .. tmp.faint + 1)
-            l_pfm = string.gsub(l_pfm, "perform stick.mie", "perform stick.mie wu shi " .. tmp.faint + 1)
+            l_pfm = string.gsub(l_pfm, "perform stick.chan",
+                                "perform stick.chan wu shi " .. tmp.faint + 1)
+            l_pfm = string.gsub(l_pfm, "perform stick.mie",
+                                "perform stick.mie wu shi " .. tmp.faint + 1)
         else
-            l_pfm = string.gsub(l_pfm, "perform stick.chan", "perform stick.chan wu shi")
-            l_pfm = string.gsub(l_pfm, "perform stick.mie", "perform stick.mie wu shi")
+            l_pfm = string.gsub(l_pfm, "perform stick.chan",
+                                "perform stick.chan wu shi")
+            l_pfm = string.gsub(l_pfm, "perform stick.mie",
+                                "perform stick.mie wu shi")
         end
     end
     if job.name == "zhuoshe" and score.party == "丐帮" then
         l_pfm = string.gsub(l_pfm, "perform stick.chan", "perform stick.zhuan")
     end
     if job.name == "songxin" then
-        if job.killer[sxjob.killer1] == "faint" and type(job.killer[sxjob.killer2]) == "string" then
-            l_pfm = string.gsub(l_pfm, "perform stick.zhuan", "perform stick.zhuan " .. job.killer[sxjob.killer2])
-        elseif job.killer[sxjob.killer2] == "faint" and type(job.killer[sxjob.killer1]) == "string" then
-            l_pfm = string.gsub(l_pfm, "perform stick.zhuan", "perform stick.zhuan " .. job.killer[sxjob.killer1])
+        if job.killer[sxjob.killer1] == "faint" and
+            type(job.killer[sxjob.killer2]) == "string" then
+            l_pfm = string.gsub(l_pfm, "perform stick.zhuan",
+                                "perform stick.zhuan " ..
+                                    job.killer[sxjob.killer2])
+        elseif job.killer[sxjob.killer2] == "faint" and
+            type(job.killer[sxjob.killer1]) == "string" then
+            l_pfm = string.gsub(l_pfm, "perform stick.zhuan",
+                                "perform stick.zhuan " ..
+                                    job.killer[sxjob.killer1])
         end
     end
-    if skills["linji-zhuang"] and skills["linji-zhuang"].lvl > 150 and hp.qixue_per < 70 then
-        l_pfm = "yun yinyang;" .. l_pfm
-    end
-    if score.party == "神龙教" and (hp.qixue_per < 40 or (flag.wudi and flag.wudi == 0)) then
+    if skills["linji-zhuang"] and skills["linji-zhuang"].lvl > 150 and
+        hp.qixue_per < 70 then l_pfm = "yun yinyang;" .. l_pfm end
+    if score.party == "神龙教" and
+        (hp.qixue_per < 40 or (flag.wudi and flag.wudi == 0)) then
         l_pfm = "yun wudi " .. score.id .. ";" .. l_pfm
     end
     exe(l_pfm)
-    if score.party == "神龙教" and job.type and job.type == "zh" and job.name == "sldsm" and job.id then
-        exe("zh " .. job.id .. ";no")
-    end
+    if score.party == "神龙教" and job.type and job.type == "zh" and job.name ==
+        "sldsm" and job.id then exe("zh " .. job.id .. ";no") end
 end
 
 fight_prepare = function()
@@ -1464,15 +1407,14 @@ fight_prepare = function()
     --     exe('yun shield')
     --  endhaven
 
-    if skills["xiantian-gong"] and perform.force and perform.force == "xiantian-gong" then
-        exe("yun wuqi")
-    end
+    if skills["xiantian-gong"] and perform.force and perform.force ==
+        "xiantian-gong" then exe("yun wuqi") end
 
-    if skills["huagong-dafa"] and perform.force and perform.force == "huagong-dafa" then
-        exe("yun huadu")
-    end
+    if skills["huagong-dafa"] and perform.force and perform.force ==
+        "huagong-dafa" then exe("yun huadu") end
 
-    if skills["bahuang-gong"] and perform.force and perform.force == "bahuang-gong" then
+    if skills["bahuang-gong"] and perform.force and perform.force ==
+        "bahuang-gong" then
         exe("yun duzun")
         exe("yun bahuang")
     end
@@ -1480,12 +1422,10 @@ fight_prepare = function()
     --    exe('yun shenzhao')
     -- 因为立即散功 取消了
     -- end
-    if skills["yunu-xinjing"] and perform.force and perform.force == "yunu-xinjing" then
-        exe("yun xinjing")
-    end
-    if skills["hanbing-zhenqi"] and perform.force and perform.force == "hanbing-zhenqi" then
-        exe("yun huti")
-    end
+    if skills["yunu-xinjing"] and perform.force and perform.force ==
+        "yunu-xinjing" then exe("yun xinjing") end
+    if skills["hanbing-zhenqi"] and perform.force and perform.force ==
+        "hanbing-zhenqi" then exe("yun huti") end
 end
 
 prepare_lianxi = function(func)
@@ -1507,35 +1447,36 @@ function prepareLianxi()
         DeleteTriggerGroup("prepare_neili")
         return dummyfind()
     end
-    if (not condition.busy or condition.busy == 0) and job.prepare ~= duHhe_start and job.prepare ~= duCjiang_start then
+    if (not condition.busy or condition.busy == 0) and job.prepare ~=
+        duHhe_start and job.prepare ~= duCjiang_start then
         return prepare_neili(job.prepare)
     end
     if condition.busy > 60 then
-        if
-            score.party == "姑苏慕容" and need_dzxy == "yes" and dzxy_level == 3 and hp.food > 50 and hp.water > 50 and
-                (locl.time == "戊" or locl.time == "亥" or locl.time == "子" or locl.time == "丑")
-         then
-            messageShow("任务监控：是三段斗转星移，而且是晚上，可以去看星星领悟斗转星移了！", "white")
+        if score.party == "姑苏慕容" and need_dzxy == "yes" and dzxy_level ==
+            3 and hp.food > 50 and hp.water > 50 and
+            (locl.time == "戊" or locl.time == "亥" or locl.time == "子" or
+                locl.time == "丑") then
+            messageShow(
+                "任务监控：是三段斗转星移，而且是晚上，可以去看星星领悟斗转星移了！",
+                "white")
             return check_halt(checkdzxy)
-        elseif
-            score.party == "明教" and skills["qiankun-danuoyi"].lvl > 449 and
-                skills["qiankun-danuoyi"].lvl < hp.pot_max - 102 and
-                hp.pot >= 1
-         then
-            messageShow("任务监控：去向小张同学学习大挪移！", "white")
+        elseif score.party == "明教" and skills["qiankun-danuoyi"].lvl > 449 and
+            skills["qiankun-danuoyi"].lvl < hp.pot_max - 102 and hp.pot >= 1 then
+            messageShow("任务监控：去向小张同学学习大挪移！",
+                        "white")
             return check_halt(check_dny)
         end
     end
     if flag.xuezhu == false and condition.busy and condition.busy > 30 then
         local status = check_xuezhu_status()
-        if status < 2 then
-            return xuezhuGoCatch()
-        end
+        if status < 2 then return xuezhuGoCatch() end
     end
     flag.jixu = 1
     if hp.neili_max > hp.neili_lim - 10 then
         exe("unset 积蓄")
-    elseif job.prepare and (job.prepare == test or job.prepare == duHhe_start or job.prepare == duCjiang_start) then
+    elseif job.prepare and
+        (job.prepare == test or job.prepare == duHhe_start or job.prepare ==
+            duCjiang_start) then
         exe("unset 积蓄")
     else
         flag.jixu = 0
@@ -1558,13 +1499,10 @@ prepare_neili = function(func, p_cmd)
 
     tmp.db = p_cmd
     l_db = 1 / 2
-    if tmp.db and type(tmp.db) == "number" and tmp.db < 2 then
-        l_db = tmp.db
-    end
+    if tmp.db and type(tmp.db) == "number" and tmp.db < 2 then l_db = tmp.db end
 
-    if hp.neili > hp.neili_max * l_db and job.prepare ~= test and job.prepare ~= fight_prepare then
-        return check_bei(job.prepare)
-    end
+    if hp.neili > hp.neili_max * l_db and job.prepare ~= test and job.prepare ~=
+        fight_prepare then return check_bei(job.prepare) end
 
     prepare_trigger()
     EnableTriggerGroup("prepare_neili", true)
@@ -1572,20 +1510,14 @@ prepare_neili = function(func, p_cmd)
     exe("unset 积蓄")
     flag.prepare = 0
     exe("yun jing;yun jingli;hp")
-    if job.zuhe["gblu"] and not locl.id["铜钱"] then
-        exe("drop 1 coin")
-    end
+    if job.zuhe["gblu"] and not locl.id["铜钱"] then exe("drop 1 coin") end
     prepare_neili_a()
 end
 prepare_neili_at = function()
-    if tmp.prepare then
-        job.prepare = tmp.prepare
-    end
+    if tmp.prepare then job.prepare = tmp.prepare end
     prepare_trigger()
 
-    if job.zuhe["gblu"] and not locl.id["铜钱"] then
-        exe("drop 1 coin")
-    end
+    if job.zuhe["gblu"] and not locl.id["铜钱"] then exe("drop 1 coin") end
 
     EnableTriggerGroup("prepare_neili", true)
     create_timer_s("neili", 3, "prepare_neili_idle")
@@ -1593,9 +1525,7 @@ end
 prepare_neili_a = function()
     condition.busy = 0
     prepare_neili_idle()
-    if hp.qixue_per < 50 and isInBags(drug.heal) then
-        exe("eat chantui yao")
-    end
+    if hp.qixue_per < 50 and isInBags(drug.heal) then exe("eat chantui yao") end
     create_timer_s("neili", 3, "prepare_neili_idle")
 end
 prepare_neili_b = function()
@@ -1604,31 +1534,38 @@ prepare_neili_b = function()
         DeleteTriggerGroup("prepare_neili")
         return dummyfind()
     end
-    if score.party == "普通百姓" and nobusy == 0 and condition.busy ~= nil and condition.busy >= 100 and hp.pot >= 60 then
-        if skills["literate"] and score.gold > 1000 and skills["literate"].lvl < hp.pot_max - 100 then
+    if score.party == "普通百姓" and nobusy == 0 and condition.busy ~= nil and
+        condition.busy >= 100 and hp.pot >= 60 then
+        if skills["literate"] and score.gold > 1000 and skills["literate"].lvl <
+            hp.pot_max - 100 then
             return check_halt(literate)
-        elseif
-            (skills["force"].lvl > 200 and skills["force"].lvl < hp.pot_max - 100) or
-                (skills["dodge"].lvl > 101 and skills["dodge"].lvl < hp.pot_max - 100) or
-                (skills["parry"].lvl > 101 and skills["parry"].lvl < hp.pot_max - 100)
-         then
+        elseif (skills["force"].lvl > 200 and skills["force"].lvl < hp.pot_max -
+            100) or
+            (skills["dodge"].lvl > 101 and skills["dodge"].lvl < hp.pot_max -
+                100) or
+            (skills["parry"].lvl > 101 and skills["parry"].lvl < hp.pot_max -
+                100) then
             return check_halt(lingwu)
         end
     end
-    if score.party ~= "普通百姓" and nobusy == 0 and condition.busy ~= nil and condition.busy >= 100 and hp.pot >= 60 then
-        if skills["literate"] and score.gold > 1000 and skills["literate"].lvl < hp.pot_max - 100 then
+    if score.party ~= "普通百姓" and nobusy == 0 and condition.busy ~= nil and
+        condition.busy >= 100 and hp.pot >= 60 then
+        if skills["literate"] and score.gold > 1000 and skills["literate"].lvl <
+            hp.pot_max - 100 then
             return check_halt(literate)
-        elseif
-            (skills["dodge"].lvl < 450 and skills["dodge"].lvl < hp.pot_max - 100) or
-                (skills["parry"].lvl < 450 and skills["parry"].lvl < hp.pot_max - 100) or
-                (skills["force"].lvl < 450 and skills["force"].lvl < hp.pot_max - 100)
-         then
+        elseif (skills["dodge"].lvl < 450 and skills["dodge"].lvl < hp.pot_max -
+            100) or
+            (skills["parry"].lvl < 450 and skills["parry"].lvl < hp.pot_max -
+                100) or
+            (skills["force"].lvl < 450 and skills["force"].lvl < hp.pot_max -
+                100) then
             return check_halt(xuexi)
-        elseif
-            (skills["force"].lvl >= 450 and skills["force"].lvl < hp.pot_max - 100) or
-                (skills["dodge"].lvl >= 450 and skills["dodge"].lvl < hp.pot_max - 100) or
-                (skills["parry"].lvl >= 450 and skills["parry"].lvl < hp.pot_max - 100)
-         then
+        elseif (skills["force"].lvl >= 450 and skills["force"].lvl < hp.pot_max -
+            100) or
+            (skills["dodge"].lvl >= 450 and skills["dodge"].lvl < hp.pot_max -
+                100) or
+            (skills["parry"].lvl >= 450 and skills["parry"].lvl < hp.pot_max -
+                100) then
             return check_halt(lingwu)
         end
     end
@@ -1643,28 +1580,23 @@ prepare_neili_c = function()
     -- if perform.skill and perform.skill=="jieshou-jiushi" then
     --   l_db=7/4
     -- end
-    if tmp.db and type(tmp.db) == "number" and tmp.db < 2 then
-        l_db = tmp.db
-    end
+    if tmp.db and type(tmp.db) == "number" and tmp.db < 2 then l_db = tmp.db end
 
     -- if job.zuhe["wudang"] then l_db = 1 end
 
     if not flag.prepare or type(flag.prepare) ~= "number" then
         flag.prepare = 0
     end
-    if condition.busy and condition.busy > 20 and job.prepare and job.prepare ~= test and flag.prepare > 0 then
-        flag.prepare = 4
-    end
-    if condition.busy and condition.busy == 0 and job.prepare and job.prepare ~= test and flag.prepare > 0 then
-        flag.prepare = flag.prepare + 5
-    end
+    if condition.busy and condition.busy > 20 and job.prepare and job.prepare ~=
+        test and flag.prepare > 0 then flag.prepare = 4 end
+    if condition.busy and condition.busy == 0 and job.prepare and job.prepare ~=
+        test and flag.prepare > 0 then flag.prepare = flag.prepare + 5 end
     if job.prepare == duHhe_start or job.prepare == duCjiang_start then
         flag.prepare = 0
     end
-    if flag.prepare > 4 then
-        flag.prepare = 0
-    end
-    if (hp.neili > hp.neili_max * l_db or hp.jingli > hp.jingli_max) and flag.prepare == 0 then
+    if flag.prepare > 4 then flag.prepare = 0 end
+    if (hp.neili > hp.neili_max * l_db or hp.jingli > hp.jingli_max) and
+        flag.prepare == 0 then
         EnableTriggerGroup("prepare_neili", false)
         DeleteTriggerGroup("prepare_neili")
         DeleteTimer("neili")
@@ -1678,9 +1610,7 @@ prepare_neili_w = function()
     locate()
     check_bei(prepare_neili_g)
 end
-prepare_neili_g = function()
-    exe(locl.dir)
-end
+prepare_neili_g = function() exe(locl.dir) end
 prepare_neili_t = function()
     DeleteTimer("neili")
     tmp.i = 1
@@ -1695,35 +1625,26 @@ prepare_neili_idle = function()
             break
         end
     end
-    if perform.force then
-        tmp.fskill = perform.force
-    end
+    if perform.force then tmp.fskill = perform.force end
 
-    if
-        ((hp.neili_max > hp.neili_lim - 20 and score.party and score.party == "峨嵋派") or hp.neili_max >= hp.neili_lim - 5 or
-            flag.jixu == 1 or
-            skills[tmp.fskill].full == 0) and
-            hp.neili > hp.neili_max * l_db
-     then
+    if ((hp.neili_max > hp.neili_lim - 20 and score.party and score.party ==
+        "峨嵋派") or hp.neili_max >= hp.neili_lim - 5 or flag.jixu == 1 or
+        skills[tmp.fskill].full == 0) and hp.neili > hp.neili_max * l_db then
         if hp.neili > hp.neili_max * 7 / 4 then
             l_cnt = l_cnt + math.modf((hp.neili - hp.neili_max * 7 / 4) / 10)
         end
         l_cnt = l_cnt + math.modf(hp.neili_max / 300)
-        if l_cnt < 1 then
-            l_cnt = 1
-        end
+        if l_cnt < 1 then l_cnt = 1 end
         lianxi(l_cnt)
     end
     if score.gold and score.gold > 1000 and hp.neili < hp.neili_max * 0.5 then
         exe("eat " .. drug.neili)
     end
     exe("yun jingli;yun jing;yun qi")
-    if
-        hp.jingli_max < hp.jingli_lim - 500 and flag.lianxi == 1 and hp.neili > hp.neili_max * l_db and
-            ((hp.neili_max > hp.neili_lim - 20 and score.party and score.party == "峨嵋派") or
-                hp.neili_max >= hp.neili_lim - 5 or
-                flag.jixu == 1)
-     then
+    if hp.jingli_max < hp.jingli_lim - 500 and flag.lianxi == 1 and hp.neili >
+        hp.neili_max * l_db and
+        ((hp.neili_max > hp.neili_lim - 20 and score.party and score.party ==
+            "峨嵋派") or hp.neili_max >= hp.neili_lim - 5 or flag.jixu == 1) then
         exe("unset 积蓄")
         exe("tuna " .. hp.jingxue / 2)
     else
@@ -1758,38 +1679,28 @@ prepare_neili_guanbi = function()
     if not flag.prepare or type(flag.prepare) ~= "number" then
         flag.prepare = 0
     end
-    if condition.busy and condition.busy > 20 and job.prepare and job.prepare ~= test and flag.prepare > 0 then
-        flag.prepare = 4
-    end
-    if condition.busy and condition.busy == 0 and job.prepare and job.prepare ~= test and flag.prepare > 0 then
-        flag.prepare = flag.prepare + 5
-    end
+    if condition.busy and condition.busy > 20 and job.prepare and job.prepare ~=
+        test and flag.prepare > 0 then flag.prepare = 4 end
+    if condition.busy and condition.busy == 0 and job.prepare and job.prepare ~=
+        test and flag.prepare > 0 then flag.prepare = flag.prepare + 5 end
     if job.prepare == duHhe_start or job.prepare == duCjiang_start then
         flag.prepare = 0
     end
-    if flag.prepare > 4 then
-        flag.prepare = 0
-    end
+    if flag.prepare > 4 then flag.prepare = 0 end
     EnableTriggerGroup("prepare_neili", false)
     DeleteTriggerGroup("prepare_neili")
     DeleteTimer("neili")
     exe("yun jing;yun qi;yun jingli")
     check_bei(job.prepare)
 end
-function job.find()
-    if job.name == nil then
-        return 0
-    end
-end
+function job.find() if job.name == nil then return 0 end end
 function job.flag()
     flag.find = 0
     flag.wait = 0
 end
 
 jobtimes = {}
-function checkJobtimes(n, l, w)
-    jobtimes[w[1]] = tonumber(w[2])
-end
+function checkJobtimes(n, l, w) jobtimes[w[1]] = tonumber(w[2]) end
 function checkJoblast(n, l, w)
     local joblast = {
         ["武当锄奸"] = "wudang",
@@ -1803,9 +1714,7 @@ function checkJoblast(n, l, w)
         ["颂摩崖抗敌任务"] = "songmoya"
     }
 
-    if joblast[w[2]] then
-        job.last = joblast[w[2]]
-    end
+    if joblast[w[2]] then job.last = joblast[w[2]] end
 end
 
 function check_job()
@@ -1826,20 +1735,21 @@ function check_job()
         kdummy = 0
         return xunCheng()
     end
-    if not perform.skill or not perform.pre or not job.zuhe or countTab(job.zuhe) < 2 then
-        return shujian_set()
-    end
+    if not perform.skill or not perform.pre or not job.zuhe or
+        countTab(job.zuhe) < 2 then return shujian_set() end
 
-    create_triggerex_lvl("dmlflag1", "^(> )*【江湖传闻】玩家竞技活动开始了！", "", "dml_on", 95)
+    create_triggerex_lvl("dmlflag1",
+                         "^(> )*【江湖传闻】玩家竞技活动开始了！",
+                         "", "dml_on", 95)
     SetTriggerOption("dmlflag1", "group", "hp")
-    if not dml_cnt then
-        dml_cnt = 0
-    end
-    if dml_cnt < 5 and (not condition.busy or condition.busy == 0) and vippoison == 0 then
+    if not dml_cnt then dml_cnt = 0 end
+    if dml_cnt < 5 and (not condition.busy or condition.busy == 0) and vippoison ==
+        0 then
         local fn = GetInfo(67) .. "logs\\diemenglou_mark_" .. score.id .. ".log"
         local f = io.open(fn, "r")
         if not f then
-            ColourNote("orange", "black", "未检测到蝶梦楼记录，准备进行蝶梦楼竞技！")
+            ColourNote("orange", "black",
+                       "未检测到蝶梦楼记录，准备进行蝶梦楼竞技！")
             return dml_check()
         else
             local s = f:read()
@@ -1853,37 +1763,25 @@ function check_job()
                         s = tostring(s)
                         local z = tonumber(string.sub(s, -2, -1))
                         if y >= z then
-                            ColourNote("lime", "black", "找到" .. s .. "蝶梦楼记录，日期为昨天。准备进行蝶梦楼竞技！")
+                            ColourNote("lime", "black", "找到" .. s ..
+                                           "蝶梦楼记录，日期为昨天。准备进行蝶梦楼竞技！")
                             return dml_check()
                         else
-                            ColourNote(
-                                "white",
-                                "red",
-                                "找到" .. s .. "蝶梦楼记录，时间间隔不足【",
-                                "yellow",
-                                "black",
-                                "24",
-                                "white",
-                                "red",
-                                "】小时不开启蝶梦楼竞技！"
-                            )
+                            ColourNote("white", "red", "找到" .. s ..
+                                           "蝶梦楼记录，时间间隔不足【",
+                                       "yellow", "black", "24", "white", "red",
+                                       "】小时不开启蝶梦楼竞技！")
                         end
                     else
-                        ColourNote("lime", "black", "找到" .. s .. "蝶梦楼记录，日期为昨天。准备进行蝶梦楼竞技！")
+                        ColourNote("lime", "black", "找到" .. s ..
+                                       "蝶梦楼记录，日期为昨天。准备进行蝶梦楼竞技！")
                         return dml_check()
                     end
                 else
-                    ColourNote(
-                        "white",
-                        "red",
-                        "找到" .. s .. "蝶梦楼记录，时间间隔不足【",
-                        "yellow",
-                        "black",
-                        "24",
-                        "white",
-                        "red",
-                        "】小时不开启蝶梦楼竞技！"
-                    )
+                    ColourNote("white", "red", "找到" .. s ..
+                                   "蝶梦楼记录，时间间隔不足【",
+                               "yellow", "black", "24", "white", "red",
+                               "】小时不开启蝶梦楼竞技！")
                 end
             end
         end
@@ -1894,7 +1792,8 @@ function check_job()
     if condition.busy and condition.busy > 10 then
         return check_halt(weaponUcheck)
     end
-    if job.last == "xueshan" or job.last == "wudang" or job.last == "songxin" or hsruntime ~= 0 then
+    if job.last == "xueshan" or job.last == "wudang" or job.last == "songxin" or
+        hsruntime ~= 0 then
         return check_halt(check_jobx) -- 雪山、武当任务结束后不检查武器状态，直接做下一个任务。
     else
         return check_halt(weaponUcheck)
@@ -1902,52 +1801,43 @@ function check_job()
 end
 
 function check_jobx()
-    wait.make(
-        function()
-            wait_busy()
-            for p in pairs(weaponUsave) do
-                if Bag and not Bag[p] then
-                    job.zuhe["songmoya"] = nil
-                    Log:green("丢失武器!" .. p .. "不见了")
-                    return weapon_lost()
-                end
-            end
-            if fqyytmp.goArmorD == 1 then
-                return fqyyArmorGoCheck()
-            end
-            if job.zuhe == nil then
-                job.zuhe = {}
-            end
-            if job.zuhe["zhuoshe"] and score.party ~= "丐帮" then
-                job.zuhe["zhuoshe"] = nil
-            end
-            if job.zuhe["sldsm"] and score.party ~= "神龙教" then
-                job.zuhe["sldsm"] = nil
-            end
-            if job.zuhe["songmoya"] and hp.exp < 5000000 then
+    wait.make(function()
+        wait_busy()
+        for p in pairs(weaponUsave) do
+            if Bag and not Bag[p] then
                 job.zuhe["songmoya"] = nil
-            end
-            if smydie * 1 >= smyall * 1 then
-                job.zuhe["songmoya"] = nil
-            end
-            if job.zuhe["husong"] and (score.party ~= "少林派" or hp.exp < 2000000) then
-                job.zuhe["husong"] = nil
-            end
-            if job.zuhe["songmoya"] and job.last ~= "songmoya" and mytime <= os.time() then
-                return songmoya()
-            end
-            if
-                job.zuhe["hubiao"] and job.last ~= "hubiao" and job.teamname and
-                    ((not condition.hubiao) or (condition.hubiao and condition.hubiao <= 0))
-             then
-                return hubiao()
-            elseif job.zuhe["husong"] then
-                return husong()
-            else
-                return checkJob()
+                Log:green("丢失武器!" .. p .. "不见了")
+                return weapon_lost()
             end
         end
-    )
+        if fqyytmp.goArmorD == 1 then return fqyyArmorGoCheck() end
+        if job.zuhe == nil then job.zuhe = {} end
+        if job.zuhe["zhuoshe"] and score.party ~= "丐帮" then
+            job.zuhe["zhuoshe"] = nil
+        end
+        if job.zuhe["sldsm"] and score.party ~= "神龙教" then
+            job.zuhe["sldsm"] = nil
+        end
+        if job.zuhe["songmoya"] and hp.exp < 5000000 then
+            job.zuhe["songmoya"] = nil
+        end
+        if smydie * 1 >= smyall * 1 then job.zuhe["songmoya"] = nil end
+        if job.zuhe["husong"] and
+            (score.party ~= "少林派" or hp.exp < 2000000) then
+            job.zuhe["husong"] = nil
+        end
+        if job.zuhe["songmoya"] and job.last ~= "songmoya" and mytime <=
+            os.time() then return songmoya() end
+        if job.zuhe["hubiao"] and job.last ~= "hubiao" and job.teamname and
+            ((not condition.hubiao) or
+                (condition.hubiao and condition.hubiao <= 0)) then
+            return hubiao()
+        elseif job.zuhe["husong"] then
+            return husong()
+        else
+            return checkJob()
+        end
+    end)
 end
 function checkJob()
     if job.last ~= "hqgzc" then
@@ -1997,11 +1887,10 @@ function checkJob()
             job.zuhe[job.last] = 1
         end
     end
-    if
-        countTab(job.zuhe) > 2 and not skills["xixing-dafa"] and job.zuhe["huashan"] and job.zuhe["wudang"] and
-            jobtimes["华山岳不群惩恶扬善"] and
-            jobtimes["武当宋远桥杀恶贼"]
-     then
+    if countTab(job.zuhe) > 2 and not skills["xixing-dafa"] and
+        job.zuhe["huashan"] and job.zuhe["wudang"] and
+        jobtimes["华山岳不群惩恶扬善"] and
+        jobtimes["武当宋远桥杀恶贼"] then
         local t_hs = jobtimes["华山岳不群惩恶扬善"]
         local t_wd = jobtimes["武当宋远桥杀恶贼"]
         local t_times = math.fmod((t_hs + t_wd), 50)
@@ -2011,18 +1900,17 @@ function checkJob()
                 return huashan()
             else
                 for p in pairs(job.zuhe) do
-                    if p ~= "huashan" and p ~= "wudang" and p ~= "hubiao" and p ~= "husong" and p ~= "songmoya" then
+                    if p ~= "huashan" and p ~= "wudang" and p ~= "hubiao" and p ~=
+                        "husong" and p ~= "songmoya" then
                         return _G[p]()
                     end
                 end
             end
         end
     end
-    if
-        score.party and score.party == "华山派" and countTab(job.zuhe) > 2 and not skills["dugu-jiujian"] and
-            job.zuhe["huashan"] and
-            job.zuhe["songxin"]
-     then
+    if score.party and score.party == "华山派" and countTab(job.zuhe) > 2 and
+        not skills["dugu-jiujian"] and job.zuhe["huashan"] and
+        job.zuhe["songxin"] then
         local t_hs, t_sx, t_gb
 
         if jobtimes["华山岳不群惩恶扬善"] then
@@ -2047,7 +1935,8 @@ function checkJob()
                 return huashan()
             else
                 for p in pairs(job.zuhe) do
-                    if p ~= "huashan" and p ~= "songxin" and p ~= "hubiao" and p ~= "husong" and p ~= "songmoya" then
+                    if p ~= "huashan" and p ~= "songxin" and p ~= "hubiao" and p ~=
+                        "husong" and p ~= "songmoya" then
                         return _G[p]()
                     end
                 end
@@ -2057,7 +1946,8 @@ function checkJob()
 
     if job.third and job.zuhe[job.third] and job.last ~= job.third then
         if job.second and job.last == job.second then
-            if job.third == "wudang" and (not job.wdtime or job.wdtime <= os.time()) then
+            if job.third == "wudang" and
+                (not job.wdtime or job.wdtime <= os.time()) then
                 return _G[job.third]()
             end
             if job.third ~= "wudang" and job.third ~= "songmoya" then
@@ -2066,81 +1956,59 @@ function checkJob()
         end
     end
     if job.first and job.zuhe[job.first] and job.last ~= job.first then
-        if job.first ~= "xueshan" and job.first ~= "wudang" and job.first ~= "songmoya" then
-            return _G[job.first]()
-        end
-        if job.first == "xueshan" and ((not condition.xueshan) or (condition.xueshan and condition.xueshan <= 0)) then
+        if job.first ~= "xueshan" and job.first ~= "wudang" and job.first ~=
+            "songmoya" then return _G[job.first]() end
+        if job.first == "xueshan" and
+            ((not condition.xueshan) or
+                (condition.xueshan and condition.xueshan <= 0)) then
             return _G[job.first]()
         end
         if job.first == "wudang" and (not job.wdtime or job.wdtime <= os.time()) then
             return _G[job.first]()
         end
-        if job.first == "xueshan" and condition.xueshan and condition.busy and condition.busy >= condition.xueshan then
+        if job.first == "xueshan" and condition.xueshan and condition.busy and
+            condition.busy >= condition.xueshan then
             return _G[job.first]()
         end
     end
     if job.second and job.zuhe[job.second] and job.last ~= job.second then
-        if job.second ~= "xueshan" and job.second ~= "wudang" and job.second ~= "songmoya" then
+        if job.second ~= "xueshan" and job.second ~= "wudang" and job.second ~=
+            "songmoya" then return _G[job.second]() end
+        if job.second == "xueshan" and
+            ((not condition.xueshan) or
+                (condition.xueshan and condition.xueshan <= 0)) then
             return _G[job.second]()
         end
-        if job.second == "xueshan" and ((not condition.xueshan) or (condition.xueshan and condition.xueshan <= 0)) then
+        if job.second == "wudang" and
+            (not job.wdtime or job.wdtime <= os.time()) then
             return _G[job.second]()
         end
-        if job.second == "wudang" and (not job.wdtime or job.wdtime <= os.time()) then
-            return _G[job.second]()
-        end
-        if job.second == "xueshan" and condition.xueshan and condition.busy and condition.busy >= condition.xueshan then
+        if job.second == "xueshan" and condition.xueshan and condition.busy and
+            condition.busy >= condition.xueshan then
             return _G[job.second]()
         end
     end
 
     for p in pairs(job.zuhe) do
-        if job.last ~= p and job.first ~= p and job.second ~= p and p ~= "songmoya" then
-            return _G[p]()
-        end
+        if job.last ~= p and job.first ~= p and job.second ~= p and p ~=
+            "songmoya" then return _G[p]() end
     end
 
     for p in pairs(job.zuhe) do
-        if job.last ~= p and p ~= "songmoya" then
-            return _G[p]()
-        end
+        if job.last ~= p and p ~= "songmoya" then return _G[p]() end
     end
-    if job.zuhe["xueshan"] and job.last ~= "xueshan" then
-        return xueshan()
-    end
-    if job.zuhe["huashan"] and job.last ~= "huashan" then
-        return huashan()
-    end
-    if job.zuhe["tmonk"] and job.last ~= "tmonk" then
-        return tmonk()
-    end
-    if job.zuhe["songxin"] and job.last ~= "songxin" then
-        return songxin()
-    end
-    if job.zuhe["wudang"] and job.last ~= "wudang" then
-        return wudang()
-    end
-    if job.zuhe["gaibang"] and job.last ~= "gaibang" then
-        return gaibang()
-    end
-    if job.zuhe["zhuoshe"] and job.last ~= "zhuoshe" then
-        return zhuoshe()
-    end
-    if job.zuhe["sldsm"] and job.last ~= "sldsm" then
-        return sldsm()
-    end
-    if job.zuhe["songshan"] and job.last ~= "songshan" then
-        return songshan()
-    end
-    if job.last ~= "songxin" then
-        return songxin()
-    end
-    if job.last ~= "xueshan" and hp.shen < 0 then
-        return xueshan()
-    end
-    if job.last ~= "wudang" and hp.shen > 100000 then
-        return wudang()
-    end
+    if job.zuhe["xueshan"] and job.last ~= "xueshan" then return xueshan() end
+    if job.zuhe["huashan"] and job.last ~= "huashan" then return huashan() end
+    if job.zuhe["tmonk"] and job.last ~= "tmonk" then return tmonk() end
+    if job.zuhe["songxin"] and job.last ~= "songxin" then return songxin() end
+    if job.zuhe["wudang"] and job.last ~= "wudang" then return wudang() end
+    if job.zuhe["gaibang"] and job.last ~= "gaibang" then return gaibang() end
+    if job.zuhe["zhuoshe"] and job.last ~= "zhuoshe" then return zhuoshe() end
+    if job.zuhe["sldsm"] and job.last ~= "sldsm" then return sldsm() end
+    if job.zuhe["songshan"] and job.last ~= "songshan" then return songshan() end
+    if job.last ~= "songxin" then return songxin() end
+    if job.last ~= "xueshan" and hp.shen < 0 then return xueshan() end
+    if job.last ~= "wudang" and hp.shen > 100000 then return wudang() end
     if job.last ~= "gaibang" and hp.exp < 2000000 and hp.shen > 0 then
         return gaibang()
     end
@@ -2153,27 +2021,63 @@ function job_exp_trigger()
     DeleteTriggerGroup("job_exp")
     create_trigger_t("job_exp1", "^(> )*(\\D*)点潜能!$", "", "jobExppot")
     create_trigger_t("job_exp2", "^(> )*(\\D*)点经验!$", "", "jobExpexp")
-    create_trigger_t("job_exp3", "^(> )*你静下心来，反复回想刚才的任务过程，不禁豁然开朗。。你额外地得到了(\\D*)点经验！", "", "jobExpExtra")
-    create_trigger_t("job_exp4", "^>*\\s*你觉得脑中豁然开朗，增加了(\\D*)点潜能和(\\D*)点经验！", "", "job_exp_gb")
-    create_trigger_t("job_exp5", "^(> )*恭喜你！你成功的完成了(\\D*)任务！你被奖励了", "", "jobExp")
-    create_trigger_t("job_exp6", "^>*\\s*好，任务完成了，你得到了(\\D*)点实战经验，(\\D*)点潜能", "", "job_exp_gblu")
-    create_trigger_t("job_exp7", "^>*\\s*你被奖励了(\\D*)点经验，(\\D*)点潜能，(\\D*)点负神！$", "", "job_exp_shenlong")
-    create_trigger_t("job_exp8", "^(> )*您被奖励了(\\D*)点经验，(\\D*)点潜能，您已经为长乐帮出力(\\D*)次。", "", "job_exp_clb") -- 您被奖励了一点经验，五十六点潜能，您已经为长乐帮出力一百二十四次。
+    create_trigger_t("job_exp3",
+                     "^(> )*你静下心来，反复回想刚才的任务过程，不禁豁然开朗。。你额外地得到了(\\D*)点经验！",
+                     "", "jobExpExtra")
+    create_trigger_t("job_exp4",
+                     "^>*\\s*你觉得脑中豁然开朗，增加了(\\D*)点潜能和(\\D*)点经验！",
+                     "", "job_exp_gb")
+    create_trigger_t("job_exp5",
+                     "^(> )*恭喜你！你成功的完成了(\\D*)任务！你被奖励了",
+                     "", "jobExp")
+    create_trigger_t("job_exp6",
+                     "^>*\\s*好，任务完成了，你得到了(\\D*)点实战经验，(\\D*)点潜能",
+                     "", "job_exp_gblu")
+    create_trigger_t("job_exp7",
+                     "^>*\\s*你被奖励了(\\D*)点经验，(\\D*)点潜能，(\\D*)点负神！$",
+                     "", "job_exp_shenlong")
+    create_trigger_t("job_exp8",
+                     "^(> )*您被奖励了(\\D*)点经验，(\\D*)点潜能，您已经为长乐帮出力(\\D*)次。",
+                     "", "job_exp_clb") -- 您被奖励了一点经验，五十六点潜能，您已经为长乐帮出力一百二十四次。
     -- create_trigger_t('job_exp8','^(> )*你被奖励了(\\D*)点经验，(\\D*)点潜能，(\\D*)两黄金','','hubiaoFinish')
     -- create_triggerex_lvl('job_exp9',"^(> )*【队伍】(\\D*)\\((\\D*)\\)：gblu start",'','gbluTeamStart',95)
-    create_trigger_t("job_exp10", "^(> )*好！任务完成，你被奖励了：(\\D*)点实战经验，(\\D*)点潜能。(\\D*)神。$", "", "job_exp_songxin")
-    create_trigger_t("job_exp11", "^(> )*你获得了(\\D*)点经验，(\\D*)点潜能！你的侠义正气增加了！$", "", "job_exp_wudang")
-    create_trigger_t("job_exp12", "^(> )*你获得了(\\D*)点经验，(\\D*)点潜能，(\\D*)点\\D*神。$", "", "job_exp_huashan")
-    create_trigger_t("job_exp13", "^(> )*你被奖励了(\\D*)点经验，(\\D*)点潜能！你感觉邪恶之气更胜从前！$", "", "job_exp_xueshan")
-    create_trigger_t("job_exp14", "^(> )*你被奖励了：(\\D*)点实战经验，(\\D*)点潜能，(\\D*)白银，(\\D*)神。$", "", "job_exp_xuncheng")
+    create_trigger_t("job_exp10",
+                     "^(> )*好！任务完成，你被奖励了：(\\D*)点实战经验，(\\D*)点潜能。(\\D*)神。$",
+                     "", "job_exp_songxin")
+    create_trigger_t("job_exp11",
+                     "^(> )*你获得了(\\D*)点经验，(\\D*)点潜能！你的侠义正气增加了！$",
+                     "", "job_exp_wudang")
+    create_trigger_t("job_exp12",
+                     "^(> )*你获得了(\\D*)点经验，(\\D*)点潜能，(\\D*)点\\D*神。$",
+                     "", "job_exp_huashan")
+    create_trigger_t("job_exp13",
+                     "^(> )*你被奖励了(\\D*)点经验，(\\D*)点潜能！你感觉邪恶之气更胜从前！$",
+                     "", "job_exp_xueshan")
+    create_trigger_t("job_exp14",
+                     "^(> )*你被奖励了：(\\D*)点实战经验，(\\D*)点潜能，(\\D*)白银，(\\D*)神。$",
+                     "", "job_exp_xuncheng")
     -- 你获得了五百三十九点经验，一百五十六点潜能，你共为神龙教铲除了四个恶贼。
-    create_trigger_t("job_exp15", "^(> )*你获得了(\\D*)点经验，(\\D*)点潜能，你共为(\\D*)铲除了(\\D*)个恶贼。$", "", "job_exp_dummy")
-    create_trigger_t("job_exp16", "^(> )*恭喜你任务顺利完成，你获得了(\\D*)经验，(\\D*)点潜能的奖励。$", "", "job_exp_tdh")
-    create_trigger_t("job_exp17", "^(> )*(你擅离职守，任务失败。|你速度太慢，西夏武士已过颂摩崖，任务失败。)", "", "job_gblu_fail")
-    create_trigger_t("job_exp18", "^(> )*糟了！(\\D*)死亡，任务失败！", "", "jobtdhfail")
-    create_trigger_t("job_exp19", "^(> )*(你因为自己拾「信」不昧，|你)获得了(\\D*)点经验，(\\D*)点潜能。", "", "job_exp_dolost")
-    create_trigger_t("job_exp20", "^(> )*你因被人暴揍而出名，江湖声望增加了(\\D*)点。", "", "job_rep_dolost")
-    create_trigger_t("job_exp21", "^(> )*你得到了赏金(\\D*)锭黄金，(\\D*)点潜能，(\\D*)个竞技币和(\\D*)点经验！", "", "job_exp_guanfu")
+    create_trigger_t("job_exp15",
+                     "^(> )*你获得了(\\D*)点经验，(\\D*)点潜能，你共为(\\D*)铲除了(\\D*)个恶贼。$",
+                     "", "job_exp_dummy")
+    create_trigger_t("job_exp16",
+                     "^(> )*恭喜你任务顺利完成，你获得了(\\D*)经验，(\\D*)点潜能的奖励。$",
+                     "", "job_exp_tdh")
+    create_trigger_t("job_exp17",
+                     "^(> )*(你擅离职守，任务失败。|你速度太慢，西夏武士已过颂摩崖，任务失败。)",
+                     "", "job_gblu_fail")
+    create_trigger_t("job_exp18",
+                     "^(> )*糟了！(\\D*)死亡，任务失败！", "",
+                     "jobtdhfail")
+    create_trigger_t("job_exp19",
+                     "^(> )*(你因为自己拾「信」不昧，|你)获得了(\\D*)点经验，(\\D*)点潜能。",
+                     "", "job_exp_dolost")
+    create_trigger_t("job_exp20",
+                     "^(> )*你因被人暴揍而出名，江湖声望增加了(\\D*)点。",
+                     "", "job_rep_dolost")
+    create_trigger_t("job_exp21",
+                     "^(> )*你得到了赏金(\\D*)锭黄金，(\\D*)点潜能，(\\D*)个竞技币和(\\D*)点经验！",
+                     "", "job_exp_guanfu")
     SetTriggerOption("job_exp1", "group", "job_exp")
     SetTriggerOption("job_exp2", "group", "job_exp")
     SetTriggerOption("job_exp3", "group", "job_exp")
@@ -2208,18 +2112,20 @@ function jobExp(n, l, w)
     EnableTrigger("job_exp2", true)
     hp.exp_name = tostring(w[2])
 end
-function jobExpexp(n, l, w)
-    hp.exp_exp = tostring(w[2])
-end
+function jobExpexp(n, l, w) hp.exp_exp = tostring(w[2]) end
 function job_exp_clb(n, l, w)
-    messageShow("长乐帮任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[3] .. "】点！")
+    messageShow("长乐帮任务奖励：经验:【" .. w[2] ..
+                    "】点，潜能:【" .. w[3] .. "】点！")
 end
 function jobExppot(n, l, w)
     EnableTrigger("job_exp1", false)
     EnableTrigger("job_exp2", false)
     hp.exp_pot = tostring(w[2])
-    if not isNil(hp.exp_name) and not isNil(hp.exp_exp) and not isNil(hp.exp_pot) then
-        return messageShow(hp.exp_name .. "任务奖励：经验:【" .. hp.exp_exp .. "】点，，潜能:【" .. hp.exp_pot .. "】点！", "darkorange")
+    if not isNil(hp.exp_name) and not isNil(hp.exp_exp) and
+        not isNil(hp.exp_pot) then
+        return messageShow(hp.exp_name .. "任务奖励：经验:【" ..
+                               hp.exp_exp .. "】点，，潜能:【" ..
+                               hp.exp_pot .. "】点！", "darkorange")
     end
     hp.exp_name = nil
     hp.exp_exp = nil
@@ -2227,72 +2133,89 @@ function jobExppot(n, l, w)
 end
 
 function job_exp_tdh(n, l, w)
-    messageShow("天地会任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[3] .. "】点！")
+    messageShow("天地会任务奖励：经验:【" .. w[2] ..
+                    "】点，潜能:【" .. w[3] .. "】点！")
     dis_all()
     return tdh_finish()
 end
 function jobExpExtra(n, l, w)
-    messageShow("额外任务奖励：经验:【" .. w[2] .. "】点！", "darkorange")
+    messageShow("额外任务奖励：经验:【" .. w[2] .. "】点！",
+                "darkorange")
 end
 function job_exp_dummy(n, l, w)
-    messageShow("大米任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[3] .. "】点,共完成" .. w[4] .. "【" .. w[5] .. "】次铲除恶贼！")
+    messageShow("大米任务奖励：经验:【" .. w[2] ..
+                    "】点，潜能:【" .. w[3] .. "】点,共完成" .. w[4] ..
+                    "【" .. w[5] .. "】次铲除恶贼！")
 end
 function job_exp_xueshan(n, l, w)
-    messageShow("雪山任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[3] .. "】点！")
+    messageShow("雪山任务奖励：经验:【" .. w[2] ..
+                    "】点，潜能:【" .. w[3] .. "】点！")
 end
 function job_exp_wudang(n, l, w)
-    messageShow("武当任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[3] .. "】点！")
+    messageShow("武当任务奖励：经验:【" .. w[2] ..
+                    "】点，潜能:【" .. w[3] .. "】点！")
     wudangjobok = 1
     job.wdtime = os.time() + 40
     job.time.e = os.time()
     job.time.over = job.time.e - job.time.b
-    messageShowT("武当任务：任务完成，用时:【" .. job.time.over .. "】秒。")
+    messageShowT("武当任务：任务完成，用时:【" .. job.time.over ..
+                     "】秒。")
     dis_all()
     return checkWait(wudangFinish, 1)
 end
 function job_exp_huashan(n, l, w)
-    messageShow("华山任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[3] .. "】点！")
+    messageShow("华山任务奖励：经验:【" .. w[2] ..
+                    "】点，潜能:【" .. w[3] .. "】点！")
 end
 function job_exp_dolost(n, l, w)
-    messageShow("失落信笺奖励：    经验:【" .. w[3] .. "】点，潜能:【" .. w[4] .. "】点！", "purple", "yellow")
+    messageShow("失落信笺奖励：    经验:【" .. w[3] ..
+                    "】点，潜能:【" .. w[4] .. "】点！", "purple",
+                "yellow")
 end
 function job_rep_dolost(n, l, w)
-    messageShow("失落信笺奖励：    声望:【" .. w[2] .. "】点！", "yellow", "black")
+    messageShow("失落信笺奖励：    声望:【" .. w[2] .. "】点！",
+                "yellow", "black")
 end
 function job_exp_shenlong(n, l, w)
-    messageShow("神龙任务奖励：经验:【" .. w[1] .. "】点，潜能:【" .. w[2] .. "】点！")
+    messageShow("神龙任务奖励：经验:【" .. w[1] ..
+                    "】点，潜能:【" .. w[2] .. "】点！")
 end
 function job_exp_songxin(n, l, w)
-    messageShow("送信任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[3] .. "】点！")
+    messageShow("送信任务奖励：经验:【" .. w[2] ..
+                    "】点，潜能:【" .. w[3] .. "】点！")
 end
 function job_exp_xuncheng(n, l, w)
-    messageShow("巡城任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[3] .. "】点！")
+    messageShow("巡城任务奖励：经验:【" .. w[2] ..
+                    "】点，潜能:【" .. w[3] .. "】点！")
 end
 
 function job_exp_gb(n, l, w)
     if job.name == "gaibang" then
-        messageShow("丐帮任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[1] .. "】点！")
+        messageShow("丐帮任务奖励：经验:【" .. w[2] ..
+                        "】点，潜能:【" .. w[1] .. "】点！")
     end
     if job.name == "songshan" then
-        messageShow("嵩山任务奖励：经验:【" .. w[2] .. "】点，潜能:【" .. w[1] .. "】点！")
+        messageShow("嵩山任务奖励：经验:【" .. w[2] ..
+                        "】点，潜能:【" .. w[1] .. "】点！")
     end
 end
 function job_exp_zs(n, l, w)
-    messageShow("捉蛇任务奖励：经验:【" .. w[1] .. "】点，潜能:【" .. w[2] .. "】点！")
+    messageShow("捉蛇任务奖励：经验:【" .. w[1] ..
+                    "】点，潜能:【" .. w[2] .. "】点！")
 end
 function job_exp_gblu(n, l, w)
-    messageShow("报效国家奖励：经验:【" .. w[1] .. "】点，潜能:【" .. w[2] .. "】点！")
+    messageShow("报效国家奖励：经验:【" .. w[1] ..
+                    "】点，潜能:【" .. w[2] .. "】点！")
     if hp.exp > 2000000 then
         exe("yield no")
         return gbluFinish()
     end
 end
 function job_exp_guanfu(n, l, w)
-    messageShow(
-        "官府任务奖励： 黄金：【" .. w[2] .. "】锭，经验:【" .. w[5] .. "】点，潜能:【" .. w[3] .. "】点，竞技币:【" .. w[4] .. "】个！",
-        "pink",
-        "black"
-    )
+    messageShow("官府任务奖励： 黄金：【" .. w[2] ..
+                    "】锭，经验:【" .. w[5] .. "】点，潜能:【" ..
+                    w[3] .. "】点，竞技币:【" .. w[4] .. "】个！",
+                "pink", "black")
 end
 function job_exp_tongji(p_cmd)
     tongji = tongji or {}
@@ -2308,9 +2231,7 @@ function job_exp_tongji(p_cmd)
         tongji.exp = nil
         return
     end
-    if math.modf(os.time() / 900) <= tongji.hour and not p_cmd then
-        return
-    end
+    if math.modf(os.time() / 900) <= tongji.hour and not p_cmd then return end
 
     tongji.hour = math.modf(os.time() / 900)
 
@@ -2326,22 +2247,18 @@ function job_exp_tongji(p_cmd)
 
     if flag.log and flag.log == "yes" then
         messageShowT(
-            "任务奖励统计：共运行【" ..
-                l_hour .. "小时" .. l_min .. "分" .. l_sec .. "秒" .. "】，获得经验【" .. l_exp .. "】点，平均每小时【" .. l_avg .. "】点！",
-            "orange"
-        )
+            "任务奖励统计：共运行【" .. l_hour .. "小时" .. l_min ..
+                "分" .. l_sec .. "秒" .. "】，获得经验【" .. l_exp ..
+                "】点，平均每小时【" .. l_avg .. "】点！", "orange")
     else
-        ColourNote(
-            "white",
-            "black",
-            "任务奖励统计：共运行【" ..
-                l_hour .. "小时" .. l_min .. "分" .. l_sec .. "秒" .. "】，获得经验【" .. l_exp .. "】点，平均每小时【" .. l_avg .. "】点！"
-        )
+        ColourNote("white", "black",
+                   "任务奖励统计：共运行【" .. l_hour .. "小时" ..
+                       l_min .. "分" .. l_sec .. "秒" ..
+                       "】，获得经验【" .. l_exp ..
+                       "】点，平均每小时【" .. l_avg .. "】点！")
     end
 end
-function jobExpTongji()
-    return job_exp_tongji(1)
-end
+function jobExpTongji() return job_exp_tongji(1) end
 
 JobTriggerDel = JobTriggerDel or {}
 
@@ -2361,29 +2278,47 @@ function jobTriggerDel()
     xueshan_triggerDel()
     tdh_triggerDel()
     JobTriggerDel = JobTriggerDel or {}
-    for p, q in pairs(JobTriggerDel) do
-        _G[q]()
-    end
+    for p, q in pairs(JobTriggerDel) do _G[q]() end
 end
 
 -- gaibang
 function gaibangTrigger()
     DeleteTriggerGroup("gaibangAsk")
-    create_trigger_t("gaibangAsk1", "^(> )*你向吴长老打听有关", "", "gaibangAsk")
-    create_trigger_t("gaibangAsk2", "^(> )*这里没有这个人。$", "", "gaibangNobody")
+    create_trigger_t("gaibangAsk1", "^(> )*你向吴长老打听有关", "",
+                     "gaibangAsk")
+    create_trigger_t("gaibangAsk2", "^(> )*这里没有这个人。$", "",
+                     "gaibangNobody")
     SetTriggerOption("gaibangAsk1", "group", "gaibangAsk")
     SetTriggerOption("gaibangAsk2", "group", "gaibangAsk")
     EnableTriggerGroup("gaibangAsk", false)
     DeleteTriggerGroup("gaibangAccept")
-    create_trigger_t("gaibangAccept1", "^(> )*吴长老说道：「好吧，最近「(\\D*)」一直和我丐帮作对", "", "gaibangTarget")
-    create_trigger_t("gaibangAccept2", "^(> )*吴长老说道：「此人现在在(\\D*)一带", "", "gaibangConsider")
-    create_trigger_t("gaibangAccept3", "^(> )*吴长老说道：「既然你干不了也没关系", "", "gaibangFail")
-    create_trigger_t("gaibangAccept4", "^(> )*吴长老说道：「你连上个任务去都不想去", "", "gaibangFail")
-    create_trigger_t("gaibangAccept5", "^(> )*吴长老说道：「现在我可没有给你的任务，等会再来吧！", "", "gaibangBusy")
-    create_trigger_t("gaibangAccept6", "^(> )*吴长老说道：「你没有领任务", "", "gaibang")
-    create_trigger_t("gaibangAccept7", "^(> )*吴长老说道：「没看见我正忙着吗", "", "gaibangWait")
-    create_trigger_t("gaibangAccept8", "^(> )*吴长老说道：「不是让你去杀", "", "gaibangFangqiGo")
-    create_trigger_t("gaibangAccept9", "^(> )*吴长老说道：「现在我这里没有给你的任务，你去其他地方看看吧？」", "", "gaibangFail")
+    create_trigger_t("gaibangAccept1",
+                     "^(> )*吴长老说道：「好吧，最近「(\\D*)」一直和我丐帮作对",
+                     "", "gaibangTarget")
+    create_trigger_t("gaibangAccept2",
+                     "^(> )*吴长老说道：「此人现在在(\\D*)一带",
+                     "", "gaibangConsider")
+    create_trigger_t("gaibangAccept3",
+                     "^(> )*吴长老说道：「既然你干不了也没关系",
+                     "", "gaibangFail")
+    create_trigger_t("gaibangAccept4",
+                     "^(> )*吴长老说道：「你连上个任务去都不想去",
+                     "", "gaibangFail")
+    create_trigger_t("gaibangAccept5",
+                     "^(> )*吴长老说道：「现在我可没有给你的任务，等会再来吧！",
+                     "", "gaibangBusy")
+    create_trigger_t("gaibangAccept6",
+                     "^(> )*吴长老说道：「你没有领任务", "",
+                     "gaibang")
+    create_trigger_t("gaibangAccept7",
+                     "^(> )*吴长老说道：「没看见我正忙着吗", "",
+                     "gaibangWait")
+    create_trigger_t("gaibangAccept8",
+                     "^(> )*吴长老说道：「不是让你去杀", "",
+                     "gaibangFangqiGo")
+    create_trigger_t("gaibangAccept9",
+                     "^(> )*吴长老说道：「现在我这里没有给你的任务，你去其他地方看看吧？」",
+                     "", "gaibangFail")
     -- ain
     -- create_trigger_t('gaibangAccept9',"^(> )*吴长老说道：「现在我可没有给你的任务，等会怎么样？",'','gaibangFail')
     SetTriggerOption("gaibangAccept1", "group", "gaibangAccept")
@@ -2397,34 +2332,56 @@ function gaibangTrigger()
     SetTriggerOption("gaibangAccept9", "group", "gaibangAccept")
     EnableTriggerGroup("gaibangAccept", false)
     DeleteTriggerGroup("gaibangFight")
-    create_trigger_t("gaibangFight1", "^(> )*(\\D*)「啪」的一声倒在地上", "", "gaibangDie")
-    create_trigger_t("gaibangFight2", "^(> )*(\\D*)神志迷糊，脚下一个不稳，倒在地上昏了过去。", "", "gaibangFaint")
-    create_trigger_t("gaibangFight3", "^(> )*(\\D*)急急忙忙地离开了。", "", "gaibangRun")
-    create_trigger_t("gaibangFight4", "^(> )*这里没有可使用的对象。", "", "gaibangNoTarget")
+    create_trigger_t("gaibangFight1",
+                     "^(> )*(\\D*)「啪」的一声倒在地上", "",
+                     "gaibangDie")
+    create_trigger_t("gaibangFight2",
+                     "^(> )*(\\D*)神志迷糊，脚下一个不稳，倒在地上昏了过去。",
+                     "", "gaibangFaint")
+    create_trigger_t("gaibangFight3", "^(> )*(\\D*)急急忙忙地离开了。",
+                     "", "gaibangRun")
+    create_trigger_t("gaibangFight4", "^(> )*这里没有可使用的对象。",
+                     "", "gaibangNoTarget")
     SetTriggerOption("gaibangFight1", "group", "gaibangFight")
     SetTriggerOption("gaibangFight2", "group", "gaibangFight")
     SetTriggerOption("gaibangFight3", "group", "gaibangFight")
     SetTriggerOption("gaibangFight4", "group", "gaibangFight")
     EnableTriggerGroup("gaibangFight", false)
     DeleteTriggerGroup("gaibangCut")
-    create_trigger_t("gaibangCut1", "^>*\\s*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。", "", "gaibangCutCon")
-    create_trigger_t("gaibangCut2", "^>*\\s*你得用件锋利的器具才能切下这尸体的头来。", "", "gaibangCutWeapon")
-    create_trigger_t("gaibangCut3", '(> )*你把 "action" 设定为 "Cut" 成功完成。', "", "gaibangCutFail")
+    create_trigger_t("gaibangCut1",
+                     "^>*\\s*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。",
+                     "", "gaibangCutCon")
+    create_trigger_t("gaibangCut2",
+                     "^>*\\s*你得用件锋利的器具才能切下这尸体的头来。",
+                     "", "gaibangCutWeapon")
+    create_trigger_t("gaibangCut3",
+                     '(> )*你把 "action" 设定为 "Cut" 成功完成。', "",
+                     "gaibangCutFail")
     SetTriggerOption("gaibangCut1", "group", "gaibangCut")
     SetTriggerOption("gaibangCut2", "group", "gaibangCut")
     SetTriggerOption("gaibangCut3", "group", "gaibangCut")
     EnableTriggerGroup("gaibangCut", false)
     DeleteTriggerGroup("gaibangGive")
-    create_trigger_t("gaibangGive1", "^(> )*你给吴长老一颗(\\D*)的首级。", "", "gaibangFinish")
-    create_trigger_t("gaibangGive2", "^(> )*吴长老说道：「嘿嘿。。。，你杀错人了。」", "", "gaibangFinish")
-    create_trigger_t("gaibangGive3", "^(> )*吴长老说道：「我现在正忙着呢，你稍等一下吧。」", "", "gaibangGiveBusy")
+    create_trigger_t("gaibangGive1",
+                     "^(> )*你给吴长老一颗(\\D*)的首级。", "",
+                     "gaibangFinish")
+    create_trigger_t("gaibangGive2",
+                     "^(> )*吴长老说道：「嘿嘿。。。，你杀错人了。」",
+                     "", "gaibangFinish")
+    create_trigger_t("gaibangGive3",
+                     "^(> )*吴长老说道：「我现在正忙着呢，你稍等一下吧。」",
+                     "", "gaibangGiveBusy")
     SetTriggerOption("gaibangGive1", "group", "gaibangGive")
     SetTriggerOption("gaibangGive2", "group", "gaibangGive")
     SetTriggerOption("gaibangGive3", "group", "gaibangGive")
     EnableTriggerGroup("gaibangGive", false)
     DeleteTriggerGroup("gaibangHead")
-    create_trigger_t("gaibangHead1", "^(> )*这是一颗(\\D*)的(首级|人头)", "", "gaibangHeadCheck")
-    create_trigger_t("gaibangHead2", '^(> )*你把 "action" 设定为 "check_head" 成功完成。', "", "gaibangHeadCon")
+    create_trigger_t("gaibangHead1",
+                     "^(> )*这是一颗(\\D*)的(首级|人头)", "",
+                     "gaibangHeadCheck")
+    create_trigger_t("gaibangHead2",
+                     '^(> )*你把 "action" 设定为 "check_head" 成功完成。',
+                     "", "gaibangHeadCon")
     SetTriggerOption("gaibangHead1", "group", "gaibangHead")
     SetTriggerOption("gaibangHead2", "group", "gaibangHead")
     EnableTriggerGroup("gaibangHead", false)
@@ -2508,17 +2465,20 @@ function gaibangConsider(n, l, w)
 
     if string.find(gaibangCancel, job.target) then
         check_bei(gaibangFangqi)
-        messageShow("丐帮任务：任务目标【" .. job.target .. "】在Cannel列表里，任务放弃。")
+        messageShow("丐帮任务：任务目标【" .. job.target ..
+                        "】在Cannel列表里，任务放弃。")
         return 0
     end
     if not job.room or not path_cal() then
         check_bei(gaibangFangqi)
-        messageShow("丐帮任务：任务地点【" .. job.where .. "】不可到达，任务放弃。")
+        messageShow("丐帮任务：任务地点【" .. job.where ..
+                        "】不可到达，任务放弃。")
         return
     end
     check_bei(gaibangFind)
     exe("丐帮任务在" .. job.where)
-    messageShow("丐帮任务：开始前往【" .. job.where .. "】，寻找任务NPC：【" .. job.target .. "】。！")
+    messageShow("丐帮任务：开始前往【" .. job.where ..
+                    "】，寻找任务NPC：【" .. job.target .. "】。！")
 end
 function gaibangFangqi()
     flag.idle = nil
@@ -2534,7 +2494,9 @@ function gaibangFangqiGo()
 end
 function gaibangFind()
     DeleteTriggerGroup("gaibangFind")
-    create_trigger_t("gaibangFind1", "^>*\\s*\\D*" .. job.target .. "\\((\\D*)\\)", "", "gaibangFight")
+    create_trigger_t("gaibangFind1",
+                     "^>*\\s*\\D*" .. job.target .. "\\((\\D*)\\)", "",
+                     "gaibangFight")
     SetTriggerOption("gaibangFind1", "group", "gaibangFind")
     EnableTriggerGroup("gaibangFind", false)
     flag.times = 1
@@ -2547,7 +2509,8 @@ function gaibangFindAct()
     exe("look")
     find()
     exe("丐帮任务在" .. job.where)
-    messageShow("丐帮任务：开始寻找【" .. dest.area .. dest.room .. "】的任务NPC：【" .. job.target .. "】。！")
+    messageShow("丐帮任务：开始寻找【" .. dest.area .. dest.room ..
+                    "】的任务NPC：【" .. job.target .. "】。！")
 end
 function gaibangFight(n, l, w)
     EnableTriggerGroup("gaibangFind", false)
@@ -2562,9 +2525,7 @@ function gaibangFight(n, l, w)
     killPfm(job.id)
 end
 function gaibangFaint(n, l, w)
-    if job.target == w[2] then
-        exe("kill " .. job.id)
-    end
+    if job.target == w[2] then exe("kill " .. job.id) end
 end
 function gaibangDie(n, l, w)
     if job.target == w[2] then
@@ -2574,9 +2535,7 @@ function gaibangDie(n, l, w)
 end
 function gaibangRun(n, l, w)
     EnableTriggerGroup("gaibangFight", false)
-    if job.target == w[2] then
-        check_bei(gaibangFind)
-    end
+    if job.target == w[2] then check_bei(gaibangFind) end
 end
 function gaibangNoTarget()
     EnableTriggerGroup("gaibangFight", false)
@@ -2616,8 +2575,7 @@ gaibangCutCon = function(n, l, w)
 end
 function gaibangBack()
     weapon_unwield()
-    for i = 1, 2 do
-    end
+    for i = 1, 2 do end
     -- ain
     go(gaibangHead, "福州城", "船舱")
 end
@@ -2627,11 +2585,7 @@ function gaibangHead()
     exe("look head")
     exe("alias action check_head")
 end
-function gaibangHeadCheck(n, l, w)
-    if w[2] == job.target then
-        tmp.flag = 1
-    end
-end
+function gaibangHeadCheck(n, l, w) if w[2] == job.target then tmp.flag = 1 end end
 function gaibangHeadCon()
     EnableTriggerGroup("gaibangHead", false)
     if tmp.flag == 1 then
@@ -2664,7 +2618,8 @@ function gaibangFinish()
     nobusy = 0
     job.time.e = os.time()
     job.time.over = job.time.e - job.time.b
-    messageShowT("丐帮吴长老任务：任务完成，用时:【" .. job.time.over .. "】秒。")
+    messageShowT("丐帮吴长老任务：任务完成，用时:【" ..
+                     job.time.over .. "】秒。")
     EnableTriggerGroup("gaibangAccept", false)
     EnableTriggerGroup("gaibangGive", false)
     checkWait(check_food)
@@ -2673,19 +2628,35 @@ end
 -- zhuoshe
 function zhuosheTrigger()
     DeleteTriggerGroup("zhuosheAsk")
-    create_trigger_t("zhuosheAsk1", "^(> )*你向陈长老打听有关", "", "zhuosheAsk")
-    create_trigger_t("zhuosheAsk2", "^(> )*这里没有这个人。$", "", "zhuosheNobody")
+    create_trigger_t("zhuosheAsk1", "^(> )*你向陈长老打听有关", "",
+                     "zhuosheAsk")
+    create_trigger_t("zhuosheAsk2", "^(> )*这里没有这个人。$", "",
+                     "zhuosheNobody")
     SetTriggerOption("zhuosheAsk1", "group", "zhuosheAsk")
     SetTriggerOption("zhuosheAsk2", "group", "zhuosheAsk")
     EnableTriggerGroup("zhuosheAsk", false)
     DeleteTriggerGroup("zhuosheAccept")
-    create_trigger_t("zhuosheAccept1", "^(> )*陈长老说道：你去(\\D*)附近帮我捉条蛇回来吧！", "", "zhuosheConsider")
-    create_trigger_t("zhuosheAccept2", "^(> )*陈长老说道：「你帮不了我，那你就去练功吧。以后我再找你。」", "", "zhuosheFail")
-    create_trigger_t("zhuosheAccept3", "^(> )*陈长老暂时不想抓蛇，你过一会儿再来吧。", "", "zhuosheBusy")
-    create_trigger_t("zhuosheAccept4", "^(> )*陈长老说道：「刚才不是让你帮我抓蛇去了吗，你怎么还不去", "", "zhuosheFangqiGo")
-    create_trigger_t("zhuosheAccept5", "^(> )*陈长老说道：「什么放弃？放什么弃？", "", "check_heal")
-    create_trigger_t("zhuosheAccept6", "^(> )*陈长老说道：「你手头还有其他的事吧？过一会再来吧！", "", "zhuosheBusy")
-    create_trigger_t("zhuosheAccept7", "^(> )*陈长老说道：「你刚抓完蛇，还是先去休息一会吧。", "", "zhuosheFail")
+    create_trigger_t("zhuosheAccept1",
+                     "^(> )*陈长老说道：你去(\\D*)附近帮我捉条蛇回来吧！",
+                     "", "zhuosheConsider")
+    create_trigger_t("zhuosheAccept2",
+                     "^(> )*陈长老说道：「你帮不了我，那你就去练功吧。以后我再找你。」",
+                     "", "zhuosheFail")
+    create_trigger_t("zhuosheAccept3",
+                     "^(> )*陈长老暂时不想抓蛇，你过一会儿再来吧。",
+                     "", "zhuosheBusy")
+    create_trigger_t("zhuosheAccept4",
+                     "^(> )*陈长老说道：「刚才不是让你帮我抓蛇去了吗，你怎么还不去",
+                     "", "zhuosheFangqiGo")
+    create_trigger_t("zhuosheAccept5",
+                     "^(> )*陈长老说道：「什么放弃？放什么弃？",
+                     "", "check_heal")
+    create_trigger_t("zhuosheAccept6",
+                     "^(> )*陈长老说道：「你手头还有其他的事吧？过一会再来吧！",
+                     "", "zhuosheBusy")
+    create_trigger_t("zhuosheAccept7",
+                     "^(> )*陈长老说道：「你刚抓完蛇，还是先去休息一会吧。",
+                     "", "zhuosheFail")
     SetTriggerOption("zhuosheAccept1", "group", "zhuosheAccept")
     SetTriggerOption("zhuosheAccept2", "group", "zhuosheAccept")
     SetTriggerOption("zhuosheAccept3", "group", "zhuosheAccept")
@@ -2695,20 +2666,32 @@ function zhuosheTrigger()
     SetTriggerOption("zhuosheAccept7", "group", "zhuosheAccept")
     EnableTriggerGroup("zhuosheAccept", false)
     DeleteTriggerGroup("zhuosheFind")
-    create_trigger_t("zhuosheFind1", "^(> )*突然你发现草丛中有一条蛇。", "", "zhuosheTarget")
+    create_trigger_t("zhuosheFind1",
+                     "^(> )*突然你发现草丛中有一条蛇。", "",
+                     "zhuosheTarget")
     SetTriggerOption("zhuosheFind1", "group", "zhuosheFind")
     EnableTriggerGroup("zhuosheFind", false)
     DeleteTriggerGroup("zhuosheFight")
-    create_trigger_t("zhuosheFight1", "^(> )*(\\D*)「啪」的一声倒在地上", "", "zhuosheBack")
-    create_trigger_t("zhuosheFight2", "^(> )*(\\D*)缩成一团，不动了。你伸手抓了起来。", "", "zhuosheBack")
-    create_trigger_t("zhuosheFight3", "^(> )*你决定跟随(\\D*)一起行动。", "", "zhuosheName")
+    create_trigger_t("zhuosheFight1",
+                     "^(> )*(\\D*)「啪」的一声倒在地上", "",
+                     "zhuosheBack")
+    create_trigger_t("zhuosheFight2",
+                     "^(> )*(\\D*)缩成一团，不动了。你伸手抓了起来。",
+                     "", "zhuosheBack")
+    create_trigger_t("zhuosheFight3",
+                     "^(> )*你决定跟随(\\D*)一起行动。", "",
+                     "zhuosheName")
     SetTriggerOption("zhuosheFight1", "group", "zhuosheFight")
     SetTriggerOption("zhuosheFight2", "group", "zhuosheFight")
     SetTriggerOption("zhuosheFight3", "group", "zhuosheFight")
     EnableTriggerGroup("zhuosheFight", false)
     DeleteTriggerGroup("zhuosheFinish")
-    create_trigger_t("zhuosheFinish1", "^(> )*陈长老从你手里接过蛇，转身装进一个口袋里。", "", "zhuosheFinish")
-    create_trigger_t("zhuosheFinish2", "^(> )*陈长老说道：「这么简单的事都办不好，你下去吧", "", "zhuosheFinish")
+    create_trigger_t("zhuosheFinish1",
+                     "^(> )*陈长老从你手里接过蛇，转身装进一个口袋里。",
+                     "", "zhuosheFinish")
+    create_trigger_t("zhuosheFinish2",
+                     "^(> )*陈长老说道：「这么简单的事都办不好，你下去吧",
+                     "", "zhuosheFinish")
     SetTriggerOption("zhuosheFinish1", "group", "zhuosheFinish")
     SetTriggerOption("zhuosheFinish2", "group", "zhuosheFinish")
     EnableTriggerGroup("zhuosheFinish", false)
@@ -2729,9 +2712,7 @@ function zhuoshe()
     job.name = "zhuoshe"
     prepare_neili(zhuosheGo)
 end
-function zhuosheGo()
-    go(zhuosheStart, "丐帮", "空地")
-end
+function zhuosheGo() go(zhuosheStart, "丐帮", "空地") end
 function zhuosheStart()
     EnableTriggerGroup("zhuosheAsk", true)
     exe("ask chen zhanglao about job")
@@ -2744,9 +2725,7 @@ function zhuosheBusy()
     EnableTriggerGroup("zhuosheAccept", false)
     check_bei(zhuosheBusyDazuo)
 end
-function zhuosheBusyDazuo()
-    prepare_lianxi(zhuosheStart)
-end
+function zhuosheBusyDazuo() prepare_lianxi(zhuosheStart) end
 function zhuosheFail()
     EnableTriggerGroup("zhuosheAccept", false)
     job.last = "zhuoshe"
@@ -2771,16 +2750,15 @@ function zhuosheConsider(n, l, w)
     dest.area = job.area
     if not job.room or not path_cal() then
         check_bei(zhuosheFangqi)
-        messageShow("捉蛇任务：任务地点【" .. job.where .. "】不可到达，任务放弃。")
+        messageShow("捉蛇任务：任务地点【" .. job.where ..
+                        "】不可到达，任务放弃。")
         return
     end
     check_bei(zhuosheFind)
     exe("丐帮捉蛇在" .. job.where)
     messageShow("捉蛇任务：开始前往【" .. job.where .. "】！")
 end
-function zhuosheFangqiGo()
-    go(zhuosheFangqi, "丐帮", "空地")
-end
+function zhuosheFangqiGo() go(zhuosheFangqi, "丐帮", "空地") end
 function zhuosheFangqi()
     flag.idle = nil
     EnableTriggerGroup("zhuosheAsk", true)
@@ -2798,7 +2776,8 @@ function zhuosheFindAct()
     job.flag()
     exe("look")
     find()
-    messageShow("捉蛇任务：开始寻找【" .. dest.area .. dest.room .. "】的毒蛇！")
+    messageShow("捉蛇任务：开始寻找【" .. dest.area .. dest.room ..
+                    "】的毒蛇！")
 end
 function zhuosheName(n, l, w)
     job.target = Trim(w[2])
@@ -2821,9 +2800,7 @@ function zhuosheFight()
     killPfm(job.id)
 end
 function zhuosheFaint(n, l, w)
-    if job.target == w[2] then
-        exe("kill " .. job.id)
-    end
+    if job.target == w[2] then exe("kill " .. job.id) end
 end
 function zhuosheBack(n, l, w)
     job.time.e = os.time()
@@ -2833,7 +2810,8 @@ function zhuosheBack(n, l, w)
         EnableTriggerGroup("zhuosheFinish", true)
         DeleteTimer("perform")
         exe("halt;fu bai caodan")
-        messageShowT("捉蛇任务：搞定毒蛇！任务用时:【" .. job.time.over .. "】秒。")
+        messageShowT("捉蛇任务：搞定毒蛇！任务用时:【" ..
+                         job.time.over .. "】秒。")
         return go(zhuosheReady, "丐帮", "空地")
     end
 end
@@ -2871,25 +2849,39 @@ end
 function thdTrigger()
     DeleteTriggerGroup("thdAsk")
     create_trigger_t("thdAsk1", "^(> )*你向黄蓉打听有关", "", "thdAsk")
-    create_trigger_t("thdAsk2", "^(> )*这里没有这个人。$", "", "thdNobody")
+    create_trigger_t("thdAsk2", "^(> )*这里没有这个人。$", "",
+                     "thdNobody")
     SetTriggerOption("thdAsk1", "group", "thdAsk")
     SetTriggerOption("thdAsk2", "group", "thdAsk")
     EnableTriggerGroup("thdAsk", false)
     DeleteTriggerGroup("thdAccept")
-    create_trigger_t(
-        "thdAccept1",
-        "^(> )*黄蓉在你的耳边悄声说道：据说(江南|江北|西南|中原|西北|河南|河北|东北)(草寇|寨主|恶霸|山贼|土匪|飞贼|盗贼)(\\D*)正在(\\D*)捣乱",
-        "",
-        "thdConsider"
-    )
-    create_trigger_t("thdAccept2", "^(> )*黄蓉说道：「我不是告诉你了吗，有人在", "", "thdFangqi")
-    create_trigger_t("thdAccept3", "^(> )*黄蓉在你的耳边悄声说道(\\D*)尤为擅长(\\D*)的功夫。", "", "thdNpc")
-    create_trigger_t("thdAccept4", "^(> )*黄蓉说道：「你正忙着别的事情呢", "", "thdBusy")
-    create_trigger_t("thdAccept5", "^(> )*黄蓉说道：「你刚做完(武当锄奸|惩恶扬善|大理送信)任务", "", "thdFail")
-    create_trigger_t("thdAccept6", "^(> )*黄蓉说道：「现在暂时没有适合你的工作", "", "thdBusy")
-    create_trigger_t("thdAccept7", "^(> )*黄蓉说道：「暂时没有任务需要做，你过一会儿再来吧", "", "thdBusy")
-    create_trigger_t("thdAccept8", "^(> )*黄蓉说道：「\\D*，你太让我失望了，居然这么点活都干不好，先退下吧", "", "thdFail")
-    create_trigger_t("thdAccept9", "^(> )*黄蓉说道：「\\D*，你又没在我这里领任务，瞎放弃什么呀", "", "thdFail")
+    create_trigger_t("thdAccept1",
+                     "^(> )*黄蓉在你的耳边悄声说道：据说(江南|江北|西南|中原|西北|河南|河北|东北)(草寇|寨主|恶霸|山贼|土匪|飞贼|盗贼)(\\D*)正在(\\D*)捣乱",
+                     "", "thdConsider")
+    create_trigger_t("thdAccept2",
+                     "^(> )*黄蓉说道：「我不是告诉你了吗，有人在",
+                     "", "thdFangqi")
+    create_trigger_t("thdAccept3",
+                     "^(> )*黄蓉在你的耳边悄声说道(\\D*)尤为擅长(\\D*)的功夫。",
+                     "", "thdNpc")
+    create_trigger_t("thdAccept4",
+                     "^(> )*黄蓉说道：「你正忙着别的事情呢", "",
+                     "thdBusy")
+    create_trigger_t("thdAccept5",
+                     "^(> )*黄蓉说道：「你刚做完(武当锄奸|惩恶扬善|大理送信)任务",
+                     "", "thdFail")
+    create_trigger_t("thdAccept6",
+                     "^(> )*黄蓉说道：「现在暂时没有适合你的工作",
+                     "", "thdBusy")
+    create_trigger_t("thdAccept7",
+                     "^(> )*黄蓉说道：「暂时没有任务需要做，你过一会儿再来吧",
+                     "", "thdBusy")
+    create_trigger_t("thdAccept8",
+                     "^(> )*黄蓉说道：「\\D*，你太让我失望了，居然这么点活都干不好，先退下吧",
+                     "", "thdFail")
+    create_trigger_t("thdAccept9",
+                     "^(> )*黄蓉说道：「\\D*，你又没在我这里领任务，瞎放弃什么呀",
+                     "", "thdFail")
     SetTriggerOption("thdAccept1", "group", "thdAccept")
     SetTriggerOption("thdAccept2", "group", "thdAccept")
     SetTriggerOption("thdAccept3", "group", "thdAccept")
@@ -2901,11 +2893,18 @@ function thdTrigger()
     SetTriggerOption("thdAccept9", "group", "thdAccept")
     EnableTriggerGroup("thdAccept", false)
     DeleteTriggerGroup("thdFight")
-    create_trigger_t("thdFight1", "^(> )*(\\D*)「啪」的一声倒在地上", "", "thdBack")
-    create_trigger_t("thdFight2", "^(> )*(\\D*)大喊一声：不好！！转身几个起落就不见了", "", "thdBack")
+    create_trigger_t("thdFight1", "^(> )*(\\D*)「啪」的一声倒在地上",
+                     "", "thdBack")
+    create_trigger_t("thdFight2",
+                     "^(> )*(\\D*)大喊一声：不好！！转身几个起落就不见了",
+                     "", "thdBack")
     create_trigger_t("thdFight3", "^(> )*这里没有(\\D*)。", "", "thdLost")
-    create_trigger_t("thdFight4", "^(> )*(\\D*)对着你发出一阵阴笑，说道", "", "thdKillAct")
-    create_trigger_t("thdFight5", "^(> )*(\\D*)大喊一声：老子不奉陪了！转身几个起落就不见了", "", "thdBack")
+    create_trigger_t("thdFight4",
+                     "^(> )*(\\D*)对着你发出一阵阴笑，说道", "",
+                     "thdKillAct")
+    create_trigger_t("thdFight5",
+                     "^(> )*(\\D*)大喊一声：老子不奉陪了！转身几个起落就不见了",
+                     "", "thdBack")
     SetTriggerOption("thdFight1", "group", "thdFight")
     SetTriggerOption("thdFight2", "group", "thdFight")
     SetTriggerOption("thdFight3", "group", "thdFight")
@@ -2913,9 +2912,14 @@ function thdTrigger()
     SetTriggerOption("thdFight5", "group", "thdFight")
     EnableTriggerGroup("thdFight", false)
     DeleteTriggerGroup("thdFinish")
-    create_trigger_t("thdFinish1", "^(> )*黄蓉对着你竖起了右手大拇指，好样的。", "", "thdFinish")
-    create_trigger_t("thdFinish2", "^(> )*黄蓉被你气得昏了过去。", "", "thdFinish")
-    create_trigger_t("thdFinish3", "^(> )*黄蓉说道：「" .. score.name .. "你怎么搞的，居然让那恶贼给跑了", "", "thdFinish")
+    create_trigger_t("thdFinish1",
+                     "^(> )*黄蓉对着你竖起了右手大拇指，好样的。",
+                     "", "thdFinish")
+    create_trigger_t("thdFinish2", "^(> )*黄蓉被你气得昏了过去。",
+                     "", "thdFinish")
+    create_trigger_t("thdFinish3", "^(> )*黄蓉说道：「" .. score.name ..
+                         "你怎么搞的，居然让那恶贼给跑了", "",
+                     "thdFinish")
     SetTriggerOption("thdFinish1", "group", "thdFinish")
     SetTriggerOption("thdFinish2", "group", "thdFinish")
     SetTriggerOption("thdFinish3", "group", "thdFinish")
@@ -2938,9 +2942,7 @@ function thd()
     job.time.b = os.time()
     prepare_lianxi(thdGo)
 end
-function thdGo()
-    go(thdStart, "桃花岛", "内室")
-end
+function thdGo() go(thdStart, "桃花岛", "内室") end
 function thdStart()
     EnableTriggerGroup("thdAsk", true)
     exe("ask song yuanqiao about job")
@@ -2953,22 +2955,44 @@ end
 -- sldsm
 function sldsmTrigger()
     DeleteTriggerGroup("sldsmAsk")
-    create_trigger_t("sldsmAsk1", "^(> )*你向洪安通打听有关", "", "sldsmAsk")
-    create_trigger_t("sldsmAsk2", "^(> )*这里没有这个人。$", "", "sldsmNobody")
+    create_trigger_t("sldsmAsk1", "^(> )*你向洪安通打听有关", "",
+                     "sldsmAsk")
+    create_trigger_t("sldsmAsk2", "^(> )*这里没有这个人。$", "",
+                     "sldsmNobody")
     SetTriggerOption("sldsmAsk1", "group", "sldsmAsk")
     SetTriggerOption("sldsmAsk2", "group", "sldsmAsk")
     EnableTriggerGroup("sldsmAsk", false)
     DeleteTriggerGroup("sldsmAccept")
-    create_trigger_t("sldsmAccept1", "^(> )*洪安通说道：「(\\D*)常与本教做对，你速去(\\D*)把他杀了！", "", "sldsmConsiderK")
-    create_trigger_t("sldsmAccept2", "^(> )*洪安通说道：「现在令你速去(\\D*)设法让(\\D*)归顺本教！」", "", "sldsmConsiderZ")
-    create_trigger_t("sldsmAccept3", "^(> )*洪安通说道：「你先把前一个任务完成再说。」", "", "sldsmFangqi")
-    create_trigger_t("sldsmAccept4", "^(> )*洪安通说道：「你小子竟敢偷偷做其他门派的任务，还想在神龙教里呆下去么", "", "sldsmBusy")
-    create_trigger_t("sldsmAccept5", "^(> )*洪安通说道：「你刚做完任务，先休息一下吧。」", "", "sldsmFail")
-    create_trigger_t("sldsmAccept6", "^(> )*洪安通说道：「你先休息一下吧。", "", "sldsmBusy")
-    create_trigger_t("sldsmAccept7", "^(> )*洪安通说道：「怎么？！你想抗命不成？！", "", "sldsmBusy")
-    create_trigger_t("sldsmAccept8", "^(> )*洪安通说道：「这么点事情都办不了，要你这种无用之人何用！」", "", "sldsmBusy")
-    create_trigger_t("sldsmAccept9", "^(> )*洪安通说道：「你三番五次抗命不遵，是不是不想活", "", "sldsmHeiw")
-    create_trigger_t("sldsmAccept10", "^(> )*洪安通说道：「现在没有任务，你等下再来吧。」", "", "sldsmBusy")
+    create_trigger_t("sldsmAccept1",
+                     "^(> )*洪安通说道：「(\\D*)常与本教做对，你速去(\\D*)把他杀了！",
+                     "", "sldsmConsiderK")
+    create_trigger_t("sldsmAccept2",
+                     "^(> )*洪安通说道：「现在令你速去(\\D*)设法让(\\D*)归顺本教！」",
+                     "", "sldsmConsiderZ")
+    create_trigger_t("sldsmAccept3",
+                     "^(> )*洪安通说道：「你先把前一个任务完成再说。」",
+                     "", "sldsmFangqi")
+    create_trigger_t("sldsmAccept4",
+                     "^(> )*洪安通说道：「你小子竟敢偷偷做其他门派的任务，还想在神龙教里呆下去么",
+                     "", "sldsmBusy")
+    create_trigger_t("sldsmAccept5",
+                     "^(> )*洪安通说道：「你刚做完任务，先休息一下吧。」",
+                     "", "sldsmFail")
+    create_trigger_t("sldsmAccept6",
+                     "^(> )*洪安通说道：「你先休息一下吧。", "",
+                     "sldsmBusy")
+    create_trigger_t("sldsmAccept7",
+                     "^(> )*洪安通说道：「怎么？！你想抗命不成？！",
+                     "", "sldsmBusy")
+    create_trigger_t("sldsmAccept8",
+                     "^(> )*洪安通说道：「这么点事情都办不了，要你这种无用之人何用！」",
+                     "", "sldsmBusy")
+    create_trigger_t("sldsmAccept9",
+                     "^(> )*洪安通说道：「你三番五次抗命不遵，是不是不想活",
+                     "", "sldsmHeiw")
+    create_trigger_t("sldsmAccept10",
+                     "^(> )*洪安通说道：「现在没有任务，你等下再来吧。」",
+                     "", "sldsmBusy")
     SetTriggerOption("sldsmAccept1", "group", "sldsmAccept")
     SetTriggerOption("sldsmAccept2", "group", "sldsmAccept")
     SetTriggerOption("sldsmAccept3", "group", "sldsmAccept")
@@ -2981,11 +3005,20 @@ function sldsmTrigger()
     SetTriggerOption("sldsmAccept10", "group", "sldsmAccept")
     EnableTriggerGroup("sldsmAccept", false)
     DeleteTriggerGroup("sldsmFight")
-    create_trigger_t("sldsmFight1", "^(> )*(\\D*)「啪」的一声倒在地上", "", "sldsmDie")
-    create_trigger_t("sldsmFight2", "^(> )*(\\D*)神志迷糊，脚下一个不稳，倒在地上昏了过去。", "", "sldsmFaint")
-    create_trigger_t("sldsmFight3", "^(> )*这里没有(\\D*)。", "", "sldsmLost")
-    create_trigger_t("sldsmFight4", "^(> )*(\\D*)跪倒在地，高呼道：洪教主神通广大，战无不胜！", "", "sldsmFlop")
-    create_trigger_t("sldsmFight5", "^(> )*没有让你诱迫这个人归顺呀!", "", "sldsmZhNext")
+    create_trigger_t("sldsmFight1",
+                     "^(> )*(\\D*)「啪」的一声倒在地上", "",
+                     "sldsmDie")
+    create_trigger_t("sldsmFight2",
+                     "^(> )*(\\D*)神志迷糊，脚下一个不稳，倒在地上昏了过去。",
+                     "", "sldsmFaint")
+    create_trigger_t("sldsmFight3", "^(> )*这里没有(\\D*)。", "",
+                     "sldsmLost")
+    create_trigger_t("sldsmFight4",
+                     "^(> )*(\\D*)跪倒在地，高呼道：洪教主神通广大，战无不胜！",
+                     "", "sldsmFlop")
+    create_trigger_t("sldsmFight5",
+                     "^(> )*没有让你诱迫这个人归顺呀!", "",
+                     "sldsmZhNext")
     SetTriggerOption("sldsmFight1", "group", "sldsmFight")
     SetTriggerOption("sldsmFight2", "group", "sldsmFight")
     SetTriggerOption("sldsmFight3", "group", "sldsmFight")
@@ -3008,9 +3041,7 @@ function sldsm()
     job.name = "sldsm"
     prepare_neili(sldsmGo)
 end
-function sldsmGo()
-    go(sldsmStart, "神龙岛", "大厅")
-end
+function sldsmGo() go(sldsmStart, "神龙岛", "大厅") end
 function sldsmStart()
     EnableTriggerGroup("sldsmAsk", true)
     exe("ask hong antong about job")
@@ -3024,9 +3055,7 @@ function sldsmBusy()
     check_bei(sldsmBusyDazuo)
 end
 function sldsmBusyDazuo()
-    if not Bag["护膝"] then
-        exe("ask shou toutuo about 护膝")
-    end
+    if not Bag["护膝"] then exe("ask shou toutuo about 护膝") end
     prepare_lianxi(sldsmStart)
 end
 function sldsmFail()
@@ -3034,9 +3063,7 @@ function sldsmFail()
     job.last = "sldsm"
     check_heal()
 end
-function sldsmHeiw()
-    EnableTriggerGroup("sldsmAccept", false)
-end
+function sldsmHeiw() EnableTriggerGroup("sldsmAccept", false) end
 function sldsmConsiderK(n, l, w)
     job.time.b = os.time()
     EnableTriggerGroup("sldsmAccept", false)
@@ -3053,15 +3080,19 @@ function sldsmConsiderK(n, l, w)
     dest.room = job.room
     dest.area = job.area
     if string.find(sldsmCancel, job.target) then
-        messageShow("神龙任务：任务目标【" .. job.target .. "】不可到达，任务放弃。")
+        messageShow("神龙任务：任务目标【" .. job.target ..
+                        "】不可到达，任务放弃。")
         return check_pot(1)
     end
     if not job.room or not path_cal() then
-        messageShow("神龙任务：任务地点【" .. job.where .. "】不可到达，任务放弃。")
+        messageShow("神龙任务：任务地点【" .. job.where ..
+                        "】不可到达，任务放弃。")
         return check_pot(1)
     end
     check_bei(sldsmFind)
-    messageShow("神龙任务：开始前往【" .. job.where .. "】索命【" .. job.target .. "】！")
+    messageShow(
+        "神龙任务：开始前往【" .. job.where .. "】索命【" ..
+            job.target .. "】！")
 end
 function sldsmConsiderZ(n, l, w)
     EnableTriggerGroup("sldsmAccept", false)
@@ -3078,19 +3109,21 @@ function sldsmConsiderZ(n, l, w)
     dest.room = job.room
     dest.area = job.area
     if string.find(sldsmCancel, job.target) then
-        messageShow("神龙任务：任务目标【" .. job.target .. "】不可到达，任务放弃。")
+        messageShow("神龙任务：任务目标【" .. job.target ..
+                        "】不可到达，任务放弃。")
         return check_pot(1)
     end
     if not job.room or not path_cal() then
-        messageShow("神龙任务：任务地点【" .. job.where .. "】不可到达，任务放弃。")
+        messageShow("神龙任务：任务地点【" .. job.where ..
+                        "】不可到达，任务放弃。")
         return check_pot(1)
     end
     check_bei(sldsmFind)
-    messageShow("神龙任务：开始前往【" .. job.where .. "】招魂【" .. job.target .. "】！")
+    messageShow(
+        "神龙任务：开始前往【" .. job.where .. "】招魂【" ..
+            job.target .. "】！")
 end
-function sldsmFangqiGo()
-    go(sldsmFangqi, "神龙岛", "大厅")
-end
+function sldsmFangqiGo() go(sldsmFangqi, "神龙岛", "大厅") end
 function sldsmFangqi()
     EnableTriggerGroup("sldsmAccept", false)
     if job.sldtime and os.time() - job.sldtime < 600 then
@@ -3104,7 +3137,8 @@ function sldsmFangqiAsk()
 end
 function sldsmFind()
     DeleteTriggerGroup("sldsmFind")
-    create_trigger_t("sldsmFind1", "^(> )*\\D*" .. job.target .. "\\((\\D*)\\)", "", "sldsmTarget")
+    create_trigger_t("sldsmFind1", "^(> )*\\D*" .. job.target .. "\\((\\D*)\\)",
+                     "", "sldsmTarget")
     SetTriggerOption("sldsmFind1", "group", "sldsmFind")
     EnableTrigger("sldsmFind1", false)
     flag.times = 1
@@ -3116,7 +3150,8 @@ function sldsmFindAct()
     job.flag()
     exe("look")
     find()
-    messageShow("神龙任务：开始寻找【" .. dest.area .. dest.room .. "】的" .. "【" .. job.target .. "】！")
+    messageShow("神龙任务：开始寻找【" .. dest.area .. dest.room ..
+                    "】的" .. "【" .. job.target .. "】！")
 end
 function sldsmTarget(n, l, w)
     EnableTriggerGroup("sldsmFind", false)
@@ -3138,13 +3173,9 @@ function sldsmZh(n, l, w, styles)
     local l_flag = false
     for _, v in ipairs(styles) do
         -- Note(v.text,RGBColourToName (v.textcolour))
-        if RGBColourToName(v.textcolour) == "maroon" then
-            l_flag = true
-        end
+        if RGBColourToName(v.textcolour) == "maroon" then l_flag = true end
     end
-    if flag and job.id then
-        exe("zh " .. job.id)
-    end
+    if flag and job.id then exe("zh " .. job.id) end
 end
 function sldsmZhNext()
     job.id = job.id .. " 2"
@@ -3167,21 +3198,13 @@ function sldsmDie(n, l, w)
             check_bei(sldsmSm)
         end
     else
-        if job.type and job.type == "sm" then
-            exe("kill " .. job.id)
-        end
+        if job.type and job.type == "sm" then exe("kill " .. job.id) end
     end
 end
-function sldsmFlop(n, l, w)
-    if job.target == w[2] then
-        return sldsmFinish()
-    end
-end
+function sldsmFlop(n, l, w) if job.target == w[2] then return sldsmFinish() end end
 function sldsmSm()
     exe("halt")
-    for i = 1, 3 do
-        exe("sm corpse " .. i)
-    end
+    for i = 1, 3 do exe("sm corpse " .. i) end
     return sldsmFinish()
 end
 function sldsmLost(n, l, w)
@@ -3211,27 +3234,44 @@ end
 -- 王掌柜急急忙忙地离开了。
 function songshanTrigger()
     DeleteTriggerGroup("songshanAsk")
-    create_trigger_t("songshanAsk1", "^(> )*你向左冷禅打听有关", "", "songshanAsk")
-    create_trigger_t("songshanAsk2", "^(> )*这里没有这个人。$", "", "songshanNobody")
+    create_trigger_t("songshanAsk1", "^(> )*你向左冷禅打听有关", "",
+                     "songshanAsk")
+    create_trigger_t("songshanAsk2", "^(> )*这里没有这个人。$", "",
+                     "songshanNobody")
     SetTriggerOption("songshanAsk1", "group", "songshanAsk")
     SetTriggerOption("songshanAsk2", "group", "songshanAsk")
     EnableTriggerGroup("songshanAsk", false)
     DeleteTriggerGroup("songshanAccept")
-    create_trigger_t(
-        "songshanAccept1",
-        "^(> )*左冷禅说道：「(你听好了，有弟子回报|对了，)(\\D*)(这人对我五岳并派之举深表不满|和我交情不错，如得他相助)",
-        "",
-        "songshanNpc"
-    )
-    create_trigger_t("songshanAccept2", "^(> )*左冷禅说道：「(嘿嘿，他在|你就代表我去)(\\D*)(一带，你去将他杀了|邀请他，)", "", "songshanConsider")
-    create_trigger_t("songshanAccept3", "^(> )*左冷禅说道：「不是让你去", "", "songshanFangqi")
-    create_trigger_t("songshanAccept4", "^(> )*左冷禅说道：「我正忙着呢，你等等。", "", "songshanBusy")
-    create_trigger_t("songshanAccept5", "^(> )*左冷禅说道：「你刚做完任务，先休息一下吧。」", "", "songshanFail")
-    create_trigger_t("songshanAccept6", "^(> )*左冷禅说道：「你没有领任务,和我嚷嚷什么?", "", "songshanFail")
-    create_trigger_t("songshanAccept7", "^(> )*左冷禅说道：「嗯，我现在正在思考并派大计，你别打扰。", "", "songshanFail")
-    create_trigger_t("songshanAccept8", "^(> )*左冷禅说道：「既然你干不了也没关系，再去刻苦练功吧，以后再来为我们的并派大计出力！」", "", "songshanFail")
-    create_trigger_t("songshanAccept9", "^(> )*左冷禅说道：「嗯，我现在忙，你别打扰。", "", "songshanBusy")
-    create_trigger_t("songshanAccept10", "^(> )*左冷禅说道：「现在没有任务，你等下再来吧。」", "", "songshanBusy")
+    create_trigger_t("songshanAccept1",
+                     "^(> )*左冷禅说道：「(你听好了，有弟子回报|对了，)(\\D*)(这人对我五岳并派之举深表不满|和我交情不错，如得他相助)",
+                     "", "songshanNpc")
+    create_trigger_t("songshanAccept2",
+                     "^(> )*左冷禅说道：「(嘿嘿，他在|你就代表我去)(\\D*)(一带，你去将他杀了|邀请他，)",
+                     "", "songshanConsider")
+    create_trigger_t("songshanAccept3",
+                     "^(> )*左冷禅说道：「不是让你去", "",
+                     "songshanFangqi")
+    create_trigger_t("songshanAccept4",
+                     "^(> )*左冷禅说道：「我正忙着呢，你等等。",
+                     "", "songshanBusy")
+    create_trigger_t("songshanAccept5",
+                     "^(> )*左冷禅说道：「你刚做完任务，先休息一下吧。」",
+                     "", "songshanFail")
+    create_trigger_t("songshanAccept6",
+                     "^(> )*左冷禅说道：「你没有领任务,和我嚷嚷什么?",
+                     "", "songshanFail")
+    create_trigger_t("songshanAccept7",
+                     "^(> )*左冷禅说道：「嗯，我现在正在思考并派大计，你别打扰。",
+                     "", "songshanFail")
+    create_trigger_t("songshanAccept8",
+                     "^(> )*左冷禅说道：「既然你干不了也没关系，再去刻苦练功吧，以后再来为我们的并派大计出力！」",
+                     "", "songshanFail")
+    create_trigger_t("songshanAccept9",
+                     "^(> )*左冷禅说道：「嗯，我现在忙，你别打扰。",
+                     "", "songshanBusy")
+    create_trigger_t("songshanAccept10",
+                     "^(> )*左冷禅说道：「现在没有任务，你等下再来吧。」",
+                     "", "songshanBusy")
     SetTriggerOption("songshanAccept1", "group", "songshanAccept")
     SetTriggerOption("songshanAccept2", "group", "songshanAccept")
     SetTriggerOption("songshanAccept3", "group", "songshanAccept")
@@ -3244,25 +3284,32 @@ function songshanTrigger()
     SetTriggerOption("songshanAccept10", "group", "songshanAccept")
     EnableTriggerGroup("songshanAccept", false)
     DeleteTriggerGroup("songshanFight")
-    create_trigger_t("songshanFight1", "^(> )*(\\D*)「啪」的一声倒在地上", "", "songshanDie")
-    create_trigger_t("songshanFight2", "^(> )*(\\D*)神志迷糊，脚下一个不稳，倒在地上昏了过去。", "", "songshanFaint")
-    create_trigger_t("songshanFight3", "^(> )*这里没有(\\D*)。", "", "songshanLost")
-    create_trigger_t("songshanFight4", "^(> )*(这里没有这个人耶|你想邀请的对象不在这里)", "", "songshanFind")
-    create_trigger_t(
-        "songshanFight5",
-        "^(> )*(你双手一拱，笑着|你胜了这招，向后跃开三尺|你哈哈大笑，说道：承让了！|没看见|你正忙着呢，先歇口气吧|你正在打架呢，等会儿再说吧|你正在极力邀请人家呢|你要先等他醒过来再说|你精神不振，先休息一下吧)",
-        "",
-        "songshanQing"
-    )
-    create_trigger_t("songshanFight6", "^(> )*(你的任务好象不是要邀请这人吧|你的任务好象不是要邀请谁吧)", "", "songshanFangqiGo")
-    create_trigger_t("songshanFight7", "^(> )*(\\D*)已经接受了邀请，你不用再费劲啦。", "", "songshanBackCheck")
-    create_trigger_t("songshanFight8", "^(> )*(\\D*)决定跟随你一起行动。", "", "songshanFollow")
-    create_trigger_t(
-        "songshanFight9",
-        "^(> )*(\\D*)(向后一纵|向后退了几步，说道|轻蔑地扫了|嘿嘿一声：|脸色苍白，只看了|转过头来，上上下下看了|脸色微变，说道：佩服，佩服|一脸不耐烦的表情)",
-        "",
-        "songshanQingCheck"
-    )
+    create_trigger_t("songshanFight1",
+                     "^(> )*(\\D*)「啪」的一声倒在地上", "",
+                     "songshanDie")
+    create_trigger_t("songshanFight2",
+                     "^(> )*(\\D*)神志迷糊，脚下一个不稳，倒在地上昏了过去。",
+                     "", "songshanFaint")
+    create_trigger_t("songshanFight3", "^(> )*这里没有(\\D*)。", "",
+                     "songshanLost")
+    create_trigger_t("songshanFight4",
+                     "^(> )*(这里没有这个人耶|你想邀请的对象不在这里)",
+                     "", "songshanFind")
+    create_trigger_t("songshanFight5",
+                     "^(> )*(你双手一拱，笑着|你胜了这招，向后跃开三尺|你哈哈大笑，说道：承让了！|没看见|你正忙着呢，先歇口气吧|你正在打架呢，等会儿再说吧|你正在极力邀请人家呢|你要先等他醒过来再说|你精神不振，先休息一下吧)",
+                     "", "songshanQing")
+    create_trigger_t("songshanFight6",
+                     "^(> )*(你的任务好象不是要邀请这人吧|你的任务好象不是要邀请谁吧)",
+                     "", "songshanFangqiGo")
+    create_trigger_t("songshanFight7",
+                     "^(> )*(\\D*)已经接受了邀请，你不用再费劲啦。",
+                     "", "songshanBackCheck")
+    create_trigger_t("songshanFight8",
+                     "^(> )*(\\D*)决定跟随你一起行动。", "",
+                     "songshanFollow")
+    create_trigger_t("songshanFight9",
+                     "^(> )*(\\D*)(向后一纵|向后退了几步，说道|轻蔑地扫了|嘿嘿一声：|脸色苍白，只看了|转过头来，上上下下看了|脸色微变，说道：佩服，佩服|一脸不耐烦的表情)",
+                     "", "songshanQingCheck")
     SetTriggerOption("songshanFight1", "group", "songshanFight")
     SetTriggerOption("songshanFight2", "group", "songshanFight")
     SetTriggerOption("songshanFight3", "group", "songshanFight")
@@ -3274,23 +3321,35 @@ function songshanTrigger()
     SetTriggerOption("songshanFight9", "group", "songshanFight")
     EnableTriggerGroup("songshanFight", false)
     DeleteTriggerGroup("songshanCut")
-    create_trigger_t("songshanCut1", "^(> )*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。", "", "songshanCutCon")
-    create_trigger_t("songshanCut2", "^(> )*你得用件锋利的器具才能切下这尸体的头来。", "", "songshanCutWeapon")
+    create_trigger_t("songshanCut1",
+                     "^(> )*只听“咔”的一声，你将(\\D*)的首级斩了下来，提在手中。",
+                     "", "songshanCutCon")
+    create_trigger_t("songshanCut2",
+                     "^(> )*你得用件锋利的器具才能切下这尸体的头来。",
+                     "", "songshanCutWeapon")
     SetTriggerOption("songshanCut1", "group", "songshanCut")
     SetTriggerOption("songshanCut2", "group", "songshanCut")
     EnableTriggerGroup("songshanCut", false)
     DeleteTriggerGroup("songshanGive")
-    create_trigger_t("songshanGive1", "^(> )*你给左冷禅一颗(\\D*)的首级。", "", "songshanFinish")
+    create_trigger_t("songshanGive1",
+                     "^(> )*你给左冷禅一颗(\\D*)的首级。", "",
+                     "songshanFinish")
     SetTriggerOption("songshanGive1", "group", "songshanGive")
     EnableTriggerGroup("songshanGive", false)
     DeleteTriggerGroup("songshanHead")
-    create_trigger_t("songshanHead1", "^(> )*这是一颗(\\D*)的(首级|人头)", "", "songshanHeadCheck")
-    create_trigger_t("songshanHead2", '^(> )*你把 "action" 设定为 "check_head" 成功完成。', "", "songshanHeadCon")
+    create_trigger_t("songshanHead1",
+                     "^(> )*这是一颗(\\D*)的(首级|人头)", "",
+                     "songshanHeadCheck")
+    create_trigger_t("songshanHead2",
+                     '^(> )*你把 "action" 设定为 "check_head" 成功完成。',
+                     "", "songshanHeadCon")
     SetTriggerOption("songshanHead1", "group", "songshanHead")
     SetTriggerOption("songshanHead2", "group", "songshanHead")
     EnableTriggerGroup("songshanHead", false)
     DeleteTriggerGroup("songshanFinish")
-    create_trigger_t("songshanFinish1", "^(> )*左冷禅说道：「(\\D*)能来，我嵩山派又多了一份力量啦", "", "songshanFinishCheck")
+    create_trigger_t("songshanFinish1",
+                     "^(> )*左冷禅说道：「(\\D*)能来，我嵩山派又多了一份力量啦",
+                     "", "songshanFinishCheck")
     SetTriggerOption("songshanFinish1", "group", "songshanFinish")
     EnableTriggerGroup("songshanFinish", false)
 end
@@ -3315,9 +3374,7 @@ function songshan()
     job.name = "songshan"
     prepare_neili(songshanGo)
 end
-function songshanGo()
-    go(songshanStart, "嵩山", "封禅台")
-end
+function songshanGo() go(songshanStart, "嵩山", "封禅台") end
 function songshanStart()
     EnableTriggerGroup("songshanAsk", true)
     exe("ask zuo lengchan about job")
@@ -3330,9 +3387,7 @@ function songshanBusy()
     EnableTriggerGroup("songshanAccept", false)
     check_bei(songshanBusyDazuo)
 end
-function songshanBusyDazuo()
-    songshanStart()
-end
+function songshanBusyDazuo() songshanStart() end
 function songshanFail()
     print("嵩山job失败，疗伤")
     EnableTriggerGroup("songshanAccept", false)
@@ -3363,23 +3418,27 @@ function songshanConsider(n, l, w)
     dest.area = job.area
 
     if string.find(sldsmCancel, job.target) then
-        messageShow("嵩山任务：任务目标【" .. job.target .. "】不可到达，任务放弃。")
+        messageShow("嵩山任务：任务目标【" .. job.target ..
+                        "】不可到达，任务放弃。")
         return songshanFangqi()
     end
     if not job.room or not path_cal() then
-        messageShow("嵩山任务：任务地点【" .. job.where .. "】不可到达，任务放弃。")
+        messageShow("嵩山任务：任务地点【" .. job.where ..
+                        "】不可到达，任务放弃。")
         return songshanFangqi()
     end
     check_bei(songshanFind)
     if job.type and job.type == "qing" then
-        messageShow("嵩山任务：开始前往【" .. job.where .. "】请【" .. job.target .. "】！")
+        messageShow(
+            "嵩山任务：开始前往【" .. job.where .. "】请【" ..
+                job.target .. "】！")
     else
-        messageShow("嵩山任务：开始前往【" .. job.where .. "】杀【" .. job.target .. "】！")
+        messageShow(
+            "嵩山任务：开始前往【" .. job.where .. "】杀【" ..
+                job.target .. "】！")
     end
 end
-function songshanFangqiGo()
-    go(songshanFangqi, "嵩山", "封禅台")
-end
+function songshanFangqiGo() go(songshanFangqi, "嵩山", "封禅台") end
 function songshanFangqi()
     nobusy = 0
     EnableTriggerGroup("songshanAsk", true)
@@ -3394,7 +3453,9 @@ function songshanFangqiAsk()
 end
 function songshanFind()
     DeleteTriggerGroup("songshanFind")
-    create_trigger_t("songshanFind1", "^(> )*\\D*" .. job.target .. "\\((\\D*)\\)", "", "songshanTarget")
+    create_trigger_t("songshanFind1",
+                     "^(> )*\\D*" .. job.target .. "\\((\\D*)\\)", "",
+                     "songshanTarget")
     SetTriggerOption("songshanFind1", "group", "songshanFind")
     EnableTrigger("songshanFind1", false)
     flag.times = 1
@@ -3406,7 +3467,8 @@ function songshanFindAct()
     job.flag()
     exe("look")
     find()
-    messageShow("嵩山任务：开始寻找【" .. dest.area .. dest.room .. "】的" .. "【" .. job.target .. "】！")
+    messageShow("嵩山任务：开始寻找【" .. dest.area .. dest.room ..
+                    "】的" .. "【" .. job.target .. "】！")
 end
 function songshanTarget(n, l, w)
     EnableTriggerGroup("songshanFind", false)
@@ -3452,11 +3514,7 @@ function songshanDie(n, l, w)
         end
     end
 end
-function songshanQingCheck(n, l, w)
-    if job.target == w[2] then
-        songshanQing()
-    end
-end
+function songshanQingCheck(n, l, w) if job.target == w[2] then songshanQing() end end
 function songshanQing()
     exe("yun qi;hp")
     --   exe('yun qi')
@@ -3480,9 +3538,7 @@ function songshanCut()
     EnableTriggerGroup("songshanCut", true)
     exe("halt")
     weaponWieldCut()
-    for i = 1, 3 do
-        exe("qie corpse " .. i)
-    end
+    for i = 1, 3 do exe("qie corpse " .. i) end
 end
 function songshanCutWeapon()
     EnableTriggerGroup("songshanCut", false)
@@ -3503,11 +3559,7 @@ function songshanLost(n, l, w)
         return songshanFind()
     end
 end
-function songshanBckCheck(n, l, w)
-    if job.target == w[2] then
-        songshanBack()
-    end
-end
+function songshanBckCheck(n, l, w) if job.target == w[2] then songshanBack() end end
 function songshanBack()
     DeleteTimer("perform")
     EnableTriggerGroup("songshanFight", false)
@@ -3525,11 +3577,7 @@ function songshanHead()
         exe("alias action check_head")
     end
 end
-function songshanHeadCheck(n, l, w)
-    if w[2] == job.target then
-        tmp.flag = 1
-    end
-end
+function songshanHeadCheck(n, l, w) if w[2] == job.target then tmp.flag = 1 end end
 function songshanHeadCon()
     EnableTriggerGroup("songshanHead", false)
     if tmp.flag == 1 then
@@ -3553,9 +3601,7 @@ function songshanFinishWait()
     end
 end
 function songshanFinishCheck(n, l, w)
-    if w[2] == job.target then
-        return songshanFinish()
-    end
+    if w[2] == job.target then return songshanFinish() end
 end
 function songshanFinish()
     exe("unset env_msg")
@@ -3563,7 +3609,8 @@ function songshanFinish()
     job.time.e = os.time()
     job.time.over = job.time.e - job.time.b
     EnableTriggerGroup("songshanFight", false)
-    messageShowT("嵩山任务：任务完成！任务用时:【" .. job.time.over .. "】秒。")
+    messageShowT("嵩山任务：任务完成！任务用时:【" ..
+                     job.time.over .. "】秒。")
     print("嵩山任务完成！")
     exe("sd;nu")
     -- ain need
@@ -3575,24 +3622,41 @@ end
 -- tmonk
 function tmonkTrigger()
     DeleteTriggerGroup("tmonkFollow")
-    create_trigger_t("tmonkFollow1", "^(> )*你决定跟随玄惭大师一起行动。", "", "tmonkFollow")
-    create_trigger_t("tmonkFollow2", "^(> )*这里没有 xuancan dashi。$", "", "tmonkNobody")
+    create_trigger_t("tmonkFollow1",
+                     "^(> )*你决定跟随玄惭大师一起行动。", "",
+                     "tmonkFollow")
+    create_trigger_t("tmonkFollow2", "^(> )*这里没有 xuancan dashi。$", "",
+                     "tmonkNobody")
     SetTriggerOption("tmonkFollow1", "group", "tmonkFollow")
     SetTriggerOption("tmonkFollow2", "group", "tmonkFollow")
     EnableTriggerGroup("tmonkFollow", false)
     DeleteTriggerGroup("tmonkAsk")
-    create_trigger_t("tmonkAsk1", "^(> )*你向玄惭大师打听有关", "", "tmonkAsk")
-    create_trigger_t("tmonkAsk2", "^(> )*这里没有这个人。$", "", "tmonkNobody")
+    create_trigger_t("tmonkAsk1", "^(> )*你向玄惭大师打听有关", "",
+                     "tmonkAsk")
+    create_trigger_t("tmonkAsk2", "^(> )*这里没有这个人。$", "",
+                     "tmonkNobody")
     SetTriggerOption("tmonkAsk1", "group", "tmonkAsk")
     SetTriggerOption("tmonkAsk2", "group", "tmonkAsk")
     EnableTriggerGroup("tmonkAsk", false)
     DeleteTriggerGroup("tmonkAccept")
-    create_trigger_t("tmonkAccept1", "^(> )*玄惭大师说道：「你刚才不是已经问过了吗？", "", "tmonkStart")
-    create_trigger_t("tmonkAccept2", "^(> )*玄惭大师说道：「你正在忙着做其它任务呢。", "", "tmonkBusy")
-    create_trigger_t("tmonkAccept3", "^(> )*玄惭大师说道：「你刚训练武僧结束，还是先休息一会吧。", "", "tmonkFangqi")
-    create_trigger_t("tmonkAccept4", "^(> )*玄惭大师说道：「你现在正忙着做其他任务呢", "", "tmonkBusy")
-    create_trigger_t("tmonkAccept5", "^(> )*玄惭大师说道：「\\D*你累犯数戒，身带重罪", "", "tmonkGuilty")
-    create_trigger_t("tmonkAccept6", "^(> )*玄惭说道：好吧，你就在罗汉堂里训练武僧", "", "tmonkStart")
+    create_trigger_t("tmonkAccept1",
+                     "^(> )*玄惭大师说道：「你刚才不是已经问过了吗？",
+                     "", "tmonkStart")
+    create_trigger_t("tmonkAccept2",
+                     "^(> )*玄惭大师说道：「你正在忙着做其它任务呢。",
+                     "", "tmonkBusy")
+    create_trigger_t("tmonkAccept3",
+                     "^(> )*玄惭大师说道：「你刚训练武僧结束，还是先休息一会吧。",
+                     "", "tmonkFangqi")
+    create_trigger_t("tmonkAccept4",
+                     "^(> )*玄惭大师说道：「你现在正忙着做其他任务呢",
+                     "", "tmonkBusy")
+    create_trigger_t("tmonkAccept5",
+                     "^(> )*玄惭大师说道：「\\D*你累犯数戒，身带重罪",
+                     "", "tmonkGuilty")
+    create_trigger_t("tmonkAccept6",
+                     "^(> )*玄惭说道：好吧，你就在罗汉堂里训练武僧",
+                     "", "tmonkStart")
     SetTriggerOption("tmonkAccept1", "group", "tmonkAccept")
     SetTriggerOption("tmonkAccept2", "group", "tmonkAccept")
     SetTriggerOption("tmonkAccept3", "group", "tmonkAccept")
@@ -3601,35 +3665,65 @@ function tmonkTrigger()
     SetTriggerOption("tmonkAccept6", "group", "tmonkAccept")
     EnableTriggerGroup("tmonkAccept", false)
     DeleteTriggerGroup("tmonkFind")
-    create_trigger_t("tmonkFind1", "^^(> )*\\D*玄惭大师\\((\\D*)\\)", "", "tmonkDashi")
+    create_trigger_t("tmonkFind1", "^^(> )*\\D*玄惭大师\\((\\D*)\\)", "",
+                     "tmonkDashi")
     SetTriggerOption("tmonkFind1", "group", "tmonkFind")
     EnableTriggerGroup("tmonkFind", false)
     DeleteTriggerGroup("tmonkWujiAsk")
-    create_trigger_t("tmonkWujiAsk1", "^(> )*你向圆(心|业|觉|慧|灭|音)和尚打听有关", "", "tmonkWujiAsk")
-    create_trigger_t("tmonkWujiAsk2", "^(> )*这里没有这个人。$", "", "tmonkWujiNobody")
+    create_trigger_t("tmonkWujiAsk1",
+                     "^(> )*你向圆(心|业|觉|慧|灭|音)和尚打听有关",
+                     "", "tmonkWujiAsk")
+    create_trigger_t("tmonkWujiAsk2", "^(> )*这里没有这个人。$", "",
+                     "tmonkWujiNobody")
     SetTriggerOption("tmonkWujiAsk1", "group", "tmonkWujiAsk")
     SetTriggerOption("tmonkWujiAsk2", "group", "tmonkWujiAsk")
     EnableTriggerGroup("tmonkWujiAsk", false)
     DeleteTriggerGroup("tmonkWujiReply")
-    create_trigger_t("tmonkWujiReply1", "^(> )*圆(心|业|觉|慧|灭|音)和尚说道：「这个可不能乱说。", "", "tmonkFinish")
-    create_trigger_t("tmonkWujiReply2", "^(> )*圆(心|业|觉|慧|灭|音)和尚一脸神秘地", "", "tmonkWujiNobody")
-    create_trigger_t("tmonkWujiReply3", "^(> )*圆(心|业|觉|慧|灭|音)和尚生气地看着你", "", "tmonkWujiNobody")
-    create_trigger_t("tmonkWujiReply4", "^(> )*圆(心|业|觉|慧|灭|音)和尚说道：「小僧在学", "", "tmonkTeachStart")
+    create_trigger_t("tmonkWujiReply1",
+                     "^(> )*圆(心|业|觉|慧|灭|音)和尚说道：「这个可不能乱说。",
+                     "", "tmonkFinish")
+    create_trigger_t("tmonkWujiReply2",
+                     "^(> )*圆(心|业|觉|慧|灭|音)和尚一脸神秘地",
+                     "", "tmonkWujiNobody")
+    create_trigger_t("tmonkWujiReply3",
+                     "^(> )*圆(心|业|觉|慧|灭|音)和尚生气地看着你",
+                     "", "tmonkWujiNobody")
+    create_trigger_t("tmonkWujiReply4",
+                     "^(> )*圆(心|业|觉|慧|灭|音)和尚说道：「小僧在学",
+                     "", "tmonkTeachStart")
     SetTriggerOption("tmonkWujiReply1", "group", "tmonkWujiReply")
     SetTriggerOption("tmonkWujiReply2", "group", "tmonkWujiReply")
     SetTriggerOption("tmonkWujiReply3", "group", "tmonkWujiReply")
     SetTriggerOption("tmonkWujiReply4", "group", "tmonkWujiReply")
     EnableTriggerGroup("tmonkWujiReply", false)
     DeleteTriggerGroup("tmonkTeach")
-    create_trigger_t("tmonkTeach1", "^(> )*你还是先去跟玄惭大师打声招呼吧。", "", "tmonkFinish")
-    create_trigger_t("tmonkTeach2", "^(> )*圆(心|业|觉|慧|灭|音)和尚说道：「我正由", "", "tmonkWujiNobody")
-    create_trigger_t("tmonkTeach3", "^(> )*你的修为还不如我呢，还想教我？", "", "tmonkWujiKill")
-    create_trigger_t("tmonkTeach4", "^(> )*圆(心|业|觉|慧|灭|音)和尚太累了，现在没有办法学。", "", "tmonkChange")
-    create_trigger_t("tmonkTeach5", "^(> )*圆(心|业|觉|慧|灭|音)和尚正忙着呢。", "", "tmonkChange")
-    create_trigger_t("tmonkTeach6", "^(> )*你(正忙着呢。|尽心竭力，对)", "", "tmonkContinue")
-    create_trigger_t("tmonkTeach7", '^(> )*你把 "action" 设定为 "teach" 成功完成。$', "", "tmonkTeachCon")
-    create_trigger_t("tmonkTeach8", "^(> )*(\\D*)在你旁边，你无法专心指点。", "", "tmonkChange")
-    create_trigger_t("tmonkTeach9", "^(> )*圆(心|业|觉|慧|灭|音)和尚神情振奋，一声大叫向(\\D*)奔去", "", "tmonkMotou")
+    create_trigger_t("tmonkTeach1",
+                     "^(> )*你还是先去跟玄惭大师打声招呼吧。",
+                     "", "tmonkFinish")
+    create_trigger_t("tmonkTeach2",
+                     "^(> )*圆(心|业|觉|慧|灭|音)和尚说道：「我正由",
+                     "", "tmonkWujiNobody")
+    create_trigger_t("tmonkTeach3",
+                     "^(> )*你的修为还不如我呢，还想教我？", "",
+                     "tmonkWujiKill")
+    create_trigger_t("tmonkTeach4",
+                     "^(> )*圆(心|业|觉|慧|灭|音)和尚太累了，现在没有办法学。",
+                     "", "tmonkChange")
+    create_trigger_t("tmonkTeach5",
+                     "^(> )*圆(心|业|觉|慧|灭|音)和尚正忙着呢。",
+                     "", "tmonkChange")
+    create_trigger_t("tmonkTeach6",
+                     "^(> )*你(正忙着呢。|尽心竭力，对)", "",
+                     "tmonkContinue")
+    create_trigger_t("tmonkTeach7",
+                     '^(> )*你把 "action" 设定为 "teach" 成功完成。$',
+                     "", "tmonkTeachCon")
+    create_trigger_t("tmonkTeach8",
+                     "^(> )*(\\D*)在你旁边，你无法专心指点。", "",
+                     "tmonkChange")
+    create_trigger_t("tmonkTeach9",
+                     "^(> )*圆(心|业|觉|慧|灭|音)和尚神情振奋，一声大叫向(\\D*)奔去",
+                     "", "tmonkMotou")
     SetTriggerOption("tmonkTeach1", "group", "tmonkTeach")
     SetTriggerOption("tmonkTeach2", "group", "tmonkTeach")
     SetTriggerOption("tmonkTeach3", "group", "tmonkTeach")
@@ -3641,12 +3735,18 @@ function tmonkTrigger()
     SetTriggerOption("tmonkTeach9", "group", "tmonkTeach")
     EnableTriggerGroup("tmonkTeach", false)
     DeleteTriggerGroup("tmonkMotouFind")
-    create_trigger_t("tmonkMotouFind1", "^^(> )*邪道魔头高举右拳，对着你", "", "tmonkMotouKill")
+    create_trigger_t("tmonkMotouFind1",
+                     "^^(> )*邪道魔头高举右拳，对着你", "",
+                     "tmonkMotouKill")
     SetTriggerOption("tmonkMotouFind1", "group", "tmonkMotouFind")
     EnableTriggerGroup("tmonkMotouFind", false)
     DeleteTriggerGroup("tmonkFight")
-    create_trigger_t("tmonkFight1", "^(> )*邪道魔头「啪」的一声倒在地上", "", "tmonkDie")
-    create_trigger_t("tmonkFight2", "^(> )*邪道魔头神志迷糊，脚下一个不稳，倒在地上昏了过去。", "", "tmonkFaint")
+    create_trigger_t("tmonkFight1",
+                     "^(> )*邪道魔头「啪」的一声倒在地上", "",
+                     "tmonkDie")
+    create_trigger_t("tmonkFight2",
+                     "^(> )*邪道魔头神志迷糊，脚下一个不稳，倒在地上昏了过去。",
+                     "", "tmonkFaint")
     SetTriggerOption("tmonkFight1", "group", "tmonkFight")
     SetTriggerOption("tmonkFight2", "group", "tmonkFight")
     EnableTriggerGroup("tmonkFight", false)
@@ -3673,9 +3773,7 @@ function tmonk()
     tmroom["shaolin/wstang4"] = true
     tmroom["shaolin/wstang5"] = true
     tmroom["shaolin/wstang6"] = true
-    for p in pairs(tm) do
-        tmroom[p] = nil
-    end
+    for p in pairs(tm) do tmroom[p] = nil end
     tmonkTrigger()
     messageShow("Tmonk任务：任务开始。", "green")
     job.findAgain = tmonkFindAgain
@@ -3686,9 +3784,7 @@ function tmonkFindAgain()
     EnableTriggerGroup("tmonkMotouFind", false)
     return go(find, dest.area, dest.room)
 end
-function tmonkGo()
-    return go(tmonkXuancan, "嵩山少林", "演武堂")
-end
+function tmonkGo() return go(tmonkXuancan, "嵩山少林", "演武堂") end
 function tmonkXuancan()
     EnableTriggerGroup("tmonkFind", true)
     job.flag()
@@ -3718,10 +3814,8 @@ function tmonkAsk()
 end
 function tmonkGuilty()
     EnableTriggerGroup("tmonkAccept", false)
-    if
-        score.party and score.party == "少林派" and score.master == "无名老僧" and skills["buddhism"] and
-            skills["buddhism"].lvl == 200
-     then
+    if score.party and score.party == "少林派" and score.master ==
+        "无名老僧" and skills["buddhism"] and skills["buddhism"].lvl == 200 then
         return go(tmonkFofa, "嵩山少林", "里屋")
     end
     return go(tmonkCh, "嵩山少林", "戒律院")
@@ -3730,9 +3824,7 @@ function tmonkFofa()
     exe("ask wuming about 佛法")
     return tmonkGo()
 end
-function tmonkCh()
-    checkWait(tmonkGo, 2)
-end
+function tmonkCh() checkWait(tmonkGo, 2) end
 function tmonkFangqi()
     EnableTriggerGroup("tmonkAccept", false)
     job.last = "tmonk"
@@ -3747,9 +3839,7 @@ function tmonkStart()
     job.last = "tmonk"
     if countTab(tm) > 0 then
         local l_id
-        for p in pairs(tm) do
-            l_id = p
-        end
+        for p in pairs(tm) do l_id = p end
         return go(tmonkWuji, l_id)
     else
         return go(tmonkWuji, "shaolin/wstang1")
@@ -3780,24 +3870,16 @@ function tmonkWujiFind()
         end
     else
         local l_id
-        for p in pairs(tmroom) do
-            l_id = p
-        end
+        for p in pairs(tmroom) do l_id = p end
         return go(tmonkWuji, l_id)
     end
 end
-function tmonkChange()
-    tmchg = true
-end
+function tmonkChange() tmchg = true end
 function tmonkChgMonk()
     EnableTriggerGroup("tmonkTeach", false)
     if countTab(tm) > 1 then
         local l_id
-        for p in pairs(tm) do
-            if p ~= road.id then
-                l_id = p
-            end
-        end
+        for p in pairs(tm) do if p ~= road.id then l_id = p end end
         if l_id then
             return go(tmonkTeach, l_id)
         else
@@ -3826,18 +3908,14 @@ function tmonkTeach()
 end
 function tmonkTeachCon()
     EnableTriggerGroup("tmonkTeach", false)
-    if tmchg then
-        return tmonkChgMonk()
-    end
+    if tmchg then return tmonkChgMonk() end
     if tmcon then
         return check_bei(tmonkTeach)
     else
         return tmonkWujiNobody()
     end
 end
-function tmonkContinue()
-    tmcon = true
-end
+function tmonkContinue() tmcon = true end
 function tmonkWujiKill()
     EnableTriggerGroup("tmonkTeach", false)
     return wipe("monk", tmonkWujiNobody)
@@ -3848,11 +3926,13 @@ function tmonkMotou(n, l, w)
     dest.area = "嵩山少林"
     road.idold = road.id
     if not dest.room or not path_cal() then
-        messageShow("Teach任务：魔头出现地点【" .. dest.area .. dest.room .. "】不可到达，放弃MONK!")
+        messageShow("Teach任务：魔头出现地点【" .. dest.area ..
+                        dest.room .. "】不可到达，放弃MONK!")
         road.id = road.idold
         return tmonkWujiNobody()
     else
-        messageShow("Tmonk任务：邪道魔头出现在" .. dest.room .. "。", "green")
+        messageShow("Tmonk任务：邪道魔头出现在" .. dest.room .. "。",
+                    "green")
         return tmonkMotouFind()
     end
 end
@@ -3879,14 +3959,14 @@ function tmonkDie()
     return check_bei(tmonkGet)
 end
 function tmonkGet()
-    for i = 1, 3 do
-    end
+    for i = 1, 3 do end
     checkBags()
     return check_busy(tmonkMuou)
 end
 function tmonkMuou()
     if Bag["十八木偶"] then
-        messageShow("Tmonk任务：运气很好，搞到十八木偶。", "green")
+        messageShow("Tmonk任务：运气很好，搞到十八木偶。",
+                    "green")
         return go(tmonkMuouGive, "嵩山少林", "方丈室")
     else
         return tmonkStart()
@@ -3907,21 +3987,24 @@ zhunbeineili = function(func, p_cmd)
     else
         job.prepare = test
     end
-    if hp.neili >= hp.neili_max * 1.1 then
-        return check_bei(job.prepare)
-    end
+    if hp.neili >= hp.neili_max * 1.1 then return check_bei(job.prepare) end
 
     DeleteTriggerGroup("zbneili")
-    create_trigger_t(
-        "zbneili1",
-        "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
-        "",
-        "zhunbeineili_b"
-    )
-    create_trigger_t("zbneili3", "^(> )*卧室不能(吐纳|打坐)，会影响别人休息。", "", "zbneili_w")
-    create_trigger_t("zbneili4", "^(> )*(你正要有所动作|你无法静下心来修炼|你还是专心拱猪吧)", "", "zbneili_w")
-    create_trigger_t("zbneili5", "^(> )*这里不准战斗，也不准(吐纳|打坐)。", "", "zbneili_w")
-    create_trigger_t("zbneili2", "^(> )*这里可不是让你提高(内力|精力)的地方。", "", "zbneili_w")
+    create_trigger_t("zbneili1",
+                     "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
+                     "", "zhunbeineili_b")
+    create_trigger_t("zbneili3",
+                     "^(> )*卧室不能(吐纳|打坐)，会影响别人休息。",
+                     "", "zbneili_w")
+    create_trigger_t("zbneili4",
+                     "^(> )*(你正要有所动作|你无法静下心来修炼|你还是专心拱猪吧)",
+                     "", "zbneili_w")
+    create_trigger_t("zbneili5",
+                     "^(> )*这里不准战斗，也不准(吐纳|打坐)。",
+                     "", "zbneili_w")
+    create_trigger_t("zbneili2",
+                     "^(> )*这里可不是让你提高(内力|精力)的地方。",
+                     "", "zbneili_w")
     SetTriggerOption("zbneili1", "group", "zbneili")
     SetTriggerOption("zbneili2", "group", "zbneili")
     SetTriggerOption("zbneili3", "group", "zbneili")
@@ -3939,9 +4022,7 @@ zbneili_g = function()
     checkWait(zhunbeineili_a, 1)
 end
 zhunbeineili_a = function()
-    if hp.qixue_per < 50 and isInBags(drug.heal) then
-        exe("eat chantui yao")
-    end
+    if hp.qixue_per < 50 and isInBags(drug.heal) then exe("eat chantui yao") end
     exe("set 积蓄")
     exe("dazuo " .. hp.dazuo)
 end
@@ -3967,37 +4048,15 @@ end
 
 function pfmjineng()
     -- print(sxjob.skills)
-    if skillsjineng1[sxjob.skills] then
-        Execute("pfmzhen")
-    end
-    if skillsjineng2[sxjob.skills] then
-        Execute("pfmqi")
-    end
-    if skillsjineng3[sxjob.skills] then
-        Execute("pfmgang")
-    end
-    if skillsjineng4[sxjob.skills] then
-        Execute("pfmrou")
-    end
-    if skillsjineng5[sxjob.skills] then
-        Execute("pfmkuai")
-    end
-    if skillsjineng6[sxjob.skills] then
-        Execute("pfmman")
-    end
-    if skillsjineng7[sxjob.skills] then
-        Execute("pfmmiao")
-    end
-    if skillsjineng8[sxjob.skills] then
-        Execute("pfmxian")
-    end
-    if skillsjineng9[sxjob.skills] then
-        Execute("pfmmrjf")
-    end
-    if skillsjineng10[sxjob.skills] then
-        Execute("pfmshlf")
-    end
-    if skillsjineng11[sxjob.skills] then
-        Execute("pfmwu")
-    end
+    if skillsjineng1[sxjob.skills] then Execute("pfmzhen") end
+    if skillsjineng2[sxjob.skills] then Execute("pfmqi") end
+    if skillsjineng3[sxjob.skills] then Execute("pfmgang") end
+    if skillsjineng4[sxjob.skills] then Execute("pfmrou") end
+    if skillsjineng5[sxjob.skills] then Execute("pfmkuai") end
+    if skillsjineng6[sxjob.skills] then Execute("pfmman") end
+    if skillsjineng7[sxjob.skills] then Execute("pfmmiao") end
+    if skillsjineng8[sxjob.skills] then Execute("pfmxian") end
+    if skillsjineng9[sxjob.skills] then Execute("pfmmrjf") end
+    if skillsjineng10[sxjob.skills] then Execute("pfmshlf") end
+    if skillsjineng11[sxjob.skills] then Execute("pfmwu") end
 end

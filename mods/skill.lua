@@ -207,6 +207,7 @@ skillEnable = {
     ["wudang-quan"] = "cuff",
     ["wudu-yanluobu"] = "dodge",
     ["wuhu-duanmendao"] = "blade",
+    ["wushang-dali"] = "staff",
     ["wuxiang-zhi"] = "finger",
     ["wuyue-jianfa"] = "sword",
     ["xiangfu-lun"] = "hammer",
@@ -489,12 +490,8 @@ function dazuo_lianxi_auto()
         end
     end
     lianxi_times = GetVariable("mycishu")
-    local shenqi_id = GetVariable("myshenqi_id")
-    if shenqi_id and shenqi_id:find(" ") then
-        local ids = utils.split(shenqi_id, " ")
-        shenqi_id = ids[-1]
-    end
-
+    local shenqi_id = weaponGetShenqiId()
+    
     local noneed = GetVariable("noneedlian") or ""
     for p in pairs(skills) do
         if
@@ -638,7 +635,7 @@ function dazuo_lianxi_auto()
                                         ";uweapon shape " ..
                                             shenqi_id ..
                                                 " staff;lian staff " ..
-                                                    lianxi_times .. ";unwield " .. shenqi_id .. ";yun jingli"
+                                                    lianxi_times .. ";unwield " .. shenqi_id .. ";yun jingli;"
                 else
                     tmp_lxskill =
                         tmp_lxskill ..

@@ -247,13 +247,18 @@ weaponWieldCut = function()
     checkWield()
 end
 
-function weaponshape(name)
+function weaponGetShenqiId()
     local shenqi_id = GetVariable("myshenqi_id")
+    if shenqi_id and shenqi_id:find(" ") then
+        local ids = utils.split(shenqi_id, " ")
+        shenqi_id = ids[1]
+    end
+    return shenqi_id
+end
+
+function weaponshape(name)
+    local shenqi_id = weaponGetShenqiId()
     if shenqi_id then
-        if shenqi_id:find(" ") then
-            local ids = utils.split(shenqi_id, " ")
-            shenqi_id = ids[-1]
-        end
         exe("uweapon shape " .. shenqi_id .. " " .. Bag[name].kind)
     else
         exe("uweapon shape " .. Bag[name].kind .. " " .. Bag[name].kind)

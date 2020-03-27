@@ -1777,6 +1777,11 @@ function checkBags(func)
     SetTriggerOption("bags8", "group", "bags")
     EnableTriggerGroup("bags", false)
     EnableTrigger("bags1", true)
+    if flag.checkingBag then
+        return
+    end
+
+    flag.checkingBag = true
     cty_cur = 0
     nxw_cur = 0
     cbw_cur = 0
@@ -2002,6 +2007,7 @@ function checkBagsOver()
     if Bag["´ÖÉþ×Ó"] and Bag["´ÖÉþ×Ó"].cnt > 2 then
         exe("drop cu shengzi 2")
     end
+    flag.checkingBag = false
     -- print(cty_cur,nxw_cur,hxd_cur)
     if tmp.bags ~= nil then
         return tmp.bags()

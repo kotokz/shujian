@@ -14266,11 +14266,11 @@ Room {
     ways = {
         ["south"] = "city/wroad3",
         -- ["right"] = "mingjiao/hdg/huacong1",
-        ["#bohuacong"] = "mingjiao/hdg/huacong1",
+        ["#bohuacong"] = "mingjiao/hdg/huacong1"
     },
     nolooks = {
         -- ["right"] = true
-        ["#go_hudiegu"] = true,
+        ["#bohuacong"] = true
     }
     --[[lengths = {
 		["right"] = "if score.party and score.party=='Ã÷½Ì' then return 10 else return false end",

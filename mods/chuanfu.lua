@@ -4,52 +4,52 @@ Chuanfu = {
     -- 陕晋渡口 黄河流域大渡口
     -- 西夏渡口 兰州渡口
     -- 长江渡口 澜沧江
-    sanjin = {
-        enable = false,
-        arriveTime = 0,
-        departTime = 0
-    },
-    huanghe = {
-        enable = false,
-        arriveTime = 0,
-        departTime = 0
-    },
-    xixia = {
-        enable = false,
-        arriveTime = 0,
-        departTime = 0
-    },
-    lanzhou = {
-        enable = false,
-        arriveTime = 0,
-        departTime = 0
-    },
-    changjiang = {
-        enable = false,
-        arriveTime = 0,
-        departTime = 0
-    },
-    lancangjiang = {
-        enable = false,
-        arriveTime = 0,
-        departTime = 0
-    }
+    sanjin = {enable = false, arriveTime = 0, departTime = 0},
+    huanghe = {enable = false, arriveTime = 0, departTime = 0},
+    xixia = {enable = false, arriveTime = 0, departTime = 0},
+    lanzhou = {enable = false, arriveTime = 0, departTime = 0},
+    changjiang = {enable = false, arriveTime = 0, departTime = 0},
+    lancangjiang = {enable = false, arriveTime = 0, departTime = 0}
 }
 
 function Chuanfu:addtrigger()
     DeleteTriggerGroup("chuanfu")
-    create_trigger_t("chuanfu1", "^(> )*\\D*告诉你：长江渡船出发时间", "", "changjiangOpen")
-    create_trigger_t("chuanfu2", "^(> )*\\D*告诉你：澜沧江渡船出发时间", "", "lancangjiangOpen")
-    create_trigger_t("chuanfu3", "^(> )*\\D*告诉你：澜沧江渡船到达时间", "", "lancangjiangClose")
-    create_trigger_t("chuanfu4", "^(> )*\\D*告诉你：长江渡船到达时间", "", "changjiangClose")
-    create_trigger_t("chuanfu5", "^(> )*\\D*告诉你：黄河流域大渡口出发时间", "", "huangheOpen")
-    create_trigger_t("chuanfu6", "^(> )*\\D*告诉你：黄河流域大渡口到达时间", "", "huangheClose")
-    create_trigger_t("chuanfu7", "^(> )*\\D*告诉你：陕晋渡口出发时间", "", "sanjinOpen")
-    create_trigger_t("chuanfu8", "^(> )*\\D*告诉你：陕晋渡口到达时间", "", "sanjinClose")
-    create_trigger_t("chuanfu9", "^(> )*\\D*告诉你：西夏渡口出发时间", "", "xixiaOpen")
-    create_trigger_t("chuanfu10", "^(> )*\\D*告诉你：西夏渡口到达时间", "", "xixiaClose")
-    create_trigger_t("chuanfu11", "^(> )*\\D*告诉你：兰州渡口出发时间", "", "lanzhouOpen")
-    create_trigger_t("chuanfu12", "^(> )*\\D*告诉你：兰州渡口到达时间", "", "lanzhouClose")
+    create_trigger_t("chuanfu1",
+                     "^(> )*\\D*告诉你：长江渡船出发时间", "",
+                     "changjiangOpen")
+    create_trigger_t("chuanfu2",
+                     "^(> )*\\D*告诉你：澜沧江渡船出发时间", "",
+                     "lancangjiangOpen")
+    create_trigger_t("chuanfu3",
+                     "^(> )*\\D*告诉你：澜沧江渡船到达时间", "",
+                     "lancangjiangClose")
+    create_trigger_t("chuanfu4",
+                     "^(> )*\\D*告诉你：长江渡船到达时间", "",
+                     "changjiangClose")
+    create_trigger_t("chuanfu5",
+                     "^(> )*\\D*告诉你：黄河流域大渡口出发时间",
+                     "", "huangheOpen")
+    create_trigger_t("chuanfu6",
+                     "^(> )*\\D*告诉你：黄河流域大渡口到达时间",
+                     "", "huangheClose")
+    create_trigger_t("chuanfu7",
+                     "^(> )*\\D*告诉你：陕晋渡口出发时间", "",
+                     "sanjinOpen")
+    create_trigger_t("chuanfu8",
+                     "^(> )*\\D*告诉你：陕晋渡口到达时间", "",
+                     "sanjinClose")
+    create_trigger_t("chuanfu9",
+                     "^(> )*\\D*告诉你：西夏渡口出发时间", "",
+                     "xixiaOpen")
+    create_trigger_t("chuanfu10",
+                     "^(> )*\\D*告诉你：西夏渡口到达时间", "",
+                     "xixiaClose")
+    create_trigger_t("chuanfu11",
+                     "^(> )*\\D*告诉你：兰州渡口出发时间", "",
+                     "lanzhouOpen")
+    create_trigger_t("chuanfu12",
+                     "^(> )*\\D*告诉你：兰州渡口到达时间", "",
+                     "lanzhouClose")
     SetTriggerOption("chuanfu1", "group", "chuanfu")
     SetTriggerOption("chuanfu2", "group", "chuanfu")
     SetTriggerOption("chuanfu3", "group", "chuanfu")
@@ -242,8 +242,10 @@ end
 function Chuanfu:openChangJiangArea()
     map.rooms["city/jiangbei"].ways["#duCjiang"] = "city/jiangnan"
     map.rooms["city/jiangnan"].ways["#duCjiang"] = "city/jiangbei"
-    map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] = "dali/dalisouth/jiangbei"
-    map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] = "dali/dalisouth/jiangnan"
+    map.rooms["dali/dalisouth/jiangnan"].ways["#duCjiang"] =
+        "dali/dalisouth/jiangbei"
+    map.rooms["dali/dalisouth/jiangbei"].ways["#duCjiang"] =
+        "dali/dalisouth/jiangnan"
 end
 
 function Chuanfu:closeChangJiang()

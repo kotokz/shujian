@@ -1,11 +1,7 @@
 luapath = string.match(GetInfo(35), "^.*\\")
 mclpath = GetInfo(67)
-include = function(str)
-    dofile(luapath .. str)
-end
-loadmod = function(str)
-    include("mods\\" .. str .. ".lua")
-end
+include = function(str) dofile(luapath .. str) end
+loadmod = function(str) include("mods\\" .. str .. ".lua") end
 
 require "wait"
 require "tprint"
@@ -48,9 +44,7 @@ loadmod "xuezhu"
 loadmod "chuanfu"
 loadmod "jinhe"
 
-test = test or function()
-        print("initial behavior, does nothing")
-    end
+test = test or function() print("initial behavior, does nothing") end
 
 master = {}
 
@@ -187,8 +181,10 @@ function main()
     delete_all_triggers()
     delete_all_timers()
     DeleteTemporaryTriggers()
-    create_trigger_t("main", "^「书剑\\D*」\\D*已经连续执行了", "", "login")
-    create_trigger_t("main1", "^Are you using BIG5 font\\(y/N\\)? ", "", "login_choose")
+    create_trigger_t("main", "^「书剑\\D*」\\D*已经连续执行了", "",
+                     "login")
+    create_trigger_t("main1", "^Are you using BIG5 font\\(y/N\\)? ", "",
+                     "login_choose")
     lujing_trigger()
     chat_trigger()
     hp_trigger()
@@ -205,24 +201,23 @@ function main()
     Chuanfu:addtrigger()
 
     local xuezhu = GetVariable("xuezhu_status")
-    if xuezhu and (xuezhu == "2" or xuezhu == "1") then
-        inwdj = 1
-    end
+    if xuezhu and (xuezhu == "2" or xuezhu == "1") then inwdj = 1 end
     checkBags()
     map.rooms["sld/lgxroom"].ways["#outSld"] = "huanghe/huanghe8"
-    exe("down;alias askk ask $*;stand;halt;uweapon;score;cha;hp;jifa all;jiali max;unset no_kill_ap;cond;pfmset")
+    exe(
+        "down;alias askk ask $*;stand;halt;uweapon;score;cha;hp;jifa all;jiali max;unset no_kill_ap;cond;pfmset")
     return check_bei(hp_dazuo_count)
 end
 
-function login_choose()
-    Send("n")
-end
+function login_choose() Send("n") end
 
 function login()
     dis_all()
     DeleteTriggerGroup("login")
     create_trigger_t("login1", "^您上次连线地址是", "", "logincheck")
-    create_trigger_t("login2", "^请您输入这个人物的识别密码\\(passwd\\)：", "", "login_passwd")
+    create_trigger_t("login2",
+                     "^请您输入这个人物的识别密码\\(passwd\\)：",
+                     "", "login_passwd")
     SetTriggerOption("login1", "group", "login")
     SetTriggerOption("login2", "group", "login")
     local l_id = GetVariable("id")
@@ -242,21 +237,15 @@ function logincheck()
     scrLog()
 end
 function login_passwd()
-    wait.make(
-        function()
-            wait.time(2)
-            EnableTriggerGroup("login", false)
-            main()
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        EnableTriggerGroup("login", false)
+        main()
+    end)
 end
 function disAll()
     local tl = GetTriggerList()
-    if tl then
-        for k, v in ipairs(tl) do
-            EnableTrigger(v, false)
-        end
-    end
+    if tl then for k, v in ipairs(tl) do EnableTrigger(v, false) end end
     delete_all_timers()
     -- if lookxin == 1 and job.name == 'dolost' then sendXin() end
     EnableTrigger("main", true)
@@ -285,11 +274,7 @@ function disAll()
 end
 function dis_all()
     local tl = GetTriggerList()
-    if tl then
-        for k, v in ipairs(tl) do
-            EnableTrigger(v, false)
-        end
-    end
+    if tl then for k, v in ipairs(tl) do EnableTrigger(v, false) end end
     delete_all_timers()
     EnableTrigger("main", true)
     EnableTrigger("main1", true)
@@ -318,19 +303,11 @@ function dis_all()
 end
 function delete_all_triggers()
     local tl = GetTriggerList()
-    if tl then
-        for k, v in ipairs(tl) do
-            DeleteTrigger(v)
-        end
-    end
+    if tl then for k, v in ipairs(tl) do DeleteTrigger(v) end end
 end
 function delete_all_timers()
     local tl = GetTimerList()
-    if tl then
-        for k, v in ipairs(tl) do
-            DeleteTimer(v)
-        end
-    end
+    if tl then for k, v in ipairs(tl) do DeleteTimer(v) end end
 end
 
 function yiliCheck(n, l, w)
@@ -346,14 +323,10 @@ end]]
 function checkQuit()
     -- dis_all()
     -- check_halt(BQuit)
-    if job.name == "idle" then
-        check_food()
-    end
+    if job.name == "idle" then check_food() end
     exe("drink jiudai")
 end
-function BQuit()
-    exe("quit")
-end
+function BQuit() exe("quit") end
 function checkfood()
     if job.name == "songmoya" or (job.name ~= nil and job.name ~= "idle") then
         return
@@ -363,15 +336,9 @@ function checkfood()
     end
 end
 
-function checkMonth()
-    flag.month = 1
-end
-function checkTongbao(n, l, w)
-    score.tongbao = tonumber(w[1])
-end
-function checkGoldLmt(n, l, w)
-    score.goldlmt = trans(w[1])
-end
+function checkMonth() flag.month = 1 end
+function checkTongbao(n, l, w) score.tongbao = tonumber(w[1]) end
+function checkGoldLmt(n, l, w) score.goldlmt = trans(w[1]) end
 
 function jifaAll()
     for p in pairs(skills) do
@@ -442,28 +409,35 @@ function wuxingzhenCon()
     if skills["wuxing-zhen"] and skills["wuxing-zhen"].lvl > 159 then
         return wuxingzhenFinish()
     end
-    if not locl.id["温方山"] or hp.pot < 10 then
-        return wuxingzhenFinish()
-    end
+    if not locl.id["温方山"] or hp.pot < 10 then return wuxingzhenFinish() end
     return checkWait(wuxingzhenStart, 0.5)
 end
 
 function dzxy_trigger()
     DeleteTriggerGroup("dzxy")
-    create_trigger_t("dzxy1", "^>*\\s*你仰首望天，太阳挂在天空中，白云朵朵，阳光顺着云层的边缘洒下来，你觉得有些刺眼。", "", "dzxy_finish")
-    create_trigger_t(
-        "dzxy2",
-        "^>*\\s*你仰首望天，天上繁星点点，你体会出了星斗的移动与你所学的“斗转星移”有莫大的联系，却苦于实战经验不足，无法将你看到的东西与实际作战联系到一起。",
-        "",
-        "dzxy_finish"
-    )
-    create_trigger_t("dzxy3", '^>*\\s*你把 "action" 设定为 "慕容斗转星移" 成功完成。', "", "dzxy_goon")
+    create_trigger_t("dzxy1",
+                     "^>*\\s*你仰首望天，太阳挂在天空中，白云朵朵，阳光顺着云层的边缘洒下来，你觉得有些刺眼。",
+                     "", "dzxy_finish")
+    create_trigger_t("dzxy2",
+                     "^>*\\s*你仰首望天，天上繁星点点，你体会出了星斗的移动与你所学的“斗转星移”有莫大的联系，却苦于实战经验不足，无法将你看到的东西与实际作战联系到一起。",
+                     "", "dzxy_finish")
+    create_trigger_t("dzxy3",
+                     '^>*\\s*你把 "action" 设定为 "慕容斗转星移" 成功完成。',
+                     "", "dzxy_goon")
     create_trigger_t("dzxy4", "^>*\\s*你的内力不够。", "", "dzxy_finish")
-    create_trigger_t("dzxy5", "^>*\\s*先从木桩上跳下来\\(down\\)再说吧！", "", "dzxy_finish")
-    create_trigger_t("dzxy6", "^>*\\s*恭喜恭喜！你已经融会贯通了斗转星移的绝妙之处！", "", "dzxy_finish")
-    create_trigger_t("dzxy7", "^>*\\s*你已经没有潜能来领悟学习斗转星移了。", "", "dzxy_finish")
+    create_trigger_t("dzxy5",
+                     "^>*\\s*先从木桩上跳下来\\(down\\)再说吧！",
+                     "", "dzxy_finish")
+    create_trigger_t("dzxy6",
+                     "^>*\\s*恭喜恭喜！你已经融会贯通了斗转星移的绝妙之处！",
+                     "", "dzxy_finish")
+    create_trigger_t("dzxy7",
+                     "^>*\\s*你已经没有潜能来领悟学习斗转星移了。",
+                     "", "dzxy_finish")
 
-    create_trigger_t("dzxy8", "^>*\\s*你仰首望天，天上繁星点点，你顺着银河的方向看去，却发现部分的夜空被周围的树冠挡住了。", "", "dzxy_goon")
+    create_trigger_t("dzxy8",
+                     "^>*\\s*你仰首望天，天上繁星点点，你顺着银河的方向看去，却发现部分的夜空被周围的树冠挡住了。",
+                     "", "dzxy_goon")
     SetTriggerOption("dzxy1", "group", "dzxy")
     SetTriggerOption("dzxy2", "group", "dzxy")
     SetTriggerOption("dzxy3", "group", "dzxy")
@@ -483,22 +457,26 @@ function checkdzxy()
     -- jobTriggerDel()
     job.name = "heal"
     if skills["douzhuan-xingyi"] ~= nil then
-        if skills["douzhuan-xingyi"].lvl > 130 and skills["douzhuan-xingyi"].lvl < 170 then
+        if skills["douzhuan-xingyi"].lvl > 130 and skills["douzhuan-xingyi"].lvl <
+            170 then
             dzxy_level = 1 -- 慕容复开始(#3 w;jump liang;lingwu zihua)，可以到171级。
             return dzxy()
         end
-        if skills["douzhuan-xingyi"].lvl > 170 and skills["douzhuan-xingyi"].lvl < 200 then
+        if skills["douzhuan-xingyi"].lvl > 170 and skills["douzhuan-xingyi"].lvl <
+            200 then
             dzxy_level = 2 -- 还施水阁 去:sit chair;zhuan;n;lingwu miji 回:s;push shujia，可以到201级。
             return dzxy()
         end
-        if
-            skills["douzhuan-xingyi"].lvl > 200 and skills["douzhuan-xingyi"].lvl < hp.pot_max - 100 and
-                (locl.time == "戊" or locl.time == "亥" or locl.time == "子" or locl.time == "丑")
-         then
+        if skills["douzhuan-xingyi"].lvl > 200 and skills["douzhuan-xingyi"].lvl <
+            hp.pot_max - 100 and
+            (locl.time == "戊" or locl.time == "亥" or locl.time == "子" or
+                locl.time == "丑") then
             dzxy_level = 3 -- 观星台 上去jump zhuang;look sky，下来jump down。只能晚上look sky。可以到N级。
             return dzxy()
         end
-        messageShow("任务监控：慕容领悟斗转星移条件不够！继续任务！", "white")
+        messageShow(
+            "任务监控：慕容领悟斗转星移条件不够！继续任务！",
+            "white")
         print("dzxy_level:" .. dzxy_level)
     end
 
@@ -511,15 +489,9 @@ function dzxy()
     DeleteTemporaryTriggers()
     dzxy_trigger()
 
-    if dzxy_level == 1 then
-        return check_busy(dzxy1_go)
-    end
-    if dzxy_level == 2 then
-        return check_busy(dzxy2_go)
-    end
-    if dzxy_level == 3 then
-        return check_busy(dzxy3_go)
-    end
+    if dzxy_level == 1 then return check_busy(dzxy1_go) end
+    if dzxy_level == 2 then return check_busy(dzxy2_go) end
+    if dzxy_level == 3 then return check_busy(dzxy3_go) end
 end
 function dzxy1_go()
     messageShow("任务监控：去慕容领悟字画去了！", "white")
@@ -556,24 +528,27 @@ end
 
 function dzxy_goon()
     -- EnableTimer('mr_dzxy_timer',true)
-    if not (locl.room == "观星台" or locl.room == "还施水阁" or locl.room == "梁上") then
-        messageShow("慕容领悟：斗转星移的位置不对！当前位置：" .. locl.room)
+    if not (locl.room == "观星台" or locl.room == "还施水阁" or locl.room ==
+        "梁上") then
+        messageShow(
+            "慕容领悟：斗转星移的位置不对！当前位置：" ..
+                locl.room)
         return dzxy_finish()
     end
     EnableTriggerGroup("dzxy", true)
     weaponWieldLearn()
-    if
-        not skills["douzhuan-xingyi"] or skills["douzhuan-xingyi"].lvl == 0 or
-            skills["douzhuan-xingyi"].lvl >= hp.pot_max - 100
-     then
-        messageShow("慕容领悟：斗转星移的等级不对！当前等级：" .. skills["douzhuan-xingyi"].lvl)
+    if not skills["douzhuan-xingyi"] or skills["douzhuan-xingyi"].lvl == 0 or
+        skills["douzhuan-xingyi"].lvl >= hp.pot_max - 100 then
+        messageShow(
+            "慕容领悟：斗转星移的等级不对！当前等级：" ..
+                skills["douzhuan-xingyi"].lvl)
         return check_busy(dzxy_finish)
     end
-    if flag.idle > 7 then
-        return check_busy(dzxy_finish)
-    end
+    if flag.idle > 7 then return check_busy(dzxy_finish) end
     if hp.neili < hp.neili_max * 0.5 then
-        messageShow("慕容领悟：斗转星移的内力不够！当前内力【" .. hp.neili .. "】", "white")
+        messageShow(
+            "慕容领悟：斗转星移的内力不够！当前内力【" ..
+                hp.neili .. "】", "white")
         return check_busy(dzxy_finish)
     else
         if dzxy_level == 1 then
@@ -593,9 +568,7 @@ function dzxy_goon()
         end
     end
 end
-function dzxy_alias()
-    exe("alias action 慕容斗转星移")
-end
+function dzxy_alias() exe("alias action 慕容斗转星移") end
 
 function dzxy_finish()
     EnableTimer("mr_dzxy_timer", false)
@@ -622,9 +595,7 @@ function turnShen(x)
             return xueshan()
         end
         if hp.shen > -10000 and hp.shen <= 20000 then
-            if job.zuhe["wudang"] then
-                return checkZqd()
-            end
+            if job.zuhe["wudang"] then return checkZqd() end
         end
     end
     if x and x == "-" then
@@ -635,9 +606,7 @@ function turnShen(x)
             return wudang()
         end
         if hp.shen > -10000 and hp.shen < 10000 then
-            if job.zuhe["xueshan"] then
-                return checkXqw()
-            end
+            if job.zuhe["xueshan"] then return checkXqw() end
         end
     end
 end
@@ -649,11 +618,11 @@ function stoneSet()
     if GetVariable("stoneprepare") then
         tmp.stone = utils.split(GetVariable("stoneprepare"), "|")
         tmp.pre = {}
-        for _, p in pairs(tmp.stone) do
-            tmp.pre[p] = true
-        end
+        for _, p in pairs(tmp.stone) do tmp.pre[p] = true end
     end
-    local l_tmp = utils.multilistbox("你准备吃的石头(请按CTRL多选)是?", "物品组合", t, tmp.pre)
+    local l_tmp = utils.multilistbox(
+                      "你准备吃的石头(请按CTRL多选)是?",
+                      "物品组合", t, tmp.pre)
     local l_result = nil
     for p in pairs(l_tmp) do
         stonePrepare[p] = true
@@ -668,24 +637,22 @@ function stoneSet()
     else
         SetVariable("stoneprepare", l_result)
     end
-    l_result = utils.inputbox("你兑换石头的次数是？", "stonecishu", GetVariable("stonecishu"), "宋体", "12")
-    if not isNil(l_result) then
-        SetVariable("stonecishu", l_result)
-    end
+    l_result = utils.inputbox("你兑换石头的次数是？", "stonecishu",
+                              GetVariable("stonecishu"), "宋体", "12")
+    if not isNil(l_result) then SetVariable("stonecishu", l_result) end
 end
 function stoneGetVar()
     stonePrepare = {}
     if GetVariable("stoneprepare") then
         tmp.stone = utils.split(GetVariable("stoneprepare"), "|")
-        for _, p in pairs(tmp.stone) do
-            stonePrepare[p] = true
-        end
+        for _, p in pairs(tmp.stone) do stonePrepare[p] = true end
     end
     return duihuan_Stone()
 end
 function duihuan_Stone()
     if MidNight[locl.time] then
-        ColourNote("red", "blue", "珠宝店关门，无法卖石头，请过一阵再尝试！")
+        ColourNote("red", "blue",
+                   "珠宝店关门，无法卖石头，请过一阵再尝试！")
     else
         return go(duihuan_prepare, "扬州城", "当铺")
     end
@@ -697,10 +664,19 @@ function duihuan_prepare()
     flag.bluestone = false
     flag.duihuan = 0
     DeleteTriggerGroup("duihuanstone")
-    create_trigger_t("duihuanstone1", "^(> )*当铺老板吆喝一声：" .. score.name .. "兑换限制级宝物(赤晶石|海蓝石).*", "", "stone_consider")
-    create_trigger_t("duihuanstone2", "^(> )*朱老板一把抓过(赤晶石|海蓝石)道：“哇，好东西呀！”", "", "maistone_set")
-    create_trigger_t("duihuanstone3", "^(> )*你还是多努力一段时间吧。", "", "duihuan_done")
-    create_trigger_t("duihuanstone4", "^(> )*你先要用完现有的物品才能再次兑换。", "", "check_stoneT")
+    create_trigger_t("duihuanstone1",
+                     "^(> )*当铺老板吆喝一声：" .. score.name ..
+                         "兑换限制级宝物(赤晶石|海蓝石).*", "",
+                     "stone_consider")
+    create_trigger_t("duihuanstone2",
+                     "^(> )*朱老板一把抓过(赤晶石|海蓝石)道：“哇，好东西呀！”",
+                     "", "maistone_set")
+    create_trigger_t("duihuanstone3",
+                     "^(> )*你还是多努力一段时间吧。", "",
+                     "duihuan_done")
+    create_trigger_t("duihuanstone4",
+                     "^(> )*你先要用完现有的物品才能再次兑换。",
+                     "", "check_stoneT")
     SetTriggerOption("duihuanstone1", "group", "duihuanstone")
     SetTriggerOption("duihuanstone2", "group", "duihuanstone")
     SetTriggerOption("duihuanstone3", "group", "duihuanstone")
@@ -708,14 +684,16 @@ function duihuan_prepare()
     return duihuanStone()
 end
 function duihuanStone()
-    if stonePrepare["赤晶石"] and tmp.redstone < tonumber(GetVariable("stonecishu")) then
+    if stonePrepare["赤晶石"] and tmp.redstone <
+        tonumber(GetVariable("stonecishu")) then
         flag.duihuan = 1
         exe("duihuan redstone")
     end
     return check_busy(duihuanStone1, 3)
 end
 function duihuanStone1()
-    if stonePrepare["海蓝石"] and tmp.bluestone < tonumber(GetVariable("stonecishu")) then
+    if stonePrepare["海蓝石"] and tmp.bluestone <
+        tonumber(GetVariable("stonecishu")) then
         flag.duihuan = 2
         exe("duihuan bluestone")
     end
@@ -733,15 +711,12 @@ function stone_consider(n, l, w)
     return stone_consider_go()
 end
 function stone_consider_go()
-    if stonePrepare["赤晶石"] and stonePrepare["海蓝石"] and flag.redstone and flag.bluestone then
-        return check_busy(mai_stone, 3)
-    end
-    if stonePrepare["赤晶石"] and not stonePrepare["海蓝石"] and flag.redstone then
-        return check_busy(mai_stone, 3)
-    end
-    if not stonePrepare["赤晶石"] and stonePrepare["海蓝石"] and flag.bluestone then
-        return check_busy(mai_stone, 3)
-    end
+    if stonePrepare["赤晶石"] and stonePrepare["海蓝石"] and flag.redstone and
+        flag.bluestone then return check_busy(mai_stone, 3) end
+    if stonePrepare["赤晶石"] and not stonePrepare["海蓝石"] and
+        flag.redstone then return check_busy(mai_stone, 3) end
+    if not stonePrepare["赤晶石"] and stonePrepare["海蓝石"] and
+        flag.bluestone then return check_busy(mai_stone, 3) end
 end
 function duihuan_done()
     if stonePrepare["赤晶石"] and stonePrepare["海蓝石"] then
@@ -767,24 +742,14 @@ function duihuan_done()
     end
     return check_stone()
 end
-function mai_stone()
-    return go(mai_stone_check, "扬州城", "珠宝店")
-end
+function mai_stone() return go(mai_stone_check, "扬州城", "珠宝店") end
 function mai_stone_check()
-    if flag.redstone then
-        exe("mai redstone")
-    end
-    if flag.bluestone and not flag.redstone then
-        exe("mai bluestone")
-    end
+    if flag.redstone then exe("mai redstone") end
+    if flag.bluestone and not flag.redstone then exe("mai bluestone") end
 end
 function maistone_set(n, l, w)
-    if w[2] == "赤晶石" then
-        flag.redstone = false
-    end
-    if w[2] == "海蓝石" then
-        flag.bluestone = false
-    end
+    if w[2] == "赤晶石" then flag.redstone = false end
+    if w[2] == "海蓝石" then flag.bluestone = false end
     if flag.redstone or flag.bluestone then
         return check_busy(mai_stone)
     else
@@ -792,55 +757,52 @@ function maistone_set(n, l, w)
     end
 end
 function check_stone()
-    if tmp.redstone >= tonumber(GetVariable("stonecishu")) and tmp.bluestone >= tonumber(GetVariable("stonecishu")) then
+    if tmp.redstone >= tonumber(GetVariable("stonecishu")) and tmp.bluestone >=
+        tonumber(GetVariable("stonecishu")) then
         checkBags()
-        wait.make(
-            function()
-                wait.time(2)
-                return check_stone1()
-            end
-        )
+        wait.make(function()
+            wait.time(2)
+            return check_stone1()
+        end)
     end
     return go(duihuanStone, "扬州城", "当铺")
 end
 function check_stone1()
-    if Bag and Bag["赤晶石"] then
-        flag.redstone = true
-    end
-    if Bag and Bag["海蓝石"] then
-        flag.bluestone = true
-    end
+    if Bag and Bag["赤晶石"] then flag.redstone = true end
+    if Bag and Bag["海蓝石"] then flag.bluestone = true end
     if flag.redstone or flag.bluestone then
         return mai_stone()
     else
         -- return checkPrepare()
-        ColourNote("red", "blue", "您选择的石头到达兑换的极限，本次兑换完毕！")
+        ColourNote("red", "blue",
+                   "您选择的石头到达兑换的极限，本次兑换完毕！")
     end
 end
 function check_stoneT()
     checkBags()
-    wait.make(
-        function()
-            wait.time(2)
-            return check_stone1()
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        return check_stone1()
+    end)
 end
 -------明教讨教-----
 function dnyTrigger()
     DeleteTriggerGroup("qk_dny")
-    create_trigger_t("qk_dny1", '^(> )*\\s*你把 "action" 设定为 "讨教大挪移中" 成功完成', "", "taoJiaozhang")
-    create_trigger_t("qk_dny2", "^(> )*你现在正忙着呢。", "", "taoJiaozhang")
-    create_trigger_t("qk_dny3", "^(> )*(由于实战经验不足，阻碍了你的「乾坤大挪移」进步！|什么?|你的内力不够)", "", "taojiao_over")
-    create_trigger_t("qk_dny4", "^(> )*你感觉全身气息翻腾，原来你真气不够，不能装备\\D*。", "", "taojiao_over")
-    for i = 1, 4 do
-        SetTriggerOption("qk_dny" .. i, "group", "qk_dny")
-    end
+    create_trigger_t("qk_dny1",
+                     '^(> )*\\s*你把 "action" 设定为 "讨教大挪移中" 成功完成',
+                     "", "taoJiaozhang")
+    create_trigger_t("qk_dny2", "^(> )*你现在正忙着呢。", "",
+                     "taoJiaozhang")
+    create_trigger_t("qk_dny3",
+                     "^(> )*(由于实战经验不足，阻碍了你的「乾坤大挪移」进步！|什么?|你的内力不够)",
+                     "", "taojiao_over")
+    create_trigger_t("qk_dny4",
+                     "^(> )*你感觉全身气息翻腾，原来你真气不够，不能装备\\D*。",
+                     "", "taojiao_over")
+    for i = 1, 4 do SetTriggerOption("qk_dny" .. i, "group", "qk_dny") end
     EnableTriggerGroup("qk_dny", false)
 end
-function check_dny()
-    return go(taojiao_dny, "mingjiao/sht", "")
-end
+function check_dny() return go(taojiao_dny, "mingjiao/sht", "") end
 function taojiao_dny()
     dnyTrigger()
     if locl.id[score.master] then
@@ -855,12 +817,11 @@ end
 function taoJiaozhang()
     flag.idle = nil
     EnableTriggerGroup("qk_dny", true)
-    wait.make(
-        function()
-            wait.time(0.2)
-            exe("#8(taojiao qiankun-danuoyi);yun jing;alias action 讨教大挪移中")
-        end
-    )
+    wait.make(function()
+        wait.time(0.2)
+        exe(
+            "#8(taojiao qiankun-danuoyi);yun jing;alias action 讨教大挪移中")
+    end)
 end
 function taojiao_over()
     messageShow("讨教乾坤大挪移完毕！")
@@ -886,25 +847,25 @@ function duihuanSomething()
     local l_result
     local l_duihuan
     local l_duihuanTimes
-    l_result = utils.inputbox("你需要兑换的物品ID是", "duihuanID", GetVariable("duihuanID"), "宋体", "12")
+    l_result = utils.inputbox("你需要兑换的物品ID是", "duihuanID",
+                              GetVariable("duihuanID"), "宋体", "12")
     if not isNil(l_result) then
         SetVariable("duihuanID", l_result)
         l_duihuan = l_result
         print(GetVariable("duihuanID"))
     end
-    l_result = utils.inputbox("你需要兑换的次数", "duihuanTimes", GetVariable("duihuanTimes"), "宋体", "12")
+    l_result = utils.inputbox("你需要兑换的次数", "duihuanTimes",
+                              GetVariable("duihuanTimes"), "宋体", "12")
     if not isNil(l_result) then
         SetVariable("duihuanTimes", l_result)
         l_duihuanTimes = l_result
         print(GetVariable("duihuanTimes"))
     end
     DeleteTriggerGroup("duihuanSomething")
-    create_trigger_t(
-        "duihuanSomething1",
-        "^(> )*当铺老板吆喝一声：" .. score.name .. "兑换限制级宝物\\D*，收讫书剑通宝(\\D*)个*",
-        "",
-        "duihuanSomething_add"
-    )
+    create_trigger_t("duihuanSomething1",
+                     "^(> )*当铺老板吆喝一声：" .. score.name ..
+                         "兑换限制级宝物\\D*，收讫书剑通宝(\\D*)个*",
+                     "", "duihuanSomething_add")
     SetTriggerOption("duihuanSomething1", "group", "duihuanSomething")
     check_busy(duihuanSomething_duihuan)
 end
@@ -919,16 +880,18 @@ function duihuanSomething_add(n, l, w)
     end
     check_busy(duihuanSomething_duihuan)
 end
-function duihuanSomething_duihuan()
-    exe("duihuan " .. GetVariable("duihuanID"))
-end
+function duihuanSomething_duihuan() exe("duihuan " .. GetVariable("duihuanID")) end
 -----扬州自动找徐霞客 by 无法风 2019.12.25------
 xxkFind = function()
     DeleteTriggerGroup("xxkFind")
-    create_trigger_t("xxkFind1", "^(> )*\\s*徐霞客\\(Xu xiake\\)", "", "xxkFindFollow")
-    create_trigger_t("xxkFind2", "^(> )*这里没有 xu xiake", "", "xxkFindGoon")
-    create_trigger_t("xxkFind3", "^(> )*你决定跟随\\D*一起行动。", "", "xxkFindDone")
-    create_trigger_t("xxkFind4", "^(> )*你已经这样做了。", "", "xxkFindDone")
+    create_trigger_t("xxkFind1", "^(> )*\\s*徐霞客\\(Xu xiake\\)", "",
+                     "xxkFindFollow")
+    create_trigger_t("xxkFind2", "^(> )*这里没有 xu xiake", "",
+                     "xxkFindGoon")
+    create_trigger_t("xxkFind3", "^(> )*你决定跟随\\D*一起行动。", "",
+                     "xxkFindDone")
+    create_trigger_t("xxkFind4", "^(> )*你已经这样做了。", "",
+                     "xxkFindDone")
     SetTriggerOption("xxkFind1", "group", "xxkFind")
     SetTriggerOption("xxkFind2", "group", "xxkFind")
     SetTriggerOption("xxkFind3", "group", "xxkFind")
@@ -954,16 +917,21 @@ xxkFindGoon = function()
 end
 function xxkFindDone()
     DeleteTriggerGroup("xxkFind")
-    ColourNote("red", "blue", "【已找到徐霞客这个狗头，请开始你的嘿嘿嘿……】")
+    ColourNote("red", "blue",
+               "【已找到徐霞客这个狗头，请开始你的嘿嘿嘿……】")
     print("by 无法风 2019.12.25")
 end
 -----扬州自动找空空儿 by 无法风 2019.12.25------
 kongkongFind = function()
     DeleteTriggerGroup("kkrFind")
-    create_trigger_t("kkrFind1", "^.*空空儿\\(Kong kong\\)", "", "kongkongFindFollow")
-    create_trigger_t("kkrFind2", "^(> )*这里没有 kong kong", "", "kongkongFindGoon")
-    create_trigger_t("kkrFind3", "^(> )*你决定跟随\\D*一起行动。", "", "kongkongFindDone")
-    create_trigger_t("kkrFind4", "^(> )*你已经这样做了。", "", "kongkongFindDone")
+    create_trigger_t("kkrFind1", "^.*空空儿\\(Kong kong\\)", "",
+                     "kongkongFindFollow")
+    create_trigger_t("kkrFind2", "^(> )*这里没有 kong kong", "",
+                     "kongkongFindGoon")
+    create_trigger_t("kkrFind3", "^(> )*你决定跟随\\D*一起行动。", "",
+                     "kongkongFindDone")
+    create_trigger_t("kkrFind4", "^(> )*你已经这样做了。", "",
+                     "kongkongFindDone")
     SetTriggerOption("kkrFind1", "group", "kkrFind")
     SetTriggerOption("kkrFind2", "group", "kkrFind")
     SetTriggerOption("kkrFind3", "group", "kkrFind")
@@ -989,6 +957,7 @@ kongkongFindGoon = function()
 end
 function kongkongFindDone()
     DeleteTriggerGroup("kkrFind")
-    ColourNote("red", "blue", "【已找到空空儿这个狗头，请开始你的嘿嘿嘿……】")
+    ColourNote("red", "blue",
+               "【已找到空空儿这个狗头，请开始你的嘿嘿嘿……】")
     print("by 无法风 2019.12.25")
 end

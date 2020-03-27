@@ -26,27 +26,16 @@ function Hubiao:start()
     dis_all()
     self.teammates = GetVariable("hb_teammates")
     self.leaderId = GetVariable("hb_leaderID")
-    if score.id == self.leaderId then
-        self.leader = true
-    end
+    if score.id == self.leaderId then self.leader = true end
 
-    wait.make(
-        function()
-            await_go("福州", "福威镖局")
-            exe("team dismiss")
+    wait.make(function()
+        await_go("福州", "福威镖局")
+        exe("team dismiss")
 
-            self:waitTeammates()
-        end
-    )
+        self:waitTeammates()
+    end)
 end
 
 function Hubiao:waitTeammates()
-    wait.make(
-        function()
-            while true do
-                if self.leader then
-                end
-            end
-        end
-    )
+    wait.make(function() while true do if self.leader then end end end)
 end

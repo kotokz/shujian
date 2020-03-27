@@ -75,12 +75,8 @@ local ItemGet = {
     ["倚天匠技残篇"] = true
 }
 function exe(cmd, queue)
-    if GetConnectDuration() == 0 then
-        return Connect()
-    end
-    if cmd == nil then
-        cmd = "look"
-    end
+    if GetConnectDuration() == 0 then return Connect() end
+    if cmd == nil then cmd = "look" end
     if queue then
         run(cmd)
     else
@@ -92,17 +88,13 @@ end
 CMD = {cmd_throttling = false, walkecho = true}
 
 function executeCmd(cmds)
-    if ((cmds == "") or (cmds == nil)) then
-        return
-    end
+    if ((cmds == "") or (cmds == nil)) then return end
 
     Execute(cmds)
     _cmds = {}
     if string.find(cmds, ";") then
         _cmds = utils.split(cmds, ";")
-        for i, cmd in pairs(_cmds) do
-            moving_sum(cmd)
-        end
+        for i, cmd in pairs(_cmds) do moving_sum(cmd) end
     else
         moving_sum(cmds)
     end
@@ -112,49 +104,37 @@ end
 SetSpeedWalkDelay(0)
 -- SetSpeedWalkDelay(math.floor(1000/cmd_limit))
 function run(str)
-    if ((str == "") or (str == nil)) then
-        return
-    end
+    if ((str == "") or (str == nil)) then return end
 
     _cmds = {}
     if string.find(str, ";") then
         _cmds = utils.split(str, ";")
         for i, cmd in pairs(_cmds) do
             add_cmd_to_queue(cmd)
-            if CMD.walkecho == true then
-                Note(cmd)
-            end
+            if CMD.walkecho == true then Note(cmd) end
         end
     else
         add_cmd_to_queue(str)
-        if CMD.walkecho == true then
-            Note(str)
-        end
+        if CMD.walkecho == true then Note(str) end
     end
 end
 
 t_cmds = {}
 function get_first_sec()
     local tkeys = {}
-    for k in pairs(t_cmds) do
-        table.insert(tkeys, k)
-    end
+    for k in pairs(t_cmds) do table.insert(tkeys, k) end
     table.sort(tkeys)
     return tkeys[1]
 end
 
 function tablelength(T)
     local count = 0
-    for _ in pairs(T) do
-        count = count + 1
-    end
+    for _ in pairs(T) do count = count + 1 end
     return count
 end
 
 function calculate_flood(offset)
-    if offset == nil then
-        offset = 0
-    end
+    if offset == nil then offset = 0 end
 
     if score.vip_level == "白金会员" then
         offset = offset + 3
@@ -164,11 +144,7 @@ function calculate_flood(offset)
 
     local sum = offset
     local time = os.time()
-    for k, v in pairs(t_cmds) do
-        if k > time - 2 then
-            sum = sum + v
-        end
-    end
+    for k, v in pairs(t_cmds) do if k > time - 2 then sum = sum + v end end
 
     local current = t_cmds[time] or 0
 
@@ -182,9 +158,7 @@ end
 
 function moving_sum(cmd)
     local count = 1
-    if cmd:sub(1, 1) == "#" then
-        count = tonumber(string.match(cmd, "%d+"))
-    end
+    if cmd:sub(1, 1) == "#" then count = tonumber(string.match(cmd, "%d+")) end
     local time = os.time()
     t_cmds[time] = t_cmds[time] or 0
     t_cmds[time] = t_cmds[time] + count
@@ -194,11 +168,10 @@ function moving_sum(cmd)
     local third = second + (t_cmds[time - 2] or 0)
 
     if second > 70 then
-        print("3 sec:" .. third .. " 2 sec:" .. second .. "  last sec:" .. t_cmds[time])
+        print("3 sec:" .. third .. " 2 sec:" .. second .. "  last sec:" ..
+                  t_cmds[time])
     end
-    if tablelength(t_cmds) > 4 then
-        t_cmds[get_first_sec()] = nil
-    end
+    if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
 
 function add_cmd_to_queue(cmd)
@@ -212,41 +185,30 @@ function add_cmd_to_queue(cmd)
 end
 
 function exe_road(cmd)
-    if GetConnectDuration() == 0 then
-        return Connect()
-    end
-    if cmd == nil then
-        cmd = "look"
-    end
+    if GetConnectDuration() == 0 then return Connect() end
+    if cmd == nil then cmd = "look" end
     road.cmd = cmd
-    if locl.area and locl.area ~= "峨嵋山" then
-        Execute("halt")
-    end
+    if locl.area and locl.area ~= "峨嵋山" then Execute("halt") end
     Execute(cmd)
 end
-function lujing_trigger()
-    walk_trigger()
-end
+function lujing_trigger() walk_trigger() end
 function locate_trigger()
     DeleteTriggerGroup("locate")
     DeleteTriggerGroup("locate_unknown")
-    create_trigger_t(
-        "locate_unknown1",
-        '^(> )*设定环境变量：look\\s*\\=\\s*\\"YES\\"\\n>\\s*(\\D*)\\s*\\ -\\s*',
-        "",
-        "local_unknown_room"
-    )
-    create_trigger_t("locate2", "^(> )*【你现在正处于(\\D*)】\\n(\\D*)\\s*\\-\\s*", "", "local_area")
+    create_trigger_t("locate_unknown1",
+                     '^(> )*设定环境变量：look\\s*\\=\\s*\\"YES\\"\\n>\\s*(\\D*)\\s*\\ -\\s*',
+                     "", "local_unknown_room")
+    create_trigger_t("locate2",
+                     "^(> )*【你现在正处于(\\D*)】\\n(\\D*)\\s*\\-\\s*",
+                     "", "local_area")
     -- create_trigger_t('locate3',"^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。$",'','local_exit')
     create_trigger_t("locate4", "^(\\D*) = (\\D*)$", "", "local_id")
     -- create_trigger_t('locate5','^(> )*你把 "action" 设定为 "正在定位" 成功完成。$','','local_start')
-    create_trigger_t("locate6", "^(> )*现在是\\D*年\\D*月\\D*日(\\D*)时", "", "local_time")
-    create_trigger_t(
-        "server_time",
-        "^您参与游戏的主机北京时间是\\s*星期(\\D*)\\s*\\d*-\\D*-\\s*\\d*\\s*(\\d*):(\\d*):",
-        "",
-        "local_time_cal"
-    )
+    create_trigger_t("locate6", "^(> )*现在是\\D*年\\D*月\\D*日(\\D*)时",
+                     "", "local_time")
+    create_trigger_t("server_time",
+                     "^您参与游戏的主机北京时间是\\s*星期(\\D*)\\s*\\d*-\\D*-\\s*\\d*\\s*(\\d*):(\\d*):",
+                     "", "local_time_cal")
     -- create_trigger_t('locate7',"^( )*这里没有任何明显的出路。$",'','local_exitt')
     SetTriggerOption("locate_unknown1", "multi_line", "y")
     SetTriggerOption("locate_unknown1", "lines_to_match", "7")
@@ -283,9 +245,7 @@ local_unknown_room = function(n, l, w)
     unknown_room_relation = (string.gsub(s, " ", ""))
     r_r = string.reverse(unknown_room_relation)
     _, i = string.find(r_r, "[\n]")
-    if i == nil then
-        i = 0
-    end
+    if i == nil then i = 0 end
     locl.room = (string.sub(unknown_room_relation, 1 - i))
     exe("unset look")
     locl.where = locl.area .. locl.room
@@ -312,19 +272,23 @@ local_area = function(n, l, w)
     locl.where = locl.area .. locl.room
     locl.room_relation = (string.gsub(room_relation, "[\n]", ""))
     print(locl.room_relation)
-    if string.find(locl.room_relation, "黄河渡船") and string.find(locl.room_relation, "∧") then
+    if string.find(locl.room_relation, "黄河渡船") and
+        string.find(locl.room_relation, "∧") then
         locl.room_relation = string.gsub(locl.room_relation, "黄河渡船", "")
         locl.room_relation = string.gsub(locl.room_relation, "∧", "")
     end
-    if string.find(locl.room_relation, "长江渡船") and string.find(locl.room_relation, "∧") then
+    if string.find(locl.room_relation, "长江渡船") and
+        string.find(locl.room_relation, "∧") then
         locl.room_relation = string.gsub(locl.room_relation, "长江渡船", "")
         locl.room_relation = string.gsub(locl.room_relation, "∧", "")
     end
-    if string.find(locl.room_relation, "渡船") and string.find(locl.room_relation, "∧") then
+    if string.find(locl.room_relation, "渡船") and
+        string.find(locl.room_relation, "∧") then
         locl.room_relation = string.gsub(locl.room_relation, "渡船", "")
         locl.room_relation = string.gsub(locl.room_relation, "∧", "")
     end
-    if string.find(locl.room_relation, "竹篓") and string.find(locl.room_relation, "∧") then
+    if string.find(locl.room_relation, "竹篓") and
+        string.find(locl.room_relation, "∧") then
         locl.room_relation = string.gsub(locl.room_relation, "竹篓", "")
         locl.room_relation = string.gsub(locl.room_relation, "∧", "")
     end
@@ -336,9 +300,11 @@ function room_relative(n, l, w)
     _, i = string.find(r_r, "[\n]")
     print(string.sub(room_relation, 1 - i))
     print((string.gsub(room_relation, "[\n]", "")))
-    local filename = GetInfo(67) .. "logs\\" .. score.id .. "房间关系图" .. ".log"
+    local filename = GetInfo(67) .. "logs\\" .. score.id .. "房间关系图" ..
+                         ".log"
     local file = io.open(filename, "a+")
-    local s = "房间区域：【" .. w[2] .. "】 房间名：【" .. "】 房间关系：【" .. room_relation .. "】\n"
+    local s = "房间区域：【" .. w[2] .. "】 房间名：【" ..
+                  "】 房间关系：【" .. room_relation .. "】\n"
     -- print(s)
     file:write(s)
     file:close()
@@ -351,18 +317,14 @@ local_exit = function(n, l, w)
     locl.exit = {}
     -- exit.locl=exit_set(w[3])
     local l_exit = Trim(w[3])
-    for w in string.gmatch(l_exit, "(%a+)") do
-        table.insert(exit.locl, w)
-    end
+    for w in string.gmatch(l_exit, "(%a+)") do table.insert(exit.locl, w) end
 
     local l_set = exit.locl
     if roomNodir[locl.where] then
         l_set = del_element(l_set, roomNodir[locl.where])
     end
     cnt = table.getn(l_set)
-    if cnt == 0 or cnt == nil then
-        cnt = 1
-    end
+    if cnt == 0 or cnt == nil then cnt = 1 end
     if string.find(locl.room, "客栈") or string.find(locl.room, "客店") then
         local l_c = 0
         for i = 1, table.getn(l_set) do
@@ -373,7 +335,8 @@ local_exit = function(n, l, w)
         end
         table.remove(l_set, l_c)
     end
-    if string.find(locl.room, "江边") or string.find(locl.room, "渡口") or string.find(locl.room, "长江") then
+    if string.find(locl.room, "江边") or string.find(locl.room, "渡口") or
+        string.find(locl.room, "长江") then
         local l_c = 0
         for i = 1, table.getn(l_set) do
             if l_set[i] == "enter" then
@@ -385,22 +348,14 @@ local_exit = function(n, l, w)
     end
     cnt = math.random(1, cnt)
     locl.dir = l_set[cnt]
-    if locl.dir == nil then
-        locl.dir = "east"
-    end
-    for _, p in pairs(exit.locl) do
-        locl.exit[p] = true
-    end
-    if locate_finish ~= 0 then
-        return _G[locate_finish]()
-    end
+    if locl.dir == nil then locl.dir = "east" end
+    for _, p in pairs(exit.locl) do locl.exit[p] = true end
+    if locate_finish ~= 0 then return _G[locate_finish]() end
 end
 local_exitt = function()
     EnableTimer("loclWait", false)
     localget = 1
-    if locate_finish ~= 0 then
-        return _G[locate_finish]()
-    end
+    if locate_finish ~= 0 then return _G[locate_finish]() end
 end
 local_time = function(n, l, w)
     EnableTriggerGroup("locate", false)
@@ -411,21 +366,21 @@ local_time_cal = function(n, l, w)
     locl.weekday = Trim(tostring(w[1]))
     locl.hour = tonumber(w[2])
     locl.min = tonumber(w[3])
-    if locl.weekday == "四" and (locl.hour == 6 or locl.hour == 7) and locl.min <= 45 and go_on_smy == 1 then -- 20161117增加变量go_on_smy开关控制 防止系统重启后自动打开颂摩崖
+    if locl.weekday == "四" and (locl.hour == 6 or locl.hour == 7) and locl.min <=
+        45 and go_on_smy == 1 then -- 20161117增加变量go_on_smy开关控制 防止系统重启后自动打开颂摩崖
         Note("快重启服务器了！")
         if job.zuhe["songmoya"] ~= nil then
             job.zuhe["songmoya"] = nil
             Note("颂摩崖任务已关闭！")
         end
     end
-    if locl.weekday == "四" and locl.hour == 8 and locl.min >= 15 and go_on_smy == 1 then
+    if locl.weekday == "四" and locl.hour == 8 and locl.min >= 15 and go_on_smy ==
+        1 then
         if job.zuhe["songmoya"] == nil and tonumber(smydie) < 2 then
             job.zuhe["songmoya"] = true -- 重启之后继续加入颂摩崖
         end
     end
-    if locl.hour == 8 and locl.min < 10 then
-        smydie = 0
-    end
+    if locl.hour == 8 and locl.min < 10 then smydie = 0 end
 end
 local_id = function(n, l, w)
     local l_name = w[1]
@@ -435,136 +390,115 @@ local_id = function(n, l, w)
         l_set = utils.split(l_id, ",")
         l_id = l_set[1]
     else
-        if not string.find(l_id, " ") and not string.find(l_id, "beauty") and string.len(l_name) < 9 then
-            MudUser[l_name] = l_id
-        end
+        if not string.find(l_id, " ") and not string.find(l_id, "beauty") and
+            string.len(l_name) < 9 then MudUser[l_name] = l_id end
     end
     locl.id[l_name] = Trim(l_id)
-    if ItemGet[l_name] then
-        exe("get " .. l_id)
-    end
+    if ItemGet[l_name] then exe("get " .. l_id) end
     if weaponPrepare[l_name] and (not weaponStore[l_name] or not Bag[l_name]) then
         exe("get " .. l_id)
     end
 
     l_set = utils.split(w[2], ",")
     locl.item[l_name] = {}
-    for p, q in pairs(l_set) do
-        locl.item[l_name][Trim(q)] = true
-    end
+    for p, q in pairs(l_set) do locl.item[l_name][Trim(q)] = true end
 end
 exit_set = function(exit)
     local l_set = {}
     local l_exit = Trim(exit)
-    for w in string.gmatch(l_exit, "(%a+)") do
-        table.insert(l_set, w)
-    end
+    for w in string.gmatch(l_exit, "(%a+)") do table.insert(l_set, w) end
 
     return l_set
 end
 locate = function(thread)
-    wait.make(
-        function()
-            localget = 0
-            locate_trigger()
-            local_start()
-            local l, w
-            while true do
-                exe("id here")
-                exe("set look;l;time")
-                -- exe('alias action 正在定位')
-                l, w = wait.regexp("^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。|^( )*这里没有任何明显的出路", 2)
-                if l ~= nil then
-                    break
-                end
-            end
-            if l:find("出口") then
-                local_exit(nil, l, w)
-            else
-                local_exitt(nil, l, w)
-            end
-            if thread then
-                coroutine.resume(thread)
-            end
+    wait.make(function()
+        localget = 0
+        locate_trigger()
+        local_start()
+        local l, w
+        while true do
+            exe("id here")
+            exe("set look;l;time")
+            -- exe('alias action 正在定位')
+            l, w = wait.regexp(
+                       "^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。|^( )*这里没有任何明显的出路",
+                       2)
+            if l ~= nil then break end
         end
-    )
+        if l:find("出口") then
+            local_exit(nil, l, w)
+        else
+            local_exitt(nil, l, w)
+        end
+        if thread then coroutine.resume(thread) end
+    end)
 end
 fastLocate = function(thread)
-    wait.make(
-        function()
-            localget = 0
-            EnableTrigger("locate5", true)
-            locate_trigger()
-            local_start()
-            local l, w
-            while true do
-                exe("id here")
-                exe("set look;l")
-                -- exe('alias action 正在定位')
-                l, w = wait.regexp("^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。|^( )*这里没有任何明显的出路", 2)
-                if l ~= nil then
-                    break
-                end
-            end
-            if l:find("出口") then
-                local_exit(nil, l, w)
-            else
-                local_exitt(nil, l, w)
-            end
-            if thread then
-                coroutine.resume(thread)
-            end
+    wait.make(function()
+        localget = 0
+        EnableTrigger("locate5", true)
+        locate_trigger()
+        local_start()
+        local l, w
+        while true do
+            exe("id here")
+            exe("set look;l")
+            -- exe('alias action 正在定位')
+            l, w = wait.regexp(
+                       "^( )*这里(看得清的|明显的|唯一的|看得见的唯一)出口是(\\D*)。|^( )*这里没有任何明显的出路",
+                       2)
+            if l ~= nil then break end
         end
-    )
+        if l:find("出口") then
+            local_exit(nil, l, w)
+        else
+            local_exitt(nil, l, w)
+        end
+        if thread then coroutine.resume(thread) end
+    end)
 end
 function walk_trigger()
     DeleteTriggerGroup("walk")
-    create_trigger_t("walk1", '^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$', "", "walk_goon")
+    create_trigger_t("walk1",
+                     '^(> )*你把 "action" 设定为 "正在赶路中" 成功完成。$',
+                     "", "walk_goon")
     SetTriggerOption("walk1", "group", "walk")
     EnableTriggerGroup("walk", false)
 end
 function walk_wait()
-    wait.make(
-        function()
-            flag.walkwait = true
-            EnableTriggerGroup("walk", true)
-            EnableTrigger("hp12", true)
-            create_timer_s("walkWait", 0.4, "walkTimer")
-            if tmp.find then
-                exe("alias action 正在赶路中")
-            else
-                return walk_goon()
-            end
+    wait.make(function()
+        flag.walkwait = true
+        EnableTriggerGroup("walk", true)
+        EnableTrigger("hp12", true)
+        create_timer_s("walkWait", 0.4, "walkTimer")
+        if tmp.find then
+            exe("alias action 正在赶路中")
+        else
+            return walk_goon()
         end
-    )
+    end)
 end
 function walkTimer()
-    if flag.walkwait then
-        exe("alias action 正在赶路中")
-    end
+    if flag.walkwait then exe("alias action 正在赶路中") end
 end
 walk_hook_thread = nil
 
 function walk_goon()
-    wait.make(
-        function()
-            flag.walkwait = false
-            EnableTriggerGroup("walk", false)
-            EnableTimer("walkwait", false)
+    wait.make(function()
+        flag.walkwait = false
+        EnableTriggerGroup("walk", false)
+        EnableTimer("walkwait", false)
 
-            wait_busy()
-            if flag.wait == 1 then
-                return
-            end
-            if tmp.find then
-                EnableTrigger("hp12", false)
-            else
-                EnableTrigger("hp12", true)
-            end
-
-            resume_walk_thread()
+        wait_busy()
+        if flag.wait == 1 then return end
+        if tmp.find then
+            EnableTrigger("hp12", false)
+        else
+            EnableTrigger("hp12", true)
         end
-    )
+
+        resume_walk_thread()
+    end)
 end
 
 function resume_walk_thread(msg)
@@ -589,15 +523,15 @@ function go_to(where)
     if l_dest.area then
         return go(test, l_dest.area, l_dest.room)
     else
-        return ColourNote("red", "blue", "找不到或无法到达此(地点|人物)：" .. where)
+        return ColourNote("red", "blue",
+                          "找不到或无法到达此(地点|人物)：" ..
+                              where)
     end
 end
 
 function await_go(area, room, sId)
     local self = coroutine.running()
-    local async_continue = function(...)
-        coroutine.resume(self, ...)
-    end
+    local async_continue = function(...) coroutine.resume(self, ...) end
     go(async_continue, area, room, sId)
     return coroutine.yield()
 end
@@ -609,21 +543,15 @@ function go(job, area, room, sId)
     sour.id = sId
     dest.id = nil
     resume_walk_thread("kill")
-    if area ~= nil then
-        dest.area = area
-    end
-    if room ~= nil then
-        dest.room = room
-    end
+    if area ~= nil then dest.area = area end
+    if room ~= nil then dest.room = room end
     if string.find(dest.area, "/") then
         dest.id = dest.area
         -- Note(dest.id)
         dest.room = map.rooms[dest.id].name
-    -- Note(dest.room)
+        -- Note(dest.room)
     end
-    if job == nil then
-        job = test
-    end
+    if job == nil then job = test end
     flag.find = 0
     flag.wait = 0
     road.act = job
@@ -639,51 +567,50 @@ function go(job, area, room, sId)
 end
 go_locate = function()
     EnableTrigger("hp12", true)
-    wait.make(
-        function()
-            if Chuanfu.enable then
-                Chuanfu:check_cjn()
-                Chuanfu:check_hh()
-            end
-            locate(coroutine.running())
-            coroutine.yield()
-            path_consider()
+    wait.make(function()
+        if Chuanfu.enable then
+            Chuanfu:check_cjn()
+            Chuanfu:check_hh()
         end
-    )
+        locate(coroutine.running())
+        coroutine.yield()
+        path_consider()
+    end)
 end
-function goContinue()
-    return go(road.act)
-end
+function goContinue() return go(road.act) end
 function path_consider()
     local l_sour, l_dest, l_path, l_way
     local l_where = locl.area .. locl.room
     sour.rooms = {}
     dest.rooms = {}
-    if sour.id and map.rooms[sour.id].name ~= locl.room then
-        sour.id = nil
-    end
+    if sour.id and map.rooms[sour.id].name ~= locl.room then sour.id = nil end
 
-    if not sour.id and road.id and map.rooms[road.id] and map.rooms[road.id].name == locl.room then
-        sour.id = road.id
-    end
+    if not sour.id and road.id and map.rooms[road.id] and
+        map.rooms[road.id].name == locl.room then sour.id = road.id end
     if sour.id == nil then
         sour.room = locl.room
         sour.area = locl.area
         sour.rooms = getRooms(sour.room, sour.area)
     end
-    if dest.id == nil then
-        dest.rooms = getRooms(dest.room, dest.area)
-    end
+    if dest.id == nil then dest.rooms = getRooms(dest.room, dest.area) end
     dest.area = dest.area or ""
     dest.room = dest.room or ""
     if sour.id ~= nil then
-        chats_locate("定位系统：从【" .. sour.id .. "】出发!目的地【" .. dest.area .. dest.room .. "】")
+        chats_locate("定位系统：从【" .. sour.id ..
+                         "】出发!目的地【" .. dest.area .. dest.room ..
+                         "】")
     else
-        chats_locate("定位系统：从【" .. sour.area .. sour.room .. "】出发! 目的地【" .. dest.area .. dest.room .. "】")
-        if sour.room == "观星台" then
-            exe("jump down")
+        chats_locate("定位系统：从【" .. sour.area .. sour.room ..
+                         "】出发! 目的地【" .. dest.area .. dest.room ..
+                         "】")
+
+        if locl.where == "嵩山少林僧舍" and #exit.locl == 1 then
+            exe(exit.locl[1])
+            return checkWait(goContinue, 0.3)
         end
-        if locl.room_relation == "九老洞九老洞" or locl.where == "不知道哪里九老洞" then
+        if sour.room == "观星台" then exe("jump down") end
+        if locl.room_relation == "九老洞九老洞" or locl.where ==
+            "不知道哪里九老洞" then
             print("尝试离开九老洞")
             exe("drop fire;leave;leave;leave;leave;leave;leave;out;ne;ed;ne;ed")
             return checkWait(goContinue, 0.3)
@@ -705,7 +632,8 @@ function path_consider()
             return checkWait(goContinue, 0.2)
         end
 
-        if locl.room_relation == "南疆沙漠吐谷浑伏俟城南疆沙漠↖｜↗南疆沙漠---南疆沙漠---南疆沙漠↙｜↘南疆沙漠南疆沙漠南疆沙漠南疆沙漠" then
+        if locl.room_relation ==
+            "南疆沙漠吐谷浑伏俟城南疆沙漠↖｜↗南疆沙漠---南疆沙漠---南疆沙漠↙｜↘南疆沙漠南疆沙漠南疆沙漠南疆沙漠" then
             chats_locate("进入南疆地图，尝试出来")
             exe("look;hp;drink jiudai;n;n;n;n;n;n;n;n;n;n")
             return njsm_check()
@@ -725,7 +653,9 @@ function path_consider()
         end
         if table.getn(sour.rooms) == 0 then
             if locl.room_relation ~= "" then
-                chats_locate("定位系统：没有归属地的房间加入了room_relative，【可以尝试定位没有归属地的房间】", "LimeGreen")
+                chats_locate(
+                    "定位系统：没有归属地的房间加入了room_relative，【可以尝试定位没有归属地的房间】",
+                    "LimeGreen")
                 sour.rooms = getRoomsByRelation(locl.room_relation)
                 if table.getn(sour.rooms) == 1 then
                     sour.id = sour.rooms[1]
@@ -735,30 +665,36 @@ function path_consider()
                 local unknown_city = {"郊外", "中原"}
                 for i, city in pairs(unknown_city) do
                     sour.rooms = getRooms(sour.room, city)
-                    if table.getn(sour.rooms) > 0 then
-                        break
-                    end
+                    if table.getn(sour.rooms) > 0 then break end
                 end
                 if table.getn(sour.rooms) == 1 then
                     sour.id = sour.rooms[1]
                 end
             end
             if table.getn(sour.rooms) == 0 then
-                chats_locate("定位系统：地图系统无此地点【" .. locl.area .. locl.room .. "】资料，随机移动寻找确切定位点！", "red")
+                chats_locate("定位系统：地图系统无此地点【" ..
+                                 locl.area .. locl.room ..
+                                 "】资料，随机移动寻找确切定位点！",
+                             "red")
                 exe("stand;leave")
                 exe(locl.dir)
                 return checkWait(goContinue, 0.2)
             end
         end
         if table.getn(sour.rooms) > 1 and sour.id ~= "city/jiangbei" then
-            chats_locate("定位系统：进入第一个同名房间判断【" .. sour.room .. "】了!", "LimeGreen")
+            chats_locate(
+                "定位系统：进入第一个同名房间判断【" ..
+                    sour.room .. "】了!", "LimeGreen")
             if locl.room_relation ~= "" then
-                chats_locate("定位系统：房间关系为【" .. locl.room_relation .. "】", "LimeGreen")
+                chats_locate("定位系统：房间关系为【" ..
+                                 locl.room_relation .. "】", "LimeGreen")
             end
             for i = 1, table.getn(sour.rooms) do
                 local roomInfo = map.rooms[sour.rooms[i]]
-                if (locl.room_relation ~= "" and roomInfo.room_relative == locl.room_relation) then
-                    if exit.locl and roomInfo.ways and #exit.locl == tablelength(roomInfo.ways) then
+                if (locl.room_relation ~= "" and roomInfo.room_relative ==
+                    locl.room_relation) then
+                    if exit.locl and roomInfo.ways and #exit.locl ==
+                        tablelength(roomInfo.ways) then
                         local match = true
                         for k, v in ipairs(exit.locl) do
                             if not roomInfo.ways[v] then
@@ -767,16 +703,19 @@ function path_consider()
                         end
                         if match then
                             sour.id = sour.rooms[i]
-                            chats_locate("定位系统：尝试精确定位！猜测目前位置为" .. sour.id, "LimeGreen")
+                            chats_locate(
+                                "定位系统：尝试精确定位！猜测目前位置为" ..
+                                    sour.id, "LimeGreen")
                         end
                     else
-                        chats_locate("定位系统：尝试精确定位！", "LimeGreen")
+                        chats_locate("定位系统：尝试精确定位！",
+                                     "LimeGreen")
                         sour.id = sour.rooms[i]
                     end
                     if sour.id then
                         return check_halt(path_consider)
                     end
-                -- return go(road.act,dest.area,dest.room,sour.rooms[i])
+                    -- return go(road.act,dest.area,dest.room,sour.rooms[i])
                 end
             end
             for p in pairs(locl.id) do
@@ -789,7 +728,8 @@ function path_consider()
                     else
                         l_corpse = p
                     end
-                    if map.rooms[v] and map.rooms[v].objs and (map.rooms[v].objs[p] or map.rooms[v].objs[l_corpse]) then
+                    if map.rooms[v] and map.rooms[v].objs and
+                        (map.rooms[v].objs[p] or map.rooms[v].objs[l_corpse]) then
                         l_cnt = l_cnt + 1
                         l_id = v
                     end
@@ -803,10 +743,9 @@ function path_consider()
                     local l_cnt = 0
                     local l_id
                     for i = 1, table.getn(sour.rooms) do
-                        if
-                            map.rooms[sour.rooms[i]] and map.rooms[sour.rooms[i]].ways and
-                                map.rooms[sour.rooms[i]].ways[p]
-                         then
+                        if map.rooms[sour.rooms[i]] and
+                            map.rooms[sour.rooms[i]].ways and
+                            map.rooms[sour.rooms[i]].ways[p] then
                             l_cnt = l_cnt + 1
                             l_id = sour.rooms[i]
                         end
@@ -827,26 +766,39 @@ function path_consider()
         if l_way then
             exe(l_way)
             exe("yun jingli")
-            chats_locate("定位系统：地图系统此地点【" .. locl.area .. locl.room .. "】无简单路径，移动寻找确切定位点！", "red")
+            chats_locate(
+                "定位系统：地图系统此地点【" .. locl.area ..
+                    locl.room ..
+                    "】无简单路径，移动寻找确切定位点！", "red")
             return checkWait(goContinue, 0.5)
         end
         if table.getn(sour.rooms) > 1 and sour.id ~= "city/jiangbei" then -------------------------------------------------------------------------
             if locl.room_relation ~= "" then -- 触发器获取到房间相对关系字符串
                 for i = 1, table.getn(sour.rooms) do
-                    if (locl.room_relation ~= "" and map.rooms[sour.rooms[i]].room_relative == locl.room_relation) then
+                    if (locl.room_relation ~= "" and
+                        map.rooms[sour.rooms[i]].room_relative ==
+                        locl.room_relation) then
                         -- return go(road.act,dest.area,dest.room,sour.rooms[i])
-                        chats_locate("定位系统：精确定位房间id为：【" .. sour.rooms[i] .. "】", "LimeGreen")
+                        chats_locate(
+                            "定位系统：精确定位房间id为：【" ..
+                                sour.rooms[i] .. "】", "LimeGreen")
                         sour.id = sour.rooms[i]
                         return check_halt(path_consider)
                     else
-                        chats_locate("定位系统：地图系统此地点【" .. locl.area .. locl.room .. "】无法精确定位，随机移动！", "red")
+                        chats_locate(
+                            "定位系统：地图系统此地点【" ..
+                                locl.area .. locl.room ..
+                                "】无法精确定位，随机移动！", "red")
                         exe("stand;leave")
                         exe(locl.dir)
                         return checkWait(goContinue, 0.5)
                     end
                 end
             else
-                chats_locate("定位系统：地图系统此地点【" .. locl.area .. locl.room .. "】存在不止一处，随机移动寻找确切定位点！", "red")
+                chats_locate("定位系统：地图系统此地点【" ..
+                                 locl.area .. locl.room ..
+                                 "】存在不止一处，随机移动寻找确切定位点！",
+                             "red")
                 exe("stand;leave")
                 exe(locl.dir)
                 return checkWait(goContinue, 0.5)
@@ -856,17 +808,16 @@ function path_consider()
 
     if dest.id == nil and table.getn(dest.rooms) == 0 then
         Note("Path Consider GetRooms Error!")
-        chats_locate("定位系统：无法找到的地点. dest.room=" .. dest.room .. " dest.area=" .. dest.area)
+        chats_locate("定位系统：无法找到的地点. dest.room=" ..
+                         dest.room .. " dest.area=" .. dest.area)
         return false
     end
     path_create()
     -- road.i = 0
-    wait.make(
-        function()
-            wait_busy()
-            path_start()
-        end
-    )
+    wait.make(function()
+        wait_busy()
+        path_start()
+    end)
 end
 function path_cal()
     local l_sour, l_dest, l_path, l_distance
@@ -903,12 +854,8 @@ function path_cal()
         end
     end
 
-    if dest.id ~= nil then
-        l_dest = dest.id
-    end
-    if sour.id ~= nil then
-        l_sour = sour.id
-    end
+    if dest.id ~= nil then l_dest = dest.id end
+    if sour.id ~= nil then l_sour = sour.id end
     road.id = l_dest
     l_path = map:getPath(l_sour, l_dest)
     if not l_path then
@@ -933,28 +880,28 @@ function path_create()
     -- Note(l_path)
     if type(l_path) ~= "string" then
         if math.random(1, 4) == 1 then
-            l_path = "stand;out;northeast;northwest;southeast;southwest;south;south;south;south;south"
+            l_path =
+                "stand;out;northeast;northwest;southeast;southwest;south;south;south;south;south"
         elseif math.random(1, 4) == 2 then
-            l_path = "stand;out;northeast;northwest;southeast;southwest;east;east;east;east;east;east"
+            l_path =
+                "stand;out;northeast;northwest;southeast;southwest;east;east;east;east;east;east"
         elseif math.random(1, 4) == 3 then
-            l_path = "stand;out;northeast;northwest;southeast;southwest;west;west;west;west;west;west"
+            l_path =
+                "stand;out;northeast;northwest;southeast;southwest;west;west;west;west;west;west"
         else
-            l_path = "stand;out;northeast;northwest;southeast;southwest;north;north;north;north;north"
+            l_path =
+                "stand;out;northeast;northwest;southeast;southwest;north;north;north;north;north"
         end
     end
     l_set = utils.split(l_path, ";") -- 一个alias里有几个命令
     l_settt = table.getn(l_set)
     -- print(l_path)
     if wdgostart == 1 then
-        if l_settt <= wd_distance then
-            l_settt = wd_distance
-        end
+        if l_settt <= wd_distance then l_settt = wd_distance end
         for i = 1, table.getn(l_set) do
             if i < l_settt - wd_distance - 3 then
                 if string.find(l_set[i], "#") then
-                    if l_num > 0 then
-                        l_cnt = l_cnt + 1
-                    end
+                    if l_num > 0 then l_cnt = l_cnt + 1 end
                     road.detail[l_cnt] = l_set[i]
                     l_cnt = l_cnt + 1
                     l_num = 0
@@ -962,7 +909,8 @@ function path_create()
                     if l_num == 0 then
                         road.detail[l_cnt] = l_set[i]
                     else
-                        road.detail[l_cnt] = road.detail[l_cnt] .. ";" .. l_set[i]
+                        road.detail[l_cnt] =
+                            road.detail[l_cnt] .. ";" .. l_set[i]
                     end
                     l_num = l_num + 1
                     if l_num > road.steps then
@@ -972,9 +920,7 @@ function path_create()
                 end
             else
                 if string.find(l_set[i], "#") then
-                    if l_num > 0 then
-                        l_cnt = l_cnt + 1
-                    end
+                    if l_num > 0 then l_cnt = l_cnt + 1 end
                     road.detail[l_cnt] = l_set[i]
                     l_cnt = l_cnt + 1
                     l_num = 0
@@ -982,7 +928,8 @@ function path_create()
                     if l_num == 0 then
                         road.detail[l_cnt] = l_set[i]
                     else
-                        road.detail[l_cnt] = road.detail[l_cnt] .. ";" .. l_set[i]
+                        road.detail[l_cnt] =
+                            road.detail[l_cnt] .. ";" .. l_set[i]
                     end
                     l_num = l_num + 1
                     if l_num > 0 then
@@ -995,9 +942,7 @@ function path_create()
     else
         for i = 1, table.getn(l_set) do
             if string.find(l_set[i], "#") then
-                if l_num > 0 then
-                    l_cnt = l_cnt + 1
-                end
+                if l_num > 0 then l_cnt = l_cnt + 1 end
                 road.detail[l_cnt] = l_set[i]
                 l_cnt = l_cnt + 1
                 l_num = 0
@@ -1021,79 +966,82 @@ function path_start()
     EnableTrigger("hp12", false)
     EnableTimer("roadWait", false)
     DeleteTimer("roadWait", false)
-    if flag.find == 1 then
-        return
-    end
-    wait.make(
-        function()
-            for i, step in ipairs(road.detail) do
-                EnableTrigger("hp12", false)
-                if l_road and string.find(l_road, "ta corpse") then
-                    DeleteTriggerGroup("eyu")
-                    create_trigger_t("eyu1", "^>*\\s*鳄鱼\\(E yu\\)$", "", "jqgeyu")
-                    create_trigger_t("eyu2", "^>*\\s*鳄鱼\\(E yu\\) <昏迷不醒>$", "", "jqgeyu")
-                    create_trigger_t("eyu3", "^>*\\s*鳄鱼的尸体\\(Corpse\\)$", "", "jqgeyu")
-                    create_trigger_t("eyu4", "^>*\\s*鳄鱼神志迷糊，脚下一个不稳，倒在地上昏了过去。$", "", "jqgeyu")
-                    create_trigger_t("eyu5", "^>*\\s*鳄鱼一见你从水中浮出，都张开血盆大口，朝你游了过来。$", "", "jqgeyu")
-                    create_trigger_t("eyu6", "^>*\\s*鳄鱼潭 - $", "", "jqgeyu")
-                    for i = 1, 6 do
-                        SetTriggerOption("eyu" .. i, "group", "eyu")
-                    end
-                    create_timer_s("jqgeyu", 30, "jqgeyuwait")
+    if flag.find == 1 then return end
+    wait.make(function()
+        for i, step in ipairs(road.detail) do
+            EnableTrigger("hp12", false)
+            if l_road and string.find(l_road, "ta corpse") then
+                DeleteTriggerGroup("eyu")
+                create_trigger_t("eyu1", "^>*\\s*鳄鱼\\(E yu\\)$", "",
+                                 "jqgeyu")
+                create_trigger_t("eyu2",
+                                 "^>*\\s*鳄鱼\\(E yu\\) <昏迷不醒>$", "",
+                                 "jqgeyu")
+                create_trigger_t("eyu3", "^>*\\s*鳄鱼的尸体\\(Corpse\\)$",
+                                 "", "jqgeyu")
+                create_trigger_t("eyu4",
+                                 "^>*\\s*鳄鱼神志迷糊，脚下一个不稳，倒在地上昏了过去。$",
+                                 "", "jqgeyu")
+                create_trigger_t("eyu5",
+                                 "^>*\\s*鳄鱼一见你从水中浮出，都张开血盆大口，朝你游了过来。$",
+                                 "", "jqgeyu")
+                create_trigger_t("eyu6", "^>*\\s*鳄鱼潭 - $", "", "jqgeyu")
+                for i = 1, 6 do
+                    SetTriggerOption("eyu" .. i, "group", "eyu")
                 end
-
-                if walk_hook_thread then
-                    coroutine.resume(walk_hook_thread, "kill")
-                end
-
-                walk_hook_thread = coroutine.running()
-                -- print("next step:"..step)
-                if string.find(step, "#") then
-                    local _, _, func, params = string.find(step, "^#(%a%w*)%s*(.-)$")
-                    if func then
-                        _G[func](params)
-                    else
-                        messageShow("Function 不存在，可能是地图问题:" .. func)
-                    end
-                else
-                    local tmp = utils.split(step, ";")
-                    local delay = calculate_flood(#tmp)
-                    if #tmp > 2 and delay then
-                        local lastSecondCmds = t_cmds[os.time()] or 0
-                        print("last second:" .. lastSecondCmds .. " next cmds:" .. #tmp)
-                        print("wait " .. delay .. " second as next step might flood")
-                        wait.time(delay)
-                    end
-                    exe(step)
-                    walk_wait()
-                end
-                local status = coroutine.yield()
-                if status and status == "kill" then
-                    walk_hook_thread = nil
-                    return
-                end
+                create_timer_s("jqgeyu", 30, "jqgeyuwait")
             end
-            locate_finish = "go_confirm"
-            return locate()
+
+            if walk_hook_thread then
+                coroutine.resume(walk_hook_thread, "kill")
+            end
+
+            walk_hook_thread = coroutine.running()
+            -- print("next step:"..step)
+            if string.find(step, "#") then
+                local _, _, func, params =
+                    string.find(step, "^#(%a%w*)%s*(.-)$")
+                if func then
+                    _G[func](params)
+                else
+                    messageShow("Function 不存在，可能是地图问题:" ..
+                                    func)
+                end
+            else
+                local tmp = utils.split(step, ";")
+                local delay = calculate_flood(#tmp)
+                if #tmp > 2 and delay then
+                    local lastSecondCmds = t_cmds[os.time()] or 0
+                    print("last second:" .. lastSecondCmds .. " next cmds:" ..
+                              #tmp)
+                    print("wait " .. delay .. " second as next step might flood")
+                    wait.time(delay)
+                end
+                exe(step)
+                walk_wait()
+            end
+            local status = coroutine.yield()
+            if status and status == "kill" then
+                walk_hook_thread = nil
+                return
+            end
         end
-    )
+        locate_finish = "go_confirm"
+        return locate()
+    end)
 end
 
 function go_confirm()
     locate_finish = 0
     checkWield()
     sour.id = nil
-    if flag.go == nil then
-        flag.go = 0
-    end
+    if flag.go == nil then flag.go = 0 end
     flag.go = flag.go + 1
-    if string.find(locl.room, "长江") or string.find(locl.room, "渡口") or string.find(locl.room, "澜沧江边") then
-        flag.go = 1
-    end
-    if flag.go > 10 then
-        flag.go = 0
-    end
-    if locl.room == dest.room and locl.room == "南门" and locl.area ~= dest.area then
+    if string.find(locl.room, "长江") or string.find(locl.room, "渡口") or
+        string.find(locl.room, "澜沧江边") then flag.go = 1 end
+    if flag.go > 10 then flag.go = 0 end
+    if locl.room == dest.room and locl.room == "南门" and locl.area ~=
+        dest.area then
         local sgate = 0
         sgate = sgate + 1
         if sgate > 0 and sour.id ~= "扬州城长江北岸" then
@@ -1105,58 +1053,41 @@ function go_confirm()
     end
     if locl.room == dest.room or flag.go == 0 then
         if locl.room == dest.room and locl.area == dest.area then
-            chats_locate(
-                "定位系统：从【" .. sour.area .. sour.room .. "】出发，到达目的地【" .. dest.area .. dest.room .. "】！",
-                "seagreen"
-            )
+            chats_locate("定位系统：从【" .. sour.area .. sour.room ..
+                             "】出发，到达目的地【" .. dest.area ..
+                             dest.room .. "】！", "seagreen")
         else
-            chats_locate(
-                "定位系统：从【" ..
-                    sour.area ..
-                        sour.room ..
-                            "】出发，未达目的地【" .. dest.area .. dest.room .. "】，终点为【" .. locl.area .. locl.room .. "】！",
-                "cyan"
-            )
+            chats_locate("定位系统：从【" .. sour.area .. sour.room ..
+                             "】出发，未达目的地【" .. dest.area ..
+                             dest.room .. "】，终点为【" .. locl.area ..
+                             locl.room .. "】！", "cyan")
         end
         flag.go = 0
-        if road.act ~= nil then
-            return road.act()
-        end
+        if road.act ~= nil then return road.act() end
     else
         return go(road.act)
     end
 end
 
 function find(l_area, l_room)
-    if job.room ~= nil and (job.room == "紫杉林" or string.find(job.room, "字门")) then
+    if job.room ~= nil and
+        (job.room == "紫杉林" or string.find(job.room, "字门")) then
         create_timer_st("zsl_timer", 30, "zsl_stop")
     end
     resume_walk_thread("kill")
-    do
-        return search()
-    end
+    do return search() end
 end
 function zsl_stop()
     EnableTimer("zsl_timer", false)
     DeleteTimer("zsl_timer")
-    if dest.room == "广场" then
-        return
-    end
-    if
-        (job.room == "紫杉林" or string.find(job.room, "字门")) and tmp.find and (flag.find == 0 or flag.wait == 0) and
-            flag.times == 1
-     then
+    if dest.room == "广场" then return end
+    if (job.room == "紫杉林" or string.find(job.room, "字门")) and tmp.find and
+        (flag.find == 0 or flag.wait == 0) and flag.times == 1 then
         disAll()
         flag.times = 2
-        if job.name == "wudang" then
-            return wudangFindAgain()
-        end
-        if job.name == "huashan" then
-            return huashanFindAgain()
-        end
-        if job.name == "xueshan" then
-            return xueshanFindAgain()
-        end
+        if job.name == "wudang" then return wudangFindAgain() end
+        if job.name == "huashan" then return huashanFindAgain() end
+        if job.name == "xueshan" then return xueshanFindAgain() end
     end
 end
 find_nobody = function()
@@ -1165,36 +1096,48 @@ find_nobody = function()
         return
     end
     if string.find(job.name, "songxin") then
-        chats_log("定位系统：未能在【" .. job.area .. "】找到【" .. job.target .. "】！", "songxinFindFail")
+        chats_log(
+            "定位系统：未能在【" .. job.area .. "】找到【" ..
+                job.target .. "】！", "songxinFindFail")
     end
     if job.name == "wudang" then
-        chats_log("定位系统：未能在【" .. job.area .. job.room .. "】找到【" .. job.target .. "】！", "wudangFindFail")
-    -- if flag.times>2 then return wudangFindFail() end
+        chats_log("定位系统：未能在【" .. job.area .. job.room ..
+                      "】找到【" .. job.target .. "】！", "wudangFindFail")
+        -- if flag.times>2 then return wudangFindFail() end
     end
     if job.name == "clb" then
-        chats_log("定位系统：未能在【" .. job.area .. job.room .. "】找到【" .. job.target .. "】！", "clbFindFail")
+        chats_log("定位系统：未能在【" .. job.area .. job.room ..
+                      "】找到【" .. job.target .. "】！", "clbFindFail")
     end
     if job.name == "husong" then
-        chats_log("定位系统：未能在【" .. job.area .. job.room .. "】找到【" .. job.target .. "】！", "husongFindFail")
+        chats_log("定位系统：未能在【" .. job.area .. job.room ..
+                      "】找到【" .. job.target .. "】！", "husongFindFail")
     end
     if job.name == "xueshan" then
-        chats_log("定位系统：未能在【" .. job.area .. job.room .. "】找到【" .. job.target .. "】！", "xueshanFindFail")
+        chats_log("定位系统：未能在【" .. job.area .. job.room ..
+                      "】找到【" .. job.target .. "】！",
+                  "xueshanFindFail")
     end
     if job.name == "tdh" then
-        chats_log("定位系统：未能在【" .. job.area .. job.room .. "】找到革命同志！", "tdhFindFail")
+        chats_log("定位系统：未能在【" .. job.area .. job.room ..
+                      "】找到革命同志！", "tdhFindFail")
     end
     if job.name == "huashan" then
-        chats_log("定位系统：未能在【" .. dest.area .. dest.room .. "】找到革命同志！", "huashanFindFail")
+        chats_log("定位系统：未能在【" .. dest.area .. dest.room ..
+                      "】找到革命同志！", "huashanFindFail")
     end
     if job.name == "Dummyjob" then
-        chats_log("定位系统：未能在【" .. job.area .. job.room .. "】找到【" .. job.target4 .. "】！")
+        chats_log("定位系统：未能在【" .. job.area .. job.room ..
+                      "】找到【" .. job.target4 .. "】！")
         return dummyover()
     end
     if job.name == "zhuacaishen" then
-        chats_log("定位系统：未能在【" .. dest.area .. dest.room .. "】找到财神同志！", "caishenFindFail")
+        chats_log("定位系统：未能在【" .. dest.area .. dest.room ..
+                      "】找到财神同志！", "caishenFindFail")
     end
     if job.name == "guanfu" then
-        chats_log("定位系统：未能在【" .. dest.area .. dest.room .. "】找到【" .. job.target .. "】！", "guanfuFindFail")
+        chats_log("定位系统：未能在【" .. dest.area .. dest.room ..
+                      "】找到【" .. job.target .. "】！", "guanfuFindFail")
     end
 
     flag.times = flag.times + 1
@@ -1220,9 +1163,7 @@ find_nobody = function()
 end
 List = {}
 -- 创建链表
-function List.new(val)
-    return {pnext = nil, index = val}
-end
+function List.new(val) return {pnext = nil, index = val} end
 -- 添加一个节点
 function List.addNode(nodeParent, nodeChild)
     nodeChild.pnext = nodeParent.pnext
@@ -1255,34 +1196,24 @@ function searchPre()
     if job.name and job.name == "guanfu" and flag.times == 1 then
         l_distance = 12
     end
-    if flag.times == 3 then
-        l_distance = 6
-    end
-    if job.name == "zhuacaishen" or job.name == "dolost" then
-        l_distance = 6
-    end
+    if flag.times == 3 then l_distance = 6 end
+    if job.name == "zhuacaishen" or job.name == "dolost" then l_distance = 6 end
 
-    if p_dest == nil then
-        p_dest = map.rooms[road.id].outdoor
-    end
+    if p_dest == nil then p_dest = map.rooms[road.id].outdoor end
     local rooms = getAroundRooms(p_room, p_dest, l_distance, "all")
     roomsnum = countTab(rooms)
     -- 构造邻接表，用于递归搜索
     -- 插入起始road.id
     -- starttime = os.clock() -- 测试计算时间
     newrooms = {}
-    if job.room and job.area then
-        SN_rooms = getRooms(job.room, job.area)
-    end
+    if job.room and job.area then SN_rooms = getRooms(job.room, job.area) end
 
     if SN_rooms ~= nil and #SN_rooms > 1 and locl.room == job.room then
         print("找到" .. #SN_rooms .. "个同名房间")
         local Firstroom = getNearRoom({road.id}, SN_rooms)
         table.insert(newrooms, Firstroom)
         for _, v in pairs(SN_rooms) do
-            if v ~= Firstroom then
-                table.insert(newrooms, v)
-            end
+            if v ~= Firstroom then table.insert(newrooms, v) end
         end
         DFS()
         newrooms = {}
@@ -1294,9 +1225,7 @@ function searchPre()
 
     if job.name ~= "dolost" and job.name ~= "hubiao" then
         -- starttime = os.clock() -- 测试计算时间
-        for id in pairs(rooms) do
-            table.insert(newrooms, id)
-        end
+        for id in pairs(rooms) do table.insert(newrooms, id) end
         DFS()
     end
 end
@@ -1336,7 +1265,7 @@ function DFS()
             local path, len = map:getPath(myrt[1].index, myrt[i].index)
             if path then
                 FastDFS(myrt, i) -- 继续遍历指定的myrt[i]这个节点
-            -- messageShow("发现通路，遍历下一个节点！通路长度="..len,"red")
+                -- messageShow("发现通路，遍历下一个节点！通路长度="..len,"red")
             end
         end
     end
@@ -1344,14 +1273,10 @@ end
 function FastDFS(myrt, i)
     visited[i] = true -- 设置下标为I的顶点为已访问
     -- Note("myrt["..i.."]="..myrt[i].index)  --输出顶点信息
-    if myrt[i] == nil or myrt[i].index == nil then
-        return
-    end
+    if myrt[i] == nil or myrt[i].index == nil then return end
     table.insert(road.rooms, myrt[i].index)
     local p = myrt[i].pnext -- 下一个边表结点
-    if p == nil then
-        return
-    end
+    if p == nil then return end
     while p ~= nil do
         if (not visited[p.index]) then -- 如果是未访问的则递归
             visited[p.index] = true
@@ -1383,9 +1308,7 @@ end
 function search()
     -- Note("run search")
     tmp.find = true
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     searchPre()
     cntr1 = countR(15)
     exe("look;halt")
@@ -1397,97 +1320,98 @@ function searchStart()
     EnableTriggerGroup("wipe", true)
     flag.search = 1
     -- only support one walk thread at the moment, so garbage collect the previous suspended one if exist.
-    if walk_hook_thread then
-        coroutine.resume(walk_hook_thread, "kill")
-    end
+    if walk_hook_thread then coroutine.resume(walk_hook_thread, "kill") end
 
-    wait.make(
-        function()
-            for i, id in ipairs(road.rooms) do
-                if flag.find == 1 then
-                    print("找到目标，停止搜索")
-                    return
+    wait.make(function()
+        for i, id in ipairs(road.rooms) do
+            if flag.find == 1 then
+                print("找到目标，停止搜索")
+                return
+            end
+
+            local path, length = map:getPath(road.id, id)
+            road.id = id
+            if type(path) == "string" then
+                if flag.wait == 1 then
+                    -- most likely that we found an candidate target before start searching.
+                    print("找到疑似目标，暂停遍历")
+                    walk_hook_thread = coroutine.running()
+                    local status = coroutine.yield()
+                    if status and status == "kill" then
+                        walk_hook_thread = nil
+                        return
+                    end
                 end
 
-                local path, length = map:getPath(road.id, id)
-                road.id = id
-                if type(path) == "string" then
-                    if flag.wait == 1 then
-                        -- most likely that we found an candidate target before start searching.
-                        print("找到疑似目标，暂停遍历")
-                        walk_hook_thread = coroutine.running()
-                        local status = coroutine.yield()
-                        if status and status == "kill" then
-                            walk_hook_thread = nil
-                            return
-                        end
-                    end
-
-                    if string.find(path, "#") or job.name ~= "huashan" then
-                        road.pathset = road.pathset or {}
-                        if path then
-                            road.pathset = utils.split(path, ";")
-                            for i = 1, table.getn(road.pathset) do
-                                for p = 1, table.getn(road.pathset) do
-                                    if isNil(road.pathset[p]) or road.pathset[p] == "halt" then
-                                        table.remove(road.pathset, p)
-                                        break
-                                    end
+                if string.find(path, "#") or job.name ~= "huashan" then
+                    road.pathset = road.pathset or {}
+                    if path then
+                        road.pathset = utils.split(path, ";")
+                        for i = 1, table.getn(road.pathset) do
+                            for p = 1, table.getn(road.pathset) do
+                                if isNil(road.pathset[p]) or road.pathset[p] ==
+                                    "halt" then
+                                    table.remove(road.pathset, p)
+                                    break
                                 end
                             end
                         end
-                        if road.pathset and table.getn(road.pathset) > 0 then
-                            for i, steps in ipairs(road.pathset) do
-                                local delay = calculate_flood()
-                                if delay then
-                                    print("wait " .. delay .. " second as next step might flood")
-                                    wait.time(delay)
-                                end
-                                walk_hook_thread = coroutine.running()
-                                if flag.find == 1 then
-                                    print("找到目标，停止搜索")
-                                    return
-                                end
-                                if string.find(steps, "#") then
-                                    local _, _, func, params = string.find(steps, "^#(%a%w*)%s*(.-)$")
-                                    if func then
-                                        print("search execute:" .. func)
-                                        _G[func](params)
-                                    else
-                                        exe(steps)
-                                        walk_wait()
-                                    end
+                    end
+                    if road.pathset and table.getn(road.pathset) > 0 then
+                        for i, steps in ipairs(road.pathset) do
+                            local delay = calculate_flood()
+                            if delay then
+                                print("wait " .. delay ..
+                                          " second as next step might flood")
+                                wait.time(delay)
+                            end
+                            walk_hook_thread = coroutine.running()
+                            if flag.find == 1 then
+                                print("找到目标，停止搜索")
+                                return
+                            end
+                            if string.find(steps, "#") then
+                                local _, _, func, params =
+                                    string.find(steps, "^#(%a%w*)%s*(.-)$")
+                                if func then
+                                    print("search execute:" .. func)
+                                    _G[func](params)
                                 else
                                     exe(steps)
                                     walk_wait()
                                 end
-                                local status = coroutine.yield()
-                                if status and status == "kill" then
-                                    walk_hook_thread = nil
-                                    return
-                                end
+                            else
+                                exe(steps)
+                                walk_wait()
+                            end
+                            local status = coroutine.yield()
+                            if status and status == "kill" then
+                                walk_hook_thread = nil
+                                return
                             end
                         end
-                    else
-                        local steps = string.sub(string.gsub(path, "halt;", ""), 1, -2)
-                        local tmp = utils.split(steps, ";")
-                        local delay = calculate_flood(#tmp)
-                        if delay then
-                            print("wait " .. delay .. " second as next step might flood")
-                            wait.time(delay)
-                        end
-                        -- we might need flood check here. but seems fine so far
-                        exe(steps)
                     end
-                    walk_hook_thread = nil
                 else
-                    Note(road.id)
-                    Note(path)
+                    local steps = string.sub(string.gsub(path, "halt;", ""), 1,
+                                             -2)
+                    local tmp = utils.split(steps, ";")
+                    local delay = calculate_flood(#tmp)
+                    if delay then
+                        print("wait " .. delay ..
+                                  " second as next step might flood")
+                        wait.time(delay)
+                    end
+                    -- we might need flood check here. but seems fine so far
+                    exe(steps)
                 end
+                walk_hook_thread = nil
+            else
+                Note(road.id)
+                Note(path)
             end
-            return find_nobody()
         end
-    )
+        return find_nobody()
+    end)
 end
 delElement = function(set, dir)
     local l_cnt = 0
@@ -1503,13 +1427,23 @@ end
 
 wipe_trigger = function()
     DeleteTriggerGroup("wipe")
-    create_trigger_t("wipe1", "^>*\\s*(\\D*)往\\D*落荒而逃了。$", "", "wipe_goon")
-    create_trigger_t("wipe2", "^>*\\s*(\\D*)「啪」的一声倒在地上，挣扎着抽动了几下就死了", "", "wipe_goon")
-    create_trigger_t("wipe3", "^>*\\s*(\\D*)神志迷糊，脚下一个不稳，倒在地上昏了过去", "", "wipe_faint")
-    create_trigger_t("wipe7", "^>*\\s*(\\D*)身子动了动，口中呻吟了几声，清醒过来", "", "wipe_wake")
-    create_trigger_t("wipe4", "^>*\\s*你对着(\\D*)(猛吼|大喝|吼道|喝道|啐了一口)", "", "wipe_who")
+    create_trigger_t("wipe1", "^>*\\s*(\\D*)往\\D*落荒而逃了。$", "",
+                     "wipe_goon")
+    create_trigger_t("wipe2",
+                     "^>*\\s*(\\D*)「啪」的一声倒在地上，挣扎着抽动了几下就死了",
+                     "", "wipe_goon")
+    create_trigger_t("wipe3",
+                     "^>*\\s*(\\D*)神志迷糊，脚下一个不稳，倒在地上昏了过去",
+                     "", "wipe_faint")
+    create_trigger_t("wipe7",
+                     "^>*\\s*(\\D*)身子动了动，口中呻吟了几声，清醒过来",
+                     "", "wipe_wake")
+    create_trigger_t("wipe4",
+                     "^>*\\s*你对着(\\D*)(猛吼|大喝|吼道|喝道|啐了一口)",
+                     "", "wipe_who")
     create_trigger_t("wipe5", "^>*\\s*这里没有这个人。", "", "wipe_over")
-    create_trigger_t("wipe6", "^>*\\s*你要对谁做这个动作？", "", "wipe_over")
+    create_trigger_t("wipe6", "^>*\\s*你要对谁做这个动作？", "",
+                     "wipe_over")
     SetTriggerOption("wipe1", "group", "wipe")
     SetTriggerOption("wipe2", "group", "wipe")
     SetTriggerOption("wipe3", "group", "wipe")
@@ -1540,9 +1474,7 @@ wipe = function(wipe_str, wipe_con)
     end
     create_timer_s("wipe", 2, "wipe_set")
 end
-wipe_set = function()
-    exe("kill " .. road.wipe_id)
-end
+wipe_set = function() exe("kill " .. road.wipe_id) end
 wipe_who = function(n, l, w)
     road.wipe_who = Trim(w[1])
     job.killer = job.killer or {}
@@ -1551,32 +1483,23 @@ wipe_who = function(n, l, w)
     end
 end
 wipe_faint = function(n, l, w)
-    if tmp.faint then
-        tmp.faint = tmp.faint + 1
-    end
+    if tmp.faint then tmp.faint = tmp.faint + 1 end
     if road.wipe_who == Trim(w[1]) then
         exe("kill " .. road.wipe_id)
         job.killer[road.wipe_who] = "faint"
     end
 end
 wipe_wake = function(n, l, w)
-    if tmp.faint then
-        tmp.faint = 0
-    end
-    if road.wipe_who == Trim(w[1]) then
-        exe("kill " .. road.wipe_id)
-    end
+    if tmp.faint then tmp.faint = 0 end
+    if road.wipe_who == Trim(w[1]) then exe("kill " .. road.wipe_id) end
 end
 wipe_goon = function(n, l, w)
     if job.name == "gblu" and road.wipe_who == "中军侍卫" then
-        chats_log("报效国家：搞定【" .. locl.room .. "】的中军侍卫！")
+        chats_log("报效国家：搞定【" .. locl.room ..
+                      "】的中军侍卫！")
     end
-    if tmp.faint and tmp.faint > 0 then
-        tmp.faint = tmp.faint - 1
-    end
-    if road.wipe_who == Trim(w[1]) then
-        exe("kill " .. road.wipe_id)
-    end
+    if tmp.faint and tmp.faint > 0 then tmp.faint = tmp.faint - 1 end
+    if road.wipe_who == Trim(w[1]) then exe("kill " .. road.wipe_id) end
 end
 wipe_over = function()
     DeleteTimer("wipe")
@@ -1592,9 +1515,7 @@ wipe_over = function()
 end
 
 function thread_resume(thread)
-    if type(thread) == "thread" then
-        coroutine.resume(thread)
-    end
+    if type(thread) == "thread" then coroutine.resume(thread) end
 end
 function walkBusy(time)
     local period = time or 0.2
@@ -1608,34 +1529,22 @@ hssslgo = function()
     create_trigger_t("sslcheck1", "^(> )*石屋 -", "", "hsssl_out")
     SetTriggerOption("sslcheck1", "group", "sslcheck")
     EnableTriggerGroup("sslcheck", true)
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     return sslgogo()
 end
-ssllook = function()
-    exe("look")
-end
+ssllook = function() exe("look") end
 sslgogo = function()
     road.temp = road.temp + 1
-    if road.temp > 50 then
-        return hsssl_out()
-    end
-    if flag.find == 1 then
-        return
-    end
+    if road.temp > 50 then return hsssl_out() end
+    if flag.find == 1 then return end
     exe("n;e;e;n;e;e")
-    wait.make(
-        function()
-            wait.time(0.2)
-            return sslgogo()
-        end
-    )
+    wait.make(function()
+        wait.time(0.2)
+        return sslgogo()
+    end)
 end
 function hsssl()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("n")
     exe("e")
     exe("e")
@@ -1650,31 +1559,26 @@ function hsssl()
 end
 hsssl_goon = function()
     locate_finish = 0
-    wait.make(
-        function()
-            wait.time(0.15)
-            if flag.find == 1 then
-                return
-            end
-            if locl.room == "石屋" then
-                return hsssl_out()
-            elseif locl.room_relation == "空地｜松树林----松树林----石屋｜山脚下松树林" then
-                exe("e")
-                return hsssl_out()
-            elseif locl.room == "空地" or locl.room == "松树林" then
-                return hsssl()
-            else
-                return go_locate()
-            end
+    wait.make(function()
+        wait.time(0.15)
+        if flag.find == 1 then return end
+        if locl.room == "石屋" then
+            return hsssl_out()
+        elseif locl.room_relation ==
+            "空地｜松树林----松树林----石屋｜山脚下松树林" then
+            exe("e")
+            return hsssl_out()
+        elseif locl.room == "空地" or locl.room == "松树林" then
+            return hsssl()
+        else
+            return go_locate()
         end
-    )
+    end)
 end
 hsssl_out = function()
     EnableTriggerGroup("sslcheck", false)
     DeleteTriggerGroup("sslcheck")
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     return walk_wait()
 end
 ------------
@@ -1685,19 +1589,13 @@ hscaidi = function()
     flag.find = 0
     road.temp = 0
     exe("n;n;n;n")
-    wait.make(
-        function()
-            wait.time(0.2)
-            if flag.find == 1 then
-                return
-            end
-            return hscaidi_goon1()
-        end
-    )
+    wait.make(function()
+        wait.time(0.2)
+        if flag.find == 1 then return end
+        return hscaidi_goon1()
+    end)
 end
-hscaidi_out1 = function()
-    caidiout = 1
-end
+hscaidi_out1 = function() caidiout = 1 end
 hscaidi_goon1 = function()
     if caidiout == 1 then
         EnableTriggerGroup("hscaidi", false)
@@ -1725,40 +1623,51 @@ eaea_start = function()
         return go(road.act)
     end
 end
-eaea_over = function()
-    return walk_wait()
-end
+eaea_over = function() return walk_wait() end
 ---------------------------------------------渡黄河------------------------------------------------
 duhe_trigger = function()
     EnableTriggerGroup("prepare_neili", false)
     DeleteTriggerGroup("prepare_neili")
     DeleteTriggerGroup("dujiang")
     DeleteTriggerGroup("duhe")
-    create_trigger_t("duhe1", "^>*\\s*艄公们把踏脚板收起来", "", "duhe_duhe")
-    create_trigger_t("duhe2", "^>*\\s*说着将一块踏脚板搭上堤岸，形成一个出去", "", "duhe_out")
-    create_trigger_t("duhe3", "^>*\\s*(江|河)面太宽了，如果没有中途借力的地方根本没法飞越过去！", "", "duhe_wait")
+    create_trigger_t("duhe1", "^>*\\s*艄公们把踏脚板收起来", "",
+                     "duhe_duhe")
+    create_trigger_t("duhe2",
+                     "^>*\\s*说着将一块踏脚板搭上堤岸，形成一个出去",
+                     "", "duhe_out")
+    create_trigger_t("duhe3",
+                     "^>*\\s*(江|河)面太宽了，如果没有中途借力的地方根本没法飞越过去！",
+                     "", "duhe_wait")
     create_trigger_t("duhe4", "^>*\\s*你的精力不够了", "", "duhe_jingli")
     create_trigger_t("duhe5", "^>*\\s*你的\\D*修为不够", "", "duhe_cannt")
-    create_trigger_t("duhe6", "^>*\\s*你的真气不够了！", "", "duhe_go_enter")
-    create_trigger_t("duhe7", "^>*\\s*你掏了掏腰包，却发现身上带的钱不够了。", "", "duhe_silver")
-    create_trigger_t("duhe8", "^>*\\s*你一提内息，看准了(河|江)中渡船位置，使出", "", "duhe_fly")
-    create_trigger_t("duhe9", "^>*\\s*艄公们把踏脚板收了起来，长篙一点", "", "duhe_duhe")
-    create_trigger_t("duhe10", "^>*\\s*一艘渡船缓缓地驶了过来，艄公将一块踏脚板搭上堤岸，以便乘客上下", "", "duhe_enter")
-    create_trigger_t("duhe11", "^>*\\s*有船不坐，你想扮Cool啊？", "", "duhe_waitb")
-    create_trigger_t("duhe12", "^>*\\s*你在江中渡船上轻轻一点，又提气飞", "", "duhe_fly")
-    create_trigger_t(
-        "duhe13",
-        "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
-        "",
-        "duhe_jump"
-    )
-    create_trigger_t("duhe14", "^>*\\s*你气息不匀，暂时不能施用内功。", "", "duhe_jump")
-    create_trigger_t(
-        "duhe15",
-        "^(> )*(你运起玄天无极神功，气聚丹田|你手捏剑诀，将寒冰真气|你盘膝而坐，运起八荒|你运起纯阳神通功，片刻之间|你抉弃杂念盘膝坐定，手捏气诀|你盘膝坐下，默运天魔大法|你凝神静气，盘坐下来|你随意坐下，双手平放在双膝，默念口诀|你手捏绣花针，盘膝坐下，默运葵花神功|你坐下来运气用功，一股内息开始在体内流动|你慢慢盘膝而坐，双手摆于胸前|你五心向天，排除一切杂念，内息顺经脉缓缓流动|你盘膝坐下，双手合十置于头顶，潜运内力|你屏息静气，坐了下来，左手搭在右手之上|你盘膝坐下，垂目合什，默运枯荣禅功|你盘膝坐下，闭目合什，运起乾天一阳神功|你盘膝坐下，暗运内力，试图采取天地之精华|你轻轻的吸一口气，闭上眼睛，运起玉女心经|你盘腿坐下，双目微闭，双手掌心相向成虚握太极|你气运丹田，将体内毒素慢慢逼出，控制着它环绕你缓缓飘动|你盘膝而坐，双手垂于胸前成火焰状，深吸口气|你盘膝而坐，运使九阳，气向下沉|你随意坐下，双手平放在双膝，默念口诀|你随意一站，双手缓缓抬起，深吸一口气|你盘膝而坐，双目紧闭，深深吸一口气引入丹田|你席地而坐，五心向天，脸上红光时隐时现|你暗运临济十二庄，气聚丹田|你收敛心神闭目打坐，手搭气诀，调匀呼吸，感受天地之深邃，自然之精华，渐入无我境界)",
-        "",
-        "dazuo_wait"
-    )
+    create_trigger_t("duhe6", "^>*\\s*你的真气不够了！", "",
+                     "duhe_go_enter")
+    create_trigger_t("duhe7",
+                     "^>*\\s*你掏了掏腰包，却发现身上带的钱不够了。",
+                     "", "duhe_silver")
+    create_trigger_t("duhe8",
+                     "^>*\\s*你一提内息，看准了(河|江)中渡船位置，使出",
+                     "", "duhe_fly")
+    create_trigger_t("duhe9",
+                     "^>*\\s*艄公们把踏脚板收了起来，长篙一点",
+                     "", "duhe_duhe")
+    create_trigger_t("duhe10",
+                     "^>*\\s*一艘渡船缓缓地驶了过来，艄公将一块踏脚板搭上堤岸，以便乘客上下",
+                     "", "duhe_enter")
+    create_trigger_t("duhe11", "^>*\\s*有船不坐，你想扮Cool啊？", "",
+                     "duhe_waitb")
+    create_trigger_t("duhe12",
+                     "^>*\\s*你在江中渡船上轻轻一点，又提气飞",
+                     "", "duhe_fly")
+    create_trigger_t("duhe13",
+                     "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
+                     "", "duhe_jump")
+    create_trigger_t("duhe14",
+                     "^>*\\s*你气息不匀，暂时不能施用内功。", "",
+                     "duhe_jump")
+    create_trigger_t("duhe15",
+                     "^(> )*(你运起玄天无极神功，气聚丹田|你手捏剑诀，将寒冰真气|你盘膝而坐，运起八荒|你运起纯阳神通功，片刻之间|你抉弃杂念盘膝坐定，手捏气诀|你盘膝坐下，默运天魔大法|你凝神静气，盘坐下来|你随意坐下，双手平放在双膝，默念口诀|你手捏绣花针，盘膝坐下，默运葵花神功|你坐下来运气用功，一股内息开始在体内流动|你慢慢盘膝而坐，双手摆于胸前|你五心向天，排除一切杂念，内息顺经脉缓缓流动|你盘膝坐下，双手合十置于头顶，潜运内力|你屏息静气，坐了下来，左手搭在右手之上|你盘膝坐下，垂目合什，默运枯荣禅功|你盘膝坐下，闭目合什，运起乾天一阳神功|你盘膝坐下，暗运内力，试图采取天地之精华|你轻轻的吸一口气，闭上眼睛，运起玉女心经|你盘腿坐下，双目微闭，双手掌心相向成虚握太极|你气运丹田，将体内毒素慢慢逼出，控制着它环绕你缓缓飘动|你盘膝而坐，双手垂于胸前成火焰状，深吸口气|你盘膝而坐，运使九阳，气向下沉|你随意坐下，双手平放在双膝，默念口诀|你随意一站，双手缓缓抬起，深吸一口气|你盘膝而坐，双目紧闭，深深吸一口气引入丹田|你席地而坐，五心向天，脸上红光时隐时现|你暗运临济十二庄，气聚丹田|你收敛心神闭目打坐，手搭气诀，调匀呼吸，感受天地之深邃，自然之精华，渐入无我境界)",
+                     "", "dazuo_wait")
     SetTriggerOption("duhe1", "group", "duhe")
     SetTriggerOption("duhe2", "group", "duhe")
     SetTriggerOption("duhe3", "group", "duhe")
@@ -1782,9 +1691,7 @@ duHhe = function()
     else
         flag.duhe = 0
     end
-    if flag.search == 1 and flag.times == 3 then
-        flag.duhe = 0
-    end
+    if flag.search == 1 and flag.times == 3 then flag.duhe = 0 end
     duhe_trigger()
     locate()
     return check_bei(duHhe_start)
@@ -1792,9 +1699,7 @@ end
 function duHhe_start()
     if string.find(locl.room, "渡") then
         if job.name == "dolost" then
-            if ll_place and ll_place == "兰州大渡口" then
-                return
-            end
+            if ll_place and ll_place == "兰州大渡口" then return end
             if ll_place and ll_place == "兰州城西夏渡口" then
                 return
             end
@@ -1819,18 +1724,14 @@ function duHhe_start()
     end
     -- create_timer_s('walkWait4',1,'duhe_wait2')
 end
-function duhe_wait2()
-    exe("yell boat;duhe")
-end
+function duhe_wait2() exe("yell boat;duhe") end
 duhe_duhe = function()
     if flag.duhe == 1 then
         prepare_neili_stop()
         return check_bei(duhe_jump)
     end
 end
-duhe_jump = function()
-    return exe("yun qi;yell boat;duhe")
-end
+duhe_jump = function() return exe("yun qi;yell boat;duhe") end
 duhe_go_enter = function()
     DeleteTimer("walkwait4")
     if flag.duhe == 1 then
@@ -1910,14 +1811,12 @@ duhe_fly = function()
     EnableTriggerGroup("duhe", false)
     DeleteTriggerGroup("duhe")
     DeleteTimer("walkwait4")
-    wait.make(
-        function()
-            wait.time(5)
-            exe("jifa all")
-            wait_busy()
-            return duhe_over()
-        end
-    )
+    wait.make(function()
+        wait.time(5)
+        exe("jifa all")
+        wait_busy()
+        return duhe_over()
+    end)
     -- return check_bei(duhe_over)
 end
 ------------------------------------------渡长江-------------------------------------------------------------
@@ -1927,30 +1826,43 @@ dujiang_trigger = function()
     DeleteTriggerGroup("duhe")
     DeleteTriggerGroup("dujiang")
     -- create_trigger_t('dujiang1','^(> )*这里的水太深太急，你渡不过去。','','')
-    create_trigger_t("dujiang2", "^(> )*(渡船猛地一震，已经靠岸|艄公说“到啦，上岸吧”)", "", "dujiang_out")
-    create_trigger_t("dujiang3", "^(> )*(江|河)面太宽了，如果没有中途借力的地方根本没法飞越过去！", "", "dujiang_wait")
-    create_trigger_t("dujiang4", "^(> )*你的精力不够了！", "", "dujiang_jingli")
-    create_trigger_t("dujiang5", "^(> )*你的\\D*修为不够", "", "dujiang_cannt")
-    create_trigger_t("dujiang6", "^(> )*你的真气不够了！", "", "dujiang_go_enter")
-    create_trigger_t("dujiang7", "^(> )*这里的水太深太急，你渡不过去。", "", "dujiang_move")
-    create_trigger_t("dujiang8", "^(> )*你一提内息，看准了(河|江)中渡船位置，使出", "", "dujiang_fly_start")
-    create_trigger_t("dujiang9", "^(> )*艄公(们|)把踏脚板收", "", "dujiang_dujiang")
-    create_trigger_t("dujiang10", "^(> )*一艘渡船缓缓地驶了过来，艄公将一块踏脚板搭上堤岸，以便乘客上下", "", "dujiang_enter")
-    create_trigger_t("dujiang11", "^(> )*有船不坐，你想扮Cool啊？", "", "dujiang_waitb")
-    create_trigger_t("dujiang12", "^(> )*你在江中渡船上轻轻一点，又提气飞", "", "dujiang_fly")
-    create_trigger_t(
-        "dujiang13",
-        "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
-        "",
-        "dujiang_jump"
-    )
-    create_trigger_t("dujiang14", "^>*\\s*你气息不匀，暂时不能施用内功。", "", "dujiang_jump")
-    create_trigger_t(
-        "dujiang15",
-        "^(> )*(你运起玄天无极神功，气聚丹田|你手捏剑诀，将寒冰真气|你盘膝而坐，运起八荒|你运起纯阳神通功，片刻之间|你抉弃杂念盘膝坐定，手捏气诀|你盘膝坐下，默运天魔大法|你凝神静气，盘坐下来|你随意坐下，双手平放在双膝，默念口诀|你手捏绣花针，盘膝坐下，默运葵花神功|你坐下来运气用功，一股内息开始在体内流动|你慢慢盘膝而坐，双手摆于胸前|你五心向天，排除一切杂念，内息顺经脉缓缓流动|你盘膝坐下，双手合十置于头顶，潜运内力|你屏息静气，坐了下来，左手搭在右手之上|你盘膝坐下，垂目合什，默运枯荣禅功|你盘膝坐下，闭目合什，运起乾天一阳神功|你盘膝坐下，暗运内力，试图采取天地之精华|你轻轻的吸一口气，闭上眼睛，运起玉女心经|你盘腿坐下，双目微闭，双手掌心相向成虚握太极|你气运丹田，将体内毒素慢慢逼出，控制着它环绕你缓缓飘动|你盘膝而坐，双手垂于胸前成火焰状，深吸口气|你盘膝而坐，运使九阳，气向下沉|你随意坐下，双手平放在双膝，默念口诀|你随意一站，双手缓缓抬起，深吸一口气|你盘膝而坐，双目紧闭，深深吸一口气引入丹田|你席地而坐，五心向天，脸上红光时隐时现|你暗运临济十二庄，气聚丹田|你收敛心神闭目打坐，手搭气诀，调匀呼吸，感受天地之深邃，自然之精华，渐入无我境界)",
-        "",
-        "dazuo_wait"
-    )
+    create_trigger_t("dujiang2",
+                     "^(> )*(渡船猛地一震，已经靠岸|艄公说“到啦，上岸吧”)",
+                     "", "dujiang_out")
+    create_trigger_t("dujiang3",
+                     "^(> )*(江|河)面太宽了，如果没有中途借力的地方根本没法飞越过去！",
+                     "", "dujiang_wait")
+    create_trigger_t("dujiang4", "^(> )*你的精力不够了！", "",
+                     "dujiang_jingli")
+    create_trigger_t("dujiang5", "^(> )*你的\\D*修为不够", "",
+                     "dujiang_cannt")
+    create_trigger_t("dujiang6", "^(> )*你的真气不够了！", "",
+                     "dujiang_go_enter")
+    create_trigger_t("dujiang7",
+                     "^(> )*这里的水太深太急，你渡不过去。", "",
+                     "dujiang_move")
+    create_trigger_t("dujiang8",
+                     "^(> )*你一提内息，看准了(河|江)中渡船位置，使出",
+                     "", "dujiang_fly_start")
+    create_trigger_t("dujiang9", "^(> )*艄公(们|)把踏脚板收", "",
+                     "dujiang_dujiang")
+    create_trigger_t("dujiang10",
+                     "^(> )*一艘渡船缓缓地驶了过来，艄公将一块踏脚板搭上堤岸，以便乘客上下",
+                     "", "dujiang_enter")
+    create_trigger_t("dujiang11", "^(> )*有船不坐，你想扮Cool啊？",
+                     "", "dujiang_waitb")
+    create_trigger_t("dujiang12",
+                     "^(> )*你在江中渡船上轻轻一点，又提气飞",
+                     "", "dujiang_fly")
+    create_trigger_t("dujiang13",
+                     "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
+                     "", "dujiang_jump")
+    create_trigger_t("dujiang14",
+                     "^>*\\s*你气息不匀，暂时不能施用内功。", "",
+                     "dujiang_jump")
+    create_trigger_t("dujiang15",
+                     "^(> )*(你运起玄天无极神功，气聚丹田|你手捏剑诀，将寒冰真气|你盘膝而坐，运起八荒|你运起纯阳神通功，片刻之间|你抉弃杂念盘膝坐定，手捏气诀|你盘膝坐下，默运天魔大法|你凝神静气，盘坐下来|你随意坐下，双手平放在双膝，默念口诀|你手捏绣花针，盘膝坐下，默运葵花神功|你坐下来运气用功，一股内息开始在体内流动|你慢慢盘膝而坐，双手摆于胸前|你五心向天，排除一切杂念，内息顺经脉缓缓流动|你盘膝坐下，双手合十置于头顶，潜运内力|你屏息静气，坐了下来，左手搭在右手之上|你盘膝坐下，垂目合什，默运枯荣禅功|你盘膝坐下，闭目合什，运起乾天一阳神功|你盘膝坐下，暗运内力，试图采取天地之精华|你轻轻的吸一口气，闭上眼睛，运起玉女心经|你盘腿坐下，双目微闭，双手掌心相向成虚握太极|你气运丹田，将体内毒素慢慢逼出，控制着它环绕你缓缓飘动|你盘膝而坐，双手垂于胸前成火焰状，深吸口气|你盘膝而坐，运使九阳，气向下沉|你随意坐下，双手平放在双膝，默念口诀|你随意一站，双手缓缓抬起，深吸一口气|你盘膝而坐，双目紧闭，深深吸一口气引入丹田|你席地而坐，五心向天，脸上红光时隐时现|你暗运临济十二庄，气聚丹田|你收敛心神闭目打坐，手搭气诀，调匀呼吸，感受天地之深邃，自然之精华，渐入无我境界)",
+                     "", "dazuo_wait")
     -- SetTriggerOption("dujiang1","group","dujiang")
     SetTriggerOption("dujiang2", "group", "dujiang")
     SetTriggerOption("dujiang3", "group", "dujiang")
@@ -1974,9 +1886,7 @@ duCjiang = function()
     else
         flag.dujiang = 0
     end
-    if flag.search == 1 and flag.times == 3 then
-        flag.dujiang = 0
-    end
+    if flag.search == 1 and flag.times == 3 then flag.dujiang = 0 end
     dujiang_trigger()
     locate()
     return check_bei(duCjiang_check)
@@ -1991,9 +1901,7 @@ duCjiang_check = function()
 end
 duCjiang_start = function()
     if string.find(locl.room, "江") then
-        if ll_place and ll_place == "扬州城长江北岸" then
-            return
-        end
+        if ll_place and ll_place == "扬州城长江北岸" then return end
         EnableTriggerGroup("dujiang", true)
         if flag.dujiang == 1 then
             tmp.dujiang_start_point = locl.room
@@ -2011,18 +1919,14 @@ duCjiang_start = function()
     end
     -- create_timer_s('walkWait4',1,'dujiang_wait2')
 end
-function dujiang_wait2()
-    exe("dujiang")
-end
+function dujiang_wait2() exe("dujiang") end
 dujiang_dujiang = function()
     if flag.dujiang == 1 then
         prepare_neili_stop()
         return check_bei(dujiang_jump)
     end
 end
-dujiang_jump = function()
-    exe("hp;yun qi;yell boat;dujiang")
-end
+dujiang_jump = function() exe("hp;yun qi;yell boat;dujiang") end
 dujiang_go_enter = function()
     DeleteTimer("walkwait4")
     if flag.dujiang == 1 then
@@ -2052,34 +1956,29 @@ dujiang_enter_check = function()
     end
     create_timer_st("walkWait4", 2, "dazuo_check")
 end
-function dazuo_check()
-    exe("hp;dazuo " .. hp.dazuo)
-end
-function dazuo_wait()
-    DeleteTimer("walkWait4")
-end
+function dazuo_check() exe("hp;dazuo " .. hp.dazuo) end
+function dazuo_wait() DeleteTimer("walkWait4") end
 dujiang_out = function()
-    wait.make(
-        function()
-            if flag.dujiang == 1 then
-                wait_busy()
-                exe("out")
-                fastLocate()
-                wait_busy()
-                if tmp.dujiang_start_point then
-                    print("previous localtion: " .. tmp.dujiang_start_point .. " current localtion: " .. locl.room)
-                end
-                if tmp.dujiang_start_point and tmp.dujiang_start_point == locl.room then
-                    return dujiang_wait()
-                else
-                    return dujiang_over()
-                end
-            else
-                exe("out")
-                dujiang_over()
+    wait.make(function()
+        if flag.dujiang == 1 then
+            wait_busy()
+            exe("out")
+            fastLocate()
+            wait_busy()
+            if tmp.dujiang_start_point then
+                print("previous localtion: " .. tmp.dujiang_start_point ..
+                          " current localtion: " .. locl.room)
             end
+            if tmp.dujiang_start_point and tmp.dujiang_start_point == locl.room then
+                return dujiang_wait()
+            else
+                return dujiang_over()
+            end
+        else
+            exe("out")
+            dujiang_over()
         end
-    )
+    end)
 end
 dujiang_over = function()
     tmp.dujiang_start_point = nil
@@ -2129,13 +2028,11 @@ dujiang_fly = function()
     EnableTriggerGroup("dujiang", false)
     DeleteTriggerGroup("dujiang")
     DeleteTimer("walkwait4")
-    wait.make(
-        function()
-            wait.time(2)
-            exe("jifa all")
-            return check_busy(dujiang_over)
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        exe("jifa all")
+        return check_busy(dujiang_over)
+    end)
     -- return check_bei(dujiang_over)
 end
 dujiang_move = function()
@@ -2156,8 +2053,12 @@ end
 function jqgin1()
     DeleteTriggerGroup("jqgin")
     create_trigger_t("jqgin1", "^>*\\s*你要看什么？", "", "jqgin_look")
-    create_trigger_t("jqgin2", "^>*\\s*一叶小舟，飘飘忽忽地随着溪流而晃来晃去。", "", "jqgin_jump")
-    create_trigger_t("jqgin3", "^>*\\s*又划出三四里，溪心忽有九块大石迎面耸立，犹如屏风一般，挡住了来船去路。", "", "jqgin_out")
+    create_trigger_t("jqgin2",
+                     "^>*\\s*一叶小舟，飘飘忽忽地随着溪流而晃来晃去。",
+                     "", "jqgin_jump")
+    create_trigger_t("jqgin3",
+                     "^>*\\s*又划出三四里，溪心忽有九块大石迎面耸立，犹如屏风一般，挡住了来船去路。",
+                     "", "jqgin_out")
     SetTriggerOption("jqgin1", "group", "jqgin")
     SetTriggerOption("jqgin2", "group", "jqgin")
     SetTriggerOption("jqgin3", "group", "jqgin")
@@ -2175,12 +2076,10 @@ jqgin_look = function()
         check_heal()
         return
     end
-    wait.make(
-        function()
-            wait.time(2)
-            exe("look boat")
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        exe("look boat")
+    end)
 end
 jqgin_jump = function()
     DeleteTimer("walkWait4")
@@ -2194,9 +2093,13 @@ jqgin_out = function()
 end
 jqgout = function()
     DeleteTriggerGroup("jqgout")
-    create_trigger_t("jqgout1", "^>*\\s*你拿着兵刃怎么推动小舟？", "", "jqgout_weapon")
-    create_trigger_t("jqgout2", "^>*\\s*又划出三四里，溪流曲折，小舟经划过了几个弯后又回到溪边。", "", "jqgout_out")
-    create_trigger_t("jqgout3", "^>*\\s*你要对谁做这个动作？", "", "jqgout_out")
+    create_trigger_t("jqgout1", "^>*\\s*你拿着兵刃怎么推动小舟？",
+                     "", "jqgout_weapon")
+    create_trigger_t("jqgout2",
+                     "^>*\\s*又划出三四里，溪流曲折，小舟经划过了几个弯后又回到溪边。",
+                     "", "jqgout_out")
+    create_trigger_t("jqgout3", "^>*\\s*你要对谁做这个动作？", "",
+                     "jqgout_out")
 
     SetTriggerOption("jqgout1", "group", "jqgout")
     SetTriggerOption("jqgout2", "group", "jqgout")
@@ -2208,9 +2111,7 @@ jqgout_weapon = function()
     exe("tui boat")
     check_halt(jgqout_jump)
 end
-jgqout_jump = function()
-    exe("jump boat")
-end
+jgqout_jump = function() exe("jump boat") end
 jqgout_out = function()
     EnableTriggerGroup("jqgout", false)
     DeleteTriggerGroup("jqgout")
@@ -2220,19 +2121,17 @@ jqgout_out = function()
 end
 jqgzlin = function()
     DeleteTriggerGroup("jqgzlin")
-    create_trigger_t("jqgzlin1", '^>*\\s*你把 "action" 设定为 "离开竹林了吗" 成功完成。', "", "jqgzlin_goon")
+    create_trigger_t("jqgzlin1",
+                     '^>*\\s*你把 "action" 设定为 "离开竹林了吗" 成功完成。',
+                     "", "jqgzlin_goon")
     SetTriggerOption("jqgzlin1", "group", "jqgzlin")
     exe("nd")
     locate()
     check_halt(jqgzlin_con)
 end
-function jqgzlin_con()
-    exe("alias action 离开竹林了吗")
-end
+function jqgzlin_con() exe("alias action 离开竹林了吗") end
 jqgzlin_goon = function()
-    if locl.room ~= "竹林" then
-        return jqgzlin_over()
-    end
+    if locl.room ~= "竹林" then return jqgzlin_over() end
     local l_set = {"east", "west", "south", "north"}
     local l_cnt = math.random(1, table.getn(l_set))
     exe(l_set[l_cnt])
@@ -2247,7 +2146,9 @@ jqgzlin_over = function()
 end
 jqgzlout = function()
     DeleteTriggerGroup("jqgzlout")
-    create_trigger_t("jqgzlout1", '^>*\\s*你把 "action" 设定为 "离开竹林了吗" 成功完成。', "", "jqgzlout_goon")
+    create_trigger_t("jqgzlout1",
+                     '^>*\\s*你把 "action" 设定为 "离开竹林了吗" 成功完成。',
+                     "", "jqgzlout_goon")
     SetTriggerOption("jqgzlout1", "group", "jqgzlout")
     exe("eu")
     locate()
@@ -2258,9 +2159,7 @@ function jqgzlout_con()
     jqgzlout_goon()
 end
 jqgzlout_goon = function()
-    if locl.room ~= "竹林" then
-        return jqgzlout_over()
-    end
+    if locl.room ~= "竹林" then return jqgzlout_over() end
     local l_set = {"east", "west", "south", "north"}
     local l_cnt = math.random(1, table.getn(l_set))
     exe(l_set[l_cnt])
@@ -2286,9 +2185,7 @@ function outJjl_check()
         return outJjl()
     end
 end
-function outJjl_over()
-    walk_wait()
-end
+function outJjl_over() walk_wait() end
 
 function goHt()
     exe("ask gongsun zhi about 绝情谷")
@@ -2307,13 +2204,11 @@ function outGb_check()
     if locl.room ~= "大戈壁" then
         return outGb_over()
     else
-        wait.make(
-            function()
-                exe("#12s")
-                wait.time(1.5)
-                return outGb()
-            end
-        )
+        wait.make(function()
+            exe("#12s")
+            wait.time(1.5)
+            return outGb()
+        end)
     end
 end
 function outGb_over()
@@ -2336,15 +2231,15 @@ function toQc_check()
         return toQc()
     end
 end
-function toQc_over()
-    walk_wait()
-end
+function toQc_over() walk_wait() end
 
 ---------------
 -- ain 古墓密室
 gmmsout = function()
     DeleteTriggerGroup("gmmsout")
-    create_trigger_t("gmmsout1", '^>*\\s*你把 "action" 设定为 "离开密室了吗" 成功完成。', "", "gmmsout_goon")
+    create_trigger_t("gmmsout1",
+                     '^>*\\s*你把 "action" 设定为 "离开密室了吗" 成功完成。',
+                     "", "gmmsout_goon")
     SetTriggerOption("gmmsout1", "group", "gmmsout")
     locate()
     exe("e;e;e;e;e;enter;s;s;s;s;s;enter;w;w;w;w;w;enter;n;n;n;n;n;enter")
@@ -2391,28 +2286,16 @@ local ZslOutArea = {
 }
 local ZslInArea = {
     ["风字门｜地字门----紫杉林----雷字门｜天字门紫杉林"] = {
-        "s",
-        "w",
-        "n",
-        "e"
+        "s", "w", "n", "e"
     },
     ["雷字门｜风字门----紫杉林----天字门｜地字门紫杉林"] = {
-        "e",
-        "s",
-        "w",
-        "n"
+        "e", "s", "w", "n"
     },
     ["天字门｜雷字门----紫杉林----地字门｜风字门紫杉林"] = {
-        "n",
-        "e",
-        "s",
-        "w"
+        "n", "e", "s", "w"
     },
     ["地字门｜天字门----紫杉林----风字门｜雷字门紫杉林"] = {
-        "w",
-        "n",
-        "e",
-        "s"
+        "w", "n", "e", "s"
     }
 }
 -------------by fqyy 新算法 20170502
@@ -2439,18 +2322,10 @@ function outzsl_check()
         walk_wait()
     end
 end
-function tianMen()
-    mjMenF(1)
-end
-function diMen()
-    mjMenF(2)
-end
-function fengMen()
-    mjMenF(3)
-end
-function leiMen()
-    mjMenF(4)
-end
+function tianMen() mjMenF(1) end
+function diMen() mjMenF(2) end
+function fengMen() mjMenF(3) end
+function leiMen() mjMenF(4) end
 function mjMenF(namen)
     ZslMen = namen
     -- ZslMenRun=false
@@ -2460,12 +2335,10 @@ function mjMen()
     print("mjmen")
     fastLocate()
     ZslMenRun = true
-    wait.make(
-        function()
-            wait.time(0.5)
-            return mjMen_checkF()
-        end
-    )
+    wait.make(function()
+        wait.time(0.5)
+        return mjMen_checkF()
+    end)
 end
 function mjMen_checkF()
     print("mencheckf")
@@ -2474,9 +2347,11 @@ function mjMen_checkF()
 end
 function mjMen_check()
     if ZslMenRun then
-        print("mencheck:" .. locl.room .. "|wait=" .. flag.wait .. "|ZslMenRun=true")
+        print("mencheck:" .. locl.room .. "|wait=" .. flag.wait ..
+                  "|ZslMenRun=true")
     else
-        print("mencheck:" .. locl.room .. "|wait=" .. flag.wait .. "|ZslMenRun=false")
+        print("mencheck:" .. locl.room .. "|wait=" .. flag.wait ..
+                  "|ZslMenRun=false")
     end
     if locl.room == "紫杉林" then
         if flag.wait == 0 then
@@ -2501,8 +2376,12 @@ end
 --------------------------------------------------------------
 function outZyl()
     DeleteTriggerGroup("outzyl")
-    create_trigger_t("outzyl1", '^>*\\s*你把 "action" 设定为 "离开针叶林了吗" 成功完成。', "", "outZylCheck")
-    create_trigger_t("outzyl2", "^>*\\s*你累得半死，终於找到了正确的方向。", "", "outZyl_over")
+    create_trigger_t("outzyl1",
+                     '^>*\\s*你把 "action" 设定为 "离开针叶林了吗" 成功完成。',
+                     "", "outZylCheck")
+    create_trigger_t("outzyl2",
+                     "^>*\\s*你累得半死，终於找到了正确的方向。",
+                     "", "outZyl_over")
     SetTriggerOption("outzyl1", "group", "outzyl")
     SetTriggerOption("outzyl2", "group", "outzyl")
     -- exe('alias action 离开针叶林了吗')
@@ -2510,18 +2389,14 @@ function outZyl()
     return outZylCheck()
 end
 function outZylCheck()
-    wait.make(
-        function()
-            wait.time(2)
-            locate()
-            return check_busy(outZyl_goon, 1)
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        locate()
+        return check_busy(outZyl_goon, 1)
+    end)
 end
 function outZyl_goon()
-    if locl.room ~= "针叶林" then
-        return go(road.act)
-    end
+    if locl.room ~= "针叶林" then return go(road.act) end
     road.zyl = road.zyl or {}
     if countTab(road.zyl) == 0 then
         road.zyl["#15e"] = true
@@ -2558,17 +2433,13 @@ function dmd_check()
     if locl.room ~= "竹林" then
         return dmd_over()
     else
-        wait.make(
-            function()
-                wait.time(1)
-                return dmd()
-            end
-        )
+        wait.make(function()
+            wait.time(1)
+            return dmd()
+        end)
     end
 end
-function dmd_over()
-    walk_wait()
-end
+function dmd_over() walk_wait() end
 
 function toXcm()
     weapon_unwield()
@@ -2598,9 +2469,7 @@ function outTlsSsl_check()
         return outTlsSsl()
     end
 end
-function outTlsSsl_over()
-    return walk_wait()
-end
+function outTlsSsl_over() return walk_wait() end
 
 function hmyUp()
     jifaDodge()
@@ -2622,9 +2491,7 @@ function hmyUpCheck()
         return hmyUpWait()
     end
 end
-function hmyUpOver()
-    return walk_wait()
-end
+function hmyUpOver() return walk_wait() end
 
 function hmyDown()
     jifaDodge()
@@ -2646,9 +2513,7 @@ function hmyDownWait()
     exe("yun qi;dazuo " .. hp.dazuo)
     check_busy(hmyDown)
 end
-function hmyDownOver()
-    return walk_wait()
-end
+function hmyDownOver() return walk_wait() end
 
 function toRyp()
     exe("whisper bu 教主文成武德，一统江湖")
@@ -2669,26 +2534,25 @@ function emeishuitan()
 end
 function outemgmc()
     DeleteTriggerGroup("outemgmc")
-    create_trigger_t("outemgmc1", '^>*\\s*你把 "action" 设定为 "离开峨嵋灌木丛了吗" 成功完成。', "", "outemgmcCheck")
-    create_trigger_t("outemgmc2", "^>*\\s*你终于走出了灌木丛。", "", "outemgmc_over")
+    create_trigger_t("outemgmc1",
+                     '^>*\\s*你把 "action" 设定为 "离开峨嵋灌木丛了吗" 成功完成。',
+                     "", "outemgmcCheck")
+    create_trigger_t("outemgmc2", "^>*\\s*你终于走出了灌木丛。", "",
+                     "outemgmc_over")
     SetTriggerOption("outemgmc1", "group", "outemgmc")
     SetTriggerOption("outemgmc2", "group", "outemgmc")
     cntr1 = countR(50)
     return outemgmcCheck()
 end
 function outemgmcCheck()
-    wait.make(
-        function()
-            wait.time(2)
-            locate()
-            return check_busy(outemgmc_goon, 1)
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        locate()
+        return check_busy(outemgmc_goon, 1)
+    end)
 end
 function outemgmc_goon()
-    if locl.room ~= "灌木丛" then
-        return go(road.act)
-    end
+    if locl.room ~= "灌木丛" then return go(road.act) end
     road.zyl = road.zyl or {}
     if countTab(road.zyl) == 0 then
         road.zyl["yun jingli;ne;ne;ne;ne;ne;ne;ne;ne;ne;yue qiaobi"] = true
@@ -2697,13 +2561,9 @@ function outemgmc_goon()
         tmp.zyl = p
         road.zyl[p] = nil
         exe("halt;ne")
-        if flag.wait == 1 then
-            return
-        end
+        if flag.wait == 1 then return end
         exe(p)
-        if flag.wait == 1 then
-            return
-        end
+        if flag.wait == 1 then return end
         return exe("alias action 离开峨嵋灌木丛了吗")
     end
 end
@@ -2715,23 +2575,22 @@ end
 function Toghz()
     weapon_unwield()
     exe("get axe;wield axe;wield jian;wield dao;kan guanmu;drop axe")
-    if score.party and score.party == "峨嵋派" and score.master == "孤鸿子" then
-        exe("ed;yue qiaobi")
-    end
+    if score.party and score.party == "峨嵋派" and score.master ==
+        "孤鸿子" then exe("ed;yue qiaobi") end
     return walk_wait()
 end
 ---------南疆沙漠测试------------
 njsm_check = function()
     EnableTriggerGroup("fight_trigger", false)
     DeleteTriggerGroup("njsm_check")
-    create_trigger_t("njsm_check1", "^一股暖流发自丹田流向全身，慢慢地你又恢复了知觉……", "", "faint_check_njsm")
+    create_trigger_t("njsm_check1",
+                     "^一股暖流发自丹田流向全身，慢慢地你又恢复了知觉……",
+                     "", "faint_check_njsm")
     SetTriggerOption("njsm_check1", "group", "njsm_check")
     EnableTriggerGroup("njsm_check1", true)
     faint_check_njsm()
 end
-function njsm_eat()
-    exe("drink jiudai;drink jiudai;yun jing;yun jingli")
-end
+function njsm_eat() exe("drink jiudai;drink jiudai;yun jing;yun jingli") end
 function njsm_goon()
     exe("drink jiudai;drink jiudai;yun jing;yun jingli;n;n;n;n;n;n;n;n;n;n")
 end
@@ -2751,182 +2610,128 @@ end
 ---------by fqyy test 武当后山茅屋---------------
 function Wdmw()
     DeleteTriggerGroup("inwdmw")
-    create_trigger_t("inwdmw1", "^(> )*这里没有这个人。", "", "Wdmw_error")
-    create_trigger_t("inwdmw2", "^(> )*你向采药道长打听有关『药典』的消息。", "", "Wdmw_find")
+    create_trigger_t("inwdmw1", "^(> )*这里没有这个人。", "",
+                     "Wdmw_error")
+    create_trigger_t("inwdmw2",
+                     "^(> )*你向采药道长打听有关『药典』的消息。",
+                     "", "Wdmw_find")
     SetTriggerOption("inwdmw1", "group", "inwdmw")
     SetTriggerOption("inwdmw2", "group", "inwdmw")
     exe("w;d;nd;nd;nd;nd;nw;ask caiyao about 药典")
-    if flag.find == 1 then
-        return
-    end
-    if flag.wait == 1 then
-        return
-    end
+    if flag.find == 1 then return end
+    if flag.wait == 1 then return end
 
     -- return check_bei(Wdmw1)
 end
 function Wdmw_error()
     DeleteTriggerGroup("inwdmw")
     exe("se;su;su;su;su;pa up")
-    if flag.find == 1 then
-        return
-    end
-    if flag.wait == 1 then
-        return
-    end
+    if flag.find == 1 then return end
+    if flag.wait == 1 then return end
     return walk_wait()
 end
 function Wdmw_find()
     -- return check_bei(Wdmw1)
-    wait.make(
-        function()
-            -- 2019.1.13
-            wait.time(0.6)
-            return check_bei(Wdmw1)
-        end
-    )
+    wait.make(function()
+        -- 2019.1.13
+        wait.time(0.6)
+        return check_bei(Wdmw1)
+    end)
 end
 function Wdmw1()
-    if flag.find == 1 then
-        return
-    end
-    if flag.wait == 1 then
-        return
-    end
+    if flag.find == 1 then return end
+    if flag.wait == 1 then return end
     exe("ask caiyao about 只是")
     -- return check_bei(Wdmw2)
-    wait.make(
-        function()
-            -- 2019.1.13
-            wait.time(0.6)
-            return check_bei(Wdmw2)
-        end
-    )
+    wait.make(function()
+        -- 2019.1.13
+        wait.time(0.6)
+        return check_bei(Wdmw2)
+    end)
 end
 function Wdmw2()
     DeleteTriggerGroup("inwdmw")
-    exe("w;nd;nd;nd;nd;n;n;nd;out;nd;nd;nd;ed;nd;nd;nu;nd;nd;ed;nd;ed;nd;nd;nd;nd;nd;e;se")
-    if flag.find == 1 then
-        return
-    end
-    if flag.wait == 1 then
-        return
-    end
+    exe(
+        "w;nd;nd;nd;nd;n;n;nd;out;nd;nd;nd;ed;nd;nd;nu;nd;nd;ed;nd;ed;nd;nd;nd;nd;nd;e;se")
+    if flag.find == 1 then return end
+    if flag.wait == 1 then return end
     return Wdmw3()
 end
 function Wdmw3()
-    wait.make(
-        function()
-            wait.time(1.2) -- Wdmw2 exe中有28个指令
-            exe("ask tao hua about rumor")
-            if flag.find == 1 then
-                return
-            end -- 后加
-            if flag.wait == 1 then
-                return
-            end
-            -- return Wdmw4()
-            wait.make(
-                function()
-                    -- 2019.1.13
-                    wait.time(0.3)
-                    return check_bei(Wdmw4)
-                end
-            )
-        end
-    )
+    wait.make(function()
+        wait.time(1.2) -- Wdmw2 exe中有28个指令
+        exe("ask tao hua about rumor")
+        if flag.find == 1 then return end -- 后加
+        if flag.wait == 1 then return end
+        -- return Wdmw4()
+        wait.make(function()
+            -- 2019.1.13
+            wait.time(0.3)
+            return check_bei(Wdmw4)
+        end)
+    end)
 end
 function Wdmw4()
     exe("nw;w;su;su;su;su;su;wu;su;wu;su;su;sd;su;su;wu;su;su;su;enter;su;s;s")
-    if flag.find == 1 then
-        return
-    end -- 后加
-    if flag.wait == 1 then
-        return
-    end
+    if flag.find == 1 then return end -- 后加
+    if flag.wait == 1 then return end
     return Wdmw5()
 end
 function Wdmw5()
-    wait.make(
-        function()
-            wait.time(1) -- 2019.1.13 Wdmw4 23个指令，这里等1s
-            exe("su;su;su;su;e;se;su;su;su;su")
-            if flag.find == 1 then
-                return
-            end -- 后加
-            if flag.wait == 1 then
-                return
-            end
-            return Wdmw6()
-        end
-    )
+    wait.make(function()
+        wait.time(1) -- 2019.1.13 Wdmw4 23个指令，这里等1s
+        exe("su;su;su;su;e;se;su;su;su;su")
+        if flag.find == 1 then return end -- 后加
+        if flag.wait == 1 then return end
+        return Wdmw6()
+    end)
 end
 function Wdmw6()
-    wait.make(
-        function()
-            wait.time(0.4) -- 2019.1.13 Wdmw5 9个指令，这里等0.4s
-            if flag.find == 1 then
-                return
-            end -- 后加
-            if flag.wait == 1 then
-                return
-            end
-            exe("pa up;e")
-            return Wdmw7()
-        end
-    )
+    wait.make(function()
+        wait.time(0.4) -- 2019.1.13 Wdmw5 9个指令，这里等0.4s
+        if flag.find == 1 then return end -- 后加
+        if flag.wait == 1 then return end
+        exe("pa up;e")
+        return Wdmw7()
+    end)
 end
 function Wdmw7()
-    wait.make(
-        function()
-            wait.time(0.4) -- 2019.1.13 Wdmw5 1个指令，这里等0.4s zuan shulin可以穿越，注意
-            if flag.find == 1 then
-                return
-            end -- 后加
-            if flag.wait == 1 then
-                return
-            end
-            exe("zuan shulin")
-            return walk_wait()
-        end
-    )
+    wait.make(function()
+        wait.time(0.4) -- 2019.1.13 Wdmw5 1个指令，这里等0.4s zuan shulin可以穿越，注意
+        if flag.find == 1 then return end -- 后加
+        if flag.wait == 1 then return end
+        exe("zuan shulin")
+        return walk_wait()
+    end)
 end
 --------------by fqyy武当后山搜索----------------
 function OutWdhs()
-    wait.make(
-        function()
-            wait.time(0.5)
-            exe("halt;eu")
-            return OutWdhs1()
-        end
-    )
+    wait.make(function()
+        wait.time(0.5)
+        exe("halt;eu")
+        return OutWdhs1()
+    end)
 end
 function OutWdhs1()
-    wait.make(
-        function()
-            wait.time(0.5)
-            exe("halt;su")
-            return OutWdhs2()
-        end
-    )
+    wait.make(function()
+        wait.time(0.5)
+        exe("halt;su")
+        return OutWdhs2()
+    end)
 end
 function OutWdhs2()
-    wait.make(
-        function()
-            wait.time(0.5)
-            exe("halt;nd;nd;")
-            return OutWdhs3()
-        end
-    )
+    wait.make(function()
+        wait.time(0.5)
+        exe("halt;nd;nd;")
+        return OutWdhs3()
+    end)
 end
 function OutWdhs3()
-    wait.make(
-        function()
-            wait.time(0.5)
-            exe("halt;su;wd;wd")
-            return walk_wait()
-        end
-    )
+    wait.make(function()
+        wait.time(0.5)
+        exe("halt;su;wd;wd")
+        return walk_wait()
+    end)
 end
 -----------------by fqyy 武当后山各种丛林------
 function inWdcl()
@@ -2970,22 +2775,15 @@ function outWdcl1()
     fastLocate()
     return checkWait(outWdclCheck0, 1)
 end
-function outWdclCheck0()
-    return check_halt(outWdclCheck)
-end
+function outWdclCheck0() return check_halt(outWdclCheck) end
 function outWdclCheck()
-    if not wdclorder[locl.room] then
-        return walk_wait()
-    end
+    if not wdclorder[locl.room] then return walk_wait() end
     local p, n, randomN, findRoomN
     local wdclOutDoor = {}
     -- print(dest.room)
-    if
-        dest.room ~= "烈火丛林" and dest.room ~= "落叶丛林" and dest.room ~= "积雪丛林" and dest.room ~= "阔叶丛林" and
-            dest.room ~= "丛林边缘"
-     then
-        tt_step = 6
-    end
+    if dest.room ~= "烈火丛林" and dest.room ~= "落叶丛林" and dest.room ~=
+        "积雪丛林" and dest.room ~= "阔叶丛林" and dest.room ~=
+        "丛林边缘" then tt_step = 6 end
     wdclOutDoor[1] = {}
     wdclOutDoor[2] = {}
     wdclOutDoor[3] = {}
@@ -2996,7 +2794,8 @@ function outWdclCheck()
         if flag.wait == 0 then
             for i = 1, 9 do
                 if i ~= 5 then
-                    p = string.sub(locl.room_relation, wdclOutAreaNum[i], wdclOutAreaNum[i] + 7)
+                    p = string.sub(locl.room_relation, wdclOutAreaNum[i],
+                                   wdclOutAreaNum[i] + 7)
                     -- print(p)
                     table.insert(wdclOutDoor[wdclorder[p]], wdclOutDoorCmd[i])
                 end
@@ -3010,13 +2809,18 @@ function outWdclCheck()
             tt_step = tt_step + 1
             if randomN ~= nil and randomN > 0 then
                 dn = math.random(randomN)
-                print("查找武当后山丛林出口为" .. wdclOutDoor[findRoomN][dn] .. "查找次数=" .. flag.times)
+                print("查找武当后山丛林出口为" ..
+                          wdclOutDoor[findRoomN][dn] .. "查找次数=" ..
+                          flag.times)
                 exe(wdclOutDoor[findRoomN][dn])
             else
                 findRoomN = findRoomN - 1
                 randomN = table.getn(wdclOutDoor[findRoomN])
                 dn = math.random(randomN)
-                print("查找武当后山丛林没有出口原地随机移动" .. wdclOutDoor[findRoomN][dn] .. "查找次数=" .. flag.times)
+                print(
+                    "查找武当后山丛林没有出口原地随机移动" ..
+                        wdclOutDoor[findRoomN][dn] .. "查找次数=" ..
+                        flag.times)
                 exe(wdclOutDoor[findRoomN][dn])
             end
             return outWdcl1()
@@ -3028,7 +2832,9 @@ end
 function wdclToHsda()
     exe("jump river")
     DeleteTriggerGroup("wdclToHsda")
-    create_trigger_t("wdclToHsda1", "^>*\\s*你随波逐流，终于发现了岸边，浑身湿漉漉的爬上了汉水西岸。", "", "wdclToHsda2")
+    create_trigger_t("wdclToHsda1",
+                     "^>*\\s*你随波逐流，终于发现了岸边，浑身湿漉漉的爬上了汉水西岸。",
+                     "", "wdclToHsda2")
     SetTriggerOption("wdclToHsda1", "group", "wdclToHsda")
     EnableTriggerGroup("wdclToHsda", true)
 end
@@ -3040,7 +2846,8 @@ end
 
 --------------------------------------------
 function Togudi()
-    exe("cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;bang song;pa down")
+    exe(
+        "cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;cuo shupi;bang song;pa down")
     fastLocate()
     return check_busy(Goyadi, 1)
 end
@@ -3070,8 +2877,11 @@ end
 function Totanan()
     DeleteTriggerGroup("qqs")
     create_trigger_t("qqs1", "^>*\\s*你要往哪里潜？$", "", "qQydok")
-    create_trigger_t("qqs2", "^>*\\s*由于重力不够，你无法继续下潜!$", "", "qQyderorr")
-    create_trigger_t("qqs3", "^>*\\s*你一个猛栽，潜了下去。$", "", "jgq_qiandown")
+    create_trigger_t("qqs2",
+                     "^>*\\s*由于重力不够，你无法继续下潜!$", "",
+                     "qQyderorr")
+    create_trigger_t("qqs3", "^>*\\s*你一个猛栽，潜了下去。$", "",
+                     "jgq_qiandown")
     SetTriggerOption("qqs1", "group", "qqs")
     SetTriggerOption("qqs2", "group", "qqs")
     SetTriggerOption("qqs3", "group", "qqs")
@@ -3099,22 +2909,8 @@ function jqg_checktiaotan()
         return checkWait(jqg_checktiaotan, 1)
     end
 end
-function jgq_qiandown()
-    check_busy(
-        function()
-            exe("qian down")
-        end,
-        1
-    )
-end
-function jqg_qianup()
-    check_busy(
-        function()
-            exe("qian up")
-        end,
-        1
-    )
-end
+function jgq_qiandown() check_busy(function() exe("qian down") end, 1) end
+function jqg_qianup() check_busy(function() exe("qian up") end, 1) end
 
 function qQyderorr()
     EnableTriggerGroup("qqs", false)
@@ -3149,8 +2945,12 @@ function qQyd_dropstone()
     return checkBags(totanan_check_qqup)
 end
 function totanan_check_qqup()
-    create_trigger_t("qqs1", "^>*\\s*你身子沉重，用尽全力也无法向上面游去！$", "", "totanan_check_qqup")
-    create_trigger_t("qqs2", "^>*\\s*你两腿用力一蹬，向左上方浮去。$", "", "qQup")
+    create_trigger_t("qqs1",
+                     "^>*\\s*你身子沉重，用尽全力也无法向上面游去！$",
+                     "", "totanan_check_qqup")
+    create_trigger_t("qqs2",
+                     "^>*\\s*你两腿用力一蹬，向左上方浮去。$",
+                     "", "qQup")
     create_trigger_t("qqs3", "^>*\\s*你要往哪里潜？$", "", "Hyadi")
     SetTriggerOption("qqs1", "group", "qqs")
     SetTriggerOption("qqs2", "group", "qqs")
@@ -3159,13 +2959,10 @@ function totanan_check_qqup()
 end
 
 function qQup()
-    check_busy(
-        function()
-            exe("qian up")
-            return check_busy(qQsover)
-        end,
-        1
-    )
+    check_busy(function()
+        exe("qian up")
+        return check_busy(qQsover)
+    end, 1)
 end
 
 function qQsover()
@@ -3177,8 +2974,11 @@ end
 function Hgudi()
     DeleteTriggerGroup("qqs")
     create_trigger_t("qqs1", "^>*\\s*你要往哪里潜？$", "", "Hyadi")
-    create_trigger_t("qqs2", "^>*\\s*由于重力不够，你无法继续下潜!$", "", "qQyderorr")
-    create_trigger_t("qqs3", "^>*\\s*你一个猛栽，潜了下去。$", "", "jgq_qiandown")
+    create_trigger_t("qqs2",
+                     "^>*\\s*由于重力不够，你无法继续下潜!$", "",
+                     "qQyderorr")
+    create_trigger_t("qqs3", "^>*\\s*你一个猛栽，潜了下去。$", "",
+                     "jgq_qiandown")
     SetTriggerOption("qqs1", "group", "qqs")
     SetTriggerOption("qqs2", "group", "qqs")
     SetTriggerOption("qqs3", "group", "qqs")
@@ -3211,8 +3011,12 @@ function hhq_dropstone()
 end
 function Hyadiup()
     DeleteTriggerGroup("qqs")
-    create_trigger_t("qqs1", "^>*\\s*(你身子沉重，用尽全力也无法向上面游去|你身子沉重，用尽全力也无法潜回上面)", "", "Hyadiup")
-    create_trigger_t("qqs2", "^>*\\s*你(两腿用力一蹬，向上面浮去|手脚齐划，顺着水势向上面浮去)", "", "jqg_qianup")
+    create_trigger_t("qqs1",
+                     "^>*\\s*(你身子沉重，用尽全力也无法向上面游去|你身子沉重，用尽全力也无法潜回上面)",
+                     "", "Hyadiup")
+    create_trigger_t("qqs2",
+                     "^>*\\s*你(两腿用力一蹬，向上面浮去|手脚齐划，顺着水势向上面浮去)",
+                     "", "jqg_qianup")
     create_trigger_t("qqs3", "^>*\\s*你要往哪里潜？$", "", "hhqover")
     SetTriggerOption("qqs1", "group", "qqs")
     SetTriggerOption("qqs2", "group", "qqs")
@@ -3241,8 +3045,7 @@ function Insldsk()
 end
 function Outsldsk()
     exe(
-        "drop shenlong pi;drop shenlong pi;drop shenlong pi;drop shenlong pi;drop shenlong pi;wear all;go east;go east;go east;go east"
-    )
+        "drop shenlong pi;drop shenlong pi;drop shenlong pi;drop shenlong pi;drop shenlong pi;wear all;go east;go east;go east;go east")
     return walk_wait()
 end
 ------------------------------------------
@@ -3262,7 +3065,8 @@ function boatInCheck()
         exe("south;#3w;#2e;#3s;qu xiaozhu")
         locate()
         return create_timer_s("boat", 3, "boatInCheck")
-    elseif string.find(locl.room, "岸边") or string.find(locl.room, "小岛边") then
+    elseif string.find(locl.room, "岸边") or
+        string.find(locl.room, "小岛边") then
         locate()
         return create_timer_s("boat", 3, "boatInCheck")
     else
@@ -3278,9 +3082,7 @@ function boatWait()
 end
 
 function boatInLian()
-    if hp.neili > hp.neili_max / 4 * 3 then
-        exe("sxlian")
-    end
+    if hp.neili > hp.neili_max / 4 * 3 then exe("sxlian") end
     exe("hp")
 end
 function CboatWait()
@@ -3323,12 +3125,9 @@ function boatOutCheck()
 end
 function boatOutTrigger()
     DeleteTriggerGroup("boat")
-    create_trigger_t(
-        "boat1",
-        "^(> )*(船夫把小舟靠在岸边，快下船吧。|艄公说“到啦，上岸吧”，随即把一块踏脚板搭上堤岸。|终于到了小岛边，船夫把小舟靠在岸边，快下船吧。|终于到了岸边，船夫把小舟靠在岸边，快下船吧。)",
-        "",
-        "boatOut"
-    )
+    create_trigger_t("boat1",
+                     "^(> )*(船夫把小舟靠在岸边，快下船吧。|艄公说“到啦，上岸吧”，随即把一块踏脚板搭上堤岸。|终于到了小岛边，船夫把小舟靠在岸边，快下船吧。|终于到了岸边，船夫把小舟靠在岸边，快下船吧。)",
+                     "", "boatOut")
     SetTriggerOption("boat1", "group", "boat")
 end
 function boatOut()
@@ -3340,16 +3139,16 @@ function boatOut()
     walk_wait()
 end
 
-function outJgzW()
-    return outJgz()
-end
-function outJgzE()
-    return outJgz()
-end
+function outJgzW() return outJgz() end
+function outJgzE() return outJgz() end
 function outJgz()
     DeleteTriggerGroup("jiugz")
-    create_trigger_t("jiugz1", "^>*\\s*这是一片茂密的桃花丛，你一走进来就迷失了方向。地上有(\\D*)株桃花\\(taohua\\)。$", "", "outJgzGet")
-    create_trigger_t("jiugz2", "^>*\\s*这是一片茂密的桃花丛，你一走进来就迷失了方向。地上一株桃花\\(taohua\\)也没有。$", "", "outJgzGo")
+    create_trigger_t("jiugz1",
+                     "^>*\\s*这是一片茂密的桃花丛，你一走进来就迷失了方向。地上有(\\D*)株桃花\\(taohua\\)。$",
+                     "", "outJgzGet")
+    create_trigger_t("jiugz2",
+                     "^>*\\s*这是一片茂密的桃花丛，你一走进来就迷失了方向。地上一株桃花\\(taohua\\)也没有。$",
+                     "", "outJgzGo")
     SetTriggerOption("jiugz1", "group", "jiugz")
     SetTriggerOption("jiugz2", "group", "jiugz")
     EnableTriggerGroup("jiugz", false)
@@ -3362,33 +3161,15 @@ function outJgzTaohua(p_cnt)
     else
         tmp.i = tmp.i + 1
     end
-    if tmp.i == 2 then
-        exe("e")
-    end
-    if tmp.i == 3 then
-        exe("e")
-    end
-    if tmp.i == 4 then
-        exe("s")
-    end
-    if tmp.i == 5 then
-        exe("w")
-    end
-    if tmp.i == 6 then
-        exe("w")
-    end
-    if tmp.i == 7 then
-        exe("s")
-    end
-    if tmp.i == 8 then
-        exe("e")
-    end
-    if tmp.i == 9 then
-        exe("e")
-    end
-    if tmp.i == 10 then
-        return outJgzDrop()
-    end
+    if tmp.i == 2 then exe("e") end
+    if tmp.i == 3 then exe("e") end
+    if tmp.i == 4 then exe("s") end
+    if tmp.i == 5 then exe("w") end
+    if tmp.i == 6 then exe("w") end
+    if tmp.i == 7 then exe("s") end
+    if tmp.i == 8 then exe("e") end
+    if tmp.i == 9 then exe("e") end
+    if tmp.i == 10 then return outJgzDrop() end
     EnableTriggerGroup("jiugz", true)
     exe("look")
 end
@@ -3438,7 +3219,9 @@ end
 
 function wdYm()
     DeleteTriggerGroup("wdxj")
-    create_trigger_t("wdxj1", "^>*\\s*你站在小径上，四周打量，仿佛看见(\\D*)面有些亮光。$", "", "wdYmGo")
+    create_trigger_t("wdxj1",
+                     "^>*\\s*你站在小径上，四周打量，仿佛看见(\\D*)面有些亮光。$",
+                     "", "wdYmGo")
     SetTriggerOption("wdxj1", "group", "wdxj")
     exe("s")
     locate()
@@ -3447,46 +3230,32 @@ function wdYm()
 end
 function wdYmCheck()
     DeleteTimer("wdxjTimer")
-    if locl.room ~= "小径" then
-        return wdYmOver()
-    end
+    if locl.room ~= "小径" then return wdYmOver() end
     create_timer_s("wdxjTimer", 16, "wdYmRandom")
 end
 function wdYmRandom()
     tmp.i = tmp.i + 1
     exe("n;n;n;n;n;n;n;n;n;s;s;s;s;s;s")
     fastLocate()
-    wait.make(
-        function()
-            wait.time(0.5)
-            check_halt(wdYmCheck)
-        end
-    )
+    wait.make(function()
+        wait.time(0.5)
+        check_halt(wdYmCheck)
+    end)
 end
 function wdYmGo(n, l, w)
     if flag.wait == 0 then
         local l_dir
         DeleteTimer("wdxjTimer")
-        if w[1] == "东" then
-            l_dir = "e"
-        end
-        if w[1] == "西" then
-            l_dir = "w"
-        end
-        if w[1] == "南" then
-            l_dir = "s"
-        end
-        if w[1] == "北" then
-            l_dir = "n"
-        end
+        if w[1] == "东" then l_dir = "e" end
+        if w[1] == "西" then l_dir = "w" end
+        if w[1] == "南" then l_dir = "s" end
+        if w[1] == "北" then l_dir = "n" end
         exe("halt;" .. l_dir)
         fastLocate()
-        wait.make(
-            function()
-                wait.time(0.5)
-                check_halt(wdYmCheck)
-            end
-        )
+        wait.make(function()
+            wait.time(0.5)
+            check_halt(wdYmCheck)
+        end)
     end
 end
 function wdYmOver()
@@ -3518,12 +3287,10 @@ function mjSlout4()
 end
 function mjSlout()
     fastLocate()
-    wait.make(
-        function()
-            wait.time(0.5)
-            check_halt(mjSloutCheck)
-        end
-    )
+    wait.make(function()
+        wait.time(0.5)
+        check_halt(mjSloutCheck)
+    end)
 end
 function mjSloutCheck()
     if flag.wait == 0 then
@@ -3560,10 +3327,17 @@ end
 
 function PoutShangguan()
     DeleteTriggerGroup("tiezhangsg")
-    create_trigger_t("tiezhangsg1", "^(> )*你扎下马步，深深的吸了口气，将墓碑缓缓的向旁推开。", "", "ShangguanOk")
-    create_trigger_t("tiezhangsg2", "^(> )*你有病呀！没事推墓碑做什么？？", "", "ShangguanAsk")
-    create_trigger_t("tiezhangsg3", "^(> )*听一些帮众说，经常听见无名峰上的坟墓中，传出响声！嘿嘿！一定有什么蹊跷在里面！", "", "GoShangguan")
-    create_trigger_t("tiezhangsg4", "^(> )*这里没有这个人。", "", "GoShangguanQiuError")
+    create_trigger_t("tiezhangsg1",
+                     "^(> )*你扎下马步，深深的吸了口气，将墓碑缓缓的向旁推开。",
+                     "", "ShangguanOk")
+    create_trigger_t("tiezhangsg2",
+                     "^(> )*你有病呀！没事推墓碑做什么？？", "",
+                     "ShangguanAsk")
+    create_trigger_t("tiezhangsg3",
+                     "^(> )*听一些帮众说，经常听见无名峰上的坟墓中，传出响声！嘿嘿！一定有什么蹊跷在里面！",
+                     "", "GoShangguan")
+    create_trigger_t("tiezhangsg4", "^(> )*这里没有这个人。", "",
+                     "GoShangguanQiuError")
     SetTriggerOption("tiezhangsg1", "group", "tiezhangsg")
     SetTriggerOption("tiezhangsg2", "group", "tiezhangsg")
     SetTriggerOption("tiezhangsg3", "group", "tiezhangsg")
@@ -3573,38 +3347,27 @@ function PoutShangguan()
     exe("move bei")
 end
 function ShangguanAsk()
-    wait.make(
-        function()
-            wait.time(1.5)
-            if flag.find == 1 then
-                return
-            end
-            exe("sd;se;sd;sd;se;sd;se;sd;sd;s;s;s;sd;e;ask qianzhang about 闹鬼")
-            return GoShangguanQiuError()
-        end
-    )
+    wait.make(function()
+        wait.time(1.5)
+        if flag.find == 1 then return end
+        exe("sd;se;sd;sd;se;sd;se;sd;sd;s;s;s;sd;e;ask qianzhang about 闹鬼")
+        return GoShangguanQiuError()
+    end)
 end
-function GoShangguan()
-    return check_halt(GoShangguanOk)
-end
+function GoShangguan() return check_halt(GoShangguanOk) end
 function GoShangguanOk()
-    wait.make(
-        function()
-            wait.time(2)
-            exe("sd;sd;n;n;nw;w;w;e;nu;n;n;n;nu;nu;nw;nu;nw;nu;nu;nw;nu;move bei")
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        exe("sd;sd;n;n;nw;w;w;e;nu;n;n;n;nu;nu;nw;nu;nw;nu;nu;nw;nu;move bei")
+    end)
 end
 function GoShangguanQiuError()
     EnableTrigger("tiezhangsg4", false)
-    wait.make(
-        function()
-            wait.time(1.5)
-            exe(
-                "ask qianzhang about 闹鬼;se;ask qianzhang about 闹鬼;nw;w;ask qianzhang about 闹鬼;w;ask qianzhang about 闹鬼;e;nu;ask qianzhang about 闹鬼;sd;s;ask qianzhang about 闹鬼;n;e"
-            )
-        end
-    )
+    wait.make(function()
+        wait.time(1.5)
+        exe(
+            "ask qianzhang about 闹鬼;se;ask qianzhang about 闹鬼;nw;w;ask qianzhang about 闹鬼;w;ask qianzhang about 闹鬼;e;nu;ask qianzhang about 闹鬼;sd;s;ask qianzhang about 闹鬼;n;e")
+    end)
 end
 function ShangguanOk()
     EnableTriggerGroup("tiezhangsg", false)
@@ -3630,60 +3393,51 @@ function ptosldDukou()
     end
 end
 function toSld()
-    wait.make(
-        function()
-            fastLocate(coroutine.running())
-            coroutine.yield()
+    wait.make(function()
+        fastLocate(coroutine.running())
+        coroutine.yield()
 
-            if locl.where ~= "神龙岛海滩" then
-                return toSldDkCheck()
-            end
-            weaponWieldCut()
-            if not Bag["粗绳子"] then
-                exe("buy cu shengzi")
-                exe("drop cu shengzi 2")
-            end
-            exe("get cu shengzi")
+        if locl.where ~= "神龙岛海滩" then return toSldDkCheck() end
+        weaponWieldCut()
+        if not Bag["粗绳子"] then
+            exe("buy cu shengzi")
             exe("drop cu shengzi 2")
-            return check_halt(toSldTrigger, 1.5)
         end
-    )
+        exe("get cu shengzi")
+        exe("drop cu shengzi 2")
+        return check_halt(toSldTrigger, 1.5)
+    end)
 end
-function toSldTrigger()
-    if locl.where == "神龙岛海滩" then
-        toSldChop()
-    end
-end
+function toSldTrigger() if locl.where == "神龙岛海滩" then toSldChop() end end
 function toSldChop()
-    wait.make(
-        function()
-            while true do
-                exe("chop tree;bang mu tou;zuo mufa")
-                local line, _ = wait.regexp("^(> )*(只见(\\D*)轻轻一跃，已坐在木筏上。|你好象没有武器，拿手砍？|你手上这件兵器无锋无刃|木筏还没扎结实，等下再坐吧)", 1)
-                if line then
-                    if line:find("轻轻一跃") and line:find("你") then
-                        break
-                    elseif line:find("你好象没有武器") or line:find("锋无刃") then
-                        weaponWieldCut()
-                    end
+    wait.make(function()
+        while true do
+            exe("chop tree;bang mu tou;zuo mufa")
+            local line, _ = wait.regexp(
+                                "^(> )*(只见(\\D*)轻轻一跃，已坐在木筏上。|你好象没有武器，拿手砍？|你手上这件兵器无锋无刃|木筏还没扎结实，等下再坐吧)",
+                                1)
+            if line then
+                if line:find("轻轻一跃") and line:find("你") then
+                    break
+                elseif line:find("你好象没有武器") or
+                    line:find("锋无刃") then
+                    weaponWieldCut()
                 end
-                wait.time(0.4)
             end
-            print("mufaokw--toslddk")
-            weapon_unwield()
-            weapon_wield()
-            toSldDukou()
+            wait.time(0.4)
         end
-    )
+        print("mufaokw--toslddk")
+        weapon_unwield()
+        weapon_wield()
+        toSldDukou()
+    end)
 end
 
 function toSldCheck()
     print("toSldCheck")
     flag.idle = nil
     if locl.room == "小木筏" or locl.room == "木筏" then
-        if hp.neili > hp.neili_max / 4 * 3 then
-            exe("sxlian;hp")
-        end
+        if hp.neili > hp.neili_max / 4 * 3 then exe("sxlian;hp") end
         locate_finish = "toSldHua"
         return check_busy(locate)
     else
@@ -3695,22 +3449,18 @@ function toSldHua()
     locate_finish = 0
     -- sld_unwield()
     exe("hua mufa")
-    wait.make(
-        function()
-            wait.time(3)
-            return toSldDukou()
-        end
-    )
+    wait.make(function()
+        wait.time(3)
+        return toSldDukou()
+    end)
 end
 function toSldDukou()
     print("toSldDukou")
-    wait.make(
-        function()
-            wait.time(2)
-            locate_finish = "toSldDkCheck"
-            return check_busy(locate)
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        locate_finish = "toSldDkCheck"
+        return check_busy(locate)
+    end)
 end
 function toSldDkCheck()
     print("toSldDkCheck")
@@ -3718,9 +3468,7 @@ function toSldDkCheck()
     if locl.room == "渡口" then
         return toSldOver()
     elseif locl.room == "小木筏" or locl.room == "木筏" then
-        if hp.neili > hp.neili_max / 4 * 3 then
-            exe("sxlian;hp")
-        end
+        if hp.neili > hp.neili_max / 4 * 3 then exe("sxlian;hp") end
         return toSldHua()
     elseif locl.area and locl.area == "神龙岛" and locl.room == "海滩" then
         return toSld()
@@ -3729,16 +3477,14 @@ function toSldDkCheck()
     end
 end
 function toSldOver()
-    wait.make(
-        function()
-            checkWield()
-            wait_busy()
-            weapon_wield()
-            exe("bei none")
-            beiUnarmed()
-            return walk_wait()
-        end
-    )
+    wait.make(function()
+        checkWield()
+        wait_busy()
+        weapon_wield()
+        exe("bei none")
+        beiUnarmed()
+        return walk_wait()
+    end)
 end
 
 function outSld()
@@ -3750,24 +3496,20 @@ function outSld()
     check_busy(outSldGive)
 end
 function outSldGive()
-    wait.make(
-        function()
-            wait.time(2)
-            exe("out;#3s;give ling pai to chuan fu")
-            check_busy(outSldWait, 3)
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        exe("out;#3s;give ling pai to chuan fu")
+        check_busy(outSldWait, 3)
+    end)
 end
 function outSldWait()
     EnableTriggerGroup("outSldGive_test", false)
     EnableTimer("walkWait4", false)
-    wait.make(
-        function()
-            wait.time(6)
-            locate_finish = "outSldCheck"
-            return check_busy(locate)
-        end
-    )
+    wait.make(function()
+        wait.time(6)
+        locate_finish = "outSldCheck"
+        return check_busy(locate)
+    end)
 end
 function outSldCheck()
     locate_finish = 0
@@ -3781,7 +3523,8 @@ end
 
 outSldGive_test = function()
     DeleteTriggerGroup("outSldGive_test")
-    create_trigger_t("outSldGive_test1", "^(> )*你给船夫一块通行令牌。", "", "outSldWait")
+    create_trigger_t("outSldGive_test1",
+                     "^(> )*你给船夫一块通行令牌。", "", "outSldWait")
     SetTriggerOption("outSldGive_test1", "group", "outSldGive_test")
     EnableTriggerGroup("outSldGive_test", true)
     sld_lp()
@@ -3791,14 +3534,10 @@ function sld_lp()
     exe("give ling pai to chuan fu")
     create_timer_s("walkWait4", 1.0, "sld_duko_test")
 end
-sld_duko_test = function()
-    exe("give ling pai to chuan fu")
-end
+sld_duko_test = function() exe("give ling pai to chuan fu") end
 
 function outSldBoat()
-    if cntr1() < 1 then
-        return go(road.act)
-    end
+    if cntr1() < 1 then return go(road.act) end
     exe("order 开船")
     locate()
     return check_halt(outSldBoatCheck)
@@ -3810,9 +3549,7 @@ function outSldBoatCheck()
         return checkWait(outSldBoat, 3)
     end
 end
-function outSldOver()
-    walk_wait()
-end
+function outSldOver() walk_wait() end
 
 function outHeiw()
     exe("repent")
@@ -3820,14 +3557,10 @@ function outHeiw()
     check_bei(outHeiwCheck)
 end
 function outHeiwCheck()
-    if locl.room ~= "黑屋" then
-        return outHeiwOver()
-    end
+    if locl.room ~= "黑屋" then return outHeiwOver() end
     checkWait(outHeiw, 15)
 end
-function outHeiwOver()
-    walk_wait()
-end
+function outHeiwOver() walk_wait() end
 
 --[[function goXtj()
     DeleteTriggerGroup("goxtj")
@@ -3959,30 +3692,26 @@ function outXtjOver()
 end]]
 function goXtj()
     exe("n")
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     locate_finish = "goxtjck"
     return fastLocate()
 end
 function goxtjck()
     locate_finish = 0
-    if flag.find == 1 then
-        return
-    end
-    wait.make(
-        function()
-            wait.time(0.15)
-            if locl.room_relation == "山路｜树林-----树林-----树林｜树林树林" or locl.room_relation == "山路↑山路｜山路山路" then
-                return goXtjOver()
-            end
-            if locl.room_relation == "山路｜山路↘山间空地山路" then
-                exe("n")
-                return goXtj()
-            end
-            return goXtjGo()
+    if flag.find == 1 then return end
+    wait.make(function()
+        wait.time(0.15)
+        if locl.room_relation ==
+            "山路｜树林-----树林-----树林｜树林树林" or
+            locl.room_relation == "山路↑山路｜山路山路" then
+            return goXtjOver()
         end
-    )
+        if locl.room_relation == "山路｜山路↘山间空地山路" then
+            exe("n")
+            return goXtj()
+        end
+        return goXtjGo()
+    end)
 end
 function goXtjGo()
     local l_set = {"e", "s", "w", "n"}
@@ -3999,31 +3728,29 @@ function goXtjOver()
 end
 function outXtj()
     exe("s")
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     locate_finish = "outxtjck"
     return fastLocate()
 end
 function outxtjck()
     locate_finish = 0
-    if flag.find == 1 then
-        return
-    end
-    wait.make(
-        function()
-            wait.time(0.1)
-            if locl.room_relation == "山路｜树林-----树林-----树林｜树林树林" or locl.room_relation == "山路↑山路｜山路山路" then
-                exe("s")
-                return outXtj()
-            end
-            if locl.room_relation == "山路｜山路↘山间空地山路" or locl.room_relation == "树林｜树林-----树林-----树林｜山路树林" then
-                exe("s")
-                return outXtjOver()
-            end
-            return outXtjGo()
+    if flag.find == 1 then return end
+    wait.make(function()
+        wait.time(0.1)
+        if locl.room_relation ==
+            "山路｜树林-----树林-----树林｜树林树林" or
+            locl.room_relation == "山路↑山路｜山路山路" then
+            exe("s")
+            return outXtj()
         end
-    )
+        if locl.room_relation == "山路｜山路↘山间空地山路" or
+            locl.room_relation ==
+            "树林｜树林-----树林-----树林｜山路树林" then
+            exe("s")
+            return outXtjOver()
+        end
+        return outXtjGo()
+    end)
 end
 function outXtjGo()
     local l_set = {"e", "s", "w", "n"}
@@ -4031,18 +3758,24 @@ function outXtjGo()
     exe(l_set[l_cnt])
     return outXtj()
 end
-function outXtjOver()
-    walk_wait()
-end
+function outXtjOver() walk_wait() end
 -----------by fqyy 2017-05-24 星宿海山洞
 function xingxiushandong()
     DeleteTriggerGroup("xxsdAsk")
-    create_trigger_t("xxsdAsk1", "^(> )*你向狮吼子打听有关『fqyy』的消息", "", "xxsdask")
-    create_trigger_t("xxsdAsk2", "^(> )*这里没有这个人。$", "", "xxsdover")
-    create_trigger_t("xxsdAsk3", "^(> )*狮吼子神志迷糊，脚下一个不稳，倒在地上昏了过去。$", "", "xxsdget")
-    create_trigger_t("xxsdAsk4", "^(> )*狮吼子「啪」的一声倒在地上，挣扎着抽动了几下就死了。$", "", "xxsdover")
+    create_trigger_t("xxsdAsk1",
+                     "^(> )*你向狮吼子打听有关『fqyy』的消息", "",
+                     "xxsdask")
+    create_trigger_t("xxsdAsk2", "^(> )*这里没有这个人。$", "",
+                     "xxsdover")
+    create_trigger_t("xxsdAsk3",
+                     "^(> )*狮吼子神志迷糊，脚下一个不稳，倒在地上昏了过去。$",
+                     "", "xxsdget")
+    create_trigger_t("xxsdAsk4",
+                     "^(> )*狮吼子「啪」的一声倒在地上，挣扎着抽动了几下就死了。$",
+                     "", "xxsdover")
     create_trigger_t("xxsdAsk5", "^(> )*你想攻击谁？$", "", "xxsdover")
-    create_trigger_t("xxsdAsk6", "^(> )*狮吼子已经无法还手了！$", "", "xxsdget")
+    create_trigger_t("xxsdAsk6", "^(> )*狮吼子已经无法还手了！$", "",
+                     "xxsdget")
     SetTriggerOption("xxsdAsk1", "group", "xxsdAsk")
     SetTriggerOption("xxsdAsk2", "group", "xxsdAsk")
     SetTriggerOption("xxsdAsk3", "group", "xxsdAsk")
@@ -4056,9 +3789,7 @@ function xxsdask()
     exe("jiali max;hit shihou zi")
     create_timer_s("xxsdhit", 3, "xxsdask1")
 end
-function xxsdask1()
-    exe("jiali max;hit shihou zi")
-end
+function xxsdask1() exe("jiali max;hit shihou zi") end
 function xxsdget()
     exe("get shihou zi;enter cave;drop shihou zi")
     inxxsd()
@@ -4076,12 +3807,20 @@ end
 --------------by fqyy 20170526黄河流域萧府------------------
 function inxiaofu()
     DeleteTriggerGroup("xiaofuask")
-    create_trigger_t("xiaofuask1", "^(> )*你向任飞燕打听有关『fqyy』的消息", "", "xiaofuask")
-    create_trigger_t("xiaofuask2", "^(> )*这里没有这个人。$", "", "xiaofuover")
-    create_trigger_t("xiaofuask3", "^(> )*张妈一手把你抓住，说道：“一点规矩也不懂！”$", "", "xiaofugetchai")
-    create_trigger_t("xiaofuask4", "^(> )*任飞燕「啪」的一声倒在地上，挣扎着抽动了几下就死了。$", "", "xiaofuover")
+    create_trigger_t("xiaofuask1",
+                     "^(> )*你向任飞燕打听有关『fqyy』的消息", "",
+                     "xiaofuask")
+    create_trigger_t("xiaofuask2", "^(> )*这里没有这个人。$", "",
+                     "xiaofuover")
+    create_trigger_t("xiaofuask3",
+                     "^(> )*张妈一手把你抓住，说道：“一点规矩也不懂！”$",
+                     "", "xiaofugetchai")
+    create_trigger_t("xiaofuask4",
+                     "^(> )*任飞燕「啪」的一声倒在地上，挣扎着抽动了几下就死了。$",
+                     "", "xiaofuover")
     create_trigger_t("xiaofuask5", "^(> )*你想攻击谁？$", "", "xiaofuover")
-    create_trigger_t("xiaofuask6", "^(> )*任飞燕已经无法还手了！$", "", "xxsdget")
+    create_trigger_t("xiaofuask6", "^(> )*任飞燕已经无法还手了！$",
+                     "", "xxsdget")
     SetTriggerOption("xiaofuask1", "group", "xiaofuask")
     SetTriggerOption("xiaofuask2", "group", "xiaofuask")
     SetTriggerOption("xiaofuask3", "group", "xiaofuask")
@@ -4091,52 +3830,45 @@ function inxiaofu()
     EnableTriggerGroup("xiaofuask", true)
     exe("n")
     fastLocate()
-    wait.make(
-        function()
-            wait.time(1)
-            return xiaofu_check()
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        return xiaofu_check()
+    end)
 end
 function xiaofu_check()
     if locl.room == "萧府大厅" then
         DeleteTriggerGroup("xiaofuask")
         check_busy(walk_wait)
     elseif locl.room == "萧府大门" then
-        wait.make(
-            function()
-                wait.time(1)
-                return xiaofu_check()
-            end
-        )
+        wait.make(function()
+            wait.time(1)
+            return xiaofu_check()
+        end)
     else
         go(road.act)
     end
 end
-function xiaofuask()
-    check_busy(xiaofuask1)
-end
-function xiaofuask1()
-    exe("jiali max;kill ren feiyan")
-end
-function xiaofuover()
-    check_busy(xiaofuover1)
-end
+function xiaofuask() check_busy(xiaofuask1) end
+function xiaofuask1() exe("jiali max;kill ren feiyan") end
+function xiaofuover() check_busy(xiaofuover1) end
 function xiaofuover1()
     exe("get chai from corpse;ne;nw;give zhang chai;n")
     DeleteTriggerGroup("xiaofuask")
     walk_wait()
 end
-function xiaofugetchai()
-    exe("se;sw;ask ren feiyan about fqyy")
-end
+function xiaofugetchai() exe("se;sw;ask ren feiyan about fqyy") end
 --------------by kkfromch 20190307翰林府院闺房------------------
 function inguifang()
     DeleteTriggerGroup("hanlinask")
-    create_trigger_t("hanlinask1", "^(> )*你向凌退思打听有关『无法风』的消息", "", "hanlinask")
-    create_trigger_t("hanlinask2", "^(> )*这里没有这个人。$", "", "hanlinover")
+    create_trigger_t("hanlinask1",
+                     "^(> )*你向凌退思打听有关『无法风』的消息",
+                     "", "hanlinask")
+    create_trigger_t("hanlinask2", "^(> )*这里没有这个人。$", "",
+                     "hanlinover")
     -- create_trigger_t('hanlinask3',"^(> )*张妈一手把你抓住，说道：“一点规矩也不懂！”$",'','xiaofugetchai')
-    create_trigger_t("hanlinask4", "^(> )*凌退思「啪」的一声倒在地上，挣扎着抽动了几下就死了。$", "", "hanlinover")
+    create_trigger_t("hanlinask4",
+                     "^(> )*凌退思「啪」的一声倒在地上，挣扎着抽动了几下就死了。$",
+                     "", "hanlinover")
     create_trigger_t("hanlinask5", "^(> )*你想攻击谁？$", "", "hanlinover")
     -- create_trigger_t('hanlinask6',"^(> )*凌退思已经无法还手了！$",'','xxsdget')
     SetTriggerOption("hanlinask1", "group", "hanlinask")
@@ -4147,46 +3879,36 @@ function inguifang()
     -- SetTriggerOption("hanlinask6","group","hanlinask")
     EnableTriggerGroup("hanlinask", true)
     fastLocate()
-    wait.make(
-        function()
-            wait.time(1)
-            return hanlin_check()
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        return hanlin_check()
+    end)
 end
 function hanlin_check()
     if locl.room == "后院" then
-        wait.make(
-            function()
-                wait.time(1)
-                return check_ling()
-            end
-        )
+        wait.make(function()
+            wait.time(1)
+            return check_ling()
+        end)
     else
         go(road.act)
     end
 end
-function hanlinask()
-    check_busy(hanlinask1)
-end
-function hanlinask1()
-    exe("jiali max;kill ling tuisi")
-end
-function hanlinover()
-    check_busy(hanlinover1)
-end
+function hanlinask() check_busy(hanlinask1) end
+function hanlinask1() exe("jiali max;kill ling tuisi") end
+function hanlinover() check_busy(hanlinover1) end
 function hanlinover1()
     exe("kai men;n")
     DeleteTriggerGroup("hanlinask")
     walk_wait()
 end
-function check_ling()
-    exe("ask ling tuisi about 无法风")
-end
+function check_ling() exe("ask ling tuisi about 无法风") end
 -----------雪山 招财大车店---------------
 function xsdachedian()
     DeleteTriggerGroup("xsdcd")
-    create_trigger_t("xsdcd1", "^(> )*客官已经付了银子，怎么不住店就走了呢！旁人还以为小店伺候不周呢！", "", "xsdachedian1")
+    create_trigger_t("xsdcd1",
+                     "^(> )*客官已经付了银子，怎么不住店就走了呢！旁人还以为小店伺候不周呢！",
+                     "", "xsdachedian1")
     create_trigger_t("xsdcd2", "^(> )*你一觉醒来，", "", "xsdachedian2")
     SetTriggerOption("xsdcd1", "group", "xsdcd")
     SetTriggerOption("xsdcd2", "group", "xsdcd")
@@ -4217,8 +3939,11 @@ end
 ------------------------------------------------------------
 function toThd()
     DeleteTriggerGroup("toThd")
-    create_trigger_t("toThd1", "^(> )*你远远望去，岛上郁郁葱葱，一团绿、一团红、一团黄、一团紫，端的是繁花似锦。", "", "toThdOver")
-    create_trigger_t("toThd2", "^(> )*你要对谁做这个动作？", "", "toThdOver")
+    create_trigger_t("toThd1",
+                     "^(> )*你远远望去，岛上郁郁葱葱，一团绿、一团红、一团黄、一团紫，端的是繁花似锦。",
+                     "", "toThdOver")
+    create_trigger_t("toThd2", "^(> )*你要对谁做这个动作？", "",
+                     "toThdOver")
     SetTriggerOption("toThd1", "group", "toThd")
     SetTriggerOption("toThd2", "group", "toThd")
     EnableTriggerGroup("toThd", true)
@@ -4226,12 +3951,10 @@ function toThd()
 end
 function toThdOver()
     locate()
-    wait.make(
-        function()
-            wait.time(1)
-            return toThdCheck()
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        return toThdCheck()
+    end)
 end
 function toThdCheck()
     EnableTriggerGroup("toThd", false)
@@ -4244,7 +3967,8 @@ end
 -- 岸边
 function songlinIn()
     DeleteTriggerGroup("songlin")
-    create_trigger_t("songlin1", "^(> )*大松林\\s*\\-", "", "songlinInSonglin")
+    create_trigger_t("songlin1", "^(> )*大松林\\s*\\-", "",
+                     "songlinInSonglin")
     create_trigger_t("songlin2", "^(> )*大瀑布\\s*\\-", "", "songlinInPubu")
     create_trigger_t("songlin3", "^(> )*后院\\s*\\-", "", "songlinInSonglin")
     SetTriggerOption("songlin1", "group", "songlin")
@@ -4257,20 +3981,14 @@ function songlinIn()
     check_halt(songlinInCheck)
 end
 function songlinInCheck()
-    if locl.room == "大瀑布" then
-        return songlinInOver()
-    end
-    if locl.room == "后院" then
-        exe("n")
-    end
+    if locl.room == "大瀑布" then return songlinInOver() end
+    if locl.room == "后院" then exe("n") end
     tmp.songlin = 0
     EnableTriggerGroup("songlin", true)
     exe("l east;l south;l west;l north")
 end
 function songlinInSonglin()
-    if not tmp.songlin then
-        tmp.songlin = 0
-    end
+    if not tmp.songlin then tmp.songlin = 0 end
     tmp.songlin = tmp.songlin + 1
     if tmp.songlin > 3 then
         EnableTriggerGroup("songlin", false)
@@ -4297,7 +4015,8 @@ function songlinInOver()
 end
 function songlinOut()
     DeleteTriggerGroup("songlin")
-    create_trigger_t("songlin1", "^(> )*大松林\\s*\\-", "", "songlinOutSonglin")
+    create_trigger_t("songlin1", "^(> )*大松林\\s*\\-", "",
+                     "songlinOutSonglin")
     create_trigger_t("songlin2", "^(> )*大瀑布\\s*\\-", "", "songlinOutPubu")
     create_trigger_t("songlin3", "^(> )*后院\\s*\\-", "", "songlinOutHouyuan")
     SetTriggerOption("songlin1", "group", "songlin")
@@ -4313,18 +4032,14 @@ function songlinOutCheck()
         exe("w;s")
         return songlinOutOver()
     end
-    if locl.room == "后院" then
-        return songlinOutOver()
-    end
+    if locl.room == "后院" then return songlinOutOver() end
 
     tmp.songlin = 0
     EnableTriggerGroup("songlin", true)
     exe("l east;l south;l west;l north")
 end
 function songlinOutSonglin()
-    if not tmp.songlin then
-        tmp.songlin = 0
-    end
+    if not tmp.songlin then tmp.songlin = 0 end
     tmp.songlin = tmp.songlin + 1
     if tmp.songlin > 2 then
         EnableTriggerGroup("songlin", false)
@@ -4371,9 +4086,7 @@ function xsMianbiChk()
         return check_halt(xsMianbi, 1)
     end
 end
-function xsMianbiOver()
-    return walk_wait()
-end
+function xsMianbiOver() return walk_wait() end
 
 function mlIn()
     tmp.way = "south"
@@ -4400,9 +4113,7 @@ function wayMl()
         ["south"] = "east",
         ["west"] = "south"
     }
-    if not tmp.way or not ways[tmp.way] then
-        tmp.way = "south"
-    end
+    if not tmp.way or not ways[tmp.way] then tmp.way = "south" end
     if locl.room == "青石板大路" then
         if tmp.ml and tmp.ml == "in" then
             return wayMlOver()
@@ -4423,9 +4134,8 @@ function wayMl()
             return checkWait(wayMl, 0.1)
         end
     end
-    if locl.room ~= "小路" and locl.room ~= "青石板大路" and locl.room ~= "梅林" then
-        return wayMlOver()
-    end
+    if locl.room ~= "小路" and locl.room ~= "青石板大路" and locl.room ~=
+        "梅林" then return wayMlOver() end
     tmp.way = ways[tmp.way]
     while not locl.exit[tmp.way] do
         Note(tmp.way)
@@ -4435,31 +4145,27 @@ function wayMl()
     locate()
     return checkWait(wayMl, 0.2)
 end
-function wayMlOver()
-    return walk_wait()
-end
+function wayMlOver() return walk_wait() end
 
 function mzDoor()
-    create_trigger_f("xxdf", "^(> )*过了半晌，大门缓缓打开，并肩走出两个家人装束的老者", "", "mzDoorHuida")
-    wait.make(
-        function()
-            exe("qiao gate 4 times")
-            wait.time(3)
-            exe("qiao gate 2 times")
-            wait.time(3)
-            exe("qiao gate 5 times")
-            wait.time(3)
-            exe("qiao gate 3 times")
-        end
-    )
+    create_trigger_f("xxdf",
+                     "^(> )*过了半晌，大门缓缓打开，并肩走出两个家人装束的老者",
+                     "", "mzDoorHuida")
+    wait.make(function()
+        exe("qiao gate 4 times")
+        wait.time(3)
+        exe("qiao gate 2 times")
+        wait.time(3)
+        exe("qiao gate 5 times")
+        wait.time(3)
+        exe("qiao gate 3 times")
+    end)
 end
 function mzDoorHuida()
     exe("huida 求见江南四友;show wuyue lingqi;s")
     return check_halt(mzDoorOver)
 end
-function mzDoorOver()
-    return walk_wait()
-end
+function mzDoorOver() return walk_wait() end
 
 ---------
 -- ain 添加新路径
@@ -4467,17 +4173,18 @@ end
 ht2ss = function()
     DeleteTriggerGroup("gmout1")
     --  create_trigger_t('gmout1','^>*\\s*你拿着兵刃怎么推动小舟？','','jqgout_weapon')
-    create_trigger_t("jqgout2", "^>*\\s*室顶石壁又慢慢自行推上了", "", "gmss_outss")
+    create_trigger_t("jqgout2", "^>*\\s*室顶石壁又慢慢自行推上了",
+                     "", "gmss_outss")
     SetTriggerOption("gmout1", "group", "gmout")
     SetTriggerOption("jqgout2", "group", "gmout")
     ht2ssgo()
 end
-ht2ssgo = function()
-    exe("tang bed;ban shiban;out")
-end
+ht2ssgo = function() exe("tang bed;ban shiban;out") end
 gmss_outss = function()
     DeleteTriggerGroup("gmout")
-    create_trigger_t("gmout1", '^>*\\s*你把 "action" 设定为 "离开竹林了吗" 成功完成。', "", "gmss_outssok")
+    create_trigger_t("gmout1",
+                     '^>*\\s*你把 "action" 设定为 "离开竹林了吗" 成功完成。',
+                     "", "gmss_outssok")
     SetTriggerOption("gmout1", "group", "gmout")
     exe("e;e;e;e;e;s;s;s;s;s;w;w;w;w;w;n;n;n;n;n")
     -- locate()
@@ -4486,7 +4193,9 @@ end
 
 gmss_outssok = function()
     DeleteTriggerGroup("gmout")
-    create_trigger_t("gmout1", '^>*\\s*你把 "action" 设定为 "离开竹林了吗" 成功完成。', "", "gmss_outssok")
+    create_trigger_t("gmout1",
+                     '^>*\\s*你把 "action" 设定为 "离开竹林了吗" 成功完成。',
+                     "", "gmss_outssok")
     SetTriggerOption("gmout1", "group", "gmout")
     exe("e;e;e;e;e;s;s;s;s;s;w;w;w;w;w;n;n;n;n;n")
     -- locate()
@@ -4498,8 +4207,11 @@ end
 
 function yuRen()
     DeleteTriggerGroup("yrAsk")
-    create_trigger_t("yrAsk1", "^(> )*你向渔人打听有关『一灯大师』的消息", "", "yuRenAsk")
-    create_trigger_t("yrAsk2", "^(> )*这里没有这个人。$", "", "yuRenOver")
+    create_trigger_t("yrAsk1",
+                     "^(> )*你向渔人打听有关『一灯大师』的消息",
+                     "", "yuRenAsk")
+    create_trigger_t("yrAsk2", "^(> )*这里没有这个人。$", "",
+                     "yuRenOver")
     SetTriggerOption("yrAsk1", "group", "yrAsk")
     SetTriggerOption("yrAsk2", "group", "yrAsk")
     checkWield()
@@ -4508,9 +4220,15 @@ end
 function yuRenAsk()
     EnableTriggerGroup("yrAsk", false)
     DeleteTriggerGroup("yren")
-    create_trigger_t("yren1", "^(> )*渔人(对你|)说道：(「|)我不是已经告诉你上山的方法了么？", "", "yuRenBag")
-    create_trigger_t("yren2", "^(> )*渔人(对你|)说道：(「|)我让你去找的金娃娃呢？", "", "yuRenWaa")
-    create_trigger_t("yren3", "^(> )*渔人(对你|)说道：(「|)要见我师傅到也不难，可是我刚丢失了两条金娃娃", "", "yuRenWaa")
+    create_trigger_t("yren1",
+                     "^(> )*渔人(对你|)说道：(「|)我不是已经告诉你上山的方法了么？",
+                     "", "yuRenBag")
+    create_trigger_t("yren2",
+                     "^(> )*渔人(对你|)说道：(「|)我让你去找的金娃娃呢？",
+                     "", "yuRenWaa")
+    create_trigger_t("yren3",
+                     "^(> )*渔人(对你|)说道：(「|)要见我师傅到也不难，可是我刚丢失了两条金娃娃",
+                     "", "yuRenWaa")
     SetTriggerOption("yren1", "group", "yren")
     SetTriggerOption("yren2", "group", "yren")
     SetTriggerOption("yren3", "group", "yren")
@@ -4527,10 +4245,16 @@ function yuRenJump()
     EnableTriggerGroup("yren", false)
     EnableTriggerGroup("yrz", false)
     DeleteTriggerGroup("yrj")
-    create_trigger_t("yrj1", "^(> )*瀑布中已经有人了，你再下去太危险了。", "", "yuRenWait")
-    create_trigger_t("yrj2", "^(> )*你当下一语不发，也不除衣裤鞋袜，涌身就往瀑布中跳落。", "", "yuRenZhua")
+    create_trigger_t("yrj1",
+                     "^(> )*瀑布中已经有人了，你再下去太危险了。",
+                     "", "yuRenWait")
+    create_trigger_t("yrj2",
+                     "^(> )*你当下一语不发，也不除衣裤鞋袜，涌身就往瀑布中跳落。",
+                     "", "yuRenZhua")
     create_trigger_t("yrj3", "^(> )*你正忙着呢。", "", "yuRenWaa")
-    create_trigger_t("yrj4", "^(> )*那瀑布奔腾而去，水沫四溅，只见\\D*稳稳站定水底，一任瀑布狂冲猛击，身子竟未摇晃。", "", "yuRenWait")
+    create_trigger_t("yrj4",
+                     "^(> )*那瀑布奔腾而去，水沫四溅，只见\\D*稳稳站定水底，一任瀑布狂冲猛击，身子竟未摇晃。",
+                     "", "yuRenWait")
     SetTriggerOption("yrj1", "group", "yrj")
     SetTriggerOption("yrj2", "group", "yrj")
     SetTriggerOption("yrj3", "group", "yrj")
@@ -4541,22 +4265,28 @@ function yuRenJump()
 end
 function yuRenWait()
     EnableTriggerGroup("yrj", false)
-    if cntr1() < 1 then
-        return yuRenOver()
-    end
+    if cntr1() < 1 then return yuRenOver() end
     return checkWait(yuRenJump, 3)
 end
 function yuRenZhua()
     EnableTriggerGroup("yrj", false)
     DeleteTriggerGroup("yrj")
     DeleteTriggerGroup("yrz")
-    create_trigger_t("yrz1", "^(> )*你不是已经抓到金娃娃了么？", "", "yuRenCheck")
-    create_trigger_t("yrz2", "^(> )*你用\\D*来抓金娃娃么？", "", "yuRenUw")
+    create_trigger_t("yrz1", "^(> )*你不是已经抓到金娃娃了么？",
+                     "", "yuRenCheck")
+    create_trigger_t("yrz2", "^(> )*你用\\D*来抓金娃娃么？", "",
+                     "yuRenUw")
     -- create_trigger_t('yrz3',"^(> )*你正忙着呢。",'','yuRenZhuaYu')
     -- create_trigger_t('yrz4','^(> )*你慢慢弯腰去捉那对金娃娃，一手一条','','yuRenZhuaYu')
-    create_trigger_t("yrz5", "^(> )*你伸手到怪鱼遁入的那大石底下用力一抬", "", "yuRenCheck")
-    create_trigger_t("yrz6", "^(> )*你实在支撑不下去了，纵身跳回了瀑布岸边。", "", "yuRenWaa")
-    create_trigger_t("yrz7", "^(> )*你手中握着怪鱼，只怕一松手又被滑脱逃去，当下在水底凝神提气，右足一点", "", "yuRenBag")
+    create_trigger_t("yrz5",
+                     "^(> )*你伸手到怪鱼遁入的那大石底下用力一抬",
+                     "", "yuRenCheck")
+    create_trigger_t("yrz6",
+                     "^(> )*你实在支撑不下去了，纵身跳回了瀑布岸边。",
+                     "", "yuRenWaa")
+    create_trigger_t("yrz7",
+                     "^(> )*你手中握着怪鱼，只怕一松手又被滑脱逃去，当下在水底凝神提气，右足一点",
+                     "", "yuRenBag")
 
     SetTriggerOption("yrz1", "group", "yrz")
     SetTriggerOption("yrz2", "group", "yrz")
@@ -4576,30 +4306,28 @@ function yuRenZhuaYu()
     EnableTriggerGroup("yrz", true)
     create_timer_s("ydzy", 3, "yrzhuayu")
 end
-function yrzhuayu()
-    exe("zhua yu")
-end
+function yrzhuayu() exe("zhua yu") end
 function yuRenCheck()
     DeleteTimer("ydzy")
     checkBags()
     create_timer_s("ydzy", 1, "jumpab")
 end
-function jumpab()
-    exe("jump anbian")
-end
+function jumpab() exe("jump anbian") end
 function yuRenBag()
     DeleteTimer("ydzy")
-    if not Bag["金娃娃"] then
-        return check_bei(yuRenAsk)
-    end
+    if not Bag["金娃娃"] then return check_bei(yuRenAsk) end
     EnableTriggerGroup("yrz", false)
     exe("give jin wawa to yu ren")
     return checkWait(yuRenGive, 4)
 end
 function yuRenGive()
     DeleteTriggerGroup("yrp")
-    create_trigger_t("yrp1", "^(> )*瀑布的水流过于湍急，现在已经有艘铁舟在河中了，你还是先等会吧。", "", "yuRenPao")
-    create_trigger_t("yrp2", "^(> )*你转过山角，喝一声：“起！”用力掷入瀑布的上游", "", "yuRenHua")
+    create_trigger_t("yrp1",
+                     "^(> )*瀑布的水流过于湍急，现在已经有艘铁舟在河中了，你还是先等会吧。",
+                     "", "yuRenPao")
+    create_trigger_t("yrp2",
+                     "^(> )*你转过山角，喝一声：“起！”用力掷入瀑布的上游",
+                     "", "yuRenHua")
     create_trigger_t("yrp3", "^(> )*你正忙着呢。", "", "yuRenPao")
     SetTriggerOption("yrp1", "group", "yrp")
     SetTriggerOption("yrp2", "group", "yrp")
@@ -4607,20 +4335,21 @@ function yuRenGive()
     return yuRenPao()
 end
 function yuRenPao()
-    wait.make(
-        function()
-            wait.time(1)
-            exe("zhi boat")
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        exe("zhi boat")
+    end)
 end
 function yuRenHua()
     EnableTriggerGroup("yrp", false)
     DeleteTriggerGroup("yrh")
     -- create_trigger_t('yrh1',"^(> )*(你真行，|你正在划呢！|你左手铁桨急忙挥出)",'','yuRenBoat')
-    create_trigger_t("yrh2", "^(> )*你已经划到岸了，想办法上岸吧！", "", "yuRenTiao")
+    create_trigger_t("yrh2",
+                     "^(> )*你已经划到岸了，想办法上岸吧！", "",
+                     "yuRenTiao")
     -- create_trigger_t('yrh3',"^(> )*你正忙着呢。",'','yuRenBoat')
-    create_trigger_t("yrh4", "^(> )*突然间一股大力冲到", "", "yuRenOver")
+    create_trigger_t("yrh4", "^(> )*突然间一股大力冲到", "",
+                     "yuRenOver")
     -- SetTriggerOption("yrh1","group","yrh")
     SetTriggerOption("yrh2", "group", "yrh")
     -- SetTriggerOption("yrh3","group","yrh")
@@ -4660,30 +4389,23 @@ function jiaoZi()
     return checkNext(jiaoZiLoc)
 end
 function jiaoZiLoc()
-    if locl.room ~= "岸边" then
-        return jiaoZiOver()
-    end
-    if not locl.id["樵子"] then
-        return jiaoZiWait()
-    end
-    wait.make(
-        function()
-            wait.time(2)
-            return jiaoZiAnswer()
-        end
-    )
+    if locl.room ~= "岸边" then return jiaoZiOver() end
+    if not locl.id["樵子"] then return jiaoZiWait() end
+    wait.make(function()
+        wait.time(2)
+        return jiaoZiAnswer()
+    end)
 end
 function jiaoZiWait()
-    wait.make(
-        function()
-            wait.time(2)
-            return jiaoZi()
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        return jiaoZi()
+    end)
 end
 function jiaoZiAnswer()
     EnableTriggerGroup("jiao", false)
-    exe("answer 青山相待，白云相爱。梦不到紫罗袍共黄金带。一茅斋，野花开，管甚谁家兴废谁成败？陋巷单瓢亦乐哉。贫，气不改！达，志不改！")
+    exe(
+        "answer 青山相待，白云相爱。梦不到紫罗袍共黄金带。一茅斋，野花开，管甚谁家兴废谁成败？陋巷单瓢亦乐哉。贫，气不改！达，志不改！")
     exe("pa teng")
     return jiaoZiOver()
 end
@@ -4697,19 +4419,27 @@ function duZi()
     return checkNext(duZiLoc)
 end
 function duZiLoc()
-    if locl.room ~= "石梁尽头" then
-        return duZiOver()
-    end
-    if not locl.id["书生"] then
-        return duZiWait()
-    end
+    if locl.room ~= "石梁尽头" then return duZiOver() end
+    if not locl.id["书生"] then return duZiWait() end
     DeleteTriggerGroup("du")
-    create_trigger_t("du1", "^(> )*书生(对你|)说道：(「|)我出三道题目考考你，", "", "duZiQuestion")
-    create_trigger_t("du2", "^(> )*书生(对你|)说道：(「|)这里有一首诗，说的是在下出身来历，打四个字儿", "", "duZiAnswer")
-    create_trigger_t("du3", "^(> )*书生(对你|)说道：(「|)好好，果然不错，下一题，我有一个上联", "", "duZiAnswerTwo")
-    create_trigger_t("du4", "^(> )*书生(对你|)说道：(「|)我还有一联，请", "", "duZiAnswerThree")
-    create_trigger_t("du5", "^(> )*书生(对你|)说道：(「|)你可回答的出我的问题？", "", "duZiAnswerAll")
-    create_trigger_t("du6", "^(> )*书生(对你|)说道：(「|)这位\\D*，我师傅就在前面不远处的石屋里。", "", "duZiOver")
+    create_trigger_t("du1",
+                     "^(> )*书生(对你|)说道：(「|)我出三道题目考考你，",
+                     "", "duZiQuestion")
+    create_trigger_t("du2",
+                     "^(> )*书生(对你|)说道：(「|)这里有一首诗，说的是在下出身来历，打四个字儿",
+                     "", "duZiAnswer")
+    create_trigger_t("du3",
+                     "^(> )*书生(对你|)说道：(「|)好好，果然不错，下一题，我有一个上联",
+                     "", "duZiAnswerTwo")
+    create_trigger_t("du4",
+                     "^(> )*书生(对你|)说道：(「|)我还有一联，请",
+                     "", "duZiAnswerThree")
+    create_trigger_t("du5",
+                     "^(> )*书生(对你|)说道：(「|)你可回答的出我的问题？",
+                     "", "duZiAnswerAll")
+    create_trigger_t("du6",
+                     "^(> )*书生(对你|)说道：(「|)这位\\D*，我师傅就在前面不远处的石屋里。",
+                     "", "duZiOver")
     SetTriggerOption("du1", "group", "du")
     SetTriggerOption("du2", "group", "du")
     SetTriggerOption("du3", "group", "du")
@@ -4718,51 +4448,39 @@ function duZiLoc()
     SetTriggerOption("du6", "group", "du")
     return check_halt(duZiAsk)
 end
-function duZiAsk()
-    exe("ask shu sheng about 一灯大师")
-end
+function duZiAsk() exe("ask shu sheng about 一灯大师") end
 function duZiQuestion()
-    wait.make(
-        function()
-            wait.time(4)
-            exe("ask shu sheng about 题目")
-        end
-    )
+    wait.make(function()
+        wait.time(4)
+        exe("ask shu sheng about 题目")
+    end)
 end
 function duZiWait()
-    wait.make(
-        function()
-            wait.time(2)
-            return duZi()
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        return duZi()
+    end)
 end
 function duZiAnswerAll()
-    wait.make(
-        function()
-            wait.time(3)
+    wait.make(function()
+        wait.time(3)
 
-            exe("answer 辛未状元")
+        exe("answer 辛未状元")
 
-            exe("answer 霜凋荷叶，独脚鬼戴逍遥巾")
+        exe("answer 霜凋荷叶，独脚鬼戴逍遥巾")
 
-            exe("answer 魑魅魍魉，四小鬼各自肚肠")
+        exe("answer 魑魅魍魉，四小鬼各自肚肠")
 
-            exe("north")
-        end
-    )
+        exe("north")
+    end)
 end
 function duZiAnswer()
-    wait.make(
-        function()
-            wait.time(4)
-            exe("answer 辛未状元")
-        end
-    )
+    wait.make(function()
+        wait.time(4)
+        exe("answer 辛未状元")
+    end)
 end
-function duZiAnswerTwo()
-    exe("answer 霜凋荷叶，独脚鬼戴逍遥巾")
-end
+function duZiAnswerTwo() exe("answer 霜凋荷叶，独脚鬼戴逍遥巾") end
 function duZiAnswerThree()
     exe("answer 魑魅魍魉，四小鬼各自肚肠")
     exe("north")
@@ -4778,17 +4496,19 @@ function nongFu()
     return checkNext(nongFuLoc)
 end
 function nongFuLoc()
-    if locl.room ~= "山坡" then
-        return nongFuOver()
-    end
-    if not locl.id["农夫"] then
-        return nongFuWait()
-    end
+    if locl.room ~= "山坡" then return nongFuOver() end
+    if not locl.id["农夫"] then return nongFuWait() end
     DeleteTriggerGroup("nong")
-    create_trigger_t("nong1", "^(> )*(已经有人托着了。|农夫不在，这么大的石块你一个人无法入手)", "", "nongFuTuo")
-    create_trigger_t("nong2", "^(> )*你已经帮农夫托起石块了，还不快离开？", "", "nongFuLeave")
+    create_trigger_t("nong1",
+                     "^(> )*(已经有人托着了。|农夫不在，这么大的石块你一个人无法入手)",
+                     "", "nongFuTuo")
+    create_trigger_t("nong2",
+                     "^(> )*你已经帮农夫托起石块了，还不快离开？",
+                     "", "nongFuLeave")
     create_trigger_t("nong3", "^(> )*你正忙着呢。", "", "nongFuTuo")
-    create_trigger_t("nong4", "^(> )*农夫双手托住大石，臂上运劲，挺起大石，对你说道", "", "nongFuLeave")
+    create_trigger_t("nong4",
+                     "^(> )*农夫双手托住大石，臂上运劲，挺起大石，对你说道",
+                     "", "nongFuLeave")
     SetTriggerOption("nong1", "group", "nong")
     SetTriggerOption("nong2", "group", "nong")
     SetTriggerOption("nong3", "group", "nong")
@@ -4797,30 +4517,24 @@ function nongFuLoc()
 end
 function nongFuTuo()
     EnableTriggerGroup("nong", true)
-    wait.make(
-        function()
-            wait.time(2)
-            exe("tuo shi")
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        exe("tuo shi")
+    end)
 end
 function nongFuWait()
-    wait.make(
-        function()
-            wait.time(2)
-            return nongFu()
-        end
-    )
+    wait.make(function()
+        wait.time(2)
+        return nongFu()
+    end)
 end
 function nongFuLeave()
     EnableTriggerGroup("nong", false)
-    wait.make(
-        function()
-            wait.time(3)
-            exe("east")
-            return nongFuOver()
-        end
-    )
+    wait.make(function()
+        wait.time(3)
+        exe("east")
+        return nongFuOver()
+    end)
 end
 function nongFuOver()
     DeleteTriggerGroup("nong")
@@ -4828,38 +4542,28 @@ function nongFuOver()
 end
 
 function liangFront()
-    if hp.neili < 6000 then
-        return prepare_neili(liangFrontJump)
-    end
+    if hp.neili < 6000 then return prepare_neili(liangFrontJump) end
     return liangFrontJump()
 end
 function liangFrontJump()
     exe("jump front;hp")
     return check_halt(liangFrontOver, 1)
 end
-function liangFrontOver()
-    return walk_wait()
-end
+function liangFrontOver() return walk_wait() end
 
 function liangBack()
-    if hp.neili < 2000 then
-        return prepare_neili(liangBackJump)
-    end
+    if hp.neili < 2000 then return prepare_neili(liangBackJump) end
     return liangBackJump()
 end
 function liangBackJump()
     exe("jump back;hp")
     return check_halt(liangBackOver, 1)
 end
-function liangBackOver()
-    return walk_wait()
-end
+function liangBackOver() return walk_wait() end
 
 room = {}
 roomMaze = {
-    ["大草原草海"] = function()
-        return locl.dir
-    end,
+    ["大草原草海"] = function() return locl.dir end,
     ["峨嵋山八十四盘"] = "ne;nd",
     ["峨嵋山九老洞"] = function()
         if locl.exit["enter"] then
@@ -4873,25 +4577,23 @@ roomMaze = {
     ["峨嵋山钻天坡"] = "ed;ed",
     ["昆仑山葱岭谷"] = "out;w;e;w;e;w;e;w;e",
     ["昆仑山云杉林"] = function()
-        wait.make(
-            function()
-                wait.time(1)
-                local r = math.random(6)
-                if r == 1 then
-                    exe("e;n;w;nw;ne")
-                elseif r == 2 then
-                    exe("n;w;nw;ne")
-                elseif r == 3 then
-                    exe("w;nw;ne")
-                elseif r == 4 then
-                    exe("nw;ne")
-                elseif r == 5 then
-                    exe("e;ne")
-                elseif r == 6 then
-                    exe("ne")
-                end
+        wait.make(function()
+            wait.time(1)
+            local r = math.random(6)
+            if r == 1 then
+                exe("e;n;w;nw;ne")
+            elseif r == 2 then
+                exe("n;w;nw;ne")
+            elseif r == 3 then
+                exe("w;nw;ne")
+            elseif r == 4 then
+                exe("nw;ne")
+            elseif r == 5 then
+                exe("e;ne")
+            elseif r == 6 then
+                exe("ne")
             end
-        )
+        end)
     end,
     ["佛山镇林间道"] = "#2e;nw;ne;se;n",
     ["杭州城柳林"] = "#3n",
@@ -4943,50 +4645,46 @@ roomMaze = {
             return locl.dir
         end
     end,
-    ["神龙岛小木筏"] = function()
-        return toSldHua()
-    end,
+    ["神龙岛小木筏"] = function() return toSldHua() end,
     ["神龙岛沙滩"] = "sw;se",
     ["神龙岛树林"] = "sw;se;s",
     ["神龙岛走廊"] = "#2e;n",
     ["神龙岛山坡"] = "d;wd;su;sd;wd",
     ["神龙岛山路"] = "s;sd;d;wd;su",
     ["嵩山少林竹林"] = function()
-        wait.make(
-            function()
-                wait.time(1)
-                local r = math.random(14)
-                if r == 1 then
-                    exe("sd;s")
-                elseif r == 2 then
-                    exe("sw;n;s;w;e;w;e;e;s;w;n;nw;n")
-                elseif r == 3 then
-                    exe("n;s;w;e;w;e;e;s;w;n;nw;n")
-                elseif r == 4 then
-                    exe("s;w;e;w;e;e;s;w;n;nw;n")
-                elseif r == 5 then
-                    exe("w;e;w;e;e;s;w;n;nw;n")
-                elseif r == 6 then
-                    exe("e;w;e;e;s;w;n;nw;n")
-                elseif r == 7 then
-                    exe("w;e;e;s;w;n;nw;n")
-                elseif r == 8 then
-                    exe("e;e;s;w;n;nw;n")
-                elseif r == 9 then
-                    exe("e;s;w;n;nw;n")
-                elseif r == 10 then
-                    exe("s;w;n;nw;n")
-                elseif r == 11 then
-                    exe("w;n;nw;n")
-                elseif r == 12 then
-                    exe("n;nw;n")
-                elseif r == 13 then
-                    exe("nw;n")
-                elseif r == 14 then
-                    exe("n")
-                end
+        wait.make(function()
+            wait.time(1)
+            local r = math.random(14)
+            if r == 1 then
+                exe("sd;s")
+            elseif r == 2 then
+                exe("sw;n;s;w;e;w;e;e;s;w;n;nw;n")
+            elseif r == 3 then
+                exe("n;s;w;e;w;e;e;s;w;n;nw;n")
+            elseif r == 4 then
+                exe("s;w;e;w;e;e;s;w;n;nw;n")
+            elseif r == 5 then
+                exe("w;e;w;e;e;s;w;n;nw;n")
+            elseif r == 6 then
+                exe("e;w;e;e;s;w;n;nw;n")
+            elseif r == 7 then
+                exe("w;e;e;s;w;n;nw;n")
+            elseif r == 8 then
+                exe("e;e;s;w;n;nw;n")
+            elseif r == 9 then
+                exe("e;s;w;n;nw;n")
+            elseif r == 10 then
+                exe("s;w;n;nw;n")
+            elseif r == 11 then
+                exe("w;n;nw;n")
+            elseif r == 12 then
+                exe("n;nw;n")
+            elseif r == 13 then
+                exe("nw;n")
+            elseif r == 14 then
+                exe("n")
             end
-        )
+        end)
     end,
     ["嵩山少林禅房"] = "n;n;s;e",
     ["嵩山少林菜园子"] = "s;w;n;n;n;nw;n;n;w;w;w",
@@ -4996,35 +4694,33 @@ roomMaze = {
     ["嵩山少林石阶"] = "sd;sd;sd;ed;sd;e",
     -- ain
     ["嵩山少林塔林"] = function()
-        wait.make(
-            function()
-                wait.time(1)
-                local r = math.random(11)
-                if r == 1 then
-                    exe("ne;se;n;e;sw;e;ne;se;s;se;open door;e")
-                elseif r == 2 then
-                    exe("se;n;e;sw;e;ne;se;s;se;open door;e")
-                elseif r == 3 then
-                    exe("n;e;sw;e;ne;se;s;se;open door;e")
-                elseif r == 4 then
-                    exe("e;sw;e;ne;se;s;se;open door;e")
-                elseif r == 5 then
-                    exe("sw;e;ne;se;s;se;open door;e")
-                elseif r == 6 then
-                    exe("e;ne;se;s;se;open door;e")
-                elseif r == 7 then
-                    exe("ne;se;s;se;open door;e")
-                elseif r == 8 then
-                    exe("se;s;se;open door;e")
-                elseif r == 9 then
-                    exe("s;se;open door;e")
-                elseif r == 10 then
-                    exe("se;open door;e")
-                elseif r == 11 then
-                    exe("open door;e")
-                end
+        wait.make(function()
+            wait.time(1)
+            local r = math.random(11)
+            if r == 1 then
+                exe("ne;se;n;e;sw;e;ne;se;s;se;open door;e")
+            elseif r == 2 then
+                exe("se;n;e;sw;e;ne;se;s;se;open door;e")
+            elseif r == 3 then
+                exe("n;e;sw;e;ne;se;s;se;open door;e")
+            elseif r == 4 then
+                exe("e;sw;e;ne;se;s;se;open door;e")
+            elseif r == 5 then
+                exe("sw;e;ne;se;s;se;open door;e")
+            elseif r == 6 then
+                exe("e;ne;se;s;se;open door;e")
+            elseif r == 7 then
+                exe("ne;se;s;se;open door;e")
+            elseif r == 8 then
+                exe("se;s;se;open door;e")
+            elseif r == 9 then
+                exe("s;se;open door;e")
+            elseif r == 10 then
+                exe("se;open door;e")
+            elseif r == 11 then
+                exe("open door;e")
             end
-        )
+        end)
     end,
     ["嵩山少林松树林"] = "w;n;nw",
     ["嵩山少林僧舍"] = function()
@@ -5047,9 +4743,7 @@ roomMaze = {
     ["扬州城长江北岸"] = "w;w;e;n",
     ["扬州城长江南岸"] = "w;w;e;s;se;s",
     ["曼佗罗山庄花丛中"] = "south;#3w;#2e;#3s",
-    ["襄阳郊外树林"] = function()
-        return outXtj()
-    end
+    ["襄阳郊外树林"] = function() return outXtj() end
 }
 
 roomNodir = {
@@ -5141,9 +4835,7 @@ MidHsDay = {
 }
 
 function del_element(set, element)
-    for i = 1, table.getn(element) do
-        set = delElement(set, element[i])
-    end
+    for i = 1, table.getn(element) do set = delElement(set, element[i]) end
     return set
 end
 
@@ -5151,10 +4843,9 @@ function del_string(string, sub)
     local l_s, l_e
     for i = 1, string.len(string) do
         l_s, l_e = string.find(string, sub)
-        if l_s == nil then
-            break
-        end
-        string = string.sub(string, 1, l_s - 1) .. string.sub(string, l_e + 1, string.len(string))
+        if l_s == nil then break end
+        string = string.sub(string, 1, l_s - 1) ..
+                     string.sub(string, l_e + 1, string.len(string))
     end
     return string
 end
@@ -5169,40 +4860,24 @@ function addrTrim(addr)
 end
 
 goto_set = {}
-goto_set.lzdk = function()
-    return go_to("兰州城大渡口")
-end
-goto_set.xy = function()
-    return go_to("襄阳城当铺")
-end
-goto_set.sl = function()
-    return go_to("嵩山少林大雄宝殿")
-end
-goto_set.xs = function()
-    return go_to("大雪山入幽口")
-end
-goto_set.hs = function()
-    return go_to("华山正气堂")
-end
-goto_set.yz = function()
-    return go_to("扬州城当铺")
-end
-goto_set.wd = function()
-    return go_to("武当山三清殿")
-end
-goto_set.thd = function()
-    return go_to("桃花岛积翠亭")
-end
-goto_set.dl = function()
-    return go_to("大理城药铺")
-end
+goto_set.lzdk = function() return go_to("兰州城大渡口") end
+goto_set.xy = function() return go_to("襄阳城当铺") end
+goto_set.sl = function() return go_to("嵩山少林大雄宝殿") end
+goto_set.xs = function() return go_to("大雪山入幽口") end
+goto_set.hs = function() return go_to("华山正气堂") end
+goto_set.yz = function() return go_to("扬州城当铺") end
+goto_set.wd = function() return go_to("武当山三清殿") end
+goto_set.thd = function() return go_to("桃花岛积翠亭") end
+goto_set.dl = function() return go_to("大理城药铺") end
 
 wxbGo = function()
     dis_all()
     return go(wxbAsk, "扬州城", "丽春院")
 end
 wxbAsk = function()
-    create_trigger_f("wxbask", "^韦春芳说道：「这位壮士，不瞒您说，我那乖儿子正在(\\D*)卖兵器呢。」", "", "wxbGoto")
+    create_trigger_f("wxbask",
+                     "^韦春芳说道：「这位壮士，不瞒您说，我那乖儿子正在(\\D*)卖兵器呢。」",
+                     "", "wxbGoto")
     Execute("ask wei chunfang about wei xiaobao")
 end
 wxbGoto = function(n, l, w)
@@ -5221,19 +4896,13 @@ function thdJiaohuiAsk()
 end
 
 function searchNpc(city, npc)
-    if city then
-        tmp.rooms = getCityRooms(city)
-    end
-    if npc then
-        tmp.npc = npc
-    end
+    if city then tmp.rooms = getCityRooms(city) end
+    if npc then tmp.npc = npc end
     tmp.rooms = tmp.rooms or {}
     tmp.sour = tmp.sour or "city/dangpu"
     while countTab(tmp.rooms) > 0 do
         local l_sour = "city/dangpu"
-        if tmp.sour ~= "city/dangpu" then
-            l_sour = tmp.sour
-        end
+        if tmp.sour ~= "city/dangpu" then l_sour = tmp.sour end
         local l_dest, l_distance = getNearRoom(l_sour, tmp.rooms)
         if l_dest then
             tmp.rooms = delElement(tmp.rooms, l_dest)
@@ -5261,44 +4930,28 @@ function searchNpcAdd()
             exe("follow " .. q)
             return disAll()
         end
-        if ItemGet[p] or weaponStore[p] or weaponThrowing[p] or drugBuy[p] or drugPoison[p] or itemSave[p] then
+        if ItemGet[p] or weaponStore[p] or weaponThrowing[p] or drugBuy[p] or
+            drugPoison[p] or itemSave[p] then locl.id[p] = nil end
+        if string.find(p, "镖车") or string.find(p, "种子") or
+            string.find(p, "残篇") or string.find(p, "精要") or
+            string.find(p, "武将") or string.find(p, "官兵") or
+            string.find(p, "削断的") or string.find(p, "传记") or
+            string.find(p, "镖师") or string.find(p, "白银") or
+            string.find(p, "火焰") or string.find(p, "设定环境变量") or
+            string.find(p, "男尸") or string.find(p, "女尸") or
+            string.find(p, "尸体") or string.find(p, "断掉的") or
+            string.find(p, "粉碎的") or string.find(p, "首级") or
+            string.find(p, "骷髅") or string.find(p, "骸骨") then
             locl.id[p] = nil
         end
-        if
-            string.find(p, "镖车") or string.find(p, "种子") or string.find(p, "残篇") or string.find(p, "精要") or
-                string.find(p, "武将") or
-                string.find(p, "官兵") or
-                string.find(p, "削断的") or
-                string.find(p, "传记") or
-                string.find(p, "镖师") or
-                string.find(p, "白银") or
-                string.find(p, "火焰") or
-                string.find(p, "设定环境变量") or
-                string.find(p, "男尸") or
-                string.find(p, "女尸") or
-                string.find(p, "尸体") or
-                string.find(p, "断掉的") or
-                string.find(p, "粉碎的") or
-                string.find(p, "首级") or
-                string.find(p, "骷髅") or
-                string.find(p, "骸骨")
-         then
-            locl.id[p] = nil
-        end
-        if p == score.name or MudUser[p] then
-            locl.id[p] = nil
-        end
-        if
-            locl.item[p]["cloth"] or locl.item[p]["shoes"] or locl.item[p]["shoe"] or locl.item[p]["blade"] or
-                locl.item[p]["sword"]
-         then
-            locl.id[p] = nil
-        end
-        if map.rooms[tmp.sour] and map.rooms[tmp.sour].objs and type(map.rooms[tmp.sour].objs) == "table" then
+        if p == score.name or MudUser[p] then locl.id[p] = nil end
+        if locl.item[p]["cloth"] or locl.item[p]["shoes"] or
+            locl.item[p]["shoe"] or locl.item[p]["blade"] or
+            locl.item[p]["sword"] then locl.id[p] = nil end
+        if map.rooms[tmp.sour] and map.rooms[tmp.sour].objs and
+            type(map.rooms[tmp.sour].objs) == "table" then
             for k in pairs(map.rooms[tmp.sour].objs) do
-                if p == k then
-                    locl.id[p] = nil
-                end
+                if p == k then locl.id[p] = nil end
             end
         end
     end
@@ -5318,9 +4971,7 @@ function locateroom(where)
     where = Trim(where)
     if string.find(where, "/") then
         local l_path = map:getPath("xiangyang/dangpu", where)
-        if l_path then
-            return where
-        end
+        if l_path then return where end
     else
         l_dest.room, l_dest.area = getAddr(Trim(where))
     end
@@ -5328,9 +4979,7 @@ function locateroom(where)
         local l_rooms = getRooms(l_dest.room, l_dest.area)
         for k, v in pairs(l_rooms) do
             local l_path = map:getPath("xiangyang/dangpu", v)
-            if l_path then
-                return l_dest.area, l_dest.room
-            end
+            if l_path then return l_dest.area, l_dest.room end
         end
     end
 
@@ -5339,9 +4988,7 @@ function locateroom(where)
             for k in pairs(map.rooms[p].objs) do
                 if k == where then
                     local l_path = map:getPath("xiangyang/dangpu", p)
-                    if l_path then
-                        return p
-                    end
+                    if l_path then return p end
                 end
             end
         end
@@ -5365,9 +5012,7 @@ function findAllRooms(where)
         local l_rooms = getRooms(l_dest.room, l_dest.area)
         for k, v in pairs(l_rooms) do
             local l_path = map:getPath("xiangyang/dangpu", v)
-            if l_path then
-                table.insert(l_dest, v)
-            end
+            if l_path then table.insert(l_dest, v) end
         end
         return l_dest
     end
@@ -5377,9 +5022,7 @@ function findAllRooms(where)
             for k in pairs(map.rooms[p].objs) do
                 if k == where then
                     local l_path = map:getPath("xiangyang/dangpu", p)
-                    if l_path then
-                        table.insert(l_dest, p)
-                    end
+                    if l_path then table.insert(l_dest, p) end
                 end
             end
         end
@@ -5411,15 +5054,14 @@ dirReverse = {
 }
 function mjlujingLog(jname)
     local filename =
-        GetInfo(67) .. "lujing\\" .. score.id .. "查找" .. jname .. "路径" .. os.date("%Y%m%d_%H时%M分%S秒") .. ".log"
+        GetInfo(67) .. "lujing\\" .. score.id .. "查找" .. jname .. "路径" ..
+            os.date("%Y%m%d_%H时%M分%S秒") .. ".log"
 
     local file = io.open(filename, "w")
 
     local t = {}
 
-    for i = 1, GetLinesInBufferCount() do
-        table.insert(t, GetLineInfo(i, 1))
-    end
+    for i = 1, GetLinesInBufferCount() do table.insert(t, GetLineInfo(i, 1)) end
 
     local s = table.concat(t, "\n") .. "\n"
 
@@ -5429,31 +5071,31 @@ function mjlujingLog(jname)
 end
 
 --------蝴蝶谷---------
-bohuacong=function()
+bohuacong = function()
     exe("opendoor;tell mentonga 开门;tell mentongb 开门")
     exe("whisper startd 开门")
-     return bohuacong11()
+    return bohuacong11()
 end
-bohuacong11=function()
-    wait.make(function() 
+bohuacong11 = function()
+    wait.make(function()
         wait.time(0.5)
-        exe('right')
-        locate_finish='bohuacong1'
+        exe("right")
+        locate_finish = "bohuacong1"
         return fastLocate()
     end)
 end
-bohuacong1=function()
-    locate_finish=0
-    wait.make(function() 
+bohuacong1 = function()
+    locate_finish = 0
+    wait.make(function()
         wait.time(2)
-        if locl.room=="山壁" then 
-        return bohuacong()
-        elseif locl.room=="花丛中" then
-        return walk_wait()
+        if locl.room == "山壁" then
+            return bohuacong()
+        elseif locl.room == "花丛中" then
+            return walk_wait()
         else
-        return go_locate()
-    end  
-end)
+            return go_locate()
+        end
+    end)
 end
 
 --------绝情谷水潭--------
@@ -5461,7 +5103,8 @@ function jqgeyuwait()
     if locl.room == "鳄鱼潭" then
         DeleteTimer("idle")
         print("鳄鱼不在，等待鳄鱼中!")
-        messageShow("鳄鱼不在，绝情谷鳄鱼潭等待鳄鱼中！", "fuchsia")
+        messageShow("鳄鱼不在，绝情谷鳄鱼潭等待鳄鱼中！",
+                    "fuchsia")
         exe("look")
     else
         DeleteTimer("jqgeyu")
@@ -5477,58 +5120,53 @@ end
 function outJqg()
     DeleteTimer("jqgeyu")
     DeleteTriggerGroup("outjqg")
-    create_trigger_t("outjqg1", "^>*\\s*你折下一根枣树的枝干，长约一丈五尺。", "", "outjqgshuganok")
-    create_trigger_t("outjqg2", "^>*\\s*你不是已经有树干了么？", "", "outjqgshupi")
-    create_trigger_t("outjqg3", "^>*\\s*这点树皮还不够搓成足够长的索子能攀上去。", "", "outjqgshuganok")
-    create_trigger_t("outjqg4", "^>*\\s*你把树皮搓绞成索，费尽了力气，才把树皮搓成一条极长的索子。", "", "outjqgsuo")
-    create_trigger_t("outjqg5", "^>*\\s*你已经将绳索一端缚在树干中间，不再需要树皮了。", "", "outjqgfuok")
-    create_trigger_t("outjqg6", "^>*\\s*你将绳索一端缚在树干中间。", "", "outjqgfuok")
-    for i = 1, 6 do
-        SetTriggerOption("outjqg" .. i, "group", "outjqg")
-    end
+    create_trigger_t("outjqg1",
+                     "^>*\\s*你折下一根枣树的枝干，长约一丈五尺。",
+                     "", "outjqgshuganok")
+    create_trigger_t("outjqg2", "^>*\\s*你不是已经有树干了么？", "",
+                     "outjqgshupi")
+    create_trigger_t("outjqg3",
+                     "^>*\\s*这点树皮还不够搓成足够长的索子能攀上去。",
+                     "", "outjqgshuganok")
+    create_trigger_t("outjqg4",
+                     "^>*\\s*你把树皮搓绞成索，费尽了力气，才把树皮搓成一条极长的索子。",
+                     "", "outjqgsuo")
+    create_trigger_t("outjqg5",
+                     "^>*\\s*你已经将绳索一端缚在树干中间，不再需要树皮了。",
+                     "", "outjqgfuok")
+    create_trigger_t("outjqg6",
+                     "^>*\\s*你将绳索一端缚在树干中间。", "",
+                     "outjqgfuok")
+    for i = 1, 6 do SetTriggerOption("outjqg" .. i, "group", "outjqg") end
     exe("zhe shugan")
 end
-function outjqgshuganok()
-    check_bei(outjqgshupi)
-end
+function outjqgshuganok() check_bei(outjqgshupi) end
 function outjqgshupi()
     exe("#10(bo shupi)")
     check_bei(outjqgneedsuo)
 end
-function outjqgneedsuo()
-    check_bei(outjqgsuo)
-end
+function outjqgneedsuo() check_bei(outjqgsuo) end
 function outjqgsuo()
     exe("cuo shupi")
     check_bei(outjqgfu)
 end
-function outjqgfu()
-    exe("fu shugan")
-end
+function outjqgfu() exe("fu shugan") end
 function outjqgfuok()
     DeleteTriggerGroup("outjqg")
-    create_trigger_t("outjqg1", "^>*\\s*你屏住呼吸，纵上石壁，一路向上攀援。", "", "outjqgshibi")
-    create_trigger_t("outjqg2", "^>*\\s*这一下劲力使得恰到好处，树干落下时正好横架在洞穴口上。", "", "outjqgOut")
-    for i = 1, 6 do
-        SetTriggerOption("outjqg" .. i, "group", "outjqg")
-    end
+    create_trigger_t("outjqg1",
+                     "^>*\\s*你屏住呼吸，纵上石壁，一路向上攀援。",
+                     "", "outjqgshibi")
+    create_trigger_t("outjqg2",
+                     "^>*\\s*这一下劲力使得恰到好处，树干落下时正好横架在洞穴口上。",
+                     "", "outjqgOut")
+    for i = 1, 6 do SetTriggerOption("outjqg" .. i, "group", "outjqg") end
     check_bei(outjqgpa)
 end
-function outjqgpa()
-    exe("pa shibi")
-end
-function outjqg()
-    check_bei(outjqgpa)
-end
-function outjqgshibi()
-    check_bei(outjqgout)
-end
-function outjqgout()
-    exe("shuai shugan")
-end
-function outjqgOut()
-    check_bei(outjqgok)
-end
+function outjqgpa() exe("pa shibi") end
+function outjqg() check_bei(outjqgpa) end
+function outjqgshibi() check_bei(outjqgout) end
+function outjqgout() exe("shuai shugan") end
+function outjqgOut() check_bei(outjqgok) end
 function outjqgok()
     DeleteTriggerGroup("outjqg")
     exe("pa up")
@@ -5550,9 +5188,7 @@ eaea_start = function()
         return go(road.act)
     end
 end
-eaea_over = function()
-    return walk_wait()
-end
+eaea_over = function() return walk_wait() end
 
 eaeab = function()
     locate_finish = 0
@@ -5568,9 +5204,7 @@ eaea_startb = function()
         return go(road.act)
     end
 end
-eaea_overb = function()
-    return walk_wait()
-end
+eaea_overb = function() return walk_wait() end
 
 eaeac = function()
     locate_finish = 0
@@ -5586,9 +5220,7 @@ eaea_startc = function()
         return go(road.act)
     end
 end
-eaea_overc = function()
-    return walk_wait()
-end
+eaea_overc = function() return walk_wait() end
 
 eaead = function()
     locate_finish = 0
@@ -5604,20 +5236,15 @@ eaea_startd = function()
         return go(road.act)
     end
 end
-eaea_overd = function()
-    return walk_wait()
-end
+eaea_overd = function() return walk_wait() end
 ----------------------------------伊犁城门------------------------------------
 check_yilitriger = function()
     DeleteTriggerGroup("yilidoorr")
     -- create_trigger_t('yilidoorr1','^>*\\s*要看什么','','yilidoor_close')
     -- create_trigger_t('yilidoorr2','^>*\\s*城中心','','yilidoor_open')
-    create_trigger_t(
-        "yilidoorr3",
-        "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
-        "",
-        "yilicheckwd"
-    )
+    create_trigger_t("yilidoorr3",
+                     "^(> )*(过了片刻，你感觉自己已经将玄天无极神功|你将寒冰真气按周天之势搬运了一周|你只觉真力运转顺畅，周身气力充沛|你将纯阳神通功运行完毕|你只觉神元归一，全身精力弥漫|你将内息走了个一个周天|你将内息游走全身，但觉全身舒畅|你将真气逼入体内，将全身聚集的蓝色气息|你将紫气在体内运行了一个周天|你运功完毕，站了起来|你一个周天行将下来，精神抖擞的站了起来|你分开双手，黑气慢慢沉下|你将内息走满一个周天，只感到全身通泰|你真气在体内运行了一个周天，冷热真气收于丹田|你真气在体内运行了一个周天，缓缓收气于丹田|你双眼微闭，缓缓将天地精华之气吸入体内|你慢慢收气，归入丹田，睁开眼睛|你将内息又运了一个小周天，缓缓导入丹田|你感觉毒素越转越快，就快要脱离你的控制了！|你将周身内息贯通经脉，缓缓睁开眼睛，站了起来|你呼翕九阳，抱一含元，缓缓睁开双眼|你吸气入丹田，真气运转渐缓，慢慢收功|你将真气在体内沿脉络运行了一圈，缓缓纳入丹田|你将内息在体内运行十二周天，返回丹田|你将内息走了个小周天，流回丹田，收功站了起来|过了片刻，你已与这大自然融合在一起，精神抖擞的站了起|你感到自己和天地融为一体，全身清爽如浴春风，忍不住舒畅的呻吟了一声，缓缓睁开了眼睛)",
+                     "", "yilicheckwd")
     -- SetTriggerOption("yilidoorr1","group","yilidoorr")
     -- SetTriggerOption("yilidoorr2","group","yilidoorr")
     SetTriggerOption("yilidoorr3", "group", "yilidoorr")
@@ -5628,31 +5255,21 @@ yilicheckwd = function()
     EnableTriggerGroup("yilidoorr", true)
     -- exe('look north')
     fastLocate()
-    if flag.find == 1 then
-        return
-    end
-    wait.make(
-        function()
-            wait.time(2)
-            return yilidoor_checkk()
-        end
-    )
+    if flag.find == 1 then return end
+    wait.make(function()
+        wait.time(2)
+        return yilidoor_checkk()
+    end)
 end
-yilidoor_close = function()
-    exe("yun qi;dazuo " .. hp.dazuo)
-end
-yilidoor_open = function()
-    wdyilidz = 0
-end
+yilidoor_close = function() exe("yun qi;dazuo " .. hp.dazuo) end
+yilidoor_open = function() wdyilidz = 0 end
 yilidoor_checkk = function()
     if locl.room_relation == "南城门｜伊犁河南城门" then
-        wait.make(
-            function()
-                wait.time(1)
-                return yilidoor_close()
-                -- return yilicheckwd()
-            end
-        )
+        wait.make(function()
+            wait.time(1)
+            return yilidoor_close()
+            -- return yilicheckwd()
+        end)
     elseif locl.room_relation == "城中心｜南城门｜伊犁河南城门" then
         EnableTriggerGroup("yilidoorr", false)
         return check_halt(yilidoor_over)
@@ -5662,22 +5279,16 @@ yilidoor_checkk = function()
 end
 yilidoor_over = function()
     exe("n")
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     return walk_wait()
 end
 yilicheckwds = function()
     fastLocate()
-    if flag.find == 1 then
-        return
-    end
-    wait.make(
-        function()
-            wait.time(2)
-            return yilidoor_checkks()
-        end
-    )
+    if flag.find == 1 then return end
+    wait.make(function()
+        wait.time(2)
+        return yilidoor_checkks()
+    end)
 end
 yilidoor_checkks = function()
     if locl.room == "南城门" then
@@ -5688,63 +5299,41 @@ yilidoor_checkks = function()
 end
 yilidoor_overs = function()
     exe("s")
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     return walk_wait()
 end
 -------------九老洞--------------
 jldin = function()
     DeleteTriggerGroup("jldin")
-    create_trigger_t("jldin1", "^>*\\s*你手中没有火折，怎么能进的了山洞？", "", "jldfalse")
+    create_trigger_t("jldin1",
+                     "^>*\\s*你手中没有火折，怎么能进的了山洞？",
+                     "", "jldfalse")
     SetTriggerOption("jldin1", "group", "jldin")
     EnableTriggerGroup("jldin", true)
-    wait.make(
-        function()
-            wait.time(1.5)
-            exe("get fire;use fire")
-            if flag.wait == 1 then
-                return
-            end
-            exe("e")
-            if flag.wait == 1 then
-                return
-            end
-            exe("n")
-            if flag.wait == 1 then
-                return
-            end
-            exe("ne")
-            if flag.wait == 1 then
-                return
-            end
-            exe("nw")
-            if flag.wait == 1 then
-                return
-            end
-            exe("s")
-            if flag.wait == 1 then
-                return
-            end
-            exe("se")
-            if flag.wait == 1 then
-                return
-            end
-            exe("sw")
-            if flag.wait == 1 then
-                return
-            end
-            exe("w")
-            if flag.wait == 1 then
-                return
-            end
-            exe("out")
-            if flag.wait == 1 then
-                return
-            end
-            return jldinover()
-        end
-    )
+    wait.make(function()
+        wait.time(1.5)
+        exe("get fire;use fire")
+        if flag.wait == 1 then return end
+        exe("e")
+        if flag.wait == 1 then return end
+        exe("n")
+        if flag.wait == 1 then return end
+        exe("ne")
+        if flag.wait == 1 then return end
+        exe("nw")
+        if flag.wait == 1 then return end
+        exe("s")
+        if flag.wait == 1 then return end
+        exe("se")
+        if flag.wait == 1 then return end
+        exe("sw")
+        if flag.wait == 1 then return end
+        exe("w")
+        if flag.wait == 1 then return end
+        exe("out")
+        if flag.wait == 1 then return end
+        return jldinover()
+    end)
 end
 jldfalse = function()
     EnableTriggerGroup("jldin", false)
@@ -5760,17 +5349,16 @@ jldout = function()
     return locate()
 end
 jldout1 = function()
-    wait.make(
-        function()
-            wait.time(1)
-            if locl.room_relation == "九老洞九老洞" or locl.where == "不知道哪里九老洞" then
-                print("离开九老洞")
-                return jldout()
-            else
-                return walk_wait()
-            end
+    wait.make(function()
+        wait.time(1)
+        if locl.room_relation == "九老洞九老洞" or locl.where ==
+            "不知道哪里九老洞" then
+            print("离开九老洞")
+            return jldout()
+        else
+            return walk_wait()
         end
-    )
+    end)
 end
 -------客店睡觉函数-------
 --[[function kedian_sleep()
@@ -5781,102 +5369,73 @@ end
 end]]
 --------福州南门函数-------
 function fznm()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     return check_halt(fznmcheck)
 end
 function fznmcheck()
-    wait.make(
-        function()
-            wait.time(3)
-            exe("n;n;w;w;w;w;nw;sw;sw;w;sw;sw;sw;sw;w;s;sd;sd;s;s;s;s;e;e;e;e;e;e")
-            return fznmcheckdo1()
-        end
-    )
+    wait.make(function()
+        wait.time(3)
+        exe("n;n;w;w;w;w;nw;sw;sw;w;sw;sw;sw;sw;w;s;sd;sd;s;s;s;s;e;e;e;e;e;e")
+        return fznmcheckdo1()
+    end)
 end
 function fznmcheckdo1()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("e")
     return checkWait(fznmcheckdo2, 0.1)
 end
 function fznmcheckdo2()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("ne")
     return checkWait(fznmcheckdo3, 0.1)
 end
 function fznmcheckdo3()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("ne")
     return checkWait(fznmcheckdo4, 0.1)
 end
 function fznmcheckdo4()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("ne")
     return checkWait(fznmcheckdo5, 0.1)
 end
 function fznmcheckdo5()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("n")
     return walk_wait()
 end
-function fznmdq()
-    return fznmdqcheck()
-end
+function fznmdq() return fznmdqcheck() end
 function fznmdqcheck()
-    wait.make(
-        function()
-            wait.time(3)
-            if flag.find == 1 then
-                return
-            end
-            exe("s;sw;sw;sw;w;w;w;w;w;w;w;n;n;n;n;nu;nu;n;e;ne;ne;ne;ne;e;ne;ne;se;e")
-            return fznmdqcheckdo1()
-        end
-    )
+    wait.make(function()
+        wait.time(3)
+        if flag.find == 1 then return end
+        exe(
+            "s;sw;sw;sw;w;w;w;w;w;w;w;n;n;n;n;nu;nu;n;e;ne;ne;ne;ne;e;ne;ne;se;e")
+        return fznmdqcheckdo1()
+    end)
 end
 function fznmdqcheckdo1()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("e")
     return checkWait(fznmdqcheckdo2, 0.1)
 end
 function fznmdqcheckdo2()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("e")
     return checkWait(fznmdqcheckdo3, 0.1)
 end
 function fznmdqcheckdo3()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("e")
     return checkWait(fznmdqcheckdo4, 0.1)
 end
 function fznmdqcheckdo4()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("s")
     return checkWait(fznmdqcheckdo5, 0.1)
 end
 function fznmdqcheckdo5()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("s")
     return walk_wait()
 end
@@ -5886,16 +5445,12 @@ lanzhoukedian = function()
     return checkWait(lanzhoukedian1, 0.4)
 end
 lanzhoukedian1 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("enter")
     return checkWait(lanzhoukedian2, 0.4)
 end
 lanzhoukedian2 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("out")
     return walk_wait()
 end
@@ -5909,22 +5464,24 @@ end
 lzkedianoutgosleep = function()
     exe("east")
     fastLocate()
-    wait.make(
-        function()
-            wait.time(1)
-            if flag.find == 1 then
-                return
-            end
-            return lzkedianoutgosleepdo()
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        if flag.find == 1 then return end
+        return lzkedianoutgosleepdo()
+    end)
 end
 lzkedianoutgosleepdo = function()
     locate_finish = 0
     DeleteTriggerGroup("lzkedianout")
-    create_trigger_t("lzkedianout1", "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$", "", "lzkdoutgo")
-    create_trigger_t("lzkedianout2", "^>*\\s*店小二一下挡在楼梯前，白眼一翻：怎麽着，想白住啊！$", "", "lzkzgogo")
-    create_trigger_t("lzkedianout3", "^>*\\s*这里不是你能睡的地方！$", "", "lzkzgogogo")
+    create_trigger_t("lzkedianout1",
+                     "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$",
+                     "", "lzkdoutgo")
+    create_trigger_t("lzkedianout2",
+                     "^>*\\s*店小二一下挡在楼梯前，白眼一翻：怎麽着，想白住啊！$",
+                     "", "lzkzgogo")
+    create_trigger_t("lzkedianout3",
+                     "^>*\\s*这里不是你能睡的地方！$", "",
+                     "lzkzgogogo")
     SetTriggerOption("lzkedianout1", "group", "lzkedianout")
     SetTriggerOption("lzkedianout2", "group", "lzkedianout")
     SetTriggerOption("lzkedianout3", "group", "lzkedianout")
@@ -5951,16 +5508,12 @@ jhkz = function()
     return checkWait(jhkz1, 0.4)
 end
 jhkz1 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("north")
     return checkWait(jhkz2, 0.4)
 end
 jhkz2 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("south")
     return walk_wait()
 end
@@ -5971,9 +5524,13 @@ jhkzout = function()
 end
 jhkzcheck = function()
     DeleteTriggerGroup("jhkz")
-    create_trigger_t("jhkz1", "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$", "", "jhkzoutgo")
-    create_trigger_t("jhkz2", "^>*\\s*怎么着，想白住啊！$", "", "jhkzoutgogogo")
-    create_trigger_t("jhkz3", "^>*\\s*这里不是你能睡的地方！$", "", "jhkzoutgogo")
+    create_trigger_t("jhkz1",
+                     "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$",
+                     "", "jhkzoutgo")
+    create_trigger_t("jhkz2", "^>*\\s*怎么着，想白住啊！$", "",
+                     "jhkzoutgogogo")
+    create_trigger_t("jhkz3", "^>*\\s*这里不是你能睡的地方！$", "",
+                     "jhkzoutgogo")
     SetTriggerOption("jhkz1", "group", "jhkz")
     SetTriggerOption("jhkz2", "group", "jhkz")
     SetTriggerOption("jhkz3", "group", "jhkz")
@@ -6006,41 +5563,39 @@ bckz = function()
     return checkWait(bckz1, 0.4)
 end
 bckz1 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("enter")
     return checkWait(bckz2, 0.4)
 end
 bckz2 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("out")
     return walk_wait()
 end
 bckzout = function()
     exe("west")
     fastLocate()
-    wait.make(
-        function()
-            wait.time(1)
-            return bckzcheck()
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        return bckzcheck()
+    end)
 end
 bckzcheck = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     DeleteTriggerGroup("bckz")
-    create_trigger_t("bckz1", "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$", "", "bckzoutgo")
-    create_trigger_t("bckz2", "^>*\\s*怎么着，想白住我们宝昌客栈啊！$", "", "bckzoutgogogo")
-    create_trigger_t("bckz3", "^>*\\s*这里不是你能睡的地方！$", "", "bckzoutgogo")
+    create_trigger_t("bckz1",
+                     "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$",
+                     "", "bckzoutgo")
+    create_trigger_t("bckz2",
+                     "^>*\\s*怎么着，想白住我们宝昌客栈啊！$",
+                     "", "bckzoutgogogo")
+    create_trigger_t("bckz3", "^>*\\s*这里不是你能睡的地方！$", "",
+                     "bckzoutgogo")
     SetTriggerOption("bckz1", "group", "bckz")
     SetTriggerOption("bckz2", "group", "bckz")
     SetTriggerOption("bckz3", "group", "bckz")
-    if locl.room_relation == "客店二楼〓北大街---宝昌客栈---偏厅宝昌客栈" then
+    if locl.room_relation ==
+        "客店二楼〓北大街---宝昌客栈---偏厅宝昌客栈" then
         exe("up;enter;sleep")
     else
         return bckzoutgogo()
@@ -6069,16 +5624,12 @@ xfkz = function()
     return checkWait(xfkz1, 0.4)
 end
 xfkz1 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("enter")
     return checkWait(xfkz2, 0.4)
 end
 xfkz2 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("out")
     return walk_wait()
 end
@@ -6095,9 +5646,14 @@ xfkzoutgosleep = function()
 end
 xfkzout1 = function()
     DeleteTriggerGroup("xfkz")
-    create_trigger_t("xfkz1", "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$", "", "xfkzoutgo")
-    create_trigger_t("xfkz2", "^>*\\s*店小二一下挡在楼梯前，白眼一翻：怎麽着，想白住啊！$", "", "xfkzsleepgogo")
-    create_trigger_t("xfkz3", "^>*\\s*这里不是你能睡的地方！$", "", "xfkzsleepgo")
+    create_trigger_t("xfkz1",
+                     "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$",
+                     "", "xfkzoutgo")
+    create_trigger_t("xfkz2",
+                     "^>*\\s*店小二一下挡在楼梯前，白眼一翻：怎麽着，想白住啊！$",
+                     "", "xfkzsleepgogo")
+    create_trigger_t("xfkz3", "^>*\\s*这里不是你能睡的地方！$", "",
+                     "xfkzsleepgo")
     SetTriggerOption("xfkz1", "group", "xfkz")
     SetTriggerOption("xfkz2", "group", "xfkz")
     SetTriggerOption("xfkz3", "group", "xfkz")
@@ -6124,16 +5680,12 @@ szkedian = function()
     return checkWait(szkedian1, 0.4)
 end
 szkedian1 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("enter")
     return checkWait(szkedian2, 0.4)
 end
 szkedian2 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("out")
     return walk_wait()
 end
@@ -6147,16 +5699,12 @@ cangzhoukedian = function()
     return checkWait(cangzhoukedian1, 0.4)
 end
 cangzhoukedian1 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("enter")
     return checkWait(cangzhoukedian2, 0.4)
 end
 cangzhoukedian2 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("out")
     return walk_wait()
 end
@@ -6170,35 +5718,33 @@ end
 czkedianoutgosleep = function()
     exe("south")
     fastLocate()
-    wait.make(
-        function()
-            wait.time(1)
-            if flag.find == 1 then
-                return
-            end
-            return czkedianoutgosleepdo()
-        end
-    )
+    wait.make(function()
+        wait.time(1)
+        if flag.find == 1 then return end
+        return czkedianoutgosleepdo()
+    end)
 end
 czkedianoutgosleep1 = function()
     exe("north")
     fastLocate()
-    wait.make(
-        function()
-            wait.time(0.3)
-            if flag.find == 1 then
-                return
-            end
-            return czkedianoutgosleepdo()
-        end
-    )
+    wait.make(function()
+        wait.time(0.3)
+        if flag.find == 1 then return end
+        return czkedianoutgosleepdo()
+    end)
 end
 czkedianoutgosleepdo = function()
     locate_finish = 0
     DeleteTriggerGroup("czkedianout")
-    create_trigger_t("czkedianout1", "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$", "", "czkdoutgo")
-    create_trigger_t("czkedianout2", "^>*\\s*店小二一下挡在楼梯前，白眼一翻：怎麽着，想白住啊！$", "", "czkzgogo")
-    create_trigger_t("czkedianout3", "^>*\\s*这里不是你能睡的地方！$", "", "czkzgogogo")
+    create_trigger_t("czkedianout1",
+                     "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$",
+                     "", "czkdoutgo")
+    create_trigger_t("czkedianout2",
+                     "^>*\\s*店小二一下挡在楼梯前，白眼一翻：怎麽着，想白住啊！$",
+                     "", "czkzgogo")
+    create_trigger_t("czkedianout3",
+                     "^>*\\s*这里不是你能睡的地方！$", "",
+                     "czkzgogogo")
     SetTriggerOption("czkedianout1", "group", "czkedianout")
     SetTriggerOption("czkedianout2", "group", "czkedianout")
     SetTriggerOption("czkedianout3", "group", "czkedianout")
@@ -6225,16 +5771,12 @@ yingxiongkedian = function()
     return checkWait(yingxiongkedian1, 0.4)
 end
 yingxiongkedian1 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("enter")
     return checkWait(yingxiongkedian2, 0.4)
 end
 yingxiongkedian2 = function()
-    if flag.find == 1 then
-        return
-    end
+    if flag.find == 1 then return end
     exe("out")
     return walk_wait()
 end
@@ -6248,26 +5790,29 @@ end
 yxkedianoutgosleep = function()
     exe("east")
     fastLocate()
-    wait.make(
-        function()
-            wait.time(0.3)
-            if flag.find == 1 then
-                return
-            end
-            return yxkedianoutgosleepdo()
-        end
-    )
+    wait.make(function()
+        wait.time(0.3)
+        if flag.find == 1 then return end
+        return yxkedianoutgosleepdo()
+    end)
 end
 yxkedianoutgosleepdo = function()
     locate_finish = 0
     DeleteTriggerGroup("yxkedianout")
-    create_trigger_t("yxkedianout1", "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$", "", "yxkdoutgo")
-    create_trigger_t("yxkedianout2", "^>*\\s*店小二一下挡在楼梯前，白眼一翻：怎麽着，想白住啊！$", "", "yxkzgogo")
-    create_trigger_t("yxkedianout3", "^>*\\s*这里不是你能睡的地方！$", "", "yxkzgogogo")
+    create_trigger_t("yxkedianout1",
+                     "^>*\\s*你一觉醒来，觉得精力充沛，该活动一下了。$",
+                     "", "yxkdoutgo")
+    create_trigger_t("yxkedianout2",
+                     "^>*\\s*店小二一下挡在楼梯前，白眼一翻：怎麽着，想白住啊！$",
+                     "", "yxkzgogo")
+    create_trigger_t("yxkedianout3",
+                     "^>*\\s*这里不是你能睡的地方！$", "",
+                     "yxkzgogogo")
     SetTriggerOption("yxkedianout1", "group", "yxkedianout")
     SetTriggerOption("yxkedianout2", "group", "yxkedianout")
     SetTriggerOption("yxkedianout3", "group", "yxkedianout")
-    if locl.room_relation == "客栈二楼〓英雄客栈---佛山南街英雄客栈" then
+    if locl.room_relation ==
+        "客栈二楼〓英雄客栈---佛山南街英雄客栈" then
         exe("up;enter;sleep")
     else
         return yxkzgogogo()
@@ -6286,28 +5831,20 @@ yxkzgogogo = function()
 end
 -------------------进梅庄------------------------------
 function inmz()
-    wait.make(
-        function()
-            wait.time(3)
-            if flag.find == 1 then
-                return
-            end
-            exe("s")
-            return walk_wait()
-        end
-    )
+    wait.make(function()
+        wait.time(3)
+        if flag.find == 1 then return end
+        exe("s")
+        return walk_wait()
+    end)
 end
 function inmzcheck()
     if locl.room_relation == "小路｜小路｜梅林小路" then
         exe("s")
-        if flag.find == 1 then
-            return
-        end
+        if flag.find == 1 then return end
         return walk_wait()
     else
-        if flag.find == 1 then
-            return
-        end
+        if flag.find == 1 then return end
         return go_locate()
     end
 end
@@ -6315,32 +5852,24 @@ end
 function mlOutt()
     tmp.cnt = 0
     exe("look")
-    wait.make(
-        function()
-            wait.time(2.5)
-            if flag.find == 1 then
-                return
-            end
-            exe("n")
-            return mloutdo()
-        end
-    )
+    wait.make(function()
+        wait.time(2.5)
+        if flag.find == 1 then return end
+        exe("n")
+        return mloutdo()
+    end)
 end
 function mloutdo()
     fastLocate()
-    wait.make(
-        function()
-            wait.time(1)
-            if flag.find == 1 then
-                return
-            end
-            if locl.room ~= "梅林" then
-                return path_consider()
-            else
-                return mlOut()
-            end
+    wait.make(function()
+        wait.time(1)
+        if flag.find == 1 then return end
+        if locl.room ~= "梅林" then
+            return path_consider()
+        else
+            return mlOut()
         end
-    )
+    end)
 end
 function mlOut()
     tmp.way = "north"
@@ -6350,12 +5879,10 @@ function mlOut()
     return checkWait(wayMl, 0.5)
 end
 function wait_seconds()
-    wait.make(
-        function()
-            wait.time(5)
-            return wayMl()
-        end
-    )
+    wait.make(function()
+        wait.time(5)
+        return wayMl()
+    end)
 end
 function wayMl()
     tmp.cnt = tmp.cnt + 1
@@ -6375,9 +5902,7 @@ function wayMl()
         ["south"] = "east",
         ["west"] = "south"
     }
-    if not tmp.way or not ways[tmp.way] then
-        tmp.way = "south"
-    end
+    if not tmp.way or not ways[tmp.way] then tmp.way = "south" end
     if locl.room == "青石板大路" then
         if tmp.ml and tmp.ml == "in" then
             return wayMlOver()
@@ -6400,9 +5925,8 @@ function wayMl()
             return checkWait(wayMl, 0.5)
         end
     end
-    if locl.room ~= "小路" and locl.room ~= "青石板大路" and locl.room ~= "梅林" then
-        return wayMlOver()
-    end
+    if locl.room ~= "小路" and locl.room ~= "青石板大路" and locl.room ~=
+        "梅林" then return wayMlOver() end
     tmp.way = ways[tmp.way]
     repeat
         if not locl.exit[tmp.way] then
@@ -6414,9 +5938,7 @@ function wayMl()
     fastLocate()
     return checkWait(wayMl, 0.5)
 end
-function wayMlOver()
-    return path_consider()
-end
+function wayMlOver() return path_consider() end
 -------------------------------------------------------------------------------------------
 klffsclimb = function()
     exe("open door;out")
@@ -6424,29 +5946,21 @@ klffsclimb = function()
 end -- EOF
 -- 武当后山climb之前的room函数等待<<EOF
 wdxlclimb = function()
-    wait.make(
-        function()
-            wait.time(0.4)
-            if flag.find == 1 or flag.wait == 1 then
-                return
-            end
-            exe("pa up")
-            return walk_wait()
-        end
-    )
+    wait.make(function()
+        wait.time(0.4)
+        if flag.find == 1 or flag.wait == 1 then return end
+        exe("pa up")
+        return walk_wait()
+    end)
 end -- EOF
 -------猩猩滩--------
 function dutan()
-    wait.make(
-        function()
-            wait.time(0.4)
-            if flag.find == 1 or flag.wait == 1 then
-                return
-            end
-            exe("dutan")
-            return walk_wait()
-        end
-    )
+    wait.make(function()
+        wait.time(0.4)
+        if flag.find == 1 or flag.wait == 1 then return end
+        exe("dutan")
+        return walk_wait()
+    end)
 end
 -- 天黑去扬州瘦西湖和珠宝店的函数控制--
 function gosxh()
@@ -6455,7 +5969,8 @@ function gosxh()
     return checkWait(gosxh_consider, 1)
 end
 function gosxh_consider()
-    if locl.room_relation == "瘦西湖酒馆｜西门----西大街----西大街｜珠宝店西大街" then
+    if locl.room_relation ==
+        "瘦西湖酒馆｜西门----西大街----西大街｜珠宝店西大街" then
         return checkWait(gosxh_go, 1)
     else
         return walk_wait()
@@ -6463,15 +5978,11 @@ function gosxh_consider()
 end
 function gosxh_go()
     exe("n")
-    wait.make(
-        function()
-            wait.time(0.4)
-            if flag.find == 1 or flag.wait == 1 then
-                return
-            end
-            return walk_wait()
-        end
-    )
+    wait.make(function()
+        wait.time(0.4)
+        if flag.find == 1 or flag.wait == 1 then return end
+        return walk_wait()
+    end)
 end
 function gozbd()
     locate_finish = 0
@@ -6479,7 +5990,8 @@ function gozbd()
     return checkWait(gozbd_consider, 1)
 end
 function gozbd_consider()
-    if locl.room_relation == "瘦西湖酒馆｜西门----西大街----西大街｜珠宝店西大街" then
+    if locl.room_relation ==
+        "瘦西湖酒馆｜西门----西大街----西大街｜珠宝店西大街" then
         return checkWait(gozbd_go, 1)
     else
         return walk_wait()
@@ -6487,13 +5999,9 @@ function gozbd_consider()
 end
 function gozbd_go()
     exe("s")
-    wait.make(
-        function()
-            wait.time(0.4)
-            if flag.find == 1 or flag.wait == 1 then
-                return
-            end
-            return walk_wait()
-        end
-    )
+    wait.make(function()
+        wait.time(0.4)
+        if flag.find == 1 or flag.wait == 1 then return end
+        return walk_wait()
+    end)
 end

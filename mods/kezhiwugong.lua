@@ -20,18 +20,19 @@ local kezhi_order_thd = { -- 优先级设置，数值约大优先级越高
     ["空"] = 10,
     ["无"] = 1
 }
-local kezhi_valuecmd = { -- mush的变量名称，对应武功使用哪种克制
-    ["正"] = 'pmiao', -- p版mush请改pmiao
-    ["奇"] = 'pxian', -- p版mush请改pxian
-    ["刚"] = 'pkuai', -- p版mush请改pkuai
-    ["柔"] = 'pman', -- p版mush请改pman
-    ["快"] = 'prou', -- p版mush请改prou
-    ["慢"] = 'pgang', -- p版mush请改pgang
-    ["妙"] = 'pqi', -- p版mush请改pqi
-    ["险"] = 'pzhen', -- p版mush请改pzhen
-    ["空"] = 'pkong',
-    ["无"] = 'pwu'
-}
+local kezhi_valuecmd =
+    { -- mush的变量名称，对应武功使用哪种克制
+        ["正"] = 'pmiao', -- p版mush请改pmiao
+        ["奇"] = 'pxian', -- p版mush请改pxian
+        ["刚"] = 'pkuai', -- p版mush请改pkuai
+        ["柔"] = 'pman', -- p版mush请改pman
+        ["快"] = 'prou', -- p版mush请改prou
+        ["慢"] = 'pgang', -- p版mush请改pgang
+        ["妙"] = 'pqi', -- p版mush请改pqi
+        ["险"] = 'pzhen', -- p版mush请改pzhen
+        ["空"] = 'pkong',
+        ["无"] = 'pwu'
+    }
 
 pk_valuecmd = nil
 pk_valuecmd1 = { -- mush的pk变量名称，对应武功使用哪种克制

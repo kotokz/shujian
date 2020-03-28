@@ -385,10 +385,11 @@ function songxin_send(n, l, w)
             while true do
                 exe('halt;songxin ' .. sxjob.id .. ' ' .. sxjob.cnt)
                 local line = wait.regexp(
-                                 '^>*\\s*(\\D*道：这封信不是给我的，|\\D*道：你看清楚|这封信不是送给这个人的。|看清楚点，那是活人吗？！|你擦了一把额头的汗，从怀中掏出信交给|你要送给谁)',
+                                 '^>*\\s*(\\D*道：这封信不是给我的，|\\D*道：你看清楚|这封信不是送给这个人的。|看清楚点，那是活人吗？！|你擦了一把额头的汗，从怀中掏出信交给|你要送给谁|\\D*辛苦你了|什么)',
                                  1)
                 if line then
-                    if line:find('掏出信交给') then
+                    if line:find('掏出信交给') or line:find('辛苦你了') or
+                        line:find('什么') then
                         return songxin_finish()
                     elseif line:find('你要送给谁') then
                         return songxin_goon()

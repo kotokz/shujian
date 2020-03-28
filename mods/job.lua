@@ -606,7 +606,8 @@ function checkPrepareOver()
             if status < 2 then return xuezhuGoCatch() end
         elseif Bag["НѕКа"] and (condition.busy and condition.busy > 10) then
             return jinheTrigger()
-        elseif (condition.busy and condition.busy > 10) or needxuexi == 1 then
+        elseif (condition.busy and condition.busy > 10) or
+            (hp.exp < 50000000 and needxuexi) then
             return check_xuexi()
         else
             return check_job()

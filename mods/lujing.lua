@@ -80,7 +80,19 @@ function exe(cmd, queue)
     if queue then
         run(cmd)
     else
-        executeCmd(cmd)
+        if coroutine.running() and cmd:find(";") then
+            local tmp = utils.split(cmd, ";")
+            for _, c in pairs(tmp) do
+                executeCmd(c)
+                delay = calculate_flood(1)
+                if delay then
+                    print("wait " .. delay .. " second as next step might flood")
+                    wait.time(delay)
+                end
+            end
+        else
+            executeCmd(cmd)
+        end
     end
 end
 
@@ -137,22 +149,23 @@ function calculate_flood(offset)
     if offset == nil then offset = 0 end
 
     if score.vip_level == "白金会员" then
-        offset = offset + 3
+        offset = offset + 10
     elseif score.vip_level == "黄金会员" then
-        offset = offset + 5
+        offset = offset + 15
     end
 
     local sum = offset
     local time = os.time()
-    for k, v in pairs(t_cmds) do if k > time - 2 then sum = sum + v end end
+    for k, v in pairs(t_cmds) do if k > time - 3 then sum = sum + v end end
 
     local current = t_cmds[time] or 0
-
-    if sum > 90 then
-        return 1
-    elseif current + offset > 75 then
-        return 0.5
-    end
+    -- if sum > 100 then
+    --     return 1
+    -- elseif current + offset > 75 then
+    --     return 0.5
+    -- end
+    if current + offset > 75 then return 0.5 end
+    if sum > 119 then return 0.5 end
     return nil
 end
 
@@ -166,10 +179,11 @@ function moving_sum(cmd)
 
     local second = t_cmds[time] + (t_cmds[time - 1] or 0)
     local third = second + (t_cmds[time - 2] or 0)
+    local fourth = third + (t_cmds[time - 3] or 0)
 
     if second > 70 then
-        print("3 sec:" .. third .. " 2 sec:" .. second .. "  last sec:" ..
-                  t_cmds[time])
+        print("4 sec" .. fourth .. " 3 sec:" .. third .. " 2 sec:" .. second ..
+                  "  last sec:" .. t_cmds[time])
     end
     if tablelength(t_cmds) > 4 then t_cmds[get_first_sec()] = nil end
 end
@@ -1008,17 +1022,27 @@ function path_start()
                                     func)
                 end
             else
-                local tmp = utils.split(step, ";")
-                local delay = calculate_flood(#tmp)
-                if #tmp > 2 and delay then
-                    local lastSecondCmds = t_cmds[os.time()] or 0
-                    print("last second:" .. lastSecondCmds .. " next cmds:" ..
-                              #tmp)
-                    print("wait " .. delay .. " second as next step might flood")
-                    wait.time(delay)
-                end
                 exe(step)
                 walk_wait()
+                -- local tmp = utils.split(step, ";")
+                -- local delay = calculate_flood(#tmp)
+                -- if #tmp > 2 and delay then
+                --     print("wait " .. delay .. " second as next step might flood")
+                --     wait.time(delay)
+                --     for _, cmd in pairs(tmp) do
+                --         exe(cmd)
+                --         delay = calculate_flood(1)
+                --         if delay then
+                --             print("wait " .. delay ..
+                --                       " second as next step might flood")
+                --             wait.time(delay)
+                --         end
+                --     end
+                --     walk_wait()
+                -- else
+                --     exe(step)
+                --     walk_wait()
+                -- end
             end
             local status = coroutine.yield()
             if status and status == "kill" then
@@ -1358,13 +1382,13 @@ function searchStart()
                         end
                     end
                     if road.pathset and table.getn(road.pathset) > 0 then
-                        for i, steps in ipairs(road.pathset) do
-                            local delay = calculate_flood()
-                            if delay then
-                                print("wait " .. delay ..
-                                          " second as next step might flood")
-                                wait.time(delay)
-                            end
+                        for _, steps in ipairs(road.pathset) do
+                            -- local delay = calculate_flood()
+                            -- if delay then
+                            --     print("wait " .. delay ..
+                            --               " second as next step might flood")
+                            --     wait.time(delay)
+                            -- end
                             walk_hook_thread = coroutine.running()
                             if flag.find == 1 then
                                 print("找到目标，停止搜索")
@@ -1394,13 +1418,13 @@ function searchStart()
                 else
                     local steps = string.sub(string.gsub(path, "halt;", ""), 1,
                                              -2)
-                    local tmp = utils.split(steps, ";")
-                    local delay = calculate_flood(#tmp)
-                    if delay then
-                        print("wait " .. delay ..
-                                  " second as next step might flood")
-                        wait.time(delay)
-                    end
+                    -- local tmp = utils.split(steps, ";")
+                    -- local delay = calculate_flood(#tmp)
+                    -- if delay then
+                    --     print("wait " .. delay ..
+                    --               " second as next step might flood")
+                    --     wait.time(delay)
+                    -- end
                     -- we might need flood check here. but seems fine so far
                     exe(steps)
                 end

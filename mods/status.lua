@@ -1877,6 +1877,9 @@ function checkBagsOver()
     if Bag["粗绳子"] and Bag["粗绳子"].cnt > 2 then
         exe("drop cu shengzi 2")
     end
+
+    if Bag["布履"] then exe("drop " .. Bag["布履"].fullid) end
+    if Bag["绣花鞋"] then exe("drop " .. Bag["绣花鞋"].fullid) end
     flag.checkingBag = false
     -- print(cty_cur,nxw_cur,hxd_cur)
     if tmp.bags ~= nil then return tmp.bags() end

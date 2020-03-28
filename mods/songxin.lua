@@ -380,16 +380,16 @@ function songxin_send(n, l, w)
         if flag.wait == 0 then
             flag.wait = 1
             sxjob.cnt = 1
+            local songxin_count = 0
             sxjob.id = string.lower(w[1])
             exe('follow ' .. sxjob.id)
-            while true do
+            while songxin_count < 5 do
                 exe('halt;songxin ' .. sxjob.id .. ' ' .. sxjob.cnt)
                 local line = wait.regexp(
-                                 '^>*\\s*(\\D*道：这封信不是给我的，|\\D*道：你看清楚|这封信不是送给这个人的。|看清楚点，那是活人吗？！|你擦了一把额头的汗，从怀中掏出信交给|你要送给谁|\\D*辛苦你了|什么)',
+                                 '^>*\\s*(\\D*道：这封信不是给我的，|\\D*道：你看清楚|这封信不是送给这个人的。|看清楚点，那是活人吗？！|你擦了一把额头的汗，从怀中掏出信交给|你要送给谁|\\D*辛苦你了)',
                                  1)
                 if line then
-                    if line:find('掏出信交给') or line:find('辛苦你了') or
-                        line:find('什么') then
+                    if line:find('掏出信交给') or line:find('辛苦你了') then
                         return songxin_finish()
                     elseif line:find('你要送给谁') then
                         return songxin_goon()
@@ -397,7 +397,11 @@ function songxin_send(n, l, w)
                         sxjob.cnt = sxjob.cnt + 1
                     end
                 end
+                songxin_count = songxin_count + 1
             end
+            Log:error('送信模块出错')
+            jobbugLog()
+            songxin_goon()
         end
     end)
 

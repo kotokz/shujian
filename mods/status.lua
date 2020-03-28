@@ -2759,7 +2759,9 @@ end
 
 function checkYu(p_yu)
     tmp.yu = p_yu
-    return go(checkYuCun, "扬州城", "杂货铺")
+    exe("drop " .. Bag[tmp.yu].fullid)
+    return check_bei(checkYuOver)
+    -- return go(checkYuCun, "扬州城", "杂货铺")
 end
 function checkYuCun()
     exe("cun " .. Bag[tmp.yu].fullid)
